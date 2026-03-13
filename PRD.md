@@ -28,7 +28,7 @@
 
 ### Enhanced Prompt (enriches existing Task 1)
 
-- [ ] **Anti-premature-termination checklist**: In `src/prompt.ts`, after the "ROLE & BEHAVIOR" section (added by Task 1), add a "DO NOT STOP IF" section: `"DO NOT STOP if: you encounter an error (debug and fix it), tests fail (fix them), you have remaining steps (complete them first), you have open questions (make a decision and proceed)."` Also add explicit ordering: `"When done: FIRST append what you did to progress.txt, THEN mark the checkbox in PRD.md. Both updates are required."` Also add persistence framing: `"Continue working until the task is fully complete. It's YOUR RESPONSIBILITY to finish. Do not hand back to the user."` Run `npx tsc --noEmit` and `npx vitest run`. Mark checkbox and append to progress.txt.
+- [x] **Anti-premature-termination checklist**: In `src/prompt.ts`, after the "ROLE & BEHAVIOR" section (added by Task 1), add a "DO NOT STOP IF" section: `"DO NOT STOP if: you encounter an error (debug and fix it), tests fail (fix them), you have remaining steps (complete them first), you have open questions (make a decision and proceed)."` Also add explicit ordering: `"When done: FIRST append what you did to progress.txt, THEN mark the checkbox in PRD.md. Both updates are required."` Also add persistence framing: `"Continue working until the task is fully complete. It's YOUR RESPONSIBILITY to finish. Do not hand back to the user."` Run `npx tsc --noEmit` and `npx vitest run`. Mark checkbox and append to progress.txt.
 
 ### Retry System
 
