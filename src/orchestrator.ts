@@ -15,7 +15,7 @@ import {
 	HookResult,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
-import { startFreshChatSession, openCopilotWithPrompt, buildPrompt, PromptCapabilities, CopilotRequestOptions } from './copilot';
+import { startFreshChatSession, openCopilotWithPrompt, buildPrompt, buildFinalNudgePrompt, PromptCapabilities, CopilotRequestOptions } from './copilot';
 import { verifyTaskCompletion, allChecksPassed, isAllDone } from './verify';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 
@@ -262,8 +262,11 @@ export class LoopOrchestrator {
 					yield { kind: LoopEventKind.TaskNudged, task, nudgeCount: taskState.nudgeCount, taskInvocationId };
 					this.logger.log(`Nudging task (${taskState.nudgeCount}/${this.config.maxNudgesPerTask}): ${task.description}`);
 
+					const finalNudge = buildFinalNudgePrompt(task.description, taskState.nudgeCount, this.config.maxNudgesPerTask);
+					const continuationSuffix = finalNudge
+						?? 'Continue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
 					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities)
-						+ '\n\nContinue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
+						+ '\n\n' + continuationSuffix;
 
 					await startFreshChatSession(this.logger);
 					await openCopilotWithPrompt(nudgePrompt, this.logger, this.copilotRequestOptions);
