@@ -48,6 +48,7 @@ export const enum LoopEventKind {
 	MaxIterations = 'max_iterations',
 	IterationLimitExpanded = 'iteration_limit_expanded',
 	YieldRequested = 'yield_requested',
+	SessionChanged = 'session_changed',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -65,6 +66,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.MaxIterations; limit: number }
 	| { kind: LoopEventKind.IterationLimitExpanded; oldLimit: number; newLimit: number }
 	| { kind: LoopEventKind.YieldRequested }
+	| { kind: LoopEventKind.SessionChanged; oldSessionId: string; newSessionId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -87,6 +89,7 @@ export interface RalphConfig {
 	hookScript?: string;
 	promptBlocks?: string[];
 	useHookBridge: boolean;
+	useSessionTracking: boolean;
 	workspaceRoot: string;
 }
 
@@ -101,6 +104,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	hookScript: undefined,
 	promptBlocks: ['safety', 'discipline'],
 	useHookBridge: false,
+	useSessionTracking: false,
 };
 
 // --- Verification ---

@@ -7,6 +7,7 @@ import { registerHookBridge, HookBridgeDisposable } from './hookBridge';
 let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.OutputChannel;
 let hookBridgeDisposable: HookBridgeDisposable | undefined;
+let sessionTrackingDisposable: vscode.Disposable | undefined;
 
 async function resolveWorkspaceRoot(): Promise<string | undefined> {
 	const folders = vscode.workspace.workspaceFolders;
@@ -85,6 +86,35 @@ export function activate(context: vscode.ExtensionContext): void {
 				}
 			}
 
+			// Session tracking if enabled (requires vscode.proposed.chatParticipantPrivate)
+			if (config.useSessionTracking) {
+				try {
+					const win = vscode.window as any;
+					if (typeof win.activeChatPanelSessionResource !== 'undefined') {
+						const uri = win.activeChatPanelSessionResource as vscode.Uri | undefined;
+						const sessionId = uri?.toString();
+						logger.log(`Initial chat session: ${sessionId ?? 'none'}`);
+						// Will be set on orchestrator after construction below
+						sessionTrackingDisposable?.dispose();
+						// Watch for session changes via polling (proposed API has no change event)
+						let lastSessionId = sessionId;
+						const interval = setInterval(() => {
+							const current = (win.activeChatPanelSessionResource as vscode.Uri | undefined)?.toString();
+							if (current !== lastSessionId) {
+								orchestrator?.setSessionId(current);
+								lastSessionId = current;
+							}
+						}, 2000);
+						sessionTrackingDisposable = new vscode.Disposable(() => clearInterval(interval));
+					} else {
+						logger.warn('Session tracking enabled but activeChatPanelSessionResource not available (proposed API missing)');
+					}
+				} catch (err) {
+					const msg = err instanceof Error ? err.message : String(err);
+					logger.warn(`Session tracking setup failed: ${msg}`);
+				}
+			}
+
 			orchestrator = new LoopOrchestrator(config, logger, event => {
 				switch (event.kind) {
 					case LoopEventKind.TaskStarted:
@@ -119,6 +149,10 @@ export function activate(context: vscode.ExtensionContext): void {
 						logger.log('Loop yielded gracefully');
 						vscode.window.showInformationMessage('Ralph Loop: Yielded gracefully after task completion');
 						break;
+					case LoopEventKind.SessionChanged:
+						logger.log(`Chat session changed: ${event.oldSessionId} → ${event.newSessionId}`);
+						vscode.window.showWarningMessage('Ralph Loop: Chat session changed — loop paused');
+						break;
 					case LoopEventKind.Stopped:
 						logger.log('Loop stopped');
 						break;
@@ -130,6 +164,16 @@ export function activate(context: vscode.ExtensionContext): void {
 			}, hookService);
 
 			logger.log(`Starting loop with config: ${JSON.stringify(config)}`);
+
+			// Set initial session ID if tracking is active
+			if (config.useSessionTracking) {
+				try {
+					const win = vscode.window as any;
+					const uri = win.activeChatPanelSessionResource as vscode.Uri | undefined;
+					orchestrator.setSessionId(uri?.toString());
+				} catch { /* proposed API unavailable */ }
+			}
+
 			try {
 				await orchestrator.start();
 			} catch (err) {
@@ -171,4 +215,6 @@ export function deactivate(): void {
 	orchestrator?.stop();
 	hookBridgeDisposable?.dispose();
 	hookBridgeDisposable = undefined;
+	sessionTrackingDisposable?.dispose();
+	sessionTrackingDisposable = undefined;
 }

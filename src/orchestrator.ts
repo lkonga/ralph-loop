@@ -39,6 +39,7 @@ export class LoopOrchestrator {
 	private readonly completedTasks = new Set<number>();
 	private readonly hookService: IRalphHookService;
 	private readonly hooksEnabled: boolean;
+	private currentSessionId: string | undefined;
 
 	constructor(
 		config: RalphConfig,
@@ -108,6 +109,21 @@ export class LoopOrchestrator {
 	requestYield(): void {
 		this.yieldRequested = true;
 		this.logger.log('Yield requested');
+	}
+
+	setSessionId(sessionId: string | undefined): void {
+		if (!this.config.useSessionTracking) { return; }
+		const old = this.currentSessionId;
+		if (old && sessionId && old !== sessionId && this.state === LoopState.Running) {
+			this.logger.log(`Session changed: ${old} → ${sessionId} — pausing loop`);
+			this.pauseRequested = true;
+			this.onEvent({ kind: LoopEventKind.SessionChanged, oldSessionId: old, newSessionId: sessionId });
+		}
+		this.currentSessionId = sessionId;
+	}
+
+	getSessionId(): string | undefined {
+		return this.currentSessionId;
 	}
 
 	private cleanup(): void {
@@ -436,6 +452,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		hookScript: vsConfig.get<string | undefined>('hookScript', undefined),
 		promptBlocks: vsConfig.get<string[]>('promptBlocks', DEFAULT_CONFIG.promptBlocks!),
 		useHookBridge: vsConfig.get<boolean>('useHookBridge', DEFAULT_CONFIG.useHookBridge),
+		useSessionTracking: vsConfig.get<boolean>('useSessionTracking', DEFAULT_CONFIG.useSessionTracking),
 		workspaceRoot,
 	};
 }
