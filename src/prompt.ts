@@ -24,7 +24,39 @@ function renderPromptBlocks(blocks?: string[]): string[] {
 	return lines;
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[]): string {
+export interface PromptCapabilities {
+	hooksEnabled?: boolean;
+	hookScript?: string;
+	promptBlocks?: string[];
+}
+
+function renderCapabilities(caps?: PromptCapabilities): string[] {
+	if (!caps) { return []; }
+	const items: string[] = [];
+	if (caps.hooksEnabled) {
+		items.push('- Quality hooks are active — your work will be validated after each tool use.');
+	}
+	if (caps.hookScript) {
+		items.push(`- External validator: ${caps.hookScript} will run on task completion.`);
+	}
+	if (caps.promptBlocks && caps.promptBlocks.length > 0) {
+		const active = caps.promptBlocks.filter(b => PROMPT_BLOCKS[b]);
+		if (active.length > 0) {
+			items.push(`- Active prompt guidelines: ${active.join(', ')}.`);
+		}
+	}
+	if (items.length === 0) { return []; }
+	return [
+		'===================================================================',
+		'                    AVAILABLE CAPABILITIES',
+		'===================================================================',
+		'',
+		...items,
+		'',
+	];
+}
+
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities): string {
 	const MAX_LEN = 5000;
 	const sanitized = taskDescription.trim().slice(0, MAX_LEN);
 
@@ -48,6 +80,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		'Continue working until the task is fully complete. It\'s YOUR RESPONSIBILITY to finish. Do not hand back to the user.',
 		'',
 		...renderPromptBlocks(promptBlocks),
+		...renderCapabilities(capabilities),
 		'===================================================================',
 		'    MANDATORY: UPDATE PRD.md AND progress.txt WHEN DONE',
 		'===================================================================',

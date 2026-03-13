@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { CopilotMethod, ILogger } from './types';
-export { buildPrompt } from './prompt';
+export { buildPrompt, PromptCapabilities } from './prompt';
 
 // 3-level fallback: agent mode → chat → clipboard
 async function tryCommand(command: string, ...args: unknown[]): Promise<boolean> {

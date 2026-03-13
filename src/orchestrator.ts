@@ -14,7 +14,7 @@ import {
 	HookResult,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
-import { startFreshChatSession, openCopilotWithPrompt, buildPrompt } from './copilot';
+import { startFreshChatSession, openCopilotWithPrompt, buildPrompt, PromptCapabilities } from './copilot';
 import { verifyTaskCompletion, allChecksPassed, isAllDone } from './verify';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 
@@ -38,6 +38,7 @@ export class LoopOrchestrator {
 	private readonly onEvent: (event: LoopEvent) => void;
 	private readonly completedTasks = new Set<number>();
 	private readonly hookService: IRalphHookService;
+	private readonly hooksEnabled: boolean;
 
 	constructor(
 		config: RalphConfig,
@@ -49,6 +50,7 @@ export class LoopOrchestrator {
 		this.logger = logger;
 		this.onEvent = onEvent;
 		this.hookService = hookService ?? new NoOpHookService();
+		this.hooksEnabled = hookService !== undefined;
 	}
 
 	getState(): LoopState {
@@ -111,6 +113,14 @@ export class LoopOrchestrator {
 	private cleanup(): void {
 		this.prdWatcher?.dispose();
 		this.prdWatcher = undefined;
+	}
+
+	private get promptCapabilities(): PromptCapabilities {
+		return {
+			hooksEnabled: this.hooksEnabled,
+			hookScript: this.config.hookScript,
+			promptBlocks: this.config.promptBlocks,
+		};
 	}
 
 	private async *runLoop(): AsyncGenerator<LoopEvent> {
@@ -203,7 +213,7 @@ export class LoopOrchestrator {
 
 				// Start fresh session + trigger Copilot
 				await startFreshChatSession(this.logger);
-				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks);
+				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities);
 				if (additionalContext) {
 					prompt += '\n\n' + additionalContext;
 					additionalContext = '';
@@ -228,7 +238,7 @@ export class LoopOrchestrator {
 					yield { kind: LoopEventKind.TaskNudged, task, nudgeCount: taskState.nudgeCount };
 					this.logger.log(`Nudging task (${taskState.nudgeCount}/${this.config.maxNudgesPerTask}): ${task.description}`);
 
-					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks)
+					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities)
 						+ '\n\nContinue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
 
 					await startFreshChatSession(this.logger);
@@ -295,7 +305,7 @@ export class LoopOrchestrator {
 						try { progressContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 
 						await startFreshChatSession(this.logger);
-						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks);
+						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities);
 						const method = await openCopilotWithPrompt(prompt, this.logger);
 						yield { kind: LoopEventKind.CopilotTriggered, method };
 
