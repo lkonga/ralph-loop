@@ -56,7 +56,7 @@
 
 ### Graceful Yield / External Stop Request
 
-- [ ] **External yield request**: In `src/types.ts`, add `yieldRequested: boolean` to `LoopOrchestrator` state. In `src/orchestrator.ts`, expose a `requestYield()` method that sets this flag. In the main loop, check `yieldRequested` after each task completes — if true, yield a new `LoopEventKind.YieldRequested` event and break the loop gracefully (not a hard stop). In autopilot mode, the yield is deferred: the loop continues until the current task's checkbox is checked, THEN yields. This mirrors VS Code's `yieldRequested` which autopilot ignores until `taskCompleted`. In `src/extension.ts`, wire a new VS Code command `ralph-loop.yield` that calls `requestYield()`. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
+- [x] **External yield request**: In `src/types.ts`, add `yieldRequested: boolean` to `LoopOrchestrator` state. In `src/orchestrator.ts`, expose a `requestYield()` method that sets this flag. In the main loop, check `yieldRequested` after each task completes — if true, yield a new `LoopEventKind.YieldRequested` event and break the loop gracefully (not a hard stop). In autopilot mode, the yield is deferred: the loop continues until the current task's checkbox is checked, THEN yields. This mirrors VS Code's `yieldRequested` which autopilot ignores until `taskCompleted`. In `src/extension.ts`, wire a new VS Code command `ralph-loop.yield` that calls `requestYield()`. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
 ### Dynamic Iteration Limits
 
