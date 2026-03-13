@@ -2,9 +2,11 @@ import * as vscode from 'vscode';
 import { LoopEventKind, createOutputLogger, IRalphHookService } from './types';
 import { LoopOrchestrator, loadConfig } from './orchestrator';
 import { ShellHookProvider } from './shellHookProvider';
+import { registerHookBridge, HookBridgeDisposable } from './hookBridge';
 
 let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.OutputChannel;
+let hookBridgeDisposable: HookBridgeDisposable | undefined;
 
 async function resolveWorkspaceRoot(): Promise<string | undefined> {
 	const folders = vscode.workspace.workspaceFolders;
@@ -70,6 +72,17 @@ export function activate(context: vscode.ExtensionContext): void {
 			if (config.hookScript) {
 				logger.log(`Shell hook script configured: ${config.hookScript}`);
 				hookService = new ShellHookProvider(config.hookScript, logger);
+			}
+
+			// Register hook bridge if enabled (requires vscode.proposed.chatHooks)
+			if (config.useHookBridge) {
+				try {
+					hookBridgeDisposable = registerHookBridge(config, logger);
+					logger.log('Hook bridge registered (chat.hooks Stop + PostToolUse)');
+				} catch (err) {
+					const msg = err instanceof Error ? err.message : String(err);
+					logger.warn(`Hook bridge registration failed (proposed API may be unavailable): ${msg}`);
+				}
 			}
 
 			orchestrator = new LoopOrchestrator(config, logger, event => {
@@ -156,4 +169,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
 export function deactivate(): void {
 	orchestrator?.stop();
+	hookBridgeDisposable?.dispose();
+	hookBridgeDisposable = undefined;
 }

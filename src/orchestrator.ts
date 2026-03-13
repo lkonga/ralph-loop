@@ -435,6 +435,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		maxNudgesPerTask: vsConfig.get<number>('maxNudgesPerTask', DEFAULT_CONFIG.maxNudgesPerTask),
 		hookScript: vsConfig.get<string | undefined>('hookScript', undefined),
 		promptBlocks: vsConfig.get<string[]>('promptBlocks', DEFAULT_CONFIG.promptBlocks!),
+		useHookBridge: vsConfig.get<boolean>('useHookBridge', DEFAULT_CONFIG.useHookBridge),
 		workspaceRoot,
 	};
 }

@@ -86,6 +86,7 @@ export interface RalphConfig {
 	maxNudgesPerTask: number;
 	hookScript?: string;
 	promptBlocks?: string[];
+	useHookBridge: boolean;
 	workspaceRoot: string;
 }
 
@@ -99,6 +100,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	maxNudgesPerTask: 3,
 	hookScript: undefined,
 	promptBlocks: ['safety', 'discipline'],
+	useHookBridge: false,
 };
 
 // --- Verification ---
