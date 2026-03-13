@@ -14,6 +14,8 @@ import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProg
 import { startFreshChatSession, openCopilotWithPrompt, buildPrompt } from './copilot';
 import { verifyTaskCompletion, allChecksPassed, isAllDone } from './verify';
 
+const MAX_RETRIES_PER_TASK = 3;
+
 export class LoopOrchestrator {
 	private state: LoopState = LoopState.Idle;
 	private stopRequested = false;
@@ -129,6 +131,7 @@ export class LoopOrchestrator {
 			task.status = TaskStatus.InProgress;
 			yield { kind: LoopEventKind.TaskStarted, task, iteration };
 
+			const startTime = Date.now();
 			try {
 				appendProgress(progressPath, `Task started: ${task.description}`);
 
@@ -149,7 +152,6 @@ export class LoopOrchestrator {
 
 				// Wait for completion: watch PRD for checkbox change
 				yield { kind: LoopEventKind.WaitingForCompletion, task };
-				const startTime = Date.now();
 				let completed = await this.waitForTaskCompletion(prdPath, task);
 
 				// Nudge loop: re-send prompt with continuation nudge if timed out
@@ -182,10 +184,46 @@ export class LoopOrchestrator {
 					yield { kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration };
 				}
 			} catch (err) {
-				const message = err instanceof Error ? err.message : String(err);
-				appendProgress(progressPath, `Task error: ${task.description} — ${message}`);
-				yield { kind: LoopEventKind.Error, message: `Task "${task.description}" failed: ${message}` };
-				// Continue to next task instead of crashing
+				let currentError = err instanceof Error ? err : new Error(String(err));
+				let retryCount = 0;
+				let handled = false;
+
+				while (this.shouldRetry(currentError, retryCount)) {
+					retryCount++;
+					yield { kind: LoopEventKind.TaskRetried, task, retryCount };
+					this.logger.log(`Retrying task (${retryCount}/${MAX_RETRIES_PER_TASK}): ${task.description}`);
+					await this.delay(2000);
+
+					try {
+						const prdContent = readPrdFile(prdPath);
+						let progressContent = '';
+						try { progressContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
+
+						await startFreshChatSession(this.logger);
+						const prompt = buildPrompt(task.description, prdContent, progressContent);
+						const method = await openCopilotWithPrompt(prompt, this.logger);
+						yield { kind: LoopEventKind.CopilotTriggered, method };
+
+						yield { kind: LoopEventKind.WaitingForCompletion, task };
+						const completed = await this.waitForTaskCompletion(prdPath, task);
+
+						if (completed) {
+							const duration = Date.now() - startTime;
+							appendProgress(progressPath, `Task completed (after ${retryCount} retries): ${task.description} (${Math.round(duration / 1000)}s)`);
+							yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
+						}
+						handled = true;
+						break;
+					} catch (retryErr) {
+						currentError = retryErr instanceof Error ? retryErr : new Error(String(retryErr));
+					}
+				}
+
+				if (!handled) {
+					const message = currentError.message;
+					appendProgress(progressPath, `Task error: ${task.description} — ${message}`);
+					yield { kind: LoopEventKind.Error, message: `Task "${task.description}" failed: ${message}` };
+				}
 			}
 
 			// Countdown between tasks
@@ -254,6 +292,18 @@ export class LoopOrchestrator {
 				checkCompletion();
 			}, 5000);
 		});
+	}
+
+	private shouldRetry(error: Error, retryCount: number): boolean {
+		if (retryCount >= MAX_RETRIES_PER_TASK) {
+			return false;
+		}
+		if (this.stopRequested) {
+			return false;
+		}
+		const msg = error.message.toLowerCase();
+		const transientPatterns = ['network', 'timeout', 'econnreset', 'econnrefused', 'etimedout', 'socket hang up', 'fetch failed', 'abort'];
+		return transientPatterns.some(p => msg.includes(p));
 	}
 
 	private delay(ms: number): Promise<void> {

@@ -42,6 +42,7 @@ export const enum LoopEventKind {
 	TaskCompleted = 'task_completed',
 	TaskTimedOut = 'task_timed_out',
 	TaskNudged = 'task_nudged',
+	TaskRetried = 'task_retried',
 	Countdown = 'countdown',
 	AllDone = 'all_done',
 	MaxIterations = 'max_iterations',
@@ -56,6 +57,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.TaskCompleted; task: Task; durationMs: number }
 	| { kind: LoopEventKind.TaskTimedOut; task: Task; durationMs: number }
 	| { kind: LoopEventKind.TaskNudged; task: Task; nudgeCount: number }
+	| { kind: LoopEventKind.TaskRetried; task: Task; retryCount: number }
 	| { kind: LoopEventKind.Countdown; secondsLeft: number }
 	| { kind: LoopEventKind.AllDone; total: number }
 	| { kind: LoopEventKind.MaxIterations; limit: number }
