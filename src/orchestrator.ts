@@ -147,6 +147,7 @@ export class LoopOrchestrator {
 			hooksEnabled: this.hooksEnabled,
 			hookScript: this.config.hookScript,
 			promptBlocks: this.config.promptBlocks,
+			modelHint: this.config.modelHint,
 		};
 	}
 
@@ -410,6 +411,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		hookScript: vsConfig.get<string | undefined>('hookScript', undefined),
 		executionStrategy: vsConfig.get<'command' | 'api'>('executionStrategy', DEFAULT_CONFIG.executionStrategy),
 		promptBlocks: vsConfig.get<string[]>('promptBlocks', DEFAULT_CONFIG.promptBlocks!),
+		modelHint: vsConfig.get<string | undefined>('modelHint', undefined),
 		useHookBridge: vsConfig.get<boolean>('useHookBridge', DEFAULT_CONFIG.useHookBridge),
 		useSessionTracking: vsConfig.get<boolean>('useSessionTracking', DEFAULT_CONFIG.useSessionTracking),
 		useAutopilotMode: vsConfig.get<boolean>('useAutopilotMode', DEFAULT_CONFIG.useAutopilotMode),

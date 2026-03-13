@@ -28,6 +28,26 @@ export interface PromptCapabilities {
 	hooksEnabled?: boolean;
 	hookScript?: string;
 	promptBlocks?: string[];
+	modelHint?: string;
+}
+
+const MODEL_HINTS: Record<string, string> = {
+	claude: 'You appear to be a Claude model. For long code outputs, use artifacts to keep responses structured. Prefer concise explanations with detailed code.',
+	gpt: 'You appear to be a GPT model. Use code blocks for all code output. Be precise and direct in explanations.',
+};
+
+function renderModelHints(modelHint?: string): string[] {
+	if (!modelHint) { return []; }
+	const key = Object.keys(MODEL_HINTS).find(k => modelHint.toLowerCase().includes(k));
+	if (!key) { return []; }
+	return [
+		'===================================================================',
+		'                       MODEL OPTIMIZATION',
+		'===================================================================',
+		'',
+		MODEL_HINTS[key],
+		'',
+	];
 }
 
 function renderCapabilities(caps?: PromptCapabilities): string[] {
@@ -85,6 +105,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		'Continue working until the task is fully complete. It\'s YOUR RESPONSIBILITY to finish. Do not hand back to the user.',
 		'',
 		...renderPromptBlocks(promptBlocks),
+		...renderModelHints(capabilities?.modelHint),
 		...renderCapabilities(capabilities),
 		'===================================================================',
 		'    MANDATORY: UPDATE PRD.md AND progress.txt WHEN DONE',

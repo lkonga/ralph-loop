@@ -109,6 +109,7 @@ export interface RalphConfig {
 	executionStrategy: 'command' | 'api';
 	hookScript?: string;
 	promptBlocks?: string[];
+	modelHint?: string;
 	useHookBridge: boolean;
 	useSessionTracking: boolean;
 	useAutopilotMode: boolean;
@@ -126,6 +127,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	executionStrategy: 'command',
 	hookScript: undefined,
 	promptBlocks: ['safety', 'discipline'],
+	modelHint: undefined,
 	useHookBridge: false,
 	useSessionTracking: false,
 	useAutopilotMode: false,
