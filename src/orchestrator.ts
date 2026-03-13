@@ -150,7 +150,22 @@ export class LoopOrchestrator {
 				// Wait for completion: watch PRD for checkbox change
 				yield { kind: LoopEventKind.WaitingForCompletion, task };
 				const startTime = Date.now();
-				const completed = await this.waitForTaskCompletion(prdPath, task);
+				let completed = await this.waitForTaskCompletion(prdPath, task);
+
+				// Nudge loop: re-send prompt with continuation nudge if timed out
+				let nudgeCount = 0;
+				while (!completed && !this.stopRequested && nudgeCount < this.config.maxNudgesPerTask) {
+					nudgeCount++;
+					yield { kind: LoopEventKind.TaskNudged, task, nudgeCount };
+					this.logger.log(`Nudging task (${nudgeCount}/${this.config.maxNudgesPerTask}): ${task.description}`);
+
+					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })())
+						+ '\n\nContinue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
+
+					await startFreshChatSession(this.logger);
+					await openCopilotWithPrompt(nudgePrompt, this.logger);
+					completed = await this.waitForTaskCompletion(prdPath, task);
+				}
 
 				if (this.stopRequested) {
 					yield { kind: LoopEventKind.Stopped };
@@ -242,6 +257,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		maxIterations: vsConfig.get<number>('maxIterations', DEFAULT_CONFIG.maxIterations),
 		countdownSeconds: vsConfig.get<number>('countdownSeconds', DEFAULT_CONFIG.countdownSeconds),
 		inactivityTimeoutMs: vsConfig.get<number>('inactivityTimeoutMs', DEFAULT_CONFIG.inactivityTimeoutMs),
+		maxNudgesPerTask: vsConfig.get<number>('maxNudgesPerTask', DEFAULT_CONFIG.maxNudgesPerTask),
 		workspaceRoot,
 	};
 }
