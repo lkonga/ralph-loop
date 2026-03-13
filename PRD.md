@@ -32,7 +32,7 @@
 
 ### Retry System
 
-- [ ] **Auto-retry with error classification**: In `src/orchestrator.ts`, when a task errors (caught by the existing try/catch), classify the error before giving up. Add `shouldRetry(error: Error, retryCount: number): boolean` — return `true` for transient errors (network, timeout) and `false` for fatal errors (user cancel via `stopRequested`, max iterations reached). Add `MAX_RETRIES_PER_TASK = 3` constant. In the catch block, if `shouldRetry` returns true, wait 2 seconds, decrement nothing, and re-enter the task body (re-send prompt). Track `retryCount` per task separately from `nudgeCount`. Add `LoopEventKind.TaskRetried` event. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
+- [x] **Auto-retry with error classification**: In `src/orchestrator.ts`, when a task errors (caught by the existing try/catch), classify the error before giving up. Add `shouldRetry(error: Error, retryCount: number): boolean` — return `true` for transient errors (network, timeout) and `false` for fatal errors (user cancel via `stopRequested`, max iterations reached). Add `MAX_RETRIES_PER_TASK = 3` constant. In the catch block, if `shouldRetry` returns true, wait 2 seconds, decrement nothing, and re-enter the task body (re-send prompt). Track `retryCount` per task separately from `nudgeCount`. Add `LoopEventKind.TaskRetried` event. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
 ### State Machine Enrichment
 
