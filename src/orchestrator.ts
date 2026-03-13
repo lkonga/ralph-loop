@@ -7,6 +7,7 @@ import {
 	LoopEventKind,
 	RalphConfig,
 	DEFAULT_CONFIG,
+	DEFAULT_FEATURES,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -123,7 +124,7 @@ export class LoopOrchestrator {
 	}
 
 	setSessionId(sessionId: string | undefined): void {
-		if (!this.config.useSessionTracking) { return; }
+		if (!this.config.features.useSessionTracking) { return; }
 		const old = this.currentSessionId;
 		if (old && sessionId && old !== sessionId && this.state === LoopState.Running) {
 			this.logger.log(`Session changed: ${old} → ${sessionId} — pausing loop`);
@@ -156,7 +157,7 @@ export class LoopOrchestrator {
 			prdPath: resolvePrdPath(this.config.workspaceRoot, this.config.prdPath),
 			workspaceRoot: this.config.workspaceRoot,
 			inactivityTimeoutMs: this.config.inactivityTimeoutMs,
-			useAutopilotMode: this.config.useAutopilotMode,
+			useAutopilotMode: this.config.features.useAutopilotMode,
 			shouldStop: () => this.stopRequested,
 		};
 	}
@@ -221,8 +222,8 @@ export class LoopOrchestrator {
 			// Parse PRD, pick next task(s)
 			const snapshot = readPrdSnapshot(prdPath);
 
-			// Use DAG-aware parallel task selection when maxParallelTasks > 1
-			if (this.config.maxParallelTasks > 1) {
+			// Use DAG-aware parallel task selection when useParallelTasks is enabled and maxParallelTasks > 1
+			if (this.config.features.useParallelTasks && this.config.maxParallelTasks > 1) {
 				const readyTasks = pickReadyTasks(snapshot, this.config.maxParallelTasks)
 					.filter(t => !this.completedTasks.has(t.id));
 
@@ -469,6 +470,16 @@ export class LoopOrchestrator {
 // Load config from VS Code settings
 export function loadConfig(workspaceRoot: string): RalphConfig {
 	const vsConfig = vscode.workspace.getConfiguration('ralph-loop');
+	const featConfig = vscode.workspace.getConfiguration('ralph-loop.features');
+
+	const features = {
+		useHookBridge: featConfig.get<boolean>('useHookBridge', DEFAULT_FEATURES.useHookBridge),
+		useSessionTracking: featConfig.get<boolean>('useSessionTracking', DEFAULT_FEATURES.useSessionTracking),
+		useAutopilotMode: featConfig.get<boolean>('useAutopilotMode', DEFAULT_FEATURES.useAutopilotMode),
+		useVerificationGate: featConfig.get<boolean>('useVerificationGate', DEFAULT_FEATURES.useVerificationGate),
+		useParallelTasks: featConfig.get<boolean>('useParallelTasks', DEFAULT_FEATURES.useParallelTasks),
+	};
+
 	return {
 		prdPath: vsConfig.get<string>('prdPath', DEFAULT_CONFIG.prdPath),
 		progressPath: vsConfig.get<string>('progressPath', DEFAULT_CONFIG.progressPath),
@@ -481,10 +492,11 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		executionStrategy: vsConfig.get<'command' | 'api'>('executionStrategy', DEFAULT_CONFIG.executionStrategy),
 		promptBlocks: vsConfig.get<string[]>('promptBlocks', DEFAULT_CONFIG.promptBlocks!),
 		modelHint: vsConfig.get<string | undefined>('modelHint', undefined),
-		useHookBridge: vsConfig.get<boolean>('useHookBridge', DEFAULT_CONFIG.useHookBridge),
-		useSessionTracking: vsConfig.get<boolean>('useSessionTracking', DEFAULT_CONFIG.useSessionTracking),
-		useAutopilotMode: vsConfig.get<boolean>('useAutopilotMode', DEFAULT_CONFIG.useAutopilotMode),
-		useVerificationGate: vsConfig.get<boolean>('useVerificationGate', DEFAULT_CONFIG.useVerificationGate),
+		features,
+		useHookBridge: features.useHookBridge,
+		useSessionTracking: features.useSessionTracking,
+		useAutopilotMode: features.useAutopilotMode,
+		useVerificationGate: features.useVerificationGate,
 		maxParallelTasks: vsConfig.get<number>('maxParallelTasks', DEFAULT_CONFIG.maxParallelTasks),
 		workspaceRoot,
 	};

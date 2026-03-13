@@ -100,6 +100,23 @@ export interface ITaskExecutionStrategy {
 	execute(task: Task, prompt: string, options: ExecutionOptions): Promise<ExecutionResult>;
 }
 
+// --- Feature flags ---
+export interface RalphFeatures {
+	useHookBridge: boolean;
+	useSessionTracking: boolean;
+	useAutopilotMode: boolean;
+	useVerificationGate: boolean;
+	useParallelTasks: boolean;
+}
+
+export const DEFAULT_FEATURES: RalphFeatures = {
+	useHookBridge: false,
+	useSessionTracking: false,
+	useAutopilotMode: false,
+	useVerificationGate: false,
+	useParallelTasks: false,
+};
+
 // --- Config ---
 export interface RalphConfig {
 	prdPath: string;
@@ -113,6 +130,7 @@ export interface RalphConfig {
 	hookScript?: string;
 	promptBlocks?: string[];
 	modelHint?: string;
+	features: RalphFeatures;
 	useHookBridge: boolean;
 	useSessionTracking: boolean;
 	useAutopilotMode: boolean;
@@ -133,6 +151,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	hookScript: undefined,
 	promptBlocks: ['safety', 'discipline'],
 	modelHint: undefined,
+	features: { ...DEFAULT_FEATURES },
 	useHookBridge: false,
 	useSessionTracking: false,
 	useAutopilotMode: false,

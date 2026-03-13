@@ -159,7 +159,7 @@ export function registerHookBridge(
 	const progressPath = path.resolve(config.workspaceRoot, config.progressPath);
 
 	// Write the hook scripts to temp files
-	fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath, progressPath, config.useVerificationGate), { mode: 0o755 });
+	fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath, progressPath, config.features.useVerificationGate), { mode: 0o755 });
 	fs.writeFileSync(postToolUseScriptPath, generatePostToolUseHookScript(), { mode: 0o755 });
 	logger.log(`Hook bridge scripts written to ${tmpDir}`);
 

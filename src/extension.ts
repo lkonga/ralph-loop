@@ -76,7 +76,7 @@ export function activate(context: vscode.ExtensionContext): void {
 			}
 
 			// Register hook bridge if enabled (requires vscode.proposed.chatHooks)
-			if (config.useHookBridge) {
+			if (config.features.useHookBridge) {
 				try {
 					hookBridgeDisposable = registerHookBridge(config, logger);
 					logger.log('Hook bridge registered (chat.hooks Stop + PostToolUse)');
@@ -87,7 +87,7 @@ export function activate(context: vscode.ExtensionContext): void {
 			}
 
 			// Session tracking if enabled (requires vscode.proposed.chatParticipantPrivate)
-			if (config.useSessionTracking) {
+			if (config.features.useSessionTracking) {
 				try {
 					const win = vscode.window as any;
 					if (typeof win.activeChatPanelSessionResource !== 'undefined') {
@@ -166,7 +166,7 @@ export function activate(context: vscode.ExtensionContext): void {
 			logger.log(`Starting loop with config: ${JSON.stringify(config)}`);
 
 			// Set initial session ID if tracking is active
-			if (config.useSessionTracking) {
+			if (config.features.useSessionTracking) {
 				try {
 					const win = vscode.window as any;
 					const uri = win.activeChatPanelSessionResource as vscode.Uri | undefined;
