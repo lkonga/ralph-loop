@@ -11,7 +11,7 @@
 
 - [x] In `src/prompt.ts`: Change how PRD content is shown in the prompt. Instead of including the FULL PRD file content, filter it to show only unchecked task lines (lines matching `- [ ]`) plus a summary header like `Progress: N/M tasks completed`. Keep the markdown code fence wrapper. This reduces context waste since completed tasks aren't relevant. Run `npx tsc --noEmit` and `npx vitest run` — update tests in `test/copilot.test.ts` that check for PRD content format. Mark this checkbox [x] in PRD.md and append to progress.txt what you did.
 
-- [ ] Add a file `src/prompt.test.ts` (or use the existing `test/copilot.test.ts`) to add a test that verifies `buildPrompt` includes the "ROLE & BEHAVIOR" section in its output. Also add a test that when given 30 lines of progress content, the output contains `[...10 earlier entries omitted]` (since default maxProgressLines is 20). Also add a test that checked PRD lines (`- [x]`) are NOT included in the output but unchecked ones are. Run `npx vitest run` to verify all tests pass. Mark this checkbox [x] in PRD.md and append to progress.txt what you did.
+- [x] Add a file `src/prompt.test.ts` (or use the existing `test/copilot.test.ts`) to add a test that verifies `buildPrompt` includes the "ROLE & BEHAVIOR" section in its output. Also add a test that when given 30 lines of progress content, the output contains `[...10 earlier entries omitted]` (since default maxProgressLines is 20). Also add a test that checked PRD lines (`- [x]`) are NOT included in the output but unchecked ones are. Run `npx vitest run` to verify all tests pass. Mark this checkbox [x] in PRD.md and append to progress.txt what you did.
 
 ---
 
