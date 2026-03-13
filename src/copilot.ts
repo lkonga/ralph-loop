@@ -13,11 +13,21 @@ async function tryCommand(command: string, ...args: unknown[]): Promise<boolean>
 }
 
 export async function startFreshChatSession(logger: ILogger): Promise<boolean> {
-	const ok = await tryCommand('workbench.action.chat.newEditSession');
-	if (ok) {
-		logger.log('Started fresh chat session');
+	// Try agent mode new session first, then fall back to regular chat new session
+	const editOk = await tryCommand('workbench.action.chat.newEditSession');
+	if (editOk) {
+		logger.log('Started fresh agent edit session');
+		return true;
 	}
-	return ok;
+
+	const chatOk = await tryCommand('workbench.action.chat.newChat');
+	if (chatOk) {
+		logger.log('Started fresh chat session');
+		return true;
+	}
+
+	logger.warn('Could not start fresh chat session — no new session command available');
+	return false;
 }
 
 export interface CopilotRequestOptions {
