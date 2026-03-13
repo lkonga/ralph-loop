@@ -203,7 +203,7 @@ export class LoopOrchestrator {
 
 				// Start fresh session + trigger Copilot
 				await startFreshChatSession(this.logger);
-				let prompt = buildPrompt(task.description, prdContent, progressContent);
+				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks);
 				if (additionalContext) {
 					prompt += '\n\n' + additionalContext;
 					additionalContext = '';
@@ -228,7 +228,7 @@ export class LoopOrchestrator {
 					yield { kind: LoopEventKind.TaskNudged, task, nudgeCount: taskState.nudgeCount };
 					this.logger.log(`Nudging task (${taskState.nudgeCount}/${this.config.maxNudgesPerTask}): ${task.description}`);
 
-					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })())
+					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks)
 						+ '\n\nContinue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
 
 					await startFreshChatSession(this.logger);
@@ -295,7 +295,7 @@ export class LoopOrchestrator {
 						try { progressContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 
 						await startFreshChatSession(this.logger);
-						const prompt = buildPrompt(task.description, prdContent, progressContent);
+						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks);
 						const method = await openCopilotWithPrompt(prompt, this.logger);
 						yield { kind: LoopEventKind.CopilotTriggered, method };
 
@@ -424,6 +424,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		inactivityTimeoutMs: vsConfig.get<number>('inactivityTimeoutMs', DEFAULT_CONFIG.inactivityTimeoutMs),
 		maxNudgesPerTask: vsConfig.get<number>('maxNudgesPerTask', DEFAULT_CONFIG.maxNudgesPerTask),
 		hookScript: vsConfig.get<string | undefined>('hookScript', undefined),
+		promptBlocks: vsConfig.get<string[]>('promptBlocks', DEFAULT_CONFIG.promptBlocks!),
 		workspaceRoot,
 	};
 }

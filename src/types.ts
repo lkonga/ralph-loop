@@ -85,6 +85,7 @@ export interface RalphConfig {
 	inactivityTimeoutMs: number;
 	maxNudgesPerTask: number;
 	hookScript?: string;
+	promptBlocks?: string[];
 	workspaceRoot: string;
 }
 
@@ -97,6 +98,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	inactivityTimeoutMs: 300_000,
 	maxNudgesPerTask: 3,
 	hookScript: undefined,
+	promptBlocks: ['safety', 'discipline'],
 };
 
 // --- Verification ---

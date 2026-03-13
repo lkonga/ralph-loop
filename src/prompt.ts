@@ -7,7 +7,24 @@ function filterPrdContent(prdContent: string): string {
 	return [header, '', ...uncheckedLines].join('\n');
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20): string {
+const PROMPT_BLOCKS: Record<string, string> = {
+	security: 'Be aware of OWASP Top 10 vulnerabilities. Validate all inputs and never hardcode secrets, tokens, or credentials in source code.',
+	safety: 'Prefer reversible actions. Confirm before destructive operations like deleting files or dropping data. Do not delete files unless the PRD explicitly instructs it.',
+	discipline: 'Make minimal, surgical changes — only what the task requires. No over-engineering, no unsolicited refactoring, no adding features beyond scope.',
+	brevity: 'Keep output concise. Do not add verbose explanations in code comments. Communicate results briefly.',
+};
+
+function renderPromptBlocks(blocks?: string[]): string[] {
+	if (!blocks || blocks.length === 0) { return []; }
+	const lines: string[] = [];
+	for (const key of blocks) {
+		const text = PROMPT_BLOCKS[key];
+		if (text) { lines.push(text, ''); }
+	}
+	return lines;
+}
+
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[]): string {
 	const MAX_LEN = 5000;
 	const sanitized = taskDescription.trim().slice(0, MAX_LEN);
 
@@ -30,6 +47,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		'',
 		'Continue working until the task is fully complete. It\'s YOUR RESPONSIBILITY to finish. Do not hand back to the user.',
 		'',
+		...renderPromptBlocks(promptBlocks),
 		'===================================================================',
 		'    MANDATORY: UPDATE PRD.md AND progress.txt WHEN DONE',
 		'===================================================================',
