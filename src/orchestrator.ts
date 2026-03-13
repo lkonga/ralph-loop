@@ -31,6 +31,7 @@ export class LoopOrchestrator {
 	private state: LoopState = LoopState.Idle;
 	private stopRequested = false;
 	private pauseRequested = false;
+	private yieldRequested = false;
 	private prdWatcher: vscode.FileSystemWatcher | undefined;
 	private config: RalphConfig;
 	private readonly logger: ILogger;
@@ -67,6 +68,7 @@ export class LoopOrchestrator {
 		this.state = LoopState.Running;
 		this.stopRequested = false;
 		this.pauseRequested = false;
+		this.yieldRequested = false;
 		this.logger.log('Loop started');
 
 		try {
@@ -74,7 +76,8 @@ export class LoopOrchestrator {
 				this.onEvent(event);
 				if (event.kind === LoopEventKind.Stopped ||
 					event.kind === LoopEventKind.AllDone ||
-					event.kind === LoopEventKind.MaxIterations) {
+					event.kind === LoopEventKind.MaxIterations ||
+					event.kind === LoopEventKind.YieldRequested) {
 					break;
 				}
 			}
@@ -98,6 +101,11 @@ export class LoopOrchestrator {
 		this.pauseRequested = false;
 		this.state = LoopState.Running;
 		this.logger.log('Resumed');
+	}
+
+	requestYield(): void {
+		this.yieldRequested = true;
+		this.logger.log('Yield requested');
 	}
 
 	private cleanup(): void {
@@ -227,6 +235,13 @@ export class LoopOrchestrator {
 					if (completeHook.additionalContext) { additionalContext = completeHook.additionalContext; }
 					if (completeHook.action === 'stop') {
 						yield { kind: LoopEventKind.Stopped };
+						return;
+					}
+
+					// Graceful yield: deferred until task completion (autopilot pattern)
+					if (this.yieldRequested) {
+						this.logger.log('Yield honoured after task completion');
+						yield { kind: LoopEventKind.YieldRequested };
 						return;
 					}
 				} else {

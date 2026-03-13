@@ -95,6 +95,10 @@ export function activate(context: vscode.ExtensionContext): void {
 						vscode.window.showWarningMessage(`Ralph Loop: Reached ${event.limit} iteration limit`);
 						logger.warn(`Hit max iterations: ${event.limit}`);
 						break;
+					case LoopEventKind.YieldRequested:
+						logger.log('Loop yielded gracefully');
+						vscode.window.showInformationMessage('Ralph Loop: Yielded gracefully after task completion');
+						break;
 					case LoopEventKind.Stopped:
 						logger.log('Loop stopped');
 						break;
@@ -126,6 +130,15 @@ export function activate(context: vscode.ExtensionContext): void {
 		vscode.commands.registerCommand('ralph-loop.status', () => {
 			const state = orchestrator?.getState() ?? 'idle';
 			vscode.window.showInformationMessage(`Ralph Loop: ${state}`);
+		}),
+
+		vscode.commands.registerCommand('ralph-loop.yield', () => {
+			if (!orchestrator || orchestrator.getState() !== 'running') {
+				vscode.window.showWarningMessage('Ralph Loop: Not running');
+				return;
+			}
+			orchestrator.requestYield();
+			vscode.window.showInformationMessage('Ralph Loop: Yield requested — will stop after current task completes');
 		}),
 
 		outputChannel,

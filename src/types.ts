@@ -46,6 +46,7 @@ export const enum LoopEventKind {
 	Countdown = 'countdown',
 	AllDone = 'all_done',
 	MaxIterations = 'max_iterations',
+	YieldRequested = 'yield_requested',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -61,6 +62,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.Countdown; secondsLeft: number }
 	| { kind: LoopEventKind.AllDone; total: number }
 	| { kind: LoopEventKind.MaxIterations; limit: number }
+	| { kind: LoopEventKind.YieldRequested }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
