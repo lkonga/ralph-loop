@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as crypto from 'crypto';
 import {
 	LoopState,
@@ -13,11 +12,13 @@ import {
 	TaskState,
 	IRalphHookService,
 	HookResult,
+	ITaskExecutionStrategy,
+	ExecutionOptions,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
-import { startFreshChatSession, openCopilotWithPrompt, buildPrompt, buildFinalNudgePrompt, PromptCapabilities, CopilotRequestOptions } from './copilot';
-import { verifyTaskCompletion, allChecksPassed, isAllDone } from './verify';
+import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
+import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
 
@@ -40,6 +41,7 @@ export class LoopOrchestrator {
 	private readonly completedTasks = new Set<number>();
 	private readonly hookService: IRalphHookService;
 	private readonly hooksEnabled: boolean;
+	private readonly executionStrategy: ITaskExecutionStrategy;
 	private currentSessionId: string | undefined;
 
 	constructor(
@@ -53,6 +55,14 @@ export class LoopOrchestrator {
 		this.onEvent = onEvent;
 		this.hookService = hookService ?? new NoOpHookService();
 		this.hooksEnabled = hookService !== undefined;
+		this.executionStrategy = this.resolveStrategy();
+	}
+
+	private resolveStrategy(): ITaskExecutionStrategy {
+		if (this.config.executionStrategy === 'api') {
+			return new DirectApiStrategy(this.logger);
+		}
+		return new CopilotCommandStrategy(this.logger);
 	}
 
 	getState(): LoopState {
@@ -140,9 +150,13 @@ export class LoopOrchestrator {
 		};
 	}
 
-	private get copilotRequestOptions(): CopilotRequestOptions {
+	private get executionOptions(): ExecutionOptions {
 		return {
+			prdPath: resolvePrdPath(this.config.workspaceRoot, this.config.prdPath),
+			workspaceRoot: this.config.workspaceRoot,
+			inactivityTimeoutMs: this.config.inactivityTimeoutMs,
 			useAutopilotMode: this.config.useAutopilotMode,
+			shouldStop: () => this.stopRequested,
 		};
 	}
 
@@ -235,20 +249,17 @@ export class LoopOrchestrator {
 					// progress file may not exist yet
 				}
 
-				// Start fresh session + trigger Copilot
-				await startFreshChatSession(this.logger);
+				// Build prompt and execute via strategy
 				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities);
 				if (additionalContext) {
 					prompt += '\n\n' + additionalContext;
 					additionalContext = '';
 				}
-				const method = await openCopilotWithPrompt(prompt, this.logger, this.copilotRequestOptions);
-				yield { kind: LoopEventKind.CopilotTriggered, method, taskInvocationId };
-
-				// Wait for completion: watch PRD for checkbox change
-				yield { kind: LoopEventKind.WaitingForCompletion, task, taskInvocationId };
 				const taskState: TaskState = { taskInvocationId, nudgeCount: 0, retryCount: 0, taskCompletedLatch: false };
-				let waitResult = await this.waitForTaskCompletion(prdPath, task);
+				const execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
+				yield { kind: LoopEventKind.CopilotTriggered, method: execResult.method, taskInvocationId };
+				yield { kind: LoopEventKind.WaitingForCompletion, task, taskInvocationId };
+				let waitResult = { completed: execResult.completed, hadFileChanges: execResult.hadFileChanges };
 
 				// Nudge loop: re-send prompt with continuation nudge if timed out
 				while (!waitResult.completed && !this.stopRequested && taskState.nudgeCount < this.config.maxNudgesPerTask) {
@@ -268,9 +279,8 @@ export class LoopOrchestrator {
 					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities)
 						+ '\n\n' + continuationSuffix;
 
-					await startFreshChatSession(this.logger);
-					await openCopilotWithPrompt(nudgePrompt, this.logger, this.copilotRequestOptions);
-					waitResult = await this.waitForTaskCompletion(prdPath, task);
+					const nudgeResult = await this.executionStrategy.execute(task, nudgePrompt, this.executionOptions);
+					waitResult = { completed: nudgeResult.completed, hadFileChanges: nudgeResult.hadFileChanges };
 				}
 
 				if (this.stopRequested) {
@@ -331,13 +341,11 @@ export class LoopOrchestrator {
 						let progressContent = '';
 						try { progressContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 
-						await startFreshChatSession(this.logger);
 						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities);
-						const method = await openCopilotWithPrompt(prompt, this.logger, this.copilotRequestOptions);
-						yield { kind: LoopEventKind.CopilotTriggered, method, taskInvocationId };
+						const retryExecResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
+						yield { kind: LoopEventKind.CopilotTriggered, method: retryExecResult.method, taskInvocationId };
 
-						yield { kind: LoopEventKind.WaitingForCompletion, task, taskInvocationId };
-						const retryResult = await this.waitForTaskCompletion(prdPath, task);
+						const retryResult = { completed: retryExecResult.completed, hadFileChanges: retryExecResult.hadFileChanges };
 
 						if (retryResult.completed) {
 							this.completedTasks.add(task.id);
@@ -379,67 +387,6 @@ export class LoopOrchestrator {
 		}
 	}
 
-	private waitForTaskCompletion(prdPath: string, task: { readonly description: string }): Promise<{ completed: boolean; hadFileChanges: boolean }> {
-		return new Promise<{ completed: boolean; hadFileChanges: boolean }>(resolve => {
-			const pattern = new vscode.RelativePattern(
-				path.dirname(prdPath),
-				path.basename(prdPath),
-			);
-
-			let settled = false;
-			let hadFileChanges = false;
-			let poll: ReturnType<typeof setInterval>;
-			let timeout: ReturnType<typeof setTimeout>;
-
-			const settle = (result: boolean) => {
-				if (!settled) {
-					settled = true;
-					prdWatcher.dispose();
-					activityWatcher.dispose();
-					clearTimeout(timeout);
-					clearInterval(poll);
-					resolve({ completed: result, hadFileChanges });
-				}
-			};
-
-			const resetInactivityTimer = () => {
-				clearTimeout(timeout);
-				timeout = setTimeout(() => settle(false), this.config.inactivityTimeoutMs);
-			};
-
-			const prdWatcher = vscode.workspace.createFileSystemWatcher(pattern);
-			const checkCompletion = () => {
-				const checks = verifyTaskCompletion(prdPath, task as any, this.logger);
-				if (allChecksPassed(checks)) {
-					settle(true);
-				}
-			};
-			prdWatcher.onDidChange(checkCompletion);
-			prdWatcher.onDidCreate(checkCompletion);
-
-			// Watch all files in the workspace to reset inactivity timer on any edit
-			const workspacePattern = new vscode.RelativePattern(this.config.workspaceRoot, '**/*');
-			const activityWatcher = vscode.workspace.createFileSystemWatcher(workspacePattern);
-			const onFileActivity = () => {
-				hadFileChanges = true;
-				resetInactivityTimer();
-			};
-			activityWatcher.onDidChange(onFileActivity);
-			activityWatcher.onDidCreate(onFileActivity);
-			activityWatcher.onDidDelete(onFileActivity);
-
-			timeout = setTimeout(() => settle(false), this.config.inactivityTimeoutMs);
-
-			poll = setInterval(() => {
-				if (this.stopRequested) {
-					settle(false);
-					return;
-				}
-				checkCompletion();
-			}, 5000);
-		});
-	}
-
 	private shouldRetry(error: Error, retryCount: number): boolean {
 		return shouldRetryError(error, retryCount, this.stopRequested);
 	}
@@ -461,6 +408,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		inactivityTimeoutMs: vsConfig.get<number>('inactivityTimeoutMs', DEFAULT_CONFIG.inactivityTimeoutMs),
 		maxNudgesPerTask: vsConfig.get<number>('maxNudgesPerTask', DEFAULT_CONFIG.maxNudgesPerTask),
 		hookScript: vsConfig.get<string | undefined>('hookScript', undefined),
+		executionStrategy: vsConfig.get<'command' | 'api'>('executionStrategy', DEFAULT_CONFIG.executionStrategy),
 		promptBlocks: vsConfig.get<string[]>('promptBlocks', DEFAULT_CONFIG.promptBlocks!),
 		useHookBridge: vsConfig.get<boolean>('useHookBridge', DEFAULT_CONFIG.useHookBridge),
 		useSessionTracking: vsConfig.get<boolean>('useSessionTracking', DEFAULT_CONFIG.useSessionTracking),

@@ -78,6 +78,25 @@ export interface TaskState {
 	taskCompletedLatch: boolean;
 }
 
+// --- Task execution strategy ---
+export interface ExecutionOptions {
+	prdPath: string;
+	workspaceRoot: string;
+	inactivityTimeoutMs: number;
+	useAutopilotMode: boolean;
+	shouldStop: () => boolean;
+}
+
+export interface ExecutionResult {
+	completed: boolean;
+	method: CopilotMethod;
+	hadFileChanges: boolean;
+}
+
+export interface ITaskExecutionStrategy {
+	execute(task: Task, prompt: string, options: ExecutionOptions): Promise<ExecutionResult>;
+}
+
 // --- Config ---
 export interface RalphConfig {
 	prdPath: string;
@@ -87,6 +106,7 @@ export interface RalphConfig {
 	countdownSeconds: number;
 	inactivityTimeoutMs: number;
 	maxNudgesPerTask: number;
+	executionStrategy: 'command' | 'api';
 	hookScript?: string;
 	promptBlocks?: string[];
 	useHookBridge: boolean;
@@ -103,6 +123,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	countdownSeconds: 12,
 	inactivityTimeoutMs: 300_000,
 	maxNudgesPerTask: 3,
+	executionStrategy: 'command',
 	hookScript: undefined,
 	promptBlocks: ['safety', 'discipline'],
 	useHookBridge: false,
