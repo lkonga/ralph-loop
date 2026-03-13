@@ -72,7 +72,7 @@
 
 ### Tool Capability Discovery
 
-- [ ] **Deferred tool/capability awareness**: In `src/prompt.ts`, add a "AVAILABLE CAPABILITIES" section to the prompt that lists what the agent CAN do based on configuration. When hooks are enabled, mention it: `"Quality hooks are active — your work will be validated after each tool use."` When shell hooks are configured, mention the script: `"External validator: [script path] will run on task completion."` When specific prompt blocks are active, list them. This gives the agent awareness of the guardrails around it, similar to how VS Code's `nonDeferredToolNames` ensures the model knows about critical tools. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
+- [x] **Deferred tool/capability awareness**: In `src/prompt.ts`, add a "AVAILABLE CAPABILITIES" section to the prompt that lists what the agent CAN do based on configuration. When hooks are enabled, mention it: `"Quality hooks are active — your work will be validated after each tool use."` When shell hooks are configured, mention the script: `"External validator: [script path] will run on task completion."` When specific prompt blocks are active, list them. This gives the agent awareness of the guardrails around it, similar to how VS Code's `nonDeferredToolNames` ensures the model knows about critical tools. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
 ### Agentic Proxy Pattern
 
