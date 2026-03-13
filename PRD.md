@@ -68,7 +68,7 @@
 
 ### Prompt Enrichment Blocks
 
-- [ ] **Security and safety prompt blocks**: In `src/prompt.ts`, add optional prompt blocks that are injected when configured. Add `promptBlocks?: string[]` to `RalphLoopConfig` with possible values: `'security'` (OWASP Top 10 awareness, input validation, no hardcoded secrets), `'safety'` (prefer reversible actions, confirm destructive ops, don't delete files without PRD instruction), `'discipline'` (minimal changes, no over-engineering, no unsolicited refactoring), `'brevity'` (concise output, no verbose explanations in comments). Each block is a 2-3 sentence instruction appended after the "ROLE & BEHAVIOR" section. Default: `['safety', 'discipline']`. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
+- [x] **Security and safety prompt blocks**: In `src/prompt.ts`, add optional prompt blocks that are injected when configured. Add `promptBlocks?: string[]` to `RalphLoopConfig` with possible values: `'security'` (OWASP Top 10 awareness, input validation, no hardcoded secrets), `'safety'` (prefer reversible actions, confirm destructive ops, don't delete files without PRD instruction), `'discipline'` (minimal changes, no over-engineering, no unsolicited refactoring), `'brevity'` (concise output, no verbose explanations in comments). Each block is a 2-3 sentence instruction appended after the "ROLE & BEHAVIOR" section. Default: `['safety', 'discipline']`. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
 ### Tool Capability Discovery
 
