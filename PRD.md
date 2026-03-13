@@ -64,7 +64,7 @@
 
 ### Shell Hook Execution
 
-- [ ] **External shell command hooks**: Extend `IRalphHookService` to support shell command hooks alongside in-process TS callbacks. Add a `ShellHookProvider` that executes a user-configured shell script on each hook event, passing hook input as JSON on stdin and reading `HookResult` as JSON from stdout. The script path is configured via `RalphLoopConfig.hookScript?: string`. Exit codes: 0 = success/continue, 1 = warning (log and continue), 2 = block/stop (halt the loop with the script's stderr as reason). This enables user-authored quality gates (e.g., run linter, check test coverage, validate git state) without modifying ralph-loop source. Add timeout of 30s per hook execution. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
+- [x] **External shell command hooks**: Extend `IRalphHookService` to support shell command hooks alongside in-process TS callbacks. Add a `ShellHookProvider` that executes a user-configured shell script on each hook event, passing hook input as JSON on stdin and reading `HookResult` as JSON from stdout. The script path is configured via `RalphLoopConfig.hookScript?: string`. Exit codes: 0 = success/continue, 1 = warning (log and continue), 2 = block/stop (halt the loop with the script's stderr as reason). This enables user-authored quality gates (e.g., run linter, check test coverage, validate git state) without modifying ralph-loop source. Add timeout of 30s per hook execution. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
 ### Prompt Enrichment Blocks
 
