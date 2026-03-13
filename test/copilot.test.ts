@@ -55,4 +55,28 @@ describe('buildPrompt', () => {
 		expect(prompt).not.toContain('[line 1] did something');
 		expect(prompt).not.toContain('[line 10] did something');
 	});
+
+	it('includes ROLE & BEHAVIOR section', () => {
+		const prompt = buildPrompt('Do something', '- [ ] Do something', '');
+		expect(prompt).toContain('ROLE & BEHAVIOR');
+		expect(prompt).toContain('You are an autonomous coding agent');
+	});
+
+	it('omits earlier entries when progress exceeds default maxProgressLines', () => {
+		const lines = Array.from({ length: 30 }, (_, i) => `[entry ${i + 1}]`);
+		const prompt = buildPrompt('Task', '- [ ] Task', lines.join('\n'));
+		expect(prompt).toContain('[...10 earlier entries omitted]');
+		expect(prompt).not.toContain('[entry 5]');
+		expect(prompt).toContain('[entry 25]');
+	});
+
+	it('excludes checked PRD lines and includes unchecked ones', () => {
+		const prd = '# PRD\n- [x] Already done\n- [x] Also done\n- [ ] Still todo\n- [ ] Another todo';
+		const prompt = buildPrompt('Still todo', prd, '');
+		expect(prompt).not.toContain('- [x] Already done');
+		expect(prompt).not.toContain('- [x] Also done');
+		expect(prompt).toContain('- [ ] Still todo');
+		expect(prompt).toContain('- [ ] Another todo');
+		expect(prompt).toContain('Progress: 2/4 tasks completed');
+	});
 });
