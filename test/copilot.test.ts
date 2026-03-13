@@ -41,4 +41,15 @@ describe('buildPrompt', () => {
 		expect(prompt).toContain('- [x] Fix bug');
 		expect(prompt).toContain('MANDATORY');
 	});
+
+	it('truncates progress when exceeding maxProgressLines', () => {
+		const lines = Array.from({ length: 30 }, (_, i) => `[line ${i + 1}] did something`);
+		const progress = lines.join('\n');
+		const prompt = buildPrompt('Task', '- [ ] Task', progress);
+		expect(prompt).toContain('[...10 earlier entries omitted]');
+		expect(prompt).toContain('[line 21] did something');
+		expect(prompt).toContain('[line 30] did something');
+		expect(prompt).not.toContain('[line 1] did something');
+		expect(prompt).not.toContain('[line 10] did something');
+	});
 });

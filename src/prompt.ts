@@ -1,4 +1,4 @@
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string): string {
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20): string {
 	const MAX_LEN = 5000;
 	const sanitized = taskDescription.trim().slice(0, MAX_LEN);
 
@@ -43,9 +43,18 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 	];
 
 	if (progressContent.trim()) {
+		const lines = progressContent.split('\n');
+		let displayContent: string;
+		if (lines.length > maxProgressLines) {
+			const omitted = lines.length - maxProgressLines;
+			const kept = lines.slice(-maxProgressLines);
+			displayContent = `[...${omitted} earlier entries omitted]\n${kept.join('\n')}`;
+		} else {
+			displayContent = progressContent;
+		}
 		parts.push('## progress.txt:');
 		parts.push('```');
-		parts.push(progressContent);
+		parts.push(displayContent);
 		parts.push('```');
 		parts.push('');
 	}
