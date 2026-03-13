@@ -60,7 +60,7 @@
 
 ### Dynamic Iteration Limits
 
-- [ ] **Auto-expand iteration limit in autopilot**: In `src/orchestrator.ts`, when `maxIterations` is reached but tasks remain, instead of immediately yielding `MaxIterations` and stopping, auto-expand the limit by 50% (capped at a hard maximum of 50 iterations). Add `hardMaxIterations: number = 50` to `RalphLoopConfig`. Log the expansion via `LoopEventKind.IterationLimitExpanded` (new event). Only auto-expand once per loop run — if the expanded limit is also reached, stop for real. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
+- [x] **Auto-expand iteration limit in autopilot**: In `src/orchestrator.ts`, when `maxIterations` is reached but tasks remain, instead of immediately yielding `MaxIterations` and stopping, auto-expand the limit by 50% (capped at a hard maximum of 50 iterations). Add `hardMaxIterations: number = 50` to `RalphLoopConfig`. Log the expansion via `LoopEventKind.IterationLimitExpanded` (new event). Only auto-expand once per loop run — if the expanded limit is also reached, stop for real. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
 ### Shell Hook Execution
 
