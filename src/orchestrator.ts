@@ -14,8 +14,7 @@ import {
 import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
 import { startFreshChatSession, openCopilotWithPrompt, buildPrompt } from './copilot';
 import { verifyTaskCompletion, allChecksPassed, isAllDone } from './verify';
-
-const MAX_RETRIES_PER_TASK = 3;
+import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 
 export class LoopOrchestrator {
 	private state: LoopState = LoopState.Idle;
@@ -316,15 +315,7 @@ export class LoopOrchestrator {
 	}
 
 	private shouldRetry(error: Error, retryCount: number): boolean {
-		if (retryCount >= MAX_RETRIES_PER_TASK) {
-			return false;
-		}
-		if (this.stopRequested) {
-			return false;
-		}
-		const msg = error.message.toLowerCase();
-		const transientPatterns = ['network', 'timeout', 'econnreset', 'econnrefused', 'etimedout', 'socket hang up', 'fetch failed', 'abort'];
-		return transientPatterns.some(p => msg.includes(p));
+		return shouldRetryError(error, retryCount, this.stopRequested);
 	}
 
 	private delay(ms: number): Promise<void> {
