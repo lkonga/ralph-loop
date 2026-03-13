@@ -20,16 +20,37 @@ export async function startFreshChatSession(logger: ILogger): Promise<boolean> {
 	return ok;
 }
 
-export async function openCopilotWithPrompt(prompt: string, logger: ILogger): Promise<CopilotMethod> {
+export interface CopilotRequestOptions {
+	useAutopilotMode?: boolean;
+}
+
+export async function openCopilotWithPrompt(prompt: string, logger: ILogger, options?: CopilotRequestOptions): Promise<CopilotMethod> {
+	const requestArgs: Record<string, unknown> = {};
+
+	// When autopilot mode is enabled, set permissionLevel on the chat request
+	if (options?.useAutopilotMode) {
+		try {
+			// chatParticipantPrivate proposed API — may not be available
+			requestArgs['permissionLevel'] = 'autopilot';
+			logger.log('Autopilot mode: setting permissionLevel=autopilot on chat request');
+		} catch {
+			logger.warn('Autopilot mode requested but chatParticipantPrivate API unavailable');
+		}
+	}
+
 	// Level 1: Agent mode (edit session)
-	const agentOk = await tryCommand('workbench.action.chat.openEditSession', prompt);
+	const agentArgs = options?.useAutopilotMode ? { prompt, ...requestArgs } : prompt;
+	const agentOk = await tryCommand('workbench.action.chat.openEditSession', agentArgs);
 	if (agentOk) {
 		logger.log('Opened Copilot Agent Mode');
 		return 'agent';
 	}
 
 	// Level 2: Chat panel
-	const chatOk = await tryCommand('workbench.action.chat.open', { query: prompt });
+	const chatArgs = options?.useAutopilotMode
+		? { query: prompt, ...requestArgs }
+		: { query: prompt };
+	const chatOk = await tryCommand('workbench.action.chat.open', chatArgs);
 	if (chatOk) {
 		logger.log('Opened Copilot Chat');
 		return 'chat';

@@ -90,6 +90,7 @@ export interface RalphConfig {
 	promptBlocks?: string[];
 	useHookBridge: boolean;
 	useSessionTracking: boolean;
+	useAutopilotMode: boolean;
 	workspaceRoot: string;
 }
 
@@ -105,6 +106,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	promptBlocks: ['safety', 'discipline'],
 	useHookBridge: false,
 	useSessionTracking: false,
+	useAutopilotMode: false,
 };
 
 // --- Verification ---

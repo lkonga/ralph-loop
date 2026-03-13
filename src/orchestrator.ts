@@ -14,7 +14,7 @@ import {
 	HookResult,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
-import { startFreshChatSession, openCopilotWithPrompt, buildPrompt, PromptCapabilities } from './copilot';
+import { startFreshChatSession, openCopilotWithPrompt, buildPrompt, PromptCapabilities, CopilotRequestOptions } from './copilot';
 import { verifyTaskCompletion, allChecksPassed, isAllDone } from './verify';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 
@@ -139,6 +139,12 @@ export class LoopOrchestrator {
 		};
 	}
 
+	private get copilotRequestOptions(): CopilotRequestOptions {
+		return {
+			useAutopilotMode: this.config.useAutopilotMode,
+		};
+	}
+
 	private async *runLoop(): AsyncGenerator<LoopEvent> {
 		const prdPath = resolvePrdPath(this.config.workspaceRoot, this.config.prdPath);
 		const progressPath = resolveProgressPath(this.config.workspaceRoot, this.config.progressPath);
@@ -234,7 +240,7 @@ export class LoopOrchestrator {
 					prompt += '\n\n' + additionalContext;
 					additionalContext = '';
 				}
-				const method = await openCopilotWithPrompt(prompt, this.logger);
+				const method = await openCopilotWithPrompt(prompt, this.logger, this.copilotRequestOptions);
 				yield { kind: LoopEventKind.CopilotTriggered, method };
 
 				// Wait for completion: watch PRD for checkbox change
@@ -258,7 +264,7 @@ export class LoopOrchestrator {
 						+ '\n\nContinue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
 
 					await startFreshChatSession(this.logger);
-					await openCopilotWithPrompt(nudgePrompt, this.logger);
+					await openCopilotWithPrompt(nudgePrompt, this.logger, this.copilotRequestOptions);
 					waitResult = await this.waitForTaskCompletion(prdPath, task);
 				}
 
@@ -322,7 +328,7 @@ export class LoopOrchestrator {
 
 						await startFreshChatSession(this.logger);
 						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities);
-						const method = await openCopilotWithPrompt(prompt, this.logger);
+						const method = await openCopilotWithPrompt(prompt, this.logger, this.copilotRequestOptions);
 						yield { kind: LoopEventKind.CopilotTriggered, method };
 
 						yield { kind: LoopEventKind.WaitingForCompletion, task };
@@ -453,6 +459,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		promptBlocks: vsConfig.get<string[]>('promptBlocks', DEFAULT_CONFIG.promptBlocks!),
 		useHookBridge: vsConfig.get<boolean>('useHookBridge', DEFAULT_CONFIG.useHookBridge),
 		useSessionTracking: vsConfig.get<boolean>('useSessionTracking', DEFAULT_CONFIG.useSessionTracking),
+		useAutopilotMode: vsConfig.get<boolean>('useAutopilotMode', DEFAULT_CONFIG.useAutopilotMode),
 		workspaceRoot,
 	};
 }
