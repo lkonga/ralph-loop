@@ -46,7 +46,7 @@
 
 - [x] **Hook type definitions**: In `src/types.ts`, define the hook system types: `type RalphHookType = 'SessionStart' | 'PreCompact' | 'PostToolUse' | 'TaskComplete'`. For each, define typed input interfaces (`SessionStartInput { prdPath: string }`, `TaskCompleteInput { taskId: string; result: 'success' | 'failure' }`, etc.) and a shared `HookResult { action: 'continue' | 'retry' | 'skip' | 'stop'; reason?: string; additionalContext?: string }`. Define `IRalphHookService` interface with one method per hook type. Export all types. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
-- [ ] **Hook integration in orchestrator**: In `src/orchestrator.ts`, accept an optional `IRalphHookService` in the constructor. At each yield point, call the corresponding hook method and check the returned `HookResult.action` — `'continue'` proceeds normally, `'retry'` re-enters the task, `'skip'` moves to next task, `'stop'` breaks the loop. If `additionalContext` is set, include it in the next prompt sent to Copilot. Create a default no-op implementation that always returns `{ action: 'continue' }`. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
+- [x] **Hook integration in orchestrator**: In `src/orchestrator.ts`, accept an optional `IRalphHookService` in the constructor. At each yield point, call the corresponding hook method and check the returned `HookResult.action` — `'continue'` proceeds normally, `'retry'` re-enters the task, `'skip'` moves to next task, `'stop'` breaks the loop. If `additionalContext` is set, include it in the next prompt sent to Copilot. Create a default no-op implementation that always returns `{ action: 'continue' }`. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
 ---
 
