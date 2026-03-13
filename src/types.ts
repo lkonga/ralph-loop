@@ -54,13 +54,13 @@ export const enum LoopEventKind {
 }
 
 export type LoopEvent =
-	| { kind: LoopEventKind.TaskStarted; task: Task; iteration: number }
-	| { kind: LoopEventKind.CopilotTriggered; method: CopilotMethod }
-	| { kind: LoopEventKind.WaitingForCompletion; task: Task }
-	| { kind: LoopEventKind.TaskCompleted; task: Task; durationMs: number }
-	| { kind: LoopEventKind.TaskTimedOut; task: Task; durationMs: number }
-	| { kind: LoopEventKind.TaskNudged; task: Task; nudgeCount: number }
-	| { kind: LoopEventKind.TaskRetried; task: Task; retryCount: number }
+	| { kind: LoopEventKind.TaskStarted; task: Task; iteration: number; taskInvocationId: string }
+	| { kind: LoopEventKind.CopilotTriggered; method: CopilotMethod; taskInvocationId?: string }
+	| { kind: LoopEventKind.WaitingForCompletion; task: Task; taskInvocationId: string }
+	| { kind: LoopEventKind.TaskCompleted; task: Task; durationMs: number; taskInvocationId: string }
+	| { kind: LoopEventKind.TaskTimedOut; task: Task; durationMs: number; taskInvocationId: string }
+	| { kind: LoopEventKind.TaskNudged; task: Task; nudgeCount: number; taskInvocationId: string }
+	| { kind: LoopEventKind.TaskRetried; task: Task; retryCount: number; taskInvocationId: string }
 	| { kind: LoopEventKind.Countdown; secondsLeft: number }
 	| { kind: LoopEventKind.AllDone; total: number }
 	| { kind: LoopEventKind.MaxIterations; limit: number }
@@ -72,6 +72,7 @@ export type LoopEvent =
 
 // --- Per-task tracking ---
 export interface TaskState {
+	taskInvocationId: string;
 	nudgeCount: number;
 	retryCount: number;
 	taskCompletedLatch: boolean;
@@ -137,11 +138,13 @@ export interface PreCompactInput {
 export interface PostToolUseInput {
 	toolName: string;
 	taskId: string;
+	taskInvocationId?: string;
 }
 
 export interface TaskCompleteInput {
 	taskId: string;
 	result: 'success' | 'failure';
+	taskInvocationId?: string;
 }
 
 export interface HookResult {

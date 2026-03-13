@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import {
 	LoopState,
 	LoopEvent,
@@ -218,11 +219,12 @@ export class LoopOrchestrator {
 
 			iteration++;
 			task.status = TaskStatus.InProgress;
-			yield { kind: LoopEventKind.TaskStarted, task, iteration };
+			const taskInvocationId = crypto.randomUUID();
+			yield { kind: LoopEventKind.TaskStarted, task, iteration, taskInvocationId };
 
 			const startTime = Date.now();
 			try {
-				appendProgress(progressPath, `Task started: ${task.description}`);
+				appendProgress(progressPath, `[${taskInvocationId}] Task started: ${task.description}`);
 
 				// Read context for prompt
 				const prdContent = readPrdFile(prdPath);
@@ -241,11 +243,11 @@ export class LoopOrchestrator {
 					additionalContext = '';
 				}
 				const method = await openCopilotWithPrompt(prompt, this.logger, this.copilotRequestOptions);
-				yield { kind: LoopEventKind.CopilotTriggered, method };
+				yield { kind: LoopEventKind.CopilotTriggered, method, taskInvocationId };
 
 				// Wait for completion: watch PRD for checkbox change
-				yield { kind: LoopEventKind.WaitingForCompletion, task };
-				const taskState: TaskState = { nudgeCount: 0, retryCount: 0, taskCompletedLatch: false };
+				yield { kind: LoopEventKind.WaitingForCompletion, task, taskInvocationId };
+				const taskState: TaskState = { taskInvocationId, nudgeCount: 0, retryCount: 0, taskCompletedLatch: false };
 				let waitResult = await this.waitForTaskCompletion(prdPath, task);
 
 				// Nudge loop: re-send prompt with continuation nudge if timed out
@@ -257,7 +259,7 @@ export class LoopOrchestrator {
 					}
 
 					taskState.nudgeCount++;
-					yield { kind: LoopEventKind.TaskNudged, task, nudgeCount: taskState.nudgeCount };
+					yield { kind: LoopEventKind.TaskNudged, task, nudgeCount: taskState.nudgeCount, taskInvocationId };
 					this.logger.log(`Nudging task (${taskState.nudgeCount}/${this.config.maxNudgesPerTask}): ${task.description}`);
 
 					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities)
@@ -278,11 +280,11 @@ export class LoopOrchestrator {
 				if (waitResult.completed) {
 					taskState.taskCompletedLatch = true;
 					this.completedTasks.add(task.id);
-					appendProgress(progressPath, `Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
-					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
+					appendProgress(progressPath, `[${taskInvocationId}] Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
+					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId };
 
 					// TaskComplete hook
-					const completeHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'success' });
+					const completeHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'success', taskInvocationId });
 					if (completeHook.additionalContext) { additionalContext = completeHook.additionalContext; }
 					if (completeHook.action === 'stop') {
 						yield { kind: LoopEventKind.Stopped };
@@ -296,11 +298,11 @@ export class LoopOrchestrator {
 						return;
 					}
 				} else {
-					appendProgress(progressPath, `Task timed out: ${task.description} (${Math.round(duration / 1000)}s)`);
-					yield { kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration };
+					appendProgress(progressPath, `[${taskInvocationId}] Task timed out: ${task.description} (${Math.round(duration / 1000)}s)`);
+					yield { kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration, taskInvocationId };
 
 					// TaskComplete hook (failure)
-					const failHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure' });
+					const failHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure', taskInvocationId });
 					if (failHook.additionalContext) { additionalContext = failHook.additionalContext; }
 					if (failHook.action === 'retry') {
 						continue; // re-enter the task
@@ -317,7 +319,7 @@ export class LoopOrchestrator {
 
 				while (this.shouldRetry(currentError, retryCount)) {
 					retryCount++;
-					yield { kind: LoopEventKind.TaskRetried, task, retryCount };
+					yield { kind: LoopEventKind.TaskRetried, task, retryCount, taskInvocationId };
 					this.logger.log(`Retrying task (${retryCount}/${MAX_RETRIES_PER_TASK}): ${task.description}`);
 					await this.delay(2000);
 
@@ -329,16 +331,16 @@ export class LoopOrchestrator {
 						await startFreshChatSession(this.logger);
 						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities);
 						const method = await openCopilotWithPrompt(prompt, this.logger, this.copilotRequestOptions);
-						yield { kind: LoopEventKind.CopilotTriggered, method };
+						yield { kind: LoopEventKind.CopilotTriggered, method, taskInvocationId };
 
-						yield { kind: LoopEventKind.WaitingForCompletion, task };
+						yield { kind: LoopEventKind.WaitingForCompletion, task, taskInvocationId };
 						const retryResult = await this.waitForTaskCompletion(prdPath, task);
 
 						if (retryResult.completed) {
 							this.completedTasks.add(task.id);
 							const duration = Date.now() - startTime;
-							appendProgress(progressPath, `Task completed (after ${retryCount} retries): ${task.description} (${Math.round(duration / 1000)}s)`);
-							yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
+							appendProgress(progressPath, `[${taskInvocationId}] Task completed (after ${retryCount} retries): ${task.description} (${Math.round(duration / 1000)}s)`);
+							yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId };
 						}
 						handled = true;
 						break;
@@ -349,11 +351,11 @@ export class LoopOrchestrator {
 
 				if (!handled) {
 					const message = currentError.message;
-					appendProgress(progressPath, `Task error: ${task.description} — ${message}`);
+					appendProgress(progressPath, `[${taskInvocationId}] Task error: ${task.description} — ${message}`);
 					yield { kind: LoopEventKind.Error, message: `Task "${task.description}" failed: ${message}` };
 
 					// TaskComplete hook (failure after retries exhausted)
-					const errorHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure' });
+					const errorHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure', taskInvocationId });
 					if (errorHook.additionalContext) { additionalContext = errorHook.additionalContext; }
 					if (errorHook.action === 'stop') {
 						yield { kind: LoopEventKind.Stopped };
