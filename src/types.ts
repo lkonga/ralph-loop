@@ -46,6 +46,7 @@ export const enum LoopEventKind {
 	Countdown = 'countdown',
 	AllDone = 'all_done',
 	MaxIterations = 'max_iterations',
+	IterationLimitExpanded = 'iteration_limit_expanded',
 	YieldRequested = 'yield_requested',
 	Stopped = 'stopped',
 	Error = 'error',
@@ -62,6 +63,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.Countdown; secondsLeft: number }
 	| { kind: LoopEventKind.AllDone; total: number }
 	| { kind: LoopEventKind.MaxIterations; limit: number }
+	| { kind: LoopEventKind.IterationLimitExpanded; oldLimit: number; newLimit: number }
 	| { kind: LoopEventKind.YieldRequested }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
@@ -78,6 +80,7 @@ export interface RalphConfig {
 	prdPath: string;
 	progressPath: string;
 	maxIterations: number;
+	hardMaxIterations: number;
 	countdownSeconds: number;
 	inactivityTimeoutMs: number;
 	maxNudgesPerTask: number;
@@ -88,6 +91,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	prdPath: 'PRD.md',
 	progressPath: 'progress.txt',
 	maxIterations: 50,
+	hardMaxIterations: 50,
 	countdownSeconds: 12,
 	inactivityTimeoutMs: 300_000,
 	maxNudgesPerTask: 3,

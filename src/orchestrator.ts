@@ -118,6 +118,8 @@ export class LoopOrchestrator {
 		const progressPath = resolveProgressPath(this.config.workspaceRoot, this.config.progressPath);
 		let iteration = 0;
 		let additionalContext = '';
+		let iterationLimitExpanded = false;
+		let effectiveMaxIterations = this.config.maxIterations;
 
 		// SessionStart hook
 		const sessionHook = await this.hookService.onSessionStart({ prdPath });
@@ -145,10 +147,27 @@ export class LoopOrchestrator {
 				}
 			}
 
-			// Check iteration limit
-			if (this.config.maxIterations > 0 && iteration >= this.config.maxIterations) {
-				yield { kind: LoopEventKind.MaxIterations, limit: this.config.maxIterations };
-				return;
+			// Check iteration limit — auto-expand once if tasks remain
+			if (effectiveMaxIterations > 0 && iteration >= effectiveMaxIterations) {
+				if (!iterationLimitExpanded) {
+					// Check if tasks remain before expanding
+					const peekSnapshot = readPrdSnapshot(prdPath);
+					const peekTask = pickNextTask(peekSnapshot);
+					if (peekTask && !this.completedTasks.has(peekTask.id)) {
+						const oldLimit = effectiveMaxIterations;
+						const expanded = Math.ceil(effectiveMaxIterations * 1.5);
+						effectiveMaxIterations = Math.min(expanded, this.config.hardMaxIterations);
+						iterationLimitExpanded = true;
+						this.logger.log(`Auto-expanded iteration limit: ${oldLimit} → ${effectiveMaxIterations}`);
+						yield { kind: LoopEventKind.IterationLimitExpanded, oldLimit, newLimit: effectiveMaxIterations };
+					} else {
+						yield { kind: LoopEventKind.MaxIterations, limit: effectiveMaxIterations };
+						return;
+					}
+				} else {
+					yield { kind: LoopEventKind.MaxIterations, limit: effectiveMaxIterations };
+					return;
+				}
 			}
 
 			// Parse PRD, pick next task
@@ -400,6 +419,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		prdPath: vsConfig.get<string>('prdPath', DEFAULT_CONFIG.prdPath),
 		progressPath: vsConfig.get<string>('progressPath', DEFAULT_CONFIG.progressPath),
 		maxIterations: vsConfig.get<number>('maxIterations', DEFAULT_CONFIG.maxIterations),
+		hardMaxIterations: vsConfig.get<number>('hardMaxIterations', DEFAULT_CONFIG.hardMaxIterations),
 		countdownSeconds: vsConfig.get<number>('countdownSeconds', DEFAULT_CONFIG.countdownSeconds),
 		inactivityTimeoutMs: vsConfig.get<number>('inactivityTimeoutMs', DEFAULT_CONFIG.inactivityTimeoutMs),
 		maxNudgesPerTask: vsConfig.get<number>('maxNudgesPerTask', DEFAULT_CONFIG.maxNudgesPerTask),
