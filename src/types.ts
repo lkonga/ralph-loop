@@ -104,6 +104,41 @@ export interface VerifyCheck {
 	readonly detail?: string;
 }
 
+// --- Hook system ---
+export type RalphHookType = 'SessionStart' | 'PreCompact' | 'PostToolUse' | 'TaskComplete';
+
+export interface SessionStartInput {
+	prdPath: string;
+}
+
+export interface PreCompactInput {
+	tokenCount: number;
+	taskId: string;
+}
+
+export interface PostToolUseInput {
+	toolName: string;
+	taskId: string;
+}
+
+export interface TaskCompleteInput {
+	taskId: string;
+	result: 'success' | 'failure';
+}
+
+export interface HookResult {
+	action: 'continue' | 'retry' | 'skip' | 'stop';
+	reason?: string;
+	additionalContext?: string;
+}
+
+export interface IRalphHookService {
+	onSessionStart(input: SessionStartInput): Promise<HookResult>;
+	onPreCompact(input: PreCompactInput): Promise<HookResult>;
+	onPostToolUse(input: PostToolUseInput): Promise<HookResult>;
+	onTaskComplete(input: TaskCompleteInput): Promise<HookResult>;
+}
+
 // --- Logger interface ---
 export interface ILogger {
 	log(message: string): void;
