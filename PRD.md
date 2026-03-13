@@ -40,7 +40,7 @@
 
 ### Testability
 
-- [ ] **Extract decision logic for testability**: Refactor `src/orchestrator.ts` to extract three pure methods: `shouldContinueLoop(state): boolean`, `shouldNudge(state): string | undefined`, `shouldRetry(error, retryCount): boolean`. These take plain state objects (no VS Code dependencies) and return decisions. Create `test/orchestrator.test.ts` with tests: (1) `shouldContinueLoop` returns false when all tasks done, true when tasks remain; (2) `shouldNudge` returns nudge text when task not complete and nudgeCount < max, undefined when at max; (3) `shouldRetry` returns true for transient errors under cap, false for fatal or over cap. Run `npx vitest run`. Mark checkbox and append to progress.txt.
+- [x] **Extract decision logic for testability**: Refactor `src/orchestrator.ts` to extract three pure methods: `shouldContinueLoop(state): boolean`, `shouldNudge(state): string | undefined`, `shouldRetry(error, retryCount): boolean`. These take plain state objects (no VS Code dependencies) and return decisions. Create `test/orchestrator.test.ts` with tests: (1) `shouldContinueLoop` returns false when all tasks done, true when tasks remain; (2) `shouldNudge` returns nudge text when task not complete and nudgeCount < max, undefined when at max; (3) `shouldRetry` returns true for transient errors under cap, false for fatal or over cap. Run `npx vitest run`. Mark checkbox and append to progress.txt.
 
 ### Hook System (V2 foundation)
 
