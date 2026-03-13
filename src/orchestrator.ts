@@ -202,7 +202,6 @@ export class LoopOrchestrator {
 
 	private waitForTaskCompletion(prdPath: string, task: { readonly description: string }): Promise<boolean> {
 		return new Promise<boolean>(resolve => {
-			const prdUri = vscode.Uri.file(prdPath);
 			const pattern = new vscode.RelativePattern(
 				path.dirname(prdPath),
 				path.basename(prdPath),
@@ -210,28 +209,42 @@ export class LoopOrchestrator {
 
 			let settled = false;
 			let poll: ReturnType<typeof setInterval>;
+			let timeout: ReturnType<typeof setTimeout>;
 
 			const settle = (result: boolean) => {
 				if (!settled) {
 					settled = true;
-					watcher.dispose();
+					prdWatcher.dispose();
+					activityWatcher.dispose();
 					clearTimeout(timeout);
 					clearInterval(poll);
 					resolve(result);
 				}
 			};
 
-			const watcher = vscode.workspace.createFileSystemWatcher(pattern);
+			const resetInactivityTimer = () => {
+				clearTimeout(timeout);
+				timeout = setTimeout(() => settle(false), this.config.inactivityTimeoutMs);
+			};
+
+			const prdWatcher = vscode.workspace.createFileSystemWatcher(pattern);
 			const checkCompletion = () => {
 				const checks = verifyTaskCompletion(prdPath, task as any, this.logger);
 				if (allChecksPassed(checks)) {
 					settle(true);
 				}
 			};
-			watcher.onDidChange(checkCompletion);
-			watcher.onDidCreate(checkCompletion);
+			prdWatcher.onDidChange(checkCompletion);
+			prdWatcher.onDidCreate(checkCompletion);
 
-			const timeout = setTimeout(() => settle(false), this.config.inactivityTimeoutMs);
+			// Watch all files in the workspace to reset inactivity timer on any edit
+			const workspacePattern = new vscode.RelativePattern(this.config.workspaceRoot, '**/*');
+			const activityWatcher = vscode.workspace.createFileSystemWatcher(workspacePattern);
+			activityWatcher.onDidChange(resetInactivityTimer);
+			activityWatcher.onDidCreate(resetInactivityTimer);
+			activityWatcher.onDidDelete(resetInactivityTimer);
+
+			timeout = setTimeout(() => settle(false), this.config.inactivityTimeoutMs);
 
 			poll = setInterval(() => {
 				if (this.stopRequested) {
