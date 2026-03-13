@@ -84,6 +84,7 @@ export interface RalphConfig {
 	countdownSeconds: number;
 	inactivityTimeoutMs: number;
 	maxNudgesPerTask: number;
+	hookScript?: string;
 	workspaceRoot: string;
 }
 
@@ -95,6 +96,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	countdownSeconds: 12,
 	inactivityTimeoutMs: 300_000,
 	maxNudgesPerTask: 3,
+	hookScript: undefined,
 };
 
 // --- Verification ---

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
-import { LoopEventKind, createOutputLogger } from './types';
+import { LoopEventKind, createOutputLogger, IRalphHookService } from './types';
 import { LoopOrchestrator, loadConfig } from './orchestrator';
+import { ShellHookProvider } from './shellHookProvider';
 
 let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.OutputChannel;
@@ -65,6 +66,12 @@ export function activate(context: vscode.ExtensionContext): void {
 
 			const config = loadConfig(workspaceRoot);
 
+			let hookService: IRalphHookService | undefined;
+			if (config.hookScript) {
+				logger.log(`Shell hook script configured: ${config.hookScript}`);
+				hookService = new ShellHookProvider(config.hookScript, logger);
+			}
+
 			orchestrator = new LoopOrchestrator(config, logger, event => {
 				switch (event.kind) {
 					case LoopEventKind.TaskStarted:
@@ -107,7 +114,7 @@ export function activate(context: vscode.ExtensionContext): void {
 						vscode.window.showErrorMessage(`Ralph Loop: ${event.message}`);
 						break;
 				}
-			});
+			}, hookService);
 
 			logger.log(`Starting loop with config: ${JSON.stringify(config)}`);
 			try {

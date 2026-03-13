@@ -423,6 +423,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		countdownSeconds: vsConfig.get<number>('countdownSeconds', DEFAULT_CONFIG.countdownSeconds),
 		inactivityTimeoutMs: vsConfig.get<number>('inactivityTimeoutMs', DEFAULT_CONFIG.inactivityTimeoutMs),
 		maxNudgesPerTask: vsConfig.get<number>('maxNudgesPerTask', DEFAULT_CONFIG.maxNudgesPerTask),
+		hookScript: vsConfig.get<string | undefined>('hookScript', undefined),
 		workspaceRoot,
 	};
 }
