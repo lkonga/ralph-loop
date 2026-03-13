@@ -7,11 +7,13 @@ describe('buildPrompt', () => {
 		expect(prompt).toContain('Implement login');
 	});
 
-	it('includes PRD content', () => {
-		const prd = '- [ ] Task A\n- [ ] Task B';
+	it('includes PRD content with only unchecked tasks', () => {
+		const prd = '- [x] Done Task\n- [ ] Task A\n- [ ] Task B';
 		const prompt = buildPrompt('Task A', prd, '');
-		expect(prompt).toContain('Task A');
-		expect(prompt).toContain('Task B');
+		expect(prompt).toContain('Progress: 1/3 tasks completed');
+		expect(prompt).toContain('- [ ] Task A');
+		expect(prompt).toContain('- [ ] Task B');
+		expect(prompt).not.toContain('- [x] Done Task');
 	});
 
 	it('includes progress when present', () => {
@@ -40,6 +42,7 @@ describe('buildPrompt', () => {
 		expect(prompt).toContain('- [ ] Fix bug');
 		expect(prompt).toContain('- [x] Fix bug');
 		expect(prompt).toContain('MANDATORY');
+		expect(prompt).toContain('Progress: 0/1 tasks completed');
 	});
 
 	it('truncates progress when exceeding maxProgressLines', () => {

@@ -1,3 +1,12 @@
+function filterPrdContent(prdContent: string): string {
+	const lines = prdContent.split('\n');
+	const checkedCount = lines.filter(l => l.match(/- \[x\]/i)).length;
+	const uncheckedLines = lines.filter(l => l.match(/- \[ \]/));
+	const totalTasks = checkedCount + uncheckedLines.length;
+	const header = `Progress: ${checkedCount}/${totalTasks} tasks completed`;
+	return [header, '', ...uncheckedLines].join('\n');
+}
+
 export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20): string {
 	const MAX_LEN = 5000;
 	const sanitized = taskDescription.trim().slice(0, MAX_LEN);
@@ -37,7 +46,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		'',
 		'## PRD.md:',
 		'```markdown',
-		prdContent,
+		filterPrdContent(prdContent),
 		'```',
 		'',
 	];
