@@ -15,7 +15,7 @@ import {
 	ITaskExecutionStrategy,
 	ExecutionOptions,
 } from './types';
-import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
+import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
@@ -218,8 +218,77 @@ export class LoopOrchestrator {
 				}
 			}
 
-			// Parse PRD, pick next task
+			// Parse PRD, pick next task(s)
 			const snapshot = readPrdSnapshot(prdPath);
+
+			// Use DAG-aware parallel task selection when maxParallelTasks > 1
+			if (this.config.maxParallelTasks > 1) {
+				const readyTasks = pickReadyTasks(snapshot, this.config.maxParallelTasks)
+					.filter(t => !this.completedTasks.has(t.id));
+
+				if (readyTasks.length === 0) {
+					const fallbackTask = pickNextTask(snapshot);
+					if (!fallbackTask || this.completedTasks.has(fallbackTask.id)) {
+						yield { kind: LoopEventKind.AllDone, total: snapshot.total };
+						return;
+					}
+					// Fall through to single-task execution below
+				} else if (readyTasks.length > 1) {
+					yield { kind: LoopEventKind.TasksParallelized, tasks: readyTasks };
+					iteration++;
+
+					const parallelResults = await Promise.all(
+						readyTasks.map(async (task) => {
+							const invId = crypto.randomUUID();
+							task.status = TaskStatus.InProgress;
+							this.onEvent({ kind: LoopEventKind.TaskStarted, task, iteration, taskInvocationId: invId });
+							const start = Date.now();
+
+							try {
+								appendProgress(progressPath, `[${invId}] Task started (parallel): ${task.description}`);
+								const prdContent = readPrdFile(prdPath);
+								let progContent = '';
+								try { progContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
+								const prompt = buildPrompt(task.description, prdContent, progContent, 20, this.config.promptBlocks, this.promptCapabilities);
+								const execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
+								const duration = Date.now() - start;
+
+								if (execResult.completed) {
+									this.completedTasks.add(task.id);
+									appendProgress(progressPath, `[${invId}] Task completed (parallel): ${task.description} (${Math.round(duration / 1000)}s)`);
+									this.onEvent({ kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId: invId });
+								} else {
+									appendProgress(progressPath, `[${invId}] Task timed out (parallel): ${task.description} (${Math.round(duration / 1000)}s)`);
+									this.onEvent({ kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration, taskInvocationId: invId });
+								}
+							} catch (err) {
+								const msg = err instanceof Error ? err.message : String(err);
+								appendProgress(progressPath, `[${invId}] Task error (parallel): ${task.description} — ${msg}`);
+								this.onEvent({ kind: LoopEventKind.Error, message: `Task "${task.description}" failed: ${msg}` });
+							}
+						}),
+					);
+
+					if (this.yieldRequested) {
+						this.logger.log('Yield honoured after parallel tasks');
+						yield { kind: LoopEventKind.YieldRequested };
+						return;
+					}
+
+					// Countdown between parallel batches
+					for (let s = this.config.countdownSeconds; s > 0; s--) {
+						if (this.stopRequested) {
+							yield { kind: LoopEventKind.Stopped };
+							return;
+						}
+						yield { kind: LoopEventKind.Countdown, secondsLeft: s };
+						await this.delay(1000);
+					}
+					continue; // back to while(true) for next batch
+				}
+				// If only 1 ready task, fall through to single-task path
+			}
+
 			const task = pickNextTask(snapshot);
 
 			if (!task) {
@@ -415,6 +484,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		useHookBridge: vsConfig.get<boolean>('useHookBridge', DEFAULT_CONFIG.useHookBridge),
 		useSessionTracking: vsConfig.get<boolean>('useSessionTracking', DEFAULT_CONFIG.useSessionTracking),
 		useAutopilotMode: vsConfig.get<boolean>('useAutopilotMode', DEFAULT_CONFIG.useAutopilotMode),
+		maxParallelTasks: vsConfig.get<number>('maxParallelTasks', DEFAULT_CONFIG.maxParallelTasks),
 		workspaceRoot,
 	};
 }

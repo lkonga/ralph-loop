@@ -22,6 +22,7 @@ export interface Task {
 	readonly description: string;
 	status: TaskStatus;
 	readonly lineNumber: number;
+	readonly dependsOn?: string[];
 }
 
 export interface PrdSnapshot {
@@ -48,6 +49,7 @@ export const enum LoopEventKind {
 	MaxIterations = 'max_iterations',
 	IterationLimitExpanded = 'iteration_limit_expanded',
 	YieldRequested = 'yield_requested',
+	TasksParallelized = 'tasks_parallelized',
 	SessionChanged = 'session_changed',
 	Stopped = 'stopped',
 	Error = 'error',
@@ -65,6 +67,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.AllDone; total: number }
 	| { kind: LoopEventKind.MaxIterations; limit: number }
 	| { kind: LoopEventKind.IterationLimitExpanded; oldLimit: number; newLimit: number }
+	| { kind: LoopEventKind.TasksParallelized; tasks: Task[] }
 	| { kind: LoopEventKind.YieldRequested }
 	| { kind: LoopEventKind.SessionChanged; oldSessionId: string; newSessionId: string }
 	| { kind: LoopEventKind.Stopped }
@@ -113,6 +116,7 @@ export interface RalphConfig {
 	useHookBridge: boolean;
 	useSessionTracking: boolean;
 	useAutopilotMode: boolean;
+	maxParallelTasks: number;
 	workspaceRoot: string;
 }
 
@@ -131,6 +135,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	useHookBridge: false,
 	useSessionTracking: false,
 	useAutopilotMode: false,
+	maxParallelTasks: 1,
 };
 
 // --- Verification ---
