@@ -64,6 +64,13 @@ export type LoopEvent =
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
+// --- Per-task tracking ---
+export interface TaskState {
+	nudgeCount: number;
+	retryCount: number;
+	taskCompletedLatch: boolean;
+}
+
 // --- Config ---
 export interface RalphConfig {
 	prdPath: string;

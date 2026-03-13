@@ -9,6 +9,7 @@ import {
 	DEFAULT_CONFIG,
 	ILogger,
 	TaskStatus,
+	TaskState,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
 import { startFreshChatSession, openCopilotWithPrompt, buildPrompt } from './copilot';
@@ -24,6 +25,7 @@ export class LoopOrchestrator {
 	private config: RalphConfig;
 	private readonly logger: ILogger;
 	private readonly onEvent: (event: LoopEvent) => void;
+	private readonly completedTasks = new Set<number>();
 
 	constructor(
 		config: RalphConfig,
@@ -127,6 +129,11 @@ export class LoopOrchestrator {
 				return;
 			}
 
+			// Skip tasks whose completion latch is already set
+			if (this.completedTasks.has(task.id)) {
+				continue;
+			}
+
 			iteration++;
 			task.status = TaskStatus.InProgress;
 			yield { kind: LoopEventKind.TaskStarted, task, iteration };
@@ -152,21 +159,27 @@ export class LoopOrchestrator {
 
 				// Wait for completion: watch PRD for checkbox change
 				yield { kind: LoopEventKind.WaitingForCompletion, task };
-				let completed = await this.waitForTaskCompletion(prdPath, task);
+				const taskState: TaskState = { nudgeCount: 0, retryCount: 0, taskCompletedLatch: false };
+				let waitResult = await this.waitForTaskCompletion(prdPath, task);
 
 				// Nudge loop: re-send prompt with continuation nudge if timed out
-				let nudgeCount = 0;
-				while (!completed && !this.stopRequested && nudgeCount < this.config.maxNudgesPerTask) {
-					nudgeCount++;
-					yield { kind: LoopEventKind.TaskNudged, task, nudgeCount };
-					this.logger.log(`Nudging task (${nudgeCount}/${this.config.maxNudgesPerTask}): ${task.description}`);
+				while (!waitResult.completed && !this.stopRequested && taskState.nudgeCount < this.config.maxNudgesPerTask) {
+					// Reset nudgeCount if productive file changes occurred during wait
+					if (waitResult.hadFileChanges) {
+						this.logger.log('Productive file changes detected — resetting nudge count');
+						taskState.nudgeCount = 0;
+					}
+
+					taskState.nudgeCount++;
+					yield { kind: LoopEventKind.TaskNudged, task, nudgeCount: taskState.nudgeCount };
+					this.logger.log(`Nudging task (${taskState.nudgeCount}/${this.config.maxNudgesPerTask}): ${task.description}`);
 
 					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })())
 						+ '\n\nContinue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
 
 					await startFreshChatSession(this.logger);
 					await openCopilotWithPrompt(nudgePrompt, this.logger);
-					completed = await this.waitForTaskCompletion(prdPath, task);
+					waitResult = await this.waitForTaskCompletion(prdPath, task);
 				}
 
 				if (this.stopRequested) {
@@ -176,7 +189,9 @@ export class LoopOrchestrator {
 
 				const duration = Date.now() - startTime;
 
-				if (completed) {
+				if (waitResult.completed) {
+					taskState.taskCompletedLatch = true;
+					this.completedTasks.add(task.id);
 					appendProgress(progressPath, `Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
 				} else {
@@ -205,9 +220,10 @@ export class LoopOrchestrator {
 						yield { kind: LoopEventKind.CopilotTriggered, method };
 
 						yield { kind: LoopEventKind.WaitingForCompletion, task };
-						const completed = await this.waitForTaskCompletion(prdPath, task);
+						const retryResult = await this.waitForTaskCompletion(prdPath, task);
 
-						if (completed) {
+						if (retryResult.completed) {
+							this.completedTasks.add(task.id);
 							const duration = Date.now() - startTime;
 							appendProgress(progressPath, `Task completed (after ${retryCount} retries): ${task.description} (${Math.round(duration / 1000)}s)`);
 							yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
@@ -238,14 +254,15 @@ export class LoopOrchestrator {
 		}
 	}
 
-	private waitForTaskCompletion(prdPath: string, task: { readonly description: string }): Promise<boolean> {
-		return new Promise<boolean>(resolve => {
+	private waitForTaskCompletion(prdPath: string, task: { readonly description: string }): Promise<{ completed: boolean; hadFileChanges: boolean }> {
+		return new Promise<{ completed: boolean; hadFileChanges: boolean }>(resolve => {
 			const pattern = new vscode.RelativePattern(
 				path.dirname(prdPath),
 				path.basename(prdPath),
 			);
 
 			let settled = false;
+			let hadFileChanges = false;
 			let poll: ReturnType<typeof setInterval>;
 			let timeout: ReturnType<typeof setTimeout>;
 
@@ -256,7 +273,7 @@ export class LoopOrchestrator {
 					activityWatcher.dispose();
 					clearTimeout(timeout);
 					clearInterval(poll);
-					resolve(result);
+					resolve({ completed: result, hadFileChanges });
 				}
 			};
 
@@ -278,9 +295,13 @@ export class LoopOrchestrator {
 			// Watch all files in the workspace to reset inactivity timer on any edit
 			const workspacePattern = new vscode.RelativePattern(this.config.workspaceRoot, '**/*');
 			const activityWatcher = vscode.workspace.createFileSystemWatcher(workspacePattern);
-			activityWatcher.onDidChange(resetInactivityTimer);
-			activityWatcher.onDidCreate(resetInactivityTimer);
-			activityWatcher.onDidDelete(resetInactivityTimer);
+			const onFileActivity = () => {
+				hadFileChanges = true;
+				resetInactivityTimer();
+			};
+			activityWatcher.onDidChange(onFileActivity);
+			activityWatcher.onDidCreate(onFileActivity);
+			activityWatcher.onDidDelete(onFileActivity);
 
 			timeout = setTimeout(() => settle(false), this.config.inactivityTimeoutMs);
 
