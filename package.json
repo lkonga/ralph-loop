@@ -13,7 +13,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onStartupFinished"
+		"workspaceContains:PRD.md"
 	],
 	"main": "./out/src/extension.js",
 	"bin": {

@@ -5,24 +5,57 @@ import { LoopOrchestrator, loadConfig } from './orchestrator';
 let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.OutputChannel;
 
+async function resolveWorkspaceRoot(): Promise<string | undefined> {
+	const folders = vscode.workspace.workspaceFolders;
+	if (!folders?.length) {
+		vscode.window.showErrorMessage('Ralph Loop: No workspace folder open');
+		return undefined;
+	}
+
+	const prdFiles = await vscode.workspace.findFiles('**/PRD.md', '**/node_modules/**', 10);
+
+	if (prdFiles.length === 0) {
+		vscode.window.showErrorMessage('Ralph Loop: No PRD.md found in workspace');
+		return undefined;
+	}
+
+	let prdUri: vscode.Uri;
+	if (prdFiles.length === 1) {
+		prdUri = prdFiles[0];
+	} else {
+		const picked = await vscode.window.showQuickPick(
+			prdFiles.map(uri => ({
+				label: vscode.workspace.asRelativePath(uri),
+				uri,
+			})),
+			{ placeHolder: 'Multiple PRD.md files found — pick one' }
+		);
+		if (!picked) {
+			return undefined;
+		}
+		prdUri = picked.uri;
+	}
+
+	const folder = vscode.workspace.getWorkspaceFolder(prdUri);
+	return folder?.uri.fsPath ?? vscode.Uri.joinPath(prdUri, '..').fsPath;
+}
+
 export function activate(context: vscode.ExtensionContext): void {
 	outputChannel = vscode.window.createOutputChannel('Ralph Loop');
 	const logger = createOutputLogger(outputChannel);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('ralph-loop.start', async () => {
-			const folders = vscode.workspace.workspaceFolders;
-			if (!folders?.length) {
-				vscode.window.showErrorMessage('Ralph Loop: No workspace folder open');
-				return;
-			}
-
-			if (orchestrator?.getState() !== 'idle') {
+			if (orchestrator && orchestrator.getState() !== 'idle') {
 				vscode.window.showWarningMessage('Ralph Loop: Already running');
 				return;
 			}
 
-			const workspaceRoot = folders[0].uri.fsPath;
+			const workspaceRoot = await resolveWorkspaceRoot();
+			if (!workspaceRoot) {
+				return;
+			}
+
 			const config = loadConfig(workspaceRoot);
 
 			orchestrator = new LoopOrchestrator(config, logger, event => {
