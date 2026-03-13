@@ -1,0 +1,81 @@
+{
+	"name": "ralph-loop",
+	"displayName": "Ralph Loop — Autonomous PRD Loop",
+	"description": "Drives Copilot Agent Mode in a deterministic loop from PRD tasks.",
+	"version": "0.1.0",
+	"publisher": "ralph-loop",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.93.0"
+	},
+	"categories": [
+		"AI",
+		"Other"
+	],
+	"activationEvents": [
+		"onStartupFinished"
+	],
+	"main": "./out/extension.js",
+	"bin": {
+		"ralph": "./out/cli/ralph.js"
+	},
+	"contributes": {
+		"commands": [
+			{
+				"command": "ralph-loop.start",
+				"title": "Ralph Loop: Start"
+			},
+			{
+				"command": "ralph-loop.stop",
+				"title": "Ralph Loop: Stop"
+			},
+			{
+				"command": "ralph-loop.status",
+				"title": "Ralph Loop: Show Status"
+			}
+		],
+		"configuration": {
+			"title": "Ralph Loop",
+			"properties": {
+				"ralph-loop.prdPath": {
+					"type": "string",
+					"default": "PRD.md",
+					"description": "Path to the PRD file (relative to workspace root)."
+				},
+				"ralph-loop.progressPath": {
+					"type": "string",
+					"default": "progress.txt",
+					"description": "Path to the progress tracking file."
+				},
+				"ralph-loop.maxIterations": {
+					"type": "number",
+					"default": 50,
+					"description": "Maximum number of loop iterations (0 = unlimited)."
+				},
+				"ralph-loop.countdownSeconds": {
+					"type": "number",
+					"default": 12,
+					"description": "Seconds to wait between tasks."
+				},
+				"ralph-loop.inactivityTimeoutMs": {
+					"type": "number",
+					"default": 60000,
+					"description": "Milliseconds of inactivity before moving to next task."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"package": "vsce package"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.0",
+		"@types/vscode": "^1.93.0",
+		"typescript": "^5.4.0",
+		"vitest": "^3.2.4"
+	}
+}
