@@ -10,11 +10,22 @@ import {
 	ILogger,
 	TaskStatus,
 	TaskState,
+	IRalphHookService,
+	HookResult,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
 import { startFreshChatSession, openCopilotWithPrompt, buildPrompt } from './copilot';
 import { verifyTaskCompletion, allChecksPassed, isAllDone } from './verify';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
+
+const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
+
+export class NoOpHookService implements IRalphHookService {
+	async onSessionStart() { return NO_OP_HOOK_RESULT; }
+	async onPreCompact() { return NO_OP_HOOK_RESULT; }
+	async onPostToolUse() { return NO_OP_HOOK_RESULT; }
+	async onTaskComplete() { return NO_OP_HOOK_RESULT; }
+}
 
 export class LoopOrchestrator {
 	private state: LoopState = LoopState.Idle;
@@ -25,15 +36,18 @@ export class LoopOrchestrator {
 	private readonly logger: ILogger;
 	private readonly onEvent: (event: LoopEvent) => void;
 	private readonly completedTasks = new Set<number>();
+	private readonly hookService: IRalphHookService;
 
 	constructor(
 		config: RalphConfig,
 		logger: ILogger,
 		onEvent: (event: LoopEvent) => void,
+		hookService?: IRalphHookService,
 	) {
 		this.config = config;
 		this.logger = logger;
 		this.onEvent = onEvent;
+		this.hookService = hookService ?? new NoOpHookService();
 	}
 
 	getState(): LoopState {
@@ -95,6 +109,16 @@ export class LoopOrchestrator {
 		const prdPath = resolvePrdPath(this.config.workspaceRoot, this.config.prdPath);
 		const progressPath = resolveProgressPath(this.config.workspaceRoot, this.config.progressPath);
 		let iteration = 0;
+		let additionalContext = '';
+
+		// SessionStart hook
+		const sessionHook = await this.hookService.onSessionStart({ prdPath });
+		this.logger.log(`SessionStart hook: action=${sessionHook.action}`);
+		if (sessionHook.additionalContext) { additionalContext = sessionHook.additionalContext; }
+		if (sessionHook.action === 'stop') {
+			yield { kind: LoopEventKind.Stopped };
+			return;
+		}
 
 		while (true) {
 			// Check stop
@@ -152,7 +176,11 @@ export class LoopOrchestrator {
 
 				// Start fresh session + trigger Copilot
 				await startFreshChatSession(this.logger);
-				const prompt = buildPrompt(task.description, prdContent, progressContent);
+				let prompt = buildPrompt(task.description, prdContent, progressContent);
+				if (additionalContext) {
+					prompt += '\n\n' + additionalContext;
+					additionalContext = '';
+				}
 				const method = await openCopilotWithPrompt(prompt, this.logger);
 				yield { kind: LoopEventKind.CopilotTriggered, method };
 
@@ -193,9 +221,28 @@ export class LoopOrchestrator {
 					this.completedTasks.add(task.id);
 					appendProgress(progressPath, `Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
+
+					// TaskComplete hook
+					const completeHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'success' });
+					if (completeHook.additionalContext) { additionalContext = completeHook.additionalContext; }
+					if (completeHook.action === 'stop') {
+						yield { kind: LoopEventKind.Stopped };
+						return;
+					}
 				} else {
 					appendProgress(progressPath, `Task timed out: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration };
+
+					// TaskComplete hook (failure)
+					const failHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure' });
+					if (failHook.additionalContext) { additionalContext = failHook.additionalContext; }
+					if (failHook.action === 'retry') {
+						continue; // re-enter the task
+					} else if (failHook.action === 'stop') {
+						yield { kind: LoopEventKind.Stopped };
+						return;
+					}
+					// 'continue' and 'skip' both move to next task
 				}
 			} catch (err) {
 				let currentError = err instanceof Error ? err : new Error(String(err));
@@ -238,6 +285,14 @@ export class LoopOrchestrator {
 					const message = currentError.message;
 					appendProgress(progressPath, `Task error: ${task.description} — ${message}`);
 					yield { kind: LoopEventKind.Error, message: `Task "${task.description}" failed: ${message}` };
+
+					// TaskComplete hook (failure after retries exhausted)
+					const errorHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure' });
+					if (errorHook.additionalContext) { additionalContext = errorHook.additionalContext; }
+					if (errorHook.action === 'stop') {
+						yield { kind: LoopEventKind.Stopped };
+						return;
+					}
 				}
 			}
 
