@@ -5,17 +5,19 @@ import * as os from 'os';
 import { ILogger, RalphConfig } from './types';
 
 // Generates the Node.js hook script content that Copilot will invoke on stdin
-function generateStopHookScript(prdPath: string): string {
+function generateStopHookScript(prdPath: string, progressPath: string, useVerificationGate: boolean): string {
 	// The script reads a JSON hook invocation from stdin,
 	// checks whether the current task's PRD checkbox is marked,
-	// and returns the appropriate result on stdout.
+	// and optionally runs a full verification gate.
 	return `#!/usr/bin/env node
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
+const { execSync } = require('child_process');
 
 const PRD_PATH = ${JSON.stringify(prdPath)};
+const PROGRESS_PATH = ${JSON.stringify(progressPath)};
+const USE_VERIFICATION_GATE = ${JSON.stringify(useVerificationGate)};
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -26,14 +28,25 @@ function readStdin() {
   });
 }
 
+function runCommand(cmd) {
+  try {
+    execSync(cmd, { stdio: 'pipe', timeout: 120000 });
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, stderr: (err.stderr || '').toString().trim() };
+  }
+}
+
 async function main() {
   await readStdin();
 
+  const failures = [];
+
+  // Check 1: PRD checkbox is marked
   let prdContent;
   try {
     prdContent = fs.readFileSync(PRD_PATH, 'utf-8');
   } catch (err) {
-    // PRD not found — let Copilot stop (can't verify)
     process.stdout.write(JSON.stringify({ resultKind: 'success' }));
     return;
   }
@@ -42,18 +55,45 @@ async function main() {
   const unchecked = lines.filter(l => /^\\s*-\\s*\\[\\s*\\]\\s+/.test(l));
   const checked = lines.filter(l => /^\\s*-\\s*\\[x\\]/i.test(l));
 
-  if (unchecked.length === 0 && checked.length > 0) {
-    // All tasks done
+  if (unchecked.length > 0) {
+    failures.push('PRD checkbox not marked');
+  } else if (checked.length === 0) {
     process.stdout.write(JSON.stringify({ resultKind: 'success' }));
-  } else if (unchecked.length > 0) {
-    // Tasks remain — block the stop
+    return;
+  }
+
+  if (USE_VERIFICATION_GATE) {
+    // Check 2: progress.txt was updated
+    try {
+      const stat = fs.statSync(PROGRESS_PATH);
+      const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+      if (stat.mtimeMs < fiveMinAgo) {
+        failures.push('progress.txt not recently updated');
+      }
+    } catch {
+      failures.push('progress.txt not found');
+    }
+
+    // Check 3: TypeScript compilation
+    const tsc = runCommand('npx tsc --noEmit');
+    if (!tsc.ok) {
+      failures.push('TypeScript compilation errors: ' + (tsc.stderr || 'see tsc output'));
+    }
+
+    // Check 4: Test failures
+    const vitest = runCommand('npx vitest run');
+    if (!vitest.ok) {
+      failures.push('Test failures: ' + (vitest.stderr || 'see vitest output'));
+    }
+  }
+
+  if (failures.length === 0) {
+    process.stdout.write(JSON.stringify({ resultKind: 'success' }));
+  } else {
     process.stdout.write(JSON.stringify({
       resultKind: 'error',
-      stopReason: 'Task not complete \\u2014 checkbox not marked in PRD.md'
+      stopReason: 'Verification failed: ' + failures.join('; ')
     }));
-  } else {
-    // No tasks at all — let it stop
-    process.stdout.write(JSON.stringify({ resultKind: 'success' }));
   }
 }
 
@@ -116,9 +156,10 @@ export function registerHookBridge(
 	const postToolUseScriptPath = path.join(tmpDir, 'post-tool-use-hook.js');
 
 	const prdPath = path.resolve(config.workspaceRoot, config.prdPath);
+	const progressPath = path.resolve(config.workspaceRoot, config.progressPath);
 
 	// Write the hook scripts to temp files
-	fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath), { mode: 0o755 });
+	fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath, progressPath, config.useVerificationGate), { mode: 0o755 });
 	fs.writeFileSync(postToolUseScriptPath, generatePostToolUseHookScript(), { mode: 0o755 });
 	logger.log(`Hook bridge scripts written to ${tmpDir}`);
 

@@ -484,6 +484,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		useHookBridge: vsConfig.get<boolean>('useHookBridge', DEFAULT_CONFIG.useHookBridge),
 		useSessionTracking: vsConfig.get<boolean>('useSessionTracking', DEFAULT_CONFIG.useSessionTracking),
 		useAutopilotMode: vsConfig.get<boolean>('useAutopilotMode', DEFAULT_CONFIG.useAutopilotMode),
+		useVerificationGate: vsConfig.get<boolean>('useVerificationGate', DEFAULT_CONFIG.useVerificationGate),
 		maxParallelTasks: vsConfig.get<number>('maxParallelTasks', DEFAULT_CONFIG.maxParallelTasks),
 		workspaceRoot,
 	};
