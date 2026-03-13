@@ -37,7 +37,14 @@ async function resolveWorkspaceRoot(): Promise<string | undefined> {
 	}
 
 	const folder = vscode.workspace.getWorkspaceFolder(prdUri);
-	return folder?.uri.fsPath ?? vscode.Uri.joinPath(prdUri, '..').fsPath;
+	if (folder) {
+		return folder.uri.fsPath;
+	}
+	if (folders.length === 1) {
+		return folders[0].uri.fsPath;
+	}
+	vscode.window.showErrorMessage('Ralph Loop: Could not determine workspace root for PRD.md');
+	return undefined;
 }
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -73,6 +80,10 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.TaskCompleted:
 						logger.log(`Completed in ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
 						break;
+					case LoopEventKind.TaskTimedOut:
+						logger.warn(`Timed out after ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
+						vscode.window.showWarningMessage(`Ralph Loop: Task timed out — ${event.task.description}`);
+						break;
 					case LoopEventKind.Countdown:
 						vscode.window.setStatusBarMessage(`$(clock) Ralph: Next task in ${event.secondsLeft}s`, 1100);
 						break;
@@ -95,7 +106,13 @@ export function activate(context: vscode.ExtensionContext): void {
 			});
 
 			logger.log(`Starting loop with config: ${JSON.stringify(config)}`);
-			await orchestrator.start();
+			try {
+				await orchestrator.start();
+			} catch (err) {
+				const message = err instanceof Error ? err.message : String(err);
+				logger.error(`Loop crashed: ${message}`);
+				vscode.window.showErrorMessage(`Ralph Loop crashed: ${message}`);
+			}
 		}),
 
 		vscode.commands.registerCommand('ralph-loop.stop', () => {

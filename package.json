@@ -59,7 +59,7 @@
 				},
 				"ralph-loop.inactivityTimeoutMs": {
 					"type": "number",
-					"default": 60000,
+					"default": 300000,
 					"description": "Milliseconds of inactivity before moving to next task."
 				}
 			}

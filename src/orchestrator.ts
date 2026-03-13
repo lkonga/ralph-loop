@@ -10,7 +10,7 @@ import {
 	ILogger,
 	TaskStatus,
 } from './types';
-import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath } from './prd';
+import { readPrdFile, readPrdSnapshot, pickNextTask, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
 import { startFreshChatSession, openCopilotWithPrompt, buildPrompt } from './copilot';
 import { verifyTaskCompletion, allChecksPassed, isAllDone } from './verify';
 
@@ -57,8 +57,7 @@ export class LoopOrchestrator {
 				this.onEvent(event);
 				if (event.kind === LoopEventKind.Stopped ||
 					event.kind === LoopEventKind.AllDone ||
-					event.kind === LoopEventKind.MaxIterations ||
-					event.kind === LoopEventKind.Error) {
+					event.kind === LoopEventKind.MaxIterations) {
 					break;
 				}
 			}
@@ -130,39 +129,48 @@ export class LoopOrchestrator {
 			task.status = TaskStatus.InProgress;
 			yield { kind: LoopEventKind.TaskStarted, task, iteration };
 
-			// Read context for prompt
-			const prdContent = readPrdFile(prdPath);
-			let progressContent = '';
 			try {
-				progressContent = fs.readFileSync(progressPath, 'utf-8');
-			} catch {
-				// progress file may not exist yet
-			}
+				appendProgress(progressPath, `Task started: ${task.description}`);
 
-			// Start fresh session + trigger Copilot
-			await startFreshChatSession(this.logger);
-			const prompt = buildPrompt(task.description, prdContent, progressContent);
-			const method = await openCopilotWithPrompt(prompt, this.logger);
-			yield { kind: LoopEventKind.CopilotTriggered, method };
+				// Read context for prompt
+				const prdContent = readPrdFile(prdPath);
+				let progressContent = '';
+				try {
+					progressContent = fs.readFileSync(progressPath, 'utf-8');
+				} catch {
+					// progress file may not exist yet
+				}
 
-			// Wait for completion: watch PRD for checkbox change
-			yield { kind: LoopEventKind.WaitingForCompletion, task };
-			const startTime = Date.now();
-			const completed = await this.waitForTaskCompletion(prdPath, task);
+				// Start fresh session + trigger Copilot
+				await startFreshChatSession(this.logger);
+				const prompt = buildPrompt(task.description, prdContent, progressContent);
+				const method = await openCopilotWithPrompt(prompt, this.logger);
+				yield { kind: LoopEventKind.CopilotTriggered, method };
 
-			if (this.stopRequested) {
-				yield { kind: LoopEventKind.Stopped };
-				return;
-			}
+				// Wait for completion: watch PRD for checkbox change
+				yield { kind: LoopEventKind.WaitingForCompletion, task };
+				const startTime = Date.now();
+				const completed = await this.waitForTaskCompletion(prdPath, task);
 
-			const duration = Date.now() - startTime;
+				if (this.stopRequested) {
+					yield { kind: LoopEventKind.Stopped };
+					return;
+				}
 
-			if (completed) {
-				yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
-			} else {
-				// Inactivity timeout — move on anyway
-				this.logger.warn(`Task timed out after ${this.config.inactivityTimeoutMs}ms, moving to next`);
-				yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
+				const duration = Date.now() - startTime;
+
+				if (completed) {
+					appendProgress(progressPath, `Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
+					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration };
+				} else {
+					appendProgress(progressPath, `Task timed out: ${task.description} (${Math.round(duration / 1000)}s)`);
+					yield { kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration };
+				}
+			} catch (err) {
+				const message = err instanceof Error ? err.message : String(err);
+				appendProgress(progressPath, `Task error: ${task.description} — ${message}`);
+				yield { kind: LoopEventKind.Error, message: `Task "${task.description}" failed: ${message}` };
+				// Continue to next task instead of crashing
 			}
 
 			// Countdown between tasks

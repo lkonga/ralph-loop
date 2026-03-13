@@ -12,7 +12,9 @@ export const enum TaskStatus {
 	Pending = 'pending',
 	InProgress = 'in_progress',
 	Complete = 'complete',
-	Blocked = 'blocked',
+	TimedOut = 'timed_out',
+	Failed = 'failed',
+	Skipped = 'skipped',
 }
 
 export interface Task {
@@ -38,6 +40,7 @@ export const enum LoopEventKind {
 	CopilotTriggered = 'copilot_triggered',
 	WaitingForCompletion = 'waiting_for_completion',
 	TaskCompleted = 'task_completed',
+	TaskTimedOut = 'task_timed_out',
 	Countdown = 'countdown',
 	AllDone = 'all_done',
 	MaxIterations = 'max_iterations',
@@ -50,6 +53,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.CopilotTriggered; method: CopilotMethod }
 	| { kind: LoopEventKind.WaitingForCompletion; task: Task }
 	| { kind: LoopEventKind.TaskCompleted; task: Task; durationMs: number }
+	| { kind: LoopEventKind.TaskTimedOut; task: Task; durationMs: number }
 	| { kind: LoopEventKind.Countdown; secondsLeft: number }
 	| { kind: LoopEventKind.AllDone; total: number }
 	| { kind: LoopEventKind.MaxIterations; limit: number }
@@ -71,7 +75,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	progressPath: 'progress.txt',
 	maxIterations: 50,
 	countdownSeconds: 12,
-	inactivityTimeoutMs: 60_000,
+	inactivityTimeoutMs: 300_000,
 };
 
 // --- Verification ---
