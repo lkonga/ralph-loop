@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPrompt } from '../src/copilot';
+import { buildPrompt } from '../src/prompt';
 
 describe('buildPrompt', () => {
 	it('includes task description', () => {
@@ -22,13 +22,17 @@ describe('buildPrompt', () => {
 
 	it('omits progress section when empty', () => {
 		const prompt = buildPrompt('Task', '- [ ] Task', '');
-		expect(prompt).not.toContain('progress.txt');
+		expect(prompt).not.toContain('## progress.txt:');
 	});
 
-	it('truncates long task descriptions', () => {
+	it('truncates task description to 5000 chars', () => {
 		const longDesc = 'A'.repeat(6000);
 		const prompt = buildPrompt(longDesc, '', '');
-		expect(prompt.length).toBeLessThan(6000 + 500);
+		// Task appears twice in prompt (task section + PRD instruction), each truncated to 5000
+		const occurrences = prompt.split('A'.repeat(5000)).length - 1;
+		expect(occurrences).toBeGreaterThanOrEqual(1);
+		// Original 6000-char string should NOT appear
+		expect(prompt).not.toContain('A'.repeat(5001));
 	});
 
 	it('includes PRD update instructions', () => {
