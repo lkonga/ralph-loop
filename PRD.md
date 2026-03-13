@@ -36,7 +36,7 @@
 
 ### State Machine Enrichment
 
-- [ ] **Separate nudge/retry counters and latch pattern**: In `src/types.ts`, add `nudgeCount` and `retryCount` to `TaskState` (or create a new per-task tracking interface). Add `LoopEventKind.TaskNudged` and `LoopEventKind.TaskRetried` to the event union. In the orchestrator, when a nudge produces productive file changes (detected by the file watcher), reset `nudgeCount` to 0 — this allows the agent to be nudged again later if it stalls a second time. Once a task is verified complete (checkbox checked), set a `taskCompletedLatch` flag so it's never re-checked. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
+- [x] **Separate nudge/retry counters and latch pattern**: In `src/types.ts`, add `nudgeCount` and `retryCount` to `TaskState` (or create a new per-task tracking interface). Add `LoopEventKind.TaskNudged` and `LoopEventKind.TaskRetried` to the event union. In the orchestrator, when a nudge produces productive file changes (detected by the file watcher), reset `nudgeCount` to 0 — this allows the agent to be nudged again later if it stalls a second time. Once a task is verified complete (checkbox checked), set a `taskCompletedLatch` flag so it's never re-checked. Run `npx tsc --noEmit`. Mark checkbox and append to progress.txt.
 
 ### Testability
 
