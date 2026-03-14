@@ -232,6 +232,19 @@ export const DEFAULT_PRE_COMPACT_BEHAVIOR: PreCompactBehavior = {
 	injectProgressSummary: true,
 };
 
+// --- Knowledge config ---
+export interface KnowledgeConfig {
+	enabled: boolean;
+	path: string;
+	maxInjectLines: number;
+}
+
+export const DEFAULT_KNOWLEDGE_CONFIG: KnowledgeConfig = {
+	enabled: true,
+	path: 'knowledge.md',
+	maxInjectLines: 15,
+};
+
 // --- Consistency checker ---
 export interface ConsistencyCheckDetail {
 	name: string;
@@ -295,6 +308,7 @@ export interface RalphConfig {
 	parallelMonitor?: ParallelMonitorConfig;
 	preCompactBehavior?: PreCompactBehavior;
 	stagnationDetection?: StagnationDetectionConfig;
+	knowledge?: KnowledgeConfig;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -323,6 +337,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	parallelMonitor: { ...DEFAULT_PARALLEL_MONITOR },
 	preCompactBehavior: { ...DEFAULT_PRE_COMPACT_BEHAVIOR },
 	stagnationDetection: { ...DEFAULT_STAGNATION_DETECTION },
+	knowledge: { ...DEFAULT_KNOWLEDGE_CONFIG },
 };
 
 // --- Verification ---

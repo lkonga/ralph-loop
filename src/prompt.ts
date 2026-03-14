@@ -76,12 +76,24 @@ function renderCapabilities(caps?: PromptCapabilities): string[] {
 	];
 }
 
+function renderLearnings(learnings?: string[]): string[] {
+	if (!learnings || learnings.length === 0) { return []; }
+	return [
+		'===================================================================',
+		'                       PRIOR LEARNINGS',
+		'===================================================================',
+		'',
+		...learnings.map(l => `- ${l}`),
+		'',
+	];
+}
+
 export function buildFinalNudgePrompt(task: string, nudgeCount: number, maxNudges: number): string | undefined {
 	if (nudgeCount < maxNudges - 1) { return undefined; }
 	return `Your remaining time is almost up. Produce your final result NOW: commit any partial work, update progress.txt, and mark the checkbox. If tests fail, document the failure and mark done anyway.`;
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities): string {
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[]): string {
 	const MAX_LEN = 5000;
 	const sanitized = taskDescription.trim().slice(0, MAX_LEN);
 
@@ -113,6 +125,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		...renderPromptBlocks(promptBlocks),
 		...renderModelHints(capabilities?.modelHint),
 		...renderCapabilities(capabilities),
+		...renderLearnings(learnings),
 		'===================================================================',
 		'    MANDATORY: UPDATE PRD.md AND progress.txt WHEN DONE',
 		'===================================================================',

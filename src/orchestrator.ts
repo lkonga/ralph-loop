@@ -14,6 +14,7 @@ import {
 	DEFAULT_PARALLEL_MONITOR,
 	DEFAULT_PRE_COMPACT_BEHAVIOR,
 	DEFAULT_STAGNATION_DETECTION,
+	DEFAULT_KNOWLEDGE_CONFIG,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -39,6 +40,7 @@ import { createDefaultChain, CircuitBreakerChain, type CircuitBreakerState } fro
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
 import { StagnationDetector } from './stagnationDetector';
+import { KnowledgeManager } from './knowledge';
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
 
@@ -292,6 +294,12 @@ export class LoopOrchestrator {
 			? new StagnationDetector(stagnationConfig.hashFiles, stagnationConfig.maxStaleIterations)
 			: undefined;
 
+		// Knowledge manager
+		const knowledgeConfig = this.config.knowledge ?? DEFAULT_KNOWLEDGE_CONFIG;
+		const knowledgeManager = knowledgeConfig.enabled
+			? new KnowledgeManager(knowledgeConfig.path, knowledgeConfig.maxInjectLines)
+			: undefined;
+
 		// SessionStart hook
 		const sessionHook = await this.hookService.onSessionStart({ prdPath });
 		this.logger.log(`SessionStart hook: action=${sessionHook.action}`);
@@ -478,7 +486,10 @@ export class LoopOrchestrator {
 				}
 
 				// Build prompt and execute via strategy
-				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities);
+				const relevantLearnings = knowledgeManager
+					? knowledgeManager.getRelevantLearnings(this.config.workspaceRoot, task.description)
+					: [];
+				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, relevantLearnings);
 				if (additionalContext) {
 					prompt += '\n\n' + additionalContext;
 					additionalContext = '';
@@ -591,6 +602,17 @@ export class LoopOrchestrator {
 					this.completedTasks.add(task.id);
 					appendProgress(progressPath, `[${taskInvocationId}] Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId };
+
+					// Knowledge extraction after task completion
+					if (knowledgeManager) {
+						let capturedOutput = '';
+						try { capturedOutput = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
+						const learnings = knowledgeManager.extractLearnings(capturedOutput);
+						const gaps = knowledgeManager.extractGaps(capturedOutput);
+						if (learnings.length > 0 || gaps.length > 0) {
+							knowledgeManager.persist(this.config.workspaceRoot, learnings, gaps);
+						}
+					}
 
 					// Consistency check after task execution
 					if (this.consistencyChecker) {
@@ -873,5 +895,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		parallelMonitor: vsConfig.get('parallelMonitor', DEFAULT_CONFIG.parallelMonitor),
 		preCompactBehavior: vsConfig.get('preCompactBehavior', DEFAULT_CONFIG.preCompactBehavior),
 		stagnationDetection: vsConfig.get('stagnationDetection', DEFAULT_CONFIG.stagnationDetection),
+		knowledge: vsConfig.get('knowledge', DEFAULT_CONFIG.knowledge),
 	};
 }
