@@ -78,8 +78,9 @@ export class ShellHookProvider implements IRalphHookService {
 
 	private executeHook(hookType: RalphHookType, input: unknown): Promise<HookResult> {
 		if (containsDangerousChars(this.scriptPath)) {
-			this.logger.error(`Shell hook blocked (${hookType}): Blocked: shell metacharacters detected in "${this.scriptPath}"`);
-			return Promise.resolve({ action: 'stop', reason: 'Blocked: shell metacharacters detected' });
+			const reason = `Blocked: shell metacharacters detected in "${this.scriptPath}"`;
+			this.logger.warn(`Shell hook blocked (${hookType}): ${reason}`);
+			return Promise.resolve({ action: 'continue', blocked: true, reason });
 		}
 
 		return new Promise<HookResult>((resolve) => {
@@ -139,10 +140,10 @@ export class ShellHookProvider implements IRalphHookService {
 					this.logger.warn(`Shell hook warning (${hookType}): ${reason}`);
 					resolve({ action: 'continue', reason });
 				} else if (code === 2) {
-					// Exit 2: block/stop — halt with stderr as reason
+					// Exit 2: block/stop — report as blocked with reason for feedback
 					const reason = stderr.trim() || 'Hook script blocked execution (exit 2)';
-					this.logger.error(`Shell hook blocked (${hookType}): ${reason}`);
-					resolve({ action: 'stop', reason });
+					this.logger.warn(`Shell hook blocked (${hookType}): ${reason}`);
+					resolve({ action: 'continue', blocked: true, reason });
 				} else {
 					this.logger.warn(`Shell hook (${hookType}): unexpected exit code ${code}`);
 					resolve({ action: 'continue', reason: `Hook script exited with code ${code}` });

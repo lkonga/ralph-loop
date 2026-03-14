@@ -64,6 +64,7 @@ export const enum LoopEventKind {
 	ConsistencyCheckFailed = 'consistency_check_failed',
 	ContextInjected = 'context_injected',
 	StruggleDetected = 'struggle_detected',
+	CommandBlocked = 'command_blocked',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -95,6 +96,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.ConsistencyCheckFailed; phase: string; checks: ConsistencyCheckDetail[]; failureReason?: string }
 	| { kind: LoopEventKind.ContextInjected; text: string }
 	| { kind: LoopEventKind.StruggleDetected; signals: string[]; taskId: string }
+	| { kind: LoopEventKind.CommandBlocked; command: string; reason: string; taskId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -444,6 +446,7 @@ export interface HookResult {
 	action: 'continue' | 'retry' | 'skip' | 'stop';
 	reason?: string;
 	additionalContext?: string;
+	blocked?: boolean;
 }
 
 export interface PreCompleteInput {

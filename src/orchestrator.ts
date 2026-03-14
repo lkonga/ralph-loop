@@ -328,7 +328,10 @@ export class LoopOrchestrator {
 		const sessionHook = await this.hookService.onSessionStart({ prdPath });
 		this.logger.log(`SessionStart hook: action=${sessionHook.action}`);
 		if (sessionHook.additionalContext) { additionalContext = sessionHook.additionalContext; }
-		if (sessionHook.action === 'stop') {
+		if (sessionHook.blocked) {
+			additionalContext = `Shell command blocked: ${sessionHook.reason}. Provide a safe alternative that does not use shell metacharacters or chaining.`;
+			yield { kind: LoopEventKind.CommandBlocked, command: this.config.hookScript ?? 'unknown', reason: sessionHook.reason ?? 'unknown', taskId: '' };
+		} else if (sessionHook.action === 'stop') {
 			yield { kind: LoopEventKind.Stopped };
 			return;
 		}
@@ -755,7 +758,10 @@ export class LoopOrchestrator {
 					// TaskComplete hook
 					const completeHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'success', taskInvocationId });
 					if (completeHook.additionalContext) { additionalContext = completeHook.additionalContext; }
-					if (completeHook.action === 'stop') {
+					if (completeHook.blocked) {
+						additionalContext = `Shell command blocked: ${completeHook.reason}. Provide a safe alternative that does not use shell metacharacters or chaining.`;
+						yield { kind: LoopEventKind.CommandBlocked, command: this.config.hookScript ?? 'unknown', reason: completeHook.reason ?? 'unknown', taskId: task.taskId };
+					} else if (completeHook.action === 'stop') {
 						yield { kind: LoopEventKind.Stopped };
 						return;
 					}
@@ -818,7 +824,11 @@ export class LoopOrchestrator {
 					// TaskComplete hook (failure)
 					const failHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure', taskInvocationId });
 					if (failHook.additionalContext) { additionalContext = failHook.additionalContext; }
-					if (failHook.action === 'retry') {
+					if (failHook.blocked) {
+						additionalContext = `Shell command blocked: ${failHook.reason}. Provide a safe alternative that does not use shell metacharacters or chaining.`;
+						yield { kind: LoopEventKind.CommandBlocked, command: this.config.hookScript ?? 'unknown', reason: failHook.reason ?? 'unknown', taskId: task.taskId };
+						continue;
+					} else if (failHook.action === 'retry') {
 						continue; // re-enter the task
 					} else if (failHook.action === 'stop') {
 						yield { kind: LoopEventKind.Stopped };
@@ -887,7 +897,10 @@ export class LoopOrchestrator {
 					// TaskComplete hook (failure after retries exhausted)
 					const errorHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure', taskInvocationId });
 					if (errorHook.additionalContext) { additionalContext = errorHook.additionalContext; }
-					if (errorHook.action === 'stop') {
+					if (errorHook.blocked) {
+						additionalContext = `Shell command blocked: ${errorHook.reason}. Provide a safe alternative that does not use shell metacharacters or chaining.`;
+						yield { kind: LoopEventKind.CommandBlocked, command: this.config.hookScript ?? 'unknown', reason: errorHook.reason ?? 'unknown', taskId: task.taskId };
+					} else if (errorHook.action === 'stop') {
 						yield { kind: LoopEventKind.Stopped };
 						return;
 					}

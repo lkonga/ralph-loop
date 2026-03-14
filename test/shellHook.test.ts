@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { containsDangerousChars, DANGEROUS_PATTERNS, killProcessTree } from '../src/shellHookProvider';
+import { containsDangerousChars, DANGEROUS_PATTERNS, killProcessTree, ShellHookProvider } from '../src/shellHookProvider';
 
 describe('DANGEROUS_PATTERNS regex', () => {
 	it('is a RegExp', () => {
@@ -105,5 +105,25 @@ describe('killProcessTree', () => {
 		killProcessTree(12345, 'win32', { kill: killFn as never, exec: execFn as never });
 		expect(execFn).toHaveBeenCalledWith('taskkill /PID 12345 /T /F');
 		expect(killFn).not.toHaveBeenCalled();
+	});
+});
+
+describe('ShellHookProvider blocked command feedback', () => {
+	it('returns blocked: true with reason when script contains dangerous chars', async () => {
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() };
+		const provider = new ShellHookProvider('echo hello && rm -rf /', logger);
+		const result = await provider.onSessionStart({ prdPath: '/tmp/PRD.md' });
+		expect(result.blocked).toBe(true);
+		expect(result.reason).toContain('shell metacharacters');
+		expect(result.action).toBe('continue');
+	});
+
+	it('blocked result includes reason string usable as feedback', async () => {
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() };
+		const provider = new ShellHookProvider('cat /etc/passwd | grep root', logger);
+		const result = await provider.onPostToolUse({ toolName: 'test', output: '' });
+		expect(result.blocked).toBe(true);
+		expect(typeof result.reason).toBe('string');
+		expect(result.reason!.length).toBeGreaterThan(0);
 	});
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
 	shouldContinueLoop,
 	shouldNudge,
@@ -18,7 +18,7 @@ import type {
 	VerifyCheck,
 	ReviewVerdict,
 } from '../src/types';
-import { VerifyResult } from '../src/types';
+import { VerifyResult, LoopEventKind } from '../src/types';
 
 // --- Helper to create a mock hook service ---
 function createMockHookService(
@@ -308,5 +308,78 @@ describe('LoopOrchestrator.injectContext', () => {
 		);
 		const ctx = (orch as any).consumePendingContext();
 		expect(ctx).toBeUndefined();
+	});
+});
+
+describe('Security rejection as feedback', () => {
+	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		const os = require('os');
+		const fs = require('fs');
+		const path = require('path');
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-test-'));
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [x] Done task\n', 'utf-8');
+	});
+
+	afterEach(() => {
+		const fs = require('fs');
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('orchestrator continues loop when session hook is blocked', async () => {
+		const events: any[] = [];
+		const blockedHookService: IRalphHookService = {
+			onSessionStart: async () => ({ action: 'continue' as const, blocked: true, reason: 'shell metacharacters detected' }),
+			onPreCompact: async () => ({ action: 'continue' as const }),
+			onPostToolUse: async () => ({ action: 'continue' as const }),
+			onPreComplete: async () => ({ action: 'continue' as const }),
+			onTaskComplete: async () => ({ action: 'continue' as const }),
+		};
+
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1 },
+			noopLogger,
+			(e: any) => events.push(e),
+			blockedHookService,
+		);
+
+		await orch.start();
+
+		const commandBlockedEvents = events.filter(e => e.kind === LoopEventKind.CommandBlocked);
+		expect(commandBlockedEvents.length).toBeGreaterThanOrEqual(1);
+		expect(commandBlockedEvents[0].reason).toContain('shell metacharacters');
+		expect(commandBlockedEvents[0].command).toBeDefined();
+
+		const stoppedEvents = events.filter(e => e.kind === LoopEventKind.Stopped);
+		expect(stoppedEvents.length).toBe(0);
+	});
+
+	it('CommandBlocked event includes command, reason, and taskId', async () => {
+		const events: any[] = [];
+		const blockedHookService: IRalphHookService = {
+			onSessionStart: async () => ({ action: 'continue' as const, blocked: true, reason: 'allowlist rejection' }),
+			onPreCompact: async () => ({ action: 'continue' as const }),
+			onPostToolUse: async () => ({ action: 'continue' as const }),
+			onPreComplete: async () => ({ action: 'continue' as const }),
+			onTaskComplete: async () => ({ action: 'continue' as const }),
+		};
+
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1 },
+			noopLogger,
+			(e: any) => events.push(e),
+			blockedHookService,
+		);
+
+		await orch.start();
+
+		const commandBlockedEvents = events.filter(e => e.kind === LoopEventKind.CommandBlocked);
+		expect(commandBlockedEvents.length).toBeGreaterThanOrEqual(1);
+		const evt = commandBlockedEvents[0];
+		expect(evt).toHaveProperty('command');
+		expect(evt).toHaveProperty('reason');
+		expect(evt).toHaveProperty('taskId');
 	});
 });
