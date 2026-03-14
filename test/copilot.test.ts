@@ -1,8 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { buildPrompt, sanitizeTaskDescription } from '../src/prompt';
+import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
-import { sendReviewPrompt } from '../src/copilot';
-import { parseReviewVerdict } from '../src/orchestrator';
+import { sendReviewPrompt, parseReviewVerdict } from '../src/copilot';
 import { DEFAULT_REVIEW_PROMPT_TEMPLATE } from '../src/types';
 import type { ILogger } from '../src/types';
 
@@ -128,27 +127,58 @@ describe('sendReviewPrompt', () => {
 	});
 });
 
+describe('buildReviewPrompt', () => {
+	it('contains the structured review format template', () => {
+		const prompt = buildReviewPrompt('Implement login feature', 'Task-001');
+		expect(prompt).toContain('## Review: Task-{id}');
+		expect(prompt).toContain('**Verdict**: APPROVED | NEEDS-RETRY');
+		expect(prompt).toContain('### Acceptance Criteria Check');
+		expect(prompt).toContain('### Issues Found (if NEEDS-RETRY)');
+		expect(prompt).toContain('### Fix Instructions');
+	});
+
+	it('includes the task description and task ID', () => {
+		const prompt = buildReviewPrompt('Add unit tests for parser', 'Task-042');
+		expect(prompt).toContain('Add unit tests for parser');
+		expect(prompt).toContain('Task-042');
+	});
+
+	it('includes reviewer instructions', () => {
+		const prompt = buildReviewPrompt('Fix bug', 'Task-001');
+		expect(prompt).toContain('You are a code reviewer');
+		expect(prompt).toContain('Verify, don\'t fix');
+		expect(prompt).toContain('APPROVED or NEEDS-RETRY');
+	});
+});
+
 describe('parseReviewVerdict', () => {
-	it('returns approved for output containing APPROVED', () => {
-		const verdict = parseReviewVerdict('All looks good. APPROVED. No issues found.');
+	it('extracts APPROVED verdict', () => {
+		const output = '## Review: Task-001 — Fix login\n**Verdict**: APPROVED\n### Acceptance Criteria Check\n- [x] Login works — verified';
+		const verdict = parseReviewVerdict(output);
 		expect(verdict.outcome).toBe('approved');
 		expect(verdict.summary).toContain('APPROVED');
 	});
 
-	it('returns needs-retry for output containing NEEDS-RETRY', () => {
-		const verdict = parseReviewVerdict('Found issues. NEEDS-RETRY. Fix the following: missing validation.');
+	it('extracts NEEDS-RETRY verdict with issues', () => {
+		const output = '## Review: Task-002 — Add tests\n**Verdict**: NEEDS-RETRY\n### Acceptance Criteria Check\n- [fail] Coverage — only 50%\n### Issues Found (if NEEDS-RETRY)\n1. **[Critical]**: Missing edge case test in parser.ts:42\n2. **[Minor]**: Unused import in utils.ts:5\n### Fix Instructions\n1. Add test for empty input';
+		const verdict = parseReviewVerdict(output);
 		expect(verdict.outcome).toBe('needs-retry');
-		expect(verdict.summary).toContain('NEEDS-RETRY');
+		expect(verdict.issues).toBeDefined();
+		expect(verdict.issues!.length).toBe(2);
+		expect(verdict.issues![0]).toContain('Critical');
+		expect(verdict.issues![1]).toContain('Minor');
 	});
 
-	it('defaults to approved when neither keyword is found', () => {
+	it('defaults to approved on unparseable input', () => {
 		const verdict = parseReviewVerdict('The code looks fine overall.');
 		expect(verdict.outcome).toBe('approved');
 	});
 
-	it('prefers NEEDS-RETRY when both keywords appear', () => {
-		const verdict = parseReviewVerdict('APPROVED generally but NEEDS-RETRY for edge case.');
-		expect(verdict.outcome).toBe('needs-retry');
+	it('handles case-insensitive verdict matching', () => {
+		const verdict = parseReviewVerdict('**Verdict**: approved');
+		expect(verdict.outcome).toBe('approved');
+		const verdict2 = parseReviewVerdict('**Verdict**: needs-retry');
+		expect(verdict2.outcome).toBe('needs-retry');
 	});
 });
 

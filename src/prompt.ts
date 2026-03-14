@@ -227,3 +227,26 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 
 	return parts.join('\n');
 }
+
+export function buildReviewPrompt(taskDescription: string, taskId: string): string {
+	const format = [
+		'## Review: Task-{id} — {title}',
+		'**Verdict**: APPROVED | NEEDS-RETRY',
+		'### Acceptance Criteria Check',
+		'- [x/fail] Criterion — reason',
+		'### Issues Found (if NEEDS-RETRY)',
+		'1. **[Critical/Minor]**: issue with file:line',
+		'### Fix Instructions',
+		'1. Specific actionable fix',
+	].join('\n');
+
+	return [
+		'You are a code reviewer. Verify, don\'t fix. Output ONLY the structured review format above. Check: correctness, code quality, test coverage, no dead code, no unused imports. Your verdict must be exactly APPROVED or NEEDS-RETRY.',
+		'',
+		`Task ID: ${taskId}`,
+		`Task: ${taskDescription}`,
+		'',
+		'Output format:',
+		format,
+	].join('\n');
+}

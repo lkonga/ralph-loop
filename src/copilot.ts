@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
-import { CopilotMethod, ILogger, DEFAULT_REVIEW_PROMPT_TEMPLATE } from './types';
-export { buildPrompt, buildFinalNudgePrompt, PromptCapabilities } from './prompt';
+import { CopilotMethod, ILogger, DEFAULT_REVIEW_PROMPT_TEMPLATE, ReviewVerdict } from './types';
+export { buildPrompt, buildFinalNudgePrompt, buildReviewPrompt, PromptCapabilities } from './prompt';
+import { buildReviewPrompt } from './prompt';
 
 // 3-level fallback: agent mode → chat → clipboard
 async function tryCommand(command: string, ...args: unknown[]): Promise<boolean> {
@@ -72,14 +73,47 @@ export async function openCopilotWithPrompt(prompt: string, logger: ILogger, opt
 	return 'clipboard';
 }
 
+export function parseReviewVerdict(reviewOutput: string): ReviewVerdict {
+	const verdictMatch = reviewOutput.match(/\*\*Verdict\*\*:\s*(APPROVED|NEEDS-RETRY)/i);
+	if (!verdictMatch) {
+		return { outcome: 'approved', summary: reviewOutput };
+	}
+
+	const outcome = verdictMatch[1].toLowerCase() === 'approved' ? 'approved' : 'needs-retry';
+
+	const issues: string[] = [];
+	const issuesHeaderMatch = reviewOutput.match(/###\s*Issues Found/i);
+	if (issuesHeaderMatch) {
+		const afterHeader = reviewOutput.slice(issuesHeaderMatch.index! + issuesHeaderMatch[0].length);
+		const nextSectionMatch = afterHeader.match(/^###\s/m);
+		const issuesBlock = nextSectionMatch ? afterHeader.slice(0, nextSectionMatch.index) : afterHeader;
+		const itemMatches = issuesBlock.matchAll(/^\d+\.\s+(.+)$/gm);
+		for (const m of itemMatches) {
+			issues.push(m[1].trim());
+		}
+	}
+
+	return {
+		outcome,
+		summary: reviewOutput,
+		issues: issues.length > 0 ? issues : undefined,
+	};
+}
+
 export async function sendReviewPrompt(
 	taskDescription: string,
 	mode: 'same-session' | 'new-session',
 	reviewPromptTemplate: string | undefined,
 	logger: ILogger,
+	taskId?: string,
 ): Promise<string> {
-	const template = reviewPromptTemplate ?? DEFAULT_REVIEW_PROMPT_TEMPLATE;
-	const prompt = template.replace('[TASK]', taskDescription);
+	let prompt: string;
+	if (taskId) {
+		prompt = buildReviewPrompt(taskDescription, taskId);
+	} else {
+		const template = reviewPromptTemplate ?? DEFAULT_REVIEW_PROMPT_TEMPLATE;
+		prompt = template.replace('[TASK]', taskDescription);
+	}
 
 	if (mode === 'new-session') {
 		await startFreshChatSession(logger);

@@ -35,7 +35,7 @@ import {
 	IConsistencyChecker,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
-import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt } from './copilot';
+import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt, parseReviewVerdict } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
 import { createDefaultChain, CircuitBreakerChain, ErrorHashTracker, type CircuitBreakerState } from './circuitBreaker';
@@ -69,15 +69,6 @@ export async function runPreCompleteChain(
 		if (result.action === 'stop') { return { action: 'stop', results }; }
 	}
 	return { action: 'continue', results };
-}
-
-export function parseReviewVerdict(output: string): ReviewVerdict {
-	const lower = output.toLowerCase();
-	const needsRetry = lower.includes('needs-retry');
-	return {
-		outcome: needsRetry ? 'needs-retry' : 'approved',
-		summary: output,
-	};
 }
 
 export interface MonitorSignals {

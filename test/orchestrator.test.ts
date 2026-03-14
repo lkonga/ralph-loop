@@ -5,7 +5,8 @@ import {
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain, parseReviewVerdict, LoopOrchestrator } from '../src/orchestrator';
+import { runPreCompleteChain, LoopOrchestrator } from '../src/orchestrator';
+import { parseReviewVerdict } from '../src/copilot';
 import {
 	DEFAULT_CONFIG,
 } from '../src/types';
@@ -240,15 +241,15 @@ describe('shouldRetryError', () => {
 
 describe('parseReviewVerdict', () => {
 	it('returns approved verdict for APPROVED output', () => {
-		const v = parseReviewVerdict('Everything looks good. APPROVED.');
+		const v = parseReviewVerdict('## Review\n**Verdict**: APPROVED\nEverything looks good.');
 		expect(v.outcome).toBe('approved');
-		expect(v.summary).toBe('Everything looks good. APPROVED.');
+		expect(v.summary).toContain('APPROVED');
 	});
 
 	it('returns needs-retry verdict for NEEDS-RETRY output', () => {
-		const v = parseReviewVerdict('Several issues found. NEEDS-RETRY. Fix validation.');
+		const v = parseReviewVerdict('## Review\n**Verdict**: NEEDS-RETRY\n### Issues Found (if NEEDS-RETRY)\n1. Fix validation.');
 		expect(v.outcome).toBe('needs-retry');
-		expect(v.summary).toBe('Several issues found. NEEDS-RETRY. Fix validation.');
+		expect(v.summary).toContain('NEEDS-RETRY');
 	});
 
 	it('defaults to approved when no keyword found', () => {
@@ -256,18 +257,18 @@ describe('parseReviewVerdict', () => {
 		expect(v.outcome).toBe('approved');
 	});
 
-	it('prefers needs-retry when both keywords present', () => {
-		const v = parseReviewVerdict('APPROVED but NEEDS-RETRY for edge case.');
+	it('prefers verdict regex over other text', () => {
+		const v = parseReviewVerdict('**Verdict**: NEEDS-RETRY\nAPPROVED generally for edge case.');
 		expect(v.outcome).toBe('needs-retry');
 	});
 
 	it('is case-insensitive for NEEDS-RETRY', () => {
-		const v = parseReviewVerdict('needs-retry: missing error handling');
+		const v = parseReviewVerdict('**Verdict**: needs-retry');
 		expect(v.outcome).toBe('needs-retry');
 	});
 
 	it('is case-insensitive for APPROVED', () => {
-		const v = parseReviewVerdict('approved - no issues');
+		const v = parseReviewVerdict('**Verdict**: approved');
 		expect(v.outcome).toBe('approved');
 	});
 });
