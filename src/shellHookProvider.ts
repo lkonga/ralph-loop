@@ -13,6 +13,13 @@ import {
 
 const SHELL_HOOK_TIMEOUT_MS = 30_000;
 
+// Defense-in-depth: reject commands containing shell metacharacters before allowlist
+export const DANGEROUS_PATTERNS = /&&|\|\||;|\||>|<|`|\$\(|\$\{/;
+
+export function containsDangerousChars(cmd: string): boolean {
+	return DANGEROUS_PATTERNS.test(cmd);
+}
+
 export class ShellHookProvider implements IRalphHookService {
 	constructor(
 		private readonly scriptPath: string,
@@ -40,6 +47,11 @@ export class ShellHookProvider implements IRalphHookService {
 	}
 
 	private executeHook(hookType: RalphHookType, input: unknown): Promise<HookResult> {
+		if (containsDangerousChars(this.scriptPath)) {
+			this.logger.error(`Shell hook blocked (${hookType}): Blocked: shell metacharacters detected in "${this.scriptPath}"`);
+			return Promise.resolve({ action: 'stop', reason: 'Blocked: shell metacharacters detected' });
+		}
+
 		return new Promise<HookResult>((resolve) => {
 			const child = spawn(this.scriptPath, [hookType], {
 				stdio: ['pipe', 'pipe', 'pipe'],
