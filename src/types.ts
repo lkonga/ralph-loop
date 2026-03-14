@@ -52,6 +52,8 @@ export const enum LoopEventKind {
 	TasksParallelized = 'tasks_parallelized',
 	SessionChanged = 'session_changed',
 	CircuitBreakerTripped = 'circuit_breaker_tripped',
+	DiffValidationFailed = 'diff_validation_failed',
+	HumanCheckpointRequested = 'human_checkpoint_requested',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -72,6 +74,8 @@ export type LoopEvent =
 	| { kind: LoopEventKind.YieldRequested }
 	| { kind: LoopEventKind.SessionChanged; oldSessionId: string; newSessionId: string }
 	| { kind: LoopEventKind.CircuitBreakerTripped; breakerName: string; reason: string; action: string; taskInvocationId: string }
+	| { kind: LoopEventKind.DiffValidationFailed; task: Task; nudge: string; attempt: number; taskInvocationId: string }
+	| { kind: LoopEventKind.HumanCheckpointRequested; task: Task; reason: string; failCount: number; taskInvocationId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -130,6 +134,29 @@ export const DEFAULT_PRE_COMPLETE_HOOKS: PreCompleteHookConfig[] = [
 	{ name: 'progress-updated', type: 'builtin', enabled: true },
 ];
 
+// --- Diff validation config ---
+export interface DiffValidationConfig {
+	enabled: boolean;
+	requireChanges: boolean;
+	maxDiffLines?: number;
+	generateSummary: boolean;
+}
+
+export const DEFAULT_DIFF_VALIDATION: DiffValidationConfig = {
+	enabled: true,
+	requireChanges: true,
+	generateSummary: true,
+};
+
+export interface DiffValidationResult {
+	filesChanged: string[];
+	linesAdded: number;
+	linesRemoved: number;
+	hasDiff: boolean;
+	summary: string;
+	nudge?: string;
+}
+
 // --- Config ---
 export interface CircuitBreakerConfig {
 	name: string;
@@ -160,6 +187,8 @@ export interface RalphConfig {
 	autoClassifyTasks?: boolean;
 	circuitBreakers?: CircuitBreakerConfig[];
 	preCompleteHooks?: PreCompleteHookConfig[];
+	diffValidation?: DiffValidationConfig;
+	maxDiffValidationRetries: number;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -181,6 +210,8 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	maxParallelTasks: 1,
 	autoClassifyTasks: false,
 	preCompleteHooks: [...DEFAULT_PRE_COMPLETE_HOOKS],
+	diffValidation: { ...DEFAULT_DIFF_VALIDATION },
+	maxDiffValidationRetries: 3,
 };
 
 // --- Verification ---

@@ -9,9 +9,11 @@ import {
 	DEFAULT_CONFIG,
 	DEFAULT_FEATURES,
 	DEFAULT_PRE_COMPLETE_HOOKS,
+	DEFAULT_DIFF_VALIDATION,
 	ILogger,
 	TaskStatus,
 	TaskState,
+	DiffValidationConfig,
 	IRalphHookService,
 	HookResult,
 	ITaskExecutionStrategy,
@@ -26,6 +28,7 @@ import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities } from './copilo
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
 import { createDefaultChain, CircuitBreakerChain, type CircuitBreakerState } from './circuitBreaker';
+import { DiffValidator } from './diffValidator';
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
 
@@ -435,6 +438,70 @@ export class LoopOrchestrator {
 					appendProgress(progressPath, `[${taskInvocationId}] Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId };
 
+					// Diff validation after TaskCompleted
+					const diffConfig = this.config.diffValidation ?? DEFAULT_DIFF_VALIDATION;
+					if (diffConfig.enabled) {
+						const diffValidator = new DiffValidator(diffConfig);
+						let diffAttempt = 0;
+						let diffPassed = false;
+
+						while (diffAttempt < this.config.maxDiffValidationRetries) {
+							const diffResult = await diffValidator.validateDiff(this.config.workspaceRoot, taskInvocationId);
+
+							if (diffResult.hasDiff) {
+								// Diff present — generate summary if configured
+								if (diffConfig.generateSummary) {
+									await diffValidator.appendStateToProgress(progressPath, task.id, diffResult);
+								}
+								diffPassed = true;
+								break;
+							}
+
+							// No diff — escalate
+							diffAttempt++;
+							const nudge = diffResult.nudge ?? 'No code changes detected. Review the task requirements and make the necessary code modifications.';
+							yield { kind: LoopEventKind.DiffValidationFailed, task, nudge, attempt: diffAttempt, taskInvocationId };
+
+							if (diffAttempt >= this.config.maxDiffValidationRetries) {
+								// Max retries exhausted — request human checkpoint
+								yield {
+									kind: LoopEventKind.HumanCheckpointRequested,
+									task,
+									reason: `Diff validation failed after ${diffAttempt} attempts — no code changes detected`,
+									failCount: diffAttempt,
+									taskInvocationId,
+								};
+								// Pause the loop for human intervention
+								this.pauseRequested = true;
+								break;
+							}
+
+							// Inject nudge and re-enter task (autopilot pattern)
+							this.logger.log(`Diff validation failed (attempt ${diffAttempt}/${this.config.maxDiffValidationRetries}): re-entering task with nudge`);
+							this.completedTasks.delete(task.id);
+
+							const prdContentRetry = readPrdFile(prdPath);
+							let progressContentRetry = '';
+							try { progressContentRetry = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
+							let retryPrompt = buildPrompt(task.description, prdContentRetry, progressContentRetry, 20, this.config.promptBlocks, this.promptCapabilities);
+							retryPrompt += '\n\n' + nudge;
+							const retryExec = await this.executionStrategy.execute(task, retryPrompt, this.executionOptions);
+							waitResult = { completed: retryExec.completed, hadFileChanges: retryExec.hadFileChanges };
+						}
+
+						if (!diffPassed && this.pauseRequested) {
+							// Wait for human to unpause
+							while (this.pauseRequested) {
+								this.state = LoopState.Paused;
+								await this.delay(1000);
+								if (this.stopRequested) {
+									yield { kind: LoopEventKind.Stopped };
+									return;
+								}
+							}
+						}
+					}
+
 					// PreComplete hook chain — runs after verifiers pass, before TaskComplete hook
 					const preCompleteHooks = this.config.preCompleteHooks ?? DEFAULT_PRE_COMPLETE_HOOKS;
 					const preCompleteResult = await runPreCompleteChain(
@@ -598,5 +665,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		useAutopilotMode: features.useAutopilotMode,
 		maxParallelTasks: vsConfig.get<number>('maxParallelTasks', DEFAULT_CONFIG.maxParallelTasks),
 		workspaceRoot,
+		diffValidation: vsConfig.get('diffValidation', DEFAULT_CONFIG.diffValidation),
+		maxDiffValidationRetries: vsConfig.get<number>('maxDiffValidationRetries', DEFAULT_CONFIG.maxDiffValidationRetries),
 	};
 }

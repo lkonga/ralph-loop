@@ -153,6 +153,37 @@ export function activate(context: vscode.ExtensionContext): void {
 						logger.log(`Chat session changed: ${event.oldSessionId} → ${event.newSessionId}`);
 						vscode.window.showWarningMessage('Ralph Loop: Chat session changed — loop paused');
 						break;
+					case LoopEventKind.DiffValidationFailed:
+						logger.warn(`Diff validation failed (attempt ${event.attempt}): ${event.nudge}`);
+						break;
+					case LoopEventKind.HumanCheckpointRequested:
+						logger.warn(`Human checkpoint requested: ${event.reason}`);
+						(async () => {
+							const choice = await vscode.window.showWarningMessage(
+								`Ralph Loop: ${event.reason}`,
+								'Continue', 'Skip Task', 'Stop Loop', 'Provide Guidance',
+							);
+							if (choice === 'Continue') {
+								orchestrator?.resume();
+							} else if (choice === 'Skip Task') {
+								orchestrator?.resume();
+							} else if (choice === 'Stop Loop') {
+								orchestrator?.stop();
+							} else if (choice === 'Provide Guidance') {
+								const guidance = await vscode.window.showInputBox({
+									prompt: 'Provide guidance for the task',
+									placeHolder: 'Enter instructions to help the agent...',
+								});
+								if (guidance) {
+									orchestrator?.updateConfig({ promptBlocks: [...(config.promptBlocks ?? []), guidance] });
+								}
+								orchestrator?.resume();
+							} else {
+								// Dismissed — resume
+								orchestrator?.resume();
+							}
+						})();
+						break;
 					case LoopEventKind.Stopped:
 						logger.log('Loop stopped');
 						break;
