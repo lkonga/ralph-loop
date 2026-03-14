@@ -11,10 +11,12 @@ import {
 	DEFAULT_PRE_COMPLETE_HOOKS,
 	DEFAULT_DIFF_VALIDATION,
 	DEFAULT_REVIEW_AFTER_EXECUTE,
+	DEFAULT_PARALLEL_MONITOR,
 	ILogger,
 	TaskStatus,
 	TaskState,
 	DiffValidationConfig,
+	ParallelMonitorConfig,
 	IRalphHookService,
 	HookResult,
 	ITaskExecutionStrategy,
@@ -66,6 +68,70 @@ export function parseReviewVerdict(output: string): ReviewVerdict {
 	return {
 		outcome: needsRetry ? 'needs-retry' : 'approved',
 		summary: output,
+	};
+}
+
+export interface MonitorSignals {
+	getPrdMtime: () => number;
+	getProgressMtime: () => number;
+	getProgressSize: () => number;
+	getCheckboxCount: () => number;
+}
+
+export function startMonitor(
+	taskId: string,
+	taskInvocationId: string,
+	config: ParallelMonitorConfig,
+	signals: MonitorSignals,
+	onEvent: (event: LoopEvent) => void,
+	logger: ILogger,
+): { stop: () => void } {
+	if (!config.enabled) {
+		return { stop: () => {} };
+	}
+
+	let staleIntervalCount = 0;
+	let prevPrdMtime = signals.getPrdMtime();
+	let prevProgressMtime = signals.getProgressMtime();
+	let prevProgressSize = signals.getProgressSize();
+	let prevCheckboxCount = signals.getCheckboxCount();
+
+	const interval = setInterval(() => {
+		const curPrdMtime = signals.getPrdMtime();
+		const curProgressMtime = signals.getProgressMtime();
+		const curProgressSize = signals.getProgressSize();
+		const curCheckboxCount = signals.getCheckboxCount();
+
+		const changed =
+			curPrdMtime !== prevPrdMtime ||
+			curProgressMtime !== prevProgressMtime ||
+			curProgressSize !== prevProgressSize ||
+			curCheckboxCount !== prevCheckboxCount;
+
+		prevPrdMtime = curPrdMtime;
+		prevProgressMtime = curProgressMtime;
+		prevProgressSize = curProgressSize;
+		prevCheckboxCount = curCheckboxCount;
+
+		if (changed) {
+			staleIntervalCount = 0;
+		} else {
+			staleIntervalCount++;
+		}
+
+		if (staleIntervalCount >= config.stuckThreshold) {
+			logger.warn(`Monitor: task ${taskId} appears stuck (${staleIntervalCount} stale intervals)`);
+			onEvent({
+				kind: LoopEventKind.MonitorAlert,
+				alert: `Task ${taskId} appears stuck — no progress signals for ${staleIntervalCount} intervals`,
+				taskId,
+			});
+			staleIntervalCount = 0;
+		}
+	}, config.intervalMs);
+
+	return {
+		stop: () => clearInterval(interval),
 	};
 }
 
@@ -285,7 +351,10 @@ export class LoopOrchestrator {
 
 			// Use DAG-aware parallel task selection when useParallelTasks is enabled and maxParallelTasks > 1
 			if (this.config.features.useParallelTasks && this.config.maxParallelTasks > 1) {
-				const readyTasks = pickReadyTasks(snapshot, this.config.maxParallelTasks)
+				const concurrencyCap = this.config.maxConcurrencyPerStage > 1
+					? this.config.maxConcurrencyPerStage
+					: this.config.maxParallelTasks;
+				const readyTasks = pickReadyTasks(snapshot, concurrencyCap)
 					.filter(t => !this.completedTasks.has(t.id));
 
 				if (readyTasks.length === 0) {
@@ -390,7 +459,25 @@ export class LoopOrchestrator {
 				const taskState: TaskState = { taskInvocationId, nudgeCount: 0, retryCount: 0, taskCompletedLatch: false };
 				let consecutiveNudgesWithoutFileChanges = 0;
 				const errorHistory: boolean[] = [];
-				const execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
+
+				// Start monitor before execute
+				const monitorConfig = this.config.parallelMonitor ?? DEFAULT_PARALLEL_MONITOR;
+				const monitorSignals: MonitorSignals = {
+					getPrdMtime: () => { try { return fs.statSync(prdPath).mtimeMs; } catch { return 0; } },
+					getProgressMtime: () => { try { return fs.statSync(progressPath).mtimeMs; } catch { return 0; } },
+					getProgressSize: () => { try { return fs.statSync(progressPath).size; } catch { return 0; } },
+					getCheckboxCount: () => { try { const content = fs.readFileSync(prdPath, 'utf-8'); return (content.match(/- \[x\]/gi) ?? []).length; } catch { return 0; } },
+				};
+				const monitor = startMonitor(String(task.id), taskInvocationId, monitorConfig, monitorSignals, this.onEvent, this.logger);
+
+				let execResult;
+				try {
+					execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
+				} catch (execErr) {
+					monitor.stop();
+					throw execErr;
+				}
+				monitor.stop();
 				yield { kind: LoopEventKind.CopilotTriggered, method: execResult.method, taskInvocationId };
 				yield { kind: LoopEventKind.WaitingForCompletion, task, taskInvocationId };
 				let waitResult = { completed: execResult.completed, hadFileChanges: execResult.hadFileChanges };
@@ -698,5 +785,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		diffValidation: vsConfig.get('diffValidation', DEFAULT_CONFIG.diffValidation),
 		maxDiffValidationRetries: vsConfig.get<number>('maxDiffValidationRetries', DEFAULT_CONFIG.maxDiffValidationRetries),
 		reviewAfterExecute: vsConfig.get('reviewAfterExecute', DEFAULT_CONFIG.reviewAfterExecute),
+		maxConcurrencyPerStage: vsConfig.get<number>('maxConcurrencyPerStage', DEFAULT_CONFIG.maxConcurrencyPerStage),
+		parallelMonitor: vsConfig.get('parallelMonitor', DEFAULT_CONFIG.parallelMonitor),
 	};
 }

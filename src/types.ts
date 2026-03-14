@@ -55,6 +55,7 @@ export const enum LoopEventKind {
 	DiffValidationFailed = 'diff_validation_failed',
 	HumanCheckpointRequested = 'human_checkpoint_requested',
 	TaskReviewed = 'task_reviewed',
+	MonitorAlert = 'monitor_alert',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -78,6 +79,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.DiffValidationFailed; task: Task; nudge: string; attempt: number; taskInvocationId: string }
 	| { kind: LoopEventKind.HumanCheckpointRequested; task: Task; reason: string; failCount: number; taskInvocationId: string }
 	| { kind: LoopEventKind.TaskReviewed; task: Task; verdict: ReviewVerdict; taskInvocationId: string }
+	| { kind: LoopEventKind.MonitorAlert; alert: string; taskId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -179,6 +181,19 @@ export interface DiffValidationResult {
 	nudge?: string;
 }
 
+// --- Parallel monitor config ---
+export interface ParallelMonitorConfig {
+	enabled: boolean;
+	intervalMs: number;
+	stuckThreshold: number;
+}
+
+export const DEFAULT_PARALLEL_MONITOR: ParallelMonitorConfig = {
+	enabled: false,
+	intervalMs: 10000,
+	stuckThreshold: 3,
+};
+
 // --- Config ---
 export interface CircuitBreakerConfig {
 	name: string;
@@ -212,6 +227,8 @@ export interface RalphConfig {
 	diffValidation?: DiffValidationConfig;
 	maxDiffValidationRetries: number;
 	reviewAfterExecute?: ReviewAfterExecuteConfig;
+	maxConcurrencyPerStage: number;
+	parallelMonitor?: ParallelMonitorConfig;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -236,6 +253,8 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	diffValidation: { ...DEFAULT_DIFF_VALIDATION },
 	maxDiffValidationRetries: 3,
 	reviewAfterExecute: { ...DEFAULT_REVIEW_AFTER_EXECUTE },
+	maxConcurrencyPerStage: 1,
+	parallelMonitor: { ...DEFAULT_PARALLEL_MONITOR },
 };
 
 // --- Verification ---
