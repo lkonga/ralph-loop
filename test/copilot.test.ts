@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildPrompt } from '../src/prompt';
+import { generateStopHookScript } from '../src/hookBridge';
 
 describe('buildPrompt', () => {
 	it('includes task description', () => {
@@ -78,5 +79,20 @@ describe('buildPrompt', () => {
 		expect(prompt).toContain('- [ ] Still todo');
 		expect(prompt).toContain('- [ ] Another todo');
 		expect(prompt).toContain('Progress: 2/4 tasks completed');
+	});
+
+	it('contains TDD GATE section with mandatory TDD instructions', () => {
+		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '');
+		expect(prompt).toContain('TDD GATE');
+		expect(prompt).toContain('Write a failing test FIRST');
+	});
+});
+
+describe('generateStopHookScript', () => {
+	it('always includes tsc and vitest checks in script source', () => {
+		const script = generateStopHookScript('/tmp/PRD.md', '/tmp/progress.txt');
+		expect(script).toContain('npx tsc --noEmit');
+		expect(script).toContain('npx vitest run');
+		expect(script).not.toContain('USE_VERIFICATION_GATE');
 	});
 });

@@ -105,7 +105,6 @@ export interface RalphFeatures {
 	useHookBridge: boolean;
 	useSessionTracking: boolean;
 	useAutopilotMode: boolean;
-	useVerificationGate: boolean;
 	useParallelTasks: boolean;
 }
 
@@ -113,7 +112,6 @@ export const DEFAULT_FEATURES: RalphFeatures = {
 	useHookBridge: false,
 	useSessionTracking: false,
 	useAutopilotMode: false,
-	useVerificationGate: false,
 	useParallelTasks: false,
 };
 
@@ -134,7 +132,6 @@ export interface RalphConfig {
 	useHookBridge: boolean;
 	useSessionTracking: boolean;
 	useAutopilotMode: boolean;
-	useVerificationGate: boolean;
 	maxParallelTasks: number;
 	workspaceRoot: string;
 }
@@ -155,7 +152,6 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	useHookBridge: false,
 	useSessionTracking: false,
 	useAutopilotMode: false,
-	useVerificationGate: false,
 	maxParallelTasks: 1,
 };
 

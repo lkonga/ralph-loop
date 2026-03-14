@@ -476,7 +476,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		useHookBridge: featConfig.get<boolean>('useHookBridge', DEFAULT_FEATURES.useHookBridge),
 		useSessionTracking: featConfig.get<boolean>('useSessionTracking', DEFAULT_FEATURES.useSessionTracking),
 		useAutopilotMode: featConfig.get<boolean>('useAutopilotMode', DEFAULT_FEATURES.useAutopilotMode),
-		useVerificationGate: featConfig.get<boolean>('useVerificationGate', DEFAULT_FEATURES.useVerificationGate),
 		useParallelTasks: featConfig.get<boolean>('useParallelTasks', DEFAULT_FEATURES.useParallelTasks),
 	};
 
@@ -496,7 +495,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		useHookBridge: features.useHookBridge,
 		useSessionTracking: features.useSessionTracking,
 		useAutopilotMode: features.useAutopilotMode,
-		useVerificationGate: features.useVerificationGate,
 		maxParallelTasks: vsConfig.get<number>('maxParallelTasks', DEFAULT_CONFIG.maxParallelTasks),
 		workspaceRoot,
 	};

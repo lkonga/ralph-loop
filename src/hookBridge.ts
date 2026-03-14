@@ -5,10 +5,10 @@ import * as os from 'os';
 import { ILogger, RalphConfig } from './types';
 
 // Generates the Node.js hook script content that Copilot will invoke on stdin
-function generateStopHookScript(prdPath: string, progressPath: string, useVerificationGate: boolean): string {
+export function generateStopHookScript(prdPath: string, progressPath: string): string {
     // The script reads a JSON hook invocation from stdin,
     // checks whether the current task's PRD checkbox is marked,
-    // and optionally runs a full verification gate.
+    // and runs a full verification gate (TDD is mandatory).
     return `#!/usr/bin/env node
 'use strict';
 
@@ -17,7 +17,6 @@ const { execSync } = require('child_process');
 
 const PRD_PATH = ${JSON.stringify(prdPath)};
 const PROGRESS_PATH = ${JSON.stringify(progressPath)};
-const USE_VERIFICATION_GATE = ${JSON.stringify(useVerificationGate)};
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -30,10 +29,10 @@ function readStdin() {
 
 function runCommand(cmd) {
   try {
-    execSync(cmd, { stdio: 'pipe', timeout: 120000 });
-    return { ok: true };
+    const stdout = execSync(cmd, { stdio: 'pipe', timeout: 120000 }).toString().trim();
+    return { ok: true, stdout: stdout, stderr: '' };
   } catch (err) {
-    return { ok: false, stderr: (err.stderr || '').toString().trim() };
+    return { ok: false, stdout: (err.stdout || '').toString().trim(), stderr: (err.stderr || '').toString().trim() };
   }
 }
 
@@ -62,29 +61,27 @@ async function main() {
     return;
   }
 
-  if (USE_VERIFICATION_GATE) {
-    // Check 2: progress.txt was updated
-    try {
-      const stat = fs.statSync(PROGRESS_PATH);
-      const fiveMinAgo = Date.now() - 5 * 60 * 1000;
-      if (stat.mtimeMs < fiveMinAgo) {
-        failures.push('progress.txt not recently updated');
-      }
-    } catch {
-      failures.push('progress.txt not found');
+  // Check 2: progress.txt was updated
+  try {
+    const stat = fs.statSync(PROGRESS_PATH);
+    const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+    if (stat.mtimeMs < fiveMinAgo) {
+      failures.push('progress.txt not recently updated');
     }
+  } catch {
+    failures.push('progress.txt not found');
+  }
 
-    // Check 3: TypeScript compilation
-    const tsc = runCommand('npx tsc --noEmit');
-    if (!tsc.ok) {
-      failures.push('TypeScript compilation errors: ' + (tsc.stderr || 'see tsc output'));
-    }
+  // Check 3: TypeScript compilation
+  const tsc = runCommand('npx tsc --noEmit');
+  if (!tsc.ok) {
+    failures.push('TypeScript compilation errors: ' + (tsc.stdout || tsc.stderr || 'see tsc output'));
+  }
 
-    // Check 4: Test failures
-    const vitest = runCommand('npx vitest run');
-    if (!vitest.ok) {
-      failures.push('Test failures: ' + (vitest.stderr || 'see vitest output'));
-    }
+  // Check 4: Test failures
+  const vitest = runCommand('npx vitest run');
+  if (!vitest.ok) {
+    failures.push('Test failures: ' + (vitest.stdout || vitest.stderr || 'see vitest output'));
   }
 
   if (failures.length === 0) {
@@ -159,7 +156,7 @@ export function registerHookBridge(
     const progressPath = path.resolve(config.workspaceRoot, config.progressPath);
 
     // Write the hook scripts to temp files
-    fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath, progressPath, config.features.useVerificationGate), { mode: 0o755 });
+    fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath, progressPath), { mode: 0o755 });
     fs.writeFileSync(postToolUseScriptPath, generatePostToolUseHookScript(), { mode: 0o755 });
     logger.log(`Hook bridge scripts written to ${tmpDir}`);
 
