@@ -12,6 +12,7 @@ import {
 	DEFAULT_DIFF_VALIDATION,
 	DEFAULT_REVIEW_AFTER_EXECUTE,
 	DEFAULT_PARALLEL_MONITOR,
+	DEFAULT_PRE_COMPACT_BEHAVIOR,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -27,6 +28,7 @@ import {
 	VerifyCheck,
 	ReviewVerdict,
 	ReviewAfterExecuteConfig,
+	IConsistencyChecker,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt } from './copilot';
@@ -150,12 +152,14 @@ export class LoopOrchestrator {
 	private readonly executionStrategy: ITaskExecutionStrategy;
 	private currentSessionId: string | undefined;
 	private readonly circuitBreakerChain: CircuitBreakerChain;
+	private readonly consistencyChecker?: IConsistencyChecker;
 
 	constructor(
 		config: RalphConfig,
 		logger: ILogger,
 		onEvent: (event: LoopEvent) => void,
 		hookService?: IRalphHookService,
+		consistencyChecker?: IConsistencyChecker,
 	) {
 		this.config = config;
 		this.logger = logger;
@@ -164,6 +168,7 @@ export class LoopOrchestrator {
 		this.hooksEnabled = hookService !== undefined;
 		this.executionStrategy = this.resolveStrategy();
 		this.circuitBreakerChain = createDefaultChain(this.config.circuitBreakers);
+		this.consistencyChecker = consistencyChecker;
 	}
 
 	private resolveStrategy(): ITaskExecutionStrategy {
@@ -537,6 +542,24 @@ export class LoopOrchestrator {
 					appendProgress(progressPath, `[${taskInvocationId}] Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId };
 
+					// Consistency check after task execution
+					if (this.consistencyChecker) {
+						const ccInput = {
+							prdPath,
+							progressPath,
+							workspaceRoot: this.config.workspaceRoot,
+							expectedPhase: 'in_progress',
+							taskDescription: task.description,
+						};
+						const ccResult = await this.consistencyChecker.runDeterministic(ccInput);
+						if (ccResult.passed) {
+							this.onEvent({ kind: LoopEventKind.ConsistencyCheckPassed, phase: 'post_task', checks: ccResult.checks });
+						} else {
+							this.onEvent({ kind: LoopEventKind.ConsistencyCheckFailed, phase: 'post_task', checks: ccResult.checks, failureReason: ccResult.failureReason });
+							this.logger.warn(`Consistency check failed: ${ccResult.failureReason}`);
+						}
+					}
+
 					// Diff validation after TaskCompleted
 					const diffConfig = this.config.diffValidation ?? DEFAULT_DIFF_VALIDATION;
 					if (diffConfig.enabled) {
@@ -762,6 +785,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		useSessionTracking: featConfig.get<boolean>('useSessionTracking', DEFAULT_FEATURES.useSessionTracking),
 		useAutopilotMode: featConfig.get<boolean>('useAutopilotMode', DEFAULT_FEATURES.useAutopilotMode),
 		useParallelTasks: featConfig.get<boolean>('useParallelTasks', DEFAULT_FEATURES.useParallelTasks),
+		useLlmConsistencyCheck: featConfig.get<boolean>('useLlmConsistencyCheck', DEFAULT_FEATURES.useLlmConsistencyCheck),
 	};
 
 	return {
@@ -787,5 +811,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		reviewAfterExecute: vsConfig.get('reviewAfterExecute', DEFAULT_CONFIG.reviewAfterExecute),
 		maxConcurrencyPerStage: vsConfig.get<number>('maxConcurrencyPerStage', DEFAULT_CONFIG.maxConcurrencyPerStage),
 		parallelMonitor: vsConfig.get('parallelMonitor', DEFAULT_CONFIG.parallelMonitor),
+		preCompactBehavior: vsConfig.get('preCompactBehavior', DEFAULT_CONFIG.preCompactBehavior),
 	};
 }

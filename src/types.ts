@@ -56,6 +56,8 @@ export const enum LoopEventKind {
 	HumanCheckpointRequested = 'human_checkpoint_requested',
 	TaskReviewed = 'task_reviewed',
 	MonitorAlert = 'monitor_alert',
+	ConsistencyCheckPassed = 'consistency_check_passed',
+	ConsistencyCheckFailed = 'consistency_check_failed',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -80,6 +82,8 @@ export type LoopEvent =
 	| { kind: LoopEventKind.HumanCheckpointRequested; task: Task; reason: string; failCount: number; taskInvocationId: string }
 	| { kind: LoopEventKind.TaskReviewed; task: Task; verdict: ReviewVerdict; taskInvocationId: string }
 	| { kind: LoopEventKind.MonitorAlert; alert: string; taskId: string }
+	| { kind: LoopEventKind.ConsistencyCheckPassed; phase: string; checks: ConsistencyCheckDetail[] }
+	| { kind: LoopEventKind.ConsistencyCheckFailed; phase: string; checks: ConsistencyCheckDetail[]; failureReason?: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -116,6 +120,7 @@ export interface RalphFeatures {
 	useSessionTracking: boolean;
 	useAutopilotMode: boolean;
 	useParallelTasks: boolean;
+	useLlmConsistencyCheck: boolean;
 }
 
 export const DEFAULT_FEATURES: RalphFeatures = {
@@ -123,6 +128,7 @@ export const DEFAULT_FEATURES: RalphFeatures = {
 	useSessionTracking: false,
 	useAutopilotMode: false,
 	useParallelTasks: false,
+	useLlmConsistencyCheck: false,
 };
 
 // --- PreComplete hook config ---
@@ -194,6 +200,47 @@ export const DEFAULT_PARALLEL_MONITOR: ParallelMonitorConfig = {
 	stuckThreshold: 3,
 };
 
+// --- PreCompact behavior ---
+export interface PreCompactBehavior {
+	enabled: boolean;
+	summaryMaxLines: number;
+	injectGitDiff: boolean;
+	injectProgressSummary: boolean;
+}
+
+export const DEFAULT_PRE_COMPACT_BEHAVIOR: PreCompactBehavior = {
+	enabled: true,
+	summaryMaxLines: 50,
+	injectGitDiff: true,
+	injectProgressSummary: true,
+};
+
+// --- Consistency checker ---
+export interface ConsistencyCheckDetail {
+	name: string;
+	passed: boolean;
+	detail?: string;
+}
+
+export interface ConsistencyCheckInput {
+	prdPath: string;
+	progressPath: string;
+	workspaceRoot: string;
+	expectedPhase: string;
+	taskDescription: string;
+}
+
+export interface ConsistencyCheckResult {
+	passed: boolean;
+	checks: ConsistencyCheckDetail[];
+	failureReason?: string;
+}
+
+export interface IConsistencyChecker {
+	runDeterministic(input: ConsistencyCheckInput): Promise<ConsistencyCheckResult>;
+	runLlmVerification(input: ConsistencyCheckInput): Promise<ConsistencyCheckResult>;
+}
+
 // --- Config ---
 export interface CircuitBreakerConfig {
 	name: string;
@@ -229,6 +276,7 @@ export interface RalphConfig {
 	reviewAfterExecute?: ReviewAfterExecuteConfig;
 	maxConcurrencyPerStage: number;
 	parallelMonitor?: ParallelMonitorConfig;
+	preCompactBehavior?: PreCompactBehavior;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -255,6 +303,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	reviewAfterExecute: { ...DEFAULT_REVIEW_AFTER_EXECUTE },
 	maxConcurrencyPerStage: 1,
 	parallelMonitor: { ...DEFAULT_PARALLEL_MONITOR },
+	preCompactBehavior: { ...DEFAULT_PRE_COMPACT_BEHAVIOR },
 };
 
 // --- Verification ---

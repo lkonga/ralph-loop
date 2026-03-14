@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { ILogger, RalphConfig, DEFAULT_PRE_COMPLETE_HOOKS } from './types';
+import { ILogger, RalphConfig, DEFAULT_PRE_COMPLETE_HOOKS, PreCompactBehavior, DEFAULT_PRE_COMPACT_BEHAVIOR } from './types';
 
 export { DEFAULT_PRE_COMPLETE_HOOKS };
 
@@ -104,6 +104,109 @@ main().catch(() => {
 `;
 }
 
+export function generatePreCompactHookScript(prdPath: string, progressPath: string, config: PreCompactBehavior): string {
+    const maxLines = config.summaryMaxLines;
+    const injectGitDiff = config.injectGitDiff;
+    const injectProgressSummary = config.injectProgressSummary;
+
+    let gitDiffBlock = '';
+    if (injectGitDiff) {
+        gitDiffBlock = `
+  // Get recent file changes
+  let diffSummary = '';
+  try {
+    const stat = runCommand('git diff --stat');
+    const names = runCommand('git diff --name-only');
+    diffSummary = stat.ok ? stat.stdout : (names.ok ? names.stdout : 'No diff available');
+  } catch {
+    diffSummary = 'Could not run git diff';
+  }`;
+    }
+
+    let progressBlock = '';
+    if (injectProgressSummary) {
+        progressBlock = `
+  // Read last N lines of progress.txt
+  let progressSummary = '';
+  try {
+    const content = fs.readFileSync(PROGRESS_PATH, 'utf-8');
+    const lines = content.split('\\n');
+    const lastLines = lines.slice(-${maxLines});
+    progressSummary = lastLines.join('\\n');
+  } catch {
+    progressSummary = 'No progress file found';
+  }`;
+    }
+
+    return `#!/usr/bin/env node
+'use strict';
+
+const fs = require('fs');
+const { execSync } = require('child_process');
+
+const PRD_PATH = ${JSON.stringify(prdPath)};
+const PROGRESS_PATH = ${JSON.stringify(progressPath)};
+
+function readStdin() {
+  return new Promise((resolve) => {
+    let data = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (chunk) => { data += chunk; });
+    process.stdin.on('end', () => { resolve(data); });
+  });
+}
+
+function runCommand(cmd) {
+  try {
+    const stdout = execSync(cmd, { stdio: 'pipe', timeout: 30000 }).toString().trim();
+    return { ok: true, stdout: stdout, stderr: '' };
+  } catch (err) {
+    return { ok: false, stdout: (err.stdout || '').toString().trim(), stderr: (err.stderr || '').toString().trim() };
+  }
+}
+
+async function main() {
+  await readStdin();
+${progressBlock}
+${gitDiffBlock}
+
+  // Find current unchecked task from PRD
+  let currentTask = 'Unknown';
+  try {
+    const prdContent = fs.readFileSync(PRD_PATH, 'utf-8');
+    const lines = prdContent.split('\\n');
+    const unchecked = lines.filter(l => /^\\s*-\\s*\\[\\s*\\]\\s+/.test(l));
+    if (unchecked.length > 0) {
+      currentTask = unchecked[0].replace(/^\\s*-\\s*\\[\\s*\\]\\s+/, '').trim();
+    }
+  } catch {
+    currentTask = 'Could not read PRD';
+  }
+
+  const resumptionBlock = '=== SESSION RESUMPTION CONTEXT ===\\n' +
+    '## Progress So Far\\n' +
+    (${injectProgressSummary} ? progressSummary : 'Summary not injected') + '\\n' +
+    '## Recent File Changes\\n' +
+    (${injectGitDiff} ? diffSummary : 'Diff not injected') + '\\n' +
+    '## Current Task\\n' +
+    currentTask + '\\n' +
+    '=== END ===';
+
+  const result = {
+    resultKind: 'success',
+    action: 'continue',
+    additionalContext: resumptionBlock
+  };
+
+  process.stdout.write(JSON.stringify(result));
+}
+
+main().catch(() => {
+  process.stdout.write(JSON.stringify({ resultKind: 'success', action: 'continue' }));
+});
+`;
+}
+
 function generatePostToolUseHookScript(): string {
     // PostToolUse hook: writes a timestamp marker file so the extension can
     // detect tool activity and reset its inactivity timer.
@@ -155,13 +258,18 @@ export function registerHookBridge(
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-hook-'));
     const stopScriptPath = path.join(tmpDir, 'stop-hook.js');
     const postToolUseScriptPath = path.join(tmpDir, 'post-tool-use-hook.js');
+    const preCompactScriptPath = path.join(tmpDir, 'pre-compact-hook.js');
 
     const prdPath = path.resolve(config.workspaceRoot, config.prdPath);
     const progressPath = path.resolve(config.workspaceRoot, config.progressPath);
+    const preCompactConfig = config.preCompactBehavior ?? DEFAULT_PRE_COMPACT_BEHAVIOR;
 
     // Write the hook scripts to temp files
     fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath, progressPath), { mode: 0o755 });
     fs.writeFileSync(postToolUseScriptPath, generatePostToolUseHookScript(), { mode: 0o755 });
+    if (preCompactConfig.enabled) {
+        fs.writeFileSync(preCompactScriptPath, generatePreCompactHookScript(prdPath, progressPath, preCompactConfig), { mode: 0o755 });
+    }
     logger.log(`Hook bridge scripts written to ${tmpDir}`);
 
     // Register hooks via VS Code's chat.hooks configuration
@@ -178,14 +286,21 @@ export function registerHookBridge(
         args: [postToolUseScriptPath],
     };
 
-    const updatedHooks = {
+    const updatedHooks: Record<string, unknown> = {
         ...existingHooks,
         Stop: stopHookCommand,
         PostToolUse: postToolUseHookCommand,
     };
 
+    if (preCompactConfig.enabled) {
+        updatedHooks['PreCompact'] = {
+            command: process.execPath,
+            args: [preCompactScriptPath],
+        };
+    }
+
     chatHooksConfig.update('hooks', updatedHooks, vscode.ConfigurationTarget.Workspace).then(
-        () => logger.log('Chat hooks registered: Stop, PostToolUse'),
+        () => logger.log('Chat hooks registered: Stop, PostToolUse' + (preCompactConfig.enabled ? ', PreCompact' : '')),
         (err: Error) => logger.error(`Failed to register chat hooks: ${err.message}`),
     );
 
@@ -212,6 +327,7 @@ export function registerHookBridge(
             // Clean up hook scripts
             try { fs.unlinkSync(stopScriptPath); } catch { /* best effort */ }
             try { fs.unlinkSync(postToolUseScriptPath); } catch { /* best effort */ }
+            try { fs.unlinkSync(preCompactScriptPath); } catch { /* best effort */ }
             try { fs.rmdirSync(tmpDir); } catch { /* best effort */ }
 
             // Remove our hooks from configuration
@@ -220,6 +336,7 @@ export function registerHookBridge(
             const cleaned = { ...hooks };
             delete cleaned['Stop'];
             delete cleaned['PostToolUse'];
+            delete cleaned['PreCompact'];
             config.update('hooks', cleaned, vscode.ConfigurationTarget.Workspace).then(
                 () => logger.log('Chat hooks unregistered'),
                 () => { /* best effort */ },
