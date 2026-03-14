@@ -134,6 +134,9 @@ export interface RalphConfig {
 	useAutopilotMode: boolean;
 	maxParallelTasks: number;
 	workspaceRoot: string;
+	verifiers?: VerifierConfig[];
+	verificationTemplates?: VerificationTemplate[];
+	autoClassifyTasks?: boolean;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -153,6 +156,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	useSessionTracking: false,
 	useAutopilotMode: false,
 	maxParallelTasks: 1,
+	autoClassifyTasks: false,
 };
 
 // --- Verification ---
@@ -166,6 +170,19 @@ export interface VerifyCheck {
 	readonly name: string;
 	readonly result: VerifyResult;
 	readonly detail?: string;
+}
+
+export type VerifierFn = (task: Task, workspaceRoot: string, args?: Record<string, string>) => Promise<VerifyCheck>;
+
+export interface VerifierConfig {
+	type: string;
+	args?: Record<string, string>;
+	stages?: string[];
+}
+
+export interface VerificationTemplate {
+	name: string;
+	verifiers: VerifierConfig[];
 }
 
 // --- Hook system ---
