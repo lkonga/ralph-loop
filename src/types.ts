@@ -117,6 +117,19 @@ export const DEFAULT_FEATURES: RalphFeatures = {
 	useParallelTasks: false,
 };
 
+// --- PreComplete hook config ---
+export interface PreCompleteHookConfig {
+	name: string;
+	type: 'builtin' | 'shell' | 'custom';
+	command?: string;
+	enabled: boolean;
+}
+
+export const DEFAULT_PRE_COMPLETE_HOOKS: PreCompleteHookConfig[] = [
+	{ name: 'prd-checkbox-check', type: 'builtin', enabled: true },
+	{ name: 'progress-updated', type: 'builtin', enabled: true },
+];
+
 // --- Config ---
 export interface CircuitBreakerConfig {
 	name: string;
@@ -146,6 +159,7 @@ export interface RalphConfig {
 	verificationTemplates?: VerificationTemplate[];
 	autoClassifyTasks?: boolean;
 	circuitBreakers?: CircuitBreakerConfig[];
+	preCompleteHooks?: PreCompleteHookConfig[];
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -166,6 +180,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	useAutopilotMode: false,
 	maxParallelTasks: 1,
 	autoClassifyTasks: false,
+	preCompleteHooks: [...DEFAULT_PRE_COMPLETE_HOOKS],
 };
 
 // --- Verification ---
@@ -195,7 +210,7 @@ export interface VerificationTemplate {
 }
 
 // --- Hook system ---
-export type RalphHookType = 'SessionStart' | 'PreCompact' | 'PostToolUse' | 'TaskComplete';
+export type RalphHookType = 'SessionStart' | 'PreCompact' | 'PostToolUse' | 'PreComplete' | 'TaskComplete';
 
 export interface SessionStartInput {
 	prdPath: string;
@@ -224,10 +239,23 @@ export interface HookResult {
 	additionalContext?: string;
 }
 
+export interface PreCompleteInput {
+	taskId: string;
+	taskInvocationId: string;
+	checksRun: VerifyCheck[];
+	prdPath: string;
+	previousResults?: PreCompleteHookResult[];
+}
+
+export interface PreCompleteHookResult extends HookResult {
+	hookName: string;
+}
+
 export interface IRalphHookService {
 	onSessionStart(input: SessionStartInput): Promise<HookResult>;
 	onPreCompact(input: PreCompactInput): Promise<HookResult>;
 	onPostToolUse(input: PostToolUseInput): Promise<HookResult>;
+	onPreComplete(input: PreCompleteInput): Promise<HookResult>;
 	onTaskComplete(input: TaskCompleteInput): Promise<HookResult>;
 }
 

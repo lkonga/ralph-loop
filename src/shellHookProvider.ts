@@ -4,6 +4,7 @@ import {
 	SessionStartInput,
 	PreCompactInput,
 	PostToolUseInput,
+	PreCompleteInput,
 	TaskCompleteInput,
 	HookResult,
 	RalphHookType,
@@ -28,6 +29,10 @@ export class ShellHookProvider implements IRalphHookService {
 
 	async onPostToolUse(input: PostToolUseInput): Promise<HookResult> {
 		return this.executeHook('PostToolUse', input);
+	}
+
+	async onPreComplete(input: PreCompleteInput): Promise<HookResult> {
+		return this.executeHook('PreComplete', input);
 	}
 
 	async onTaskComplete(input: TaskCompleteInput): Promise<HookResult> {

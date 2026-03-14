@@ -2,7 +2,9 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { ILogger, RalphConfig } from './types';
+import { ILogger, RalphConfig, DEFAULT_PRE_COMPLETE_HOOKS } from './types';
+
+export { DEFAULT_PRE_COMPLETE_HOOKS };
 
 // Generates the Node.js hook script content that Copilot will invoke on stdin
 export function generateStopHookScript(prdPath: string, progressPath: string): string {
@@ -41,6 +43,7 @@ async function main() {
 
   const failures = [];
 
+  // PreComplete hook: prd-checkbox-check
   // Check 1: PRD checkbox is marked
   let prdContent;
   try {
@@ -61,6 +64,7 @@ async function main() {
     return;
   }
 
+  // PreComplete hook: progress-updated (mtime within 5 min)
   // Check 2: progress.txt was updated
   try {
     const stat = fs.statSync(PROGRESS_PATH);

@@ -8,6 +8,7 @@ import {
 	RalphConfig,
 	DEFAULT_CONFIG,
 	DEFAULT_FEATURES,
+	DEFAULT_PRE_COMPLETE_HOOKS,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -15,6 +16,10 @@ import {
 	HookResult,
 	ITaskExecutionStrategy,
 	ExecutionOptions,
+	PreCompleteInput,
+	PreCompleteHookResult,
+	PreCompleteHookConfig,
+	VerifyCheck,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities } from './copilot';
@@ -28,7 +33,25 @@ export class NoOpHookService implements IRalphHookService {
 	async onSessionStart() { return NO_OP_HOOK_RESULT; }
 	async onPreCompact() { return NO_OP_HOOK_RESULT; }
 	async onPostToolUse() { return NO_OP_HOOK_RESULT; }
+	async onPreComplete() { return NO_OP_HOOK_RESULT; }
 	async onTaskComplete() { return NO_OP_HOOK_RESULT; }
+}
+
+export async function runPreCompleteChain(
+	hooks: PreCompleteHookConfig[],
+	hookService: IRalphHookService,
+	baseInput: Omit<PreCompleteInput, 'previousResults'>,
+): Promise<{ action: 'continue' | 'retry' | 'stop'; results: PreCompleteHookResult[] }> {
+	const results: PreCompleteHookResult[] = [];
+	for (const hook of hooks) {
+		if (!hook.enabled) { continue; }
+		const input: PreCompleteInput = { ...baseInput, previousResults: [...results] };
+		const result = await hookService.onPreComplete(input);
+		results.push({ ...result, hookName: hook.name });
+		if (result.action === 'retry') { return { action: 'retry', results }; }
+		if (result.action === 'stop') { return { action: 'stop', results }; }
+	}
+	return { action: 'continue', results };
 }
 
 export class LoopOrchestrator {
@@ -411,6 +434,22 @@ export class LoopOrchestrator {
 					this.completedTasks.add(task.id);
 					appendProgress(progressPath, `[${taskInvocationId}] Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId };
+
+					// PreComplete hook chain — runs after verifiers pass, before TaskComplete hook
+					const preCompleteHooks = this.config.preCompleteHooks ?? DEFAULT_PRE_COMPLETE_HOOKS;
+					const preCompleteResult = await runPreCompleteChain(
+						preCompleteHooks,
+						this.hookService,
+						{ taskId: String(task.id), taskInvocationId, checksRun: [], prdPath },
+					);
+					if (preCompleteResult.action === 'retry') {
+						this.completedTasks.delete(task.id);
+						continue;
+					}
+					if (preCompleteResult.action === 'stop') {
+						yield { kind: LoopEventKind.Stopped };
+						return;
+					}
 
 					// TaskComplete hook
 					const completeHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'success', taskInvocationId });
