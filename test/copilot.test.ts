@@ -89,6 +89,17 @@ describe('buildPrompt', () => {
 		expect(prompt).toContain('TDD GATE');
 		expect(prompt).toContain('Write a failing test FIRST');
 	});
+
+	it('includes task ID in YOUR TASK TO IMPLEMENT header when provided', () => {
+		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '', 20, undefined, undefined, undefined, 1, undefined, undefined, 'Task-003');
+		expect(prompt).toContain('YOUR TASK TO IMPLEMENT — Task-003');
+	});
+
+	it('omits task ID from YOUR TASK TO IMPLEMENT header when not provided', () => {
+		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '');
+		expect(prompt).toContain('YOUR TASK TO IMPLEMENT');
+		expect(prompt).not.toContain('YOUR TASK TO IMPLEMENT —');
+	});
 });
 
 describe('generateStopHookScript', () => {

@@ -192,7 +192,7 @@ describe('AutoDecomposer', () => {
 
     it('decomposeTask generates valid checkbox lines for sentence boundaries', () => {
         const decomposer = new AutoDecomposer();
-        const task = { id: 0, description: 'First thing to do. Second thing to do. Third thing to do.', status: 'pending', lineNumber: 5 };
+        const task = { id: 0, taskId: 'Task-001', description: 'First thing to do. Second thing to do. Third thing to do.', status: 'pending', lineNumber: 5 };
         const prdContent = '- [ ] First thing to do. Second thing to do. Third thing to do.\n- [ ] Another task\n';
         const result = decomposer.decomposeTask(task, prdContent);
 
@@ -211,7 +211,7 @@ describe('AutoDecomposer', () => {
 
     it('decomposeTask generates valid checkbox lines for semicolons', () => {
         const decomposer = new AutoDecomposer();
-        const task = { id: 0, description: 'Do A; Do B; Do C', status: 'pending', lineNumber: 1 };
+        const task = { id: 0, taskId: 'Task-001', description: 'Do A; Do B; Do C', status: 'pending', lineNumber: 1 };
         const prdContent = '- [ ] Do A; Do B; Do C\n';
         const result = decomposer.decomposeTask(task, prdContent);
 
@@ -223,7 +223,7 @@ describe('AutoDecomposer', () => {
 
     it('decomposeTask generates valid checkbox lines for numbered steps', () => {
         const decomposer = new AutoDecomposer();
-        const task = { id: 0, description: '(1) Do X (2) Do Y (3) Do Z', status: 'pending', lineNumber: 1 };
+        const task = { id: 0, taskId: 'Task-001', description: '(1) Do X (2) Do Y (3) Do Z', status: 'pending', lineNumber: 1 };
         const prdContent = '- [ ] (1) Do X (2) Do Y (3) Do Z\n';
         const result = decomposer.decomposeTask(task, prdContent);
 
@@ -235,7 +235,7 @@ describe('AutoDecomposer', () => {
 
     it('decomposeTask preserves other PRD lines', () => {
         const decomposer = new AutoDecomposer();
-        const task = { id: 0, description: 'First step. Second step.', status: 'pending', lineNumber: 2 };
+        const task = { id: 0, taskId: 'Task-001', description: 'First step. Second step.', status: 'pending', lineNumber: 2 };
         const prdContent = '# My PRD\n- [ ] First step. Second step.\n- [ ] Another task\n';
         const result = decomposer.decomposeTask(task, prdContent);
 

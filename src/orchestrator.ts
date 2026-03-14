@@ -426,7 +426,7 @@ export class LoopOrchestrator {
 								const prdContent = readPrdFile(prdPath);
 								let progContent = '';
 								try { progContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
-								const prompt = buildPrompt(task.description, prdContent, progContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING);
+								const prompt = buildPrompt(task.description, prdContent, progContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId);
 								const execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
 								const duration = Date.now() - start;
 
@@ -495,7 +495,7 @@ export class LoopOrchestrator {
 
 			const startTime = Date.now();
 			try {
-				appendProgress(progressPath, `[${taskInvocationId}] Task started: ${task.description}`);
+				appendProgress(progressPath, `[${taskInvocationId}] [${task.taskId}] Task started: ${task.description}`);
 
 				// Read context for prompt
 				// Stagnation snapshot before prompt
@@ -518,7 +518,7 @@ export class LoopOrchestrator {
 				if (operatorContext) {
 					this.onEvent({ kind: LoopEventKind.ContextInjected, text: operatorContext });
 				}
-				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, relevantLearnings, iteration, ctConfig, operatorContext);
+				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, relevantLearnings, iteration, ctConfig, operatorContext, task.taskId);
 				if (additionalContext) {
 					prompt += '\n\n' + additionalContext;
 					additionalContext = '';
@@ -584,7 +584,7 @@ export class LoopOrchestrator {
 					const finalNudge = buildFinalNudgePrompt(task.description, taskState.nudgeCount, this.config.maxNudgesPerTask);
 					const continuationSuffix = finalNudge
 						?? 'Continue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
-					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING)
+					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId)
 						+ '\n\n' + continuationSuffix;
 
 					const nudgeResult = await this.executionStrategy.execute(task, nudgePrompt, this.executionOptions);
@@ -633,14 +633,14 @@ export class LoopOrchestrator {
 					const struggle = struggleDetector.isStruggling();
 					if (struggle.struggling) {
 						additionalContext = `Struggle detected: ${struggle.signals.join(', ')}. Try a completely different approach. If tests keep failing, check your assumptions.`;
-						yield { kind: LoopEventKind.StruggleDetected, signals: struggle.signals, taskId: String(task.id) };
+						yield { kind: LoopEventKind.StruggleDetected, signals: struggle.signals, taskId: task.taskId };
 					}
 				}
 
 				if (waitResult.completed) {
 					taskState.taskCompletedLatch = true;
 					this.completedTasks.add(task.id);
-					appendProgress(progressPath, `[${taskInvocationId}] Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
+					appendProgress(progressPath, `[${taskInvocationId}] [${task.taskId}] Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId };
 
 					// Knowledge extraction after task completion
@@ -717,7 +717,7 @@ export class LoopOrchestrator {
 							const prdContentRetry = readPrdFile(prdPath);
 							let progressContentRetry = '';
 							try { progressContentRetry = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
-							let retryPrompt = buildPrompt(task.description, prdContentRetry, progressContentRetry, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING);
+							let retryPrompt = buildPrompt(task.description, prdContentRetry, progressContentRetry, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId);
 							retryPrompt += '\n\n' + nudge;
 							const retryExec = await this.executionStrategy.execute(task, retryPrompt, this.executionOptions);
 							waitResult = { completed: retryExec.completed, hadFileChanges: retryExec.hadFileChanges };
@@ -795,7 +795,7 @@ export class LoopOrchestrator {
 						return;
 					}
 				} else {
-					appendProgress(progressPath, `[${taskInvocationId}] Task timed out: ${task.description} (${Math.round(duration / 1000)}s)`);
+					appendProgress(progressPath, `[${taskInvocationId}] [${task.taskId}] Task timed out: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration, taskInvocationId };
 
 					// Track consecutive failures for auto-decomposition
@@ -860,7 +860,7 @@ export class LoopOrchestrator {
 						let progressContent = '';
 						try { progressContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 
-						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING);
+						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId);
 						const retryExecResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
 						yield { kind: LoopEventKind.CopilotTriggered, method: retryExecResult.method, taskInvocationId };
 
@@ -869,7 +869,7 @@ export class LoopOrchestrator {
 						if (retryResult.completed) {
 							this.completedTasks.add(task.id);
 							const duration = Date.now() - startTime;
-							appendProgress(progressPath, `[${taskInvocationId}] Task completed (after ${retryCount} retries): ${task.description} (${Math.round(duration / 1000)}s)`);
+							appendProgress(progressPath, `[${taskInvocationId}] [${task.taskId}] Task completed (after ${retryCount} retries): ${task.description} (${Math.round(duration / 1000)}s)`);
 							yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId };
 						}
 						handled = true;
@@ -881,7 +881,7 @@ export class LoopOrchestrator {
 
 				if (!handled) {
 					const message = currentError.message;
-					appendProgress(progressPath, `[${taskInvocationId}] Task error: ${task.description} — ${message}`);
+					appendProgress(progressPath, `[${taskInvocationId}] [${task.taskId}] Task error: ${task.description} — ${message}`);
 					yield { kind: LoopEventKind.Error, message: `Task "${task.description}" failed: ${message}` };
 
 					// TaskComplete hook (failure after retries exhausted)

@@ -29,7 +29,7 @@ export function inferCommitType(description: string): 'feat' | 'fix' {
 
 export function buildCommitMessage(task: Task, taskInvocationId: string, changedFiles: string[], testSummary?: string): string {
 	const type = inferCommitType(task.description);
-	const scope = `task-${task.id}`;
+	const scope = task.taskId;
 	const prefix = `${type}(${scope}): `;
 	const maxSubjectLen = 72;
 	const descriptionTruncated = task.description.slice(0, maxSubjectLen - prefix.length);

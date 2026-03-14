@@ -19,6 +19,7 @@ export const enum TaskStatus {
 
 export interface Task {
 	readonly id: number;
+	readonly taskId: string;
 	readonly description: string;
 	status: TaskStatus;
 	readonly lineNumber: number;

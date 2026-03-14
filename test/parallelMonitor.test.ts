@@ -234,10 +234,10 @@ describe('maxConcurrencyPerStage overrides maxParallelTasks', () => {
 
 		const snapshot = {
 			tasks: [
-				{ id: 1, description: 'Task 1', status: TaskStatus.Pending, lineNumber: 1 },
-				{ id: 2, description: 'Task 2', status: TaskStatus.Pending, lineNumber: 2 },
-				{ id: 3, description: 'Task 3', status: TaskStatus.Pending, lineNumber: 3 },
-				{ id: 4, description: 'Task 4', status: TaskStatus.Pending, lineNumber: 4 },
+				{ id: 1, taskId: 'Task-001', description: 'Task 1', status: TaskStatus.Pending, lineNumber: 1 },
+				{ id: 2, taskId: 'Task-002', description: 'Task 2', status: TaskStatus.Pending, lineNumber: 2 },
+				{ id: 3, taskId: 'Task-003', description: 'Task 3', status: TaskStatus.Pending, lineNumber: 3 },
+				{ id: 4, taskId: 'Task-004', description: 'Task 4', status: TaskStatus.Pending, lineNumber: 4 },
 			],
 			total: 4,
 			completed: 0,

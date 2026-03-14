@@ -17,8 +17,8 @@ vi.mock('fs', async () => {
 	};
 });
 
-function makeTask(id: number, description: string): Task {
-	return { id, description, status: TaskStatus.Pending, lineNumber: id };
+function makeTask(id: number, description: string, taskId?: string): Task {
+	return { id, description, status: TaskStatus.Pending, lineNumber: id, taskId: taskId ?? `Task-${String(id + 1).padStart(3, '0')}` };
 }
 
 type GitCallback = (err: Error | null, stdout: string, stderr: string) => void;
@@ -81,14 +81,21 @@ describe('gitOps', () => {
 			const task = makeTask(3, 'Add new feature for dashboard');
 			const msg = buildCommitMessage(task, 'inv-abc', ['src/dash.ts']);
 			const subject = msg.split('\n')[0];
-			expect(subject).toMatch(/^feat\(task-3\): /);
+			expect(subject).toMatch(/^feat\(Task-004\): /);
 		});
 
 		it('uses fix type for fix-related descriptions', () => {
 			const task = makeTask(7, 'Fix the broken authentication');
 			const msg = buildCommitMessage(task, 'inv-xyz', ['src/auth.ts']);
 			const subject = msg.split('\n')[0];
-			expect(subject).toMatch(/^fix\(task-7\): /);
+			expect(subject).toMatch(/^fix\(Task-008\): /);
+		});
+
+		it('includes task ID prefix in commit subject', () => {
+			const task = makeTask(0, 'Add dashboard', 'Task-001');
+			const msg = buildCommitMessage(task, 'inv-1', ['src/dash.ts']);
+			const subject = msg.split('\n')[0];
+			expect(subject).toMatch(/^feat\(Task-001\): /);
 		});
 
 		it('includes taskInvocationId in body', () => {

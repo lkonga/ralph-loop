@@ -125,7 +125,7 @@ export function buildFinalNudgePrompt(task: string, nudgeCount: number, maxNudge
 	return `Your remaining time is almost up. Produce your final result NOW: commit any partial work, update progress.txt, and mark the checkbox. If tests fail, document the failure and mark done anyway.`;
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string): string {
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string, taskId?: string): string {
 	const sanitized = sanitizeTaskDescription(taskDescription.trim());
 	const ct = contextTrimming ?? DEFAULT_CONTEXT_TRIMMING;
 
@@ -152,7 +152,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 
 	const parts: string[] = [
 		'===================================================================',
-		'                       YOUR TASK TO IMPLEMENT',
+		`                       YOUR TASK TO IMPLEMENT${taskId ? ` \u2014 ${taskId}` : ''}`,
 		'===================================================================',
 		'',
 		sanitized,

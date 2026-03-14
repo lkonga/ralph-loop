@@ -38,7 +38,7 @@ export function parsePrd(content: string): PrdSnapshot {
 			const description = unchecked[2].trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
-				task: { id: id++, description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn },
 				indent,
 				rawDescription: description,
 			});
@@ -50,7 +50,7 @@ export function parsePrd(content: string): PrdSnapshot {
 			const description = checked[2].trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
-				task: { id: id++, description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn },
 				indent,
 				rawDescription: description,
 			});
@@ -65,6 +65,7 @@ export function parsePrd(content: string): PrdSnapshot {
 
 	for (let i = 0; i < taskEntries.length; i++) {
 		const entry = taskEntries[i];
+		(entry.task as { taskId: string }).taskId = `Task-${String(i + 1).padStart(3, '0')}`;
 		if (entry.task.dependsOn) { continue; } // explicit annotation takes priority
 		if (entry.indent > 0) {
 			// Find the nearest preceding task with less indentation

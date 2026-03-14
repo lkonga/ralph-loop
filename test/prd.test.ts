@@ -55,6 +55,25 @@ describe('parsePrd', () => {
 		const snapshot = parsePrd(content);
 		expect(snapshot.tasks.map(t => t.id)).toEqual([0, 1, 2]);
 	});
+
+	it('assigns sequential zero-padded taskId strings', () => {
+		const content = `- [x] Done\n- [ ] Pending\n- [ ] Another\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.map(t => t.taskId)).toEqual(['Task-001', 'Task-002', 'Task-003']);
+	});
+
+	it('taskIds are consistent across multiple parses', () => {
+		const content = `- [ ] Alpha\n- [ ] Beta\n- [x] Gamma\n`;
+		const first = parsePrd(content);
+		const second = parsePrd(content);
+		expect(first.tasks.map(t => t.taskId)).toEqual(second.tasks.map(t => t.taskId));
+	});
+
+	it('zero-pads taskId to 3 digits', () => {
+		const content = `- [ ] Only task\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].taskId).toBe('Task-001');
+	});
 });
 
 describe('pickNextTask', () => {
