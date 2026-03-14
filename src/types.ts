@@ -62,6 +62,7 @@ export const enum LoopEventKind {
 	ConsistencyCheckPassed = 'consistency_check_passed',
 	ConsistencyCheckFailed = 'consistency_check_failed',
 	ContextInjected = 'context_injected',
+	StruggleDetected = 'struggle_detected',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -92,6 +93,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.ConsistencyCheckPassed; phase: string; checks: ConsistencyCheckDetail[] }
 	| { kind: LoopEventKind.ConsistencyCheckFailed; phase: string; checks: ConsistencyCheckDetail[]; failureReason?: string }
 	| { kind: LoopEventKind.ContextInjected; text: string }
+	| { kind: LoopEventKind.StruggleDetected; signals: string[]; taskId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -247,6 +249,21 @@ export const DEFAULT_AUTO_DECOMPOSE: AutoDecomposeConfig = {
 	failThreshold: 3,
 };
 
+// --- Struggle detection config ---
+export interface StruggleDetectionConfig {
+	enabled: boolean;
+	noProgressThreshold: number;
+	shortIterationThreshold: number;
+	shortIterationMs: number;
+}
+
+export const DEFAULT_STRUGGLE_DETECTION: StruggleDetectionConfig = {
+	enabled: true,
+	noProgressThreshold: 3,
+	shortIterationThreshold: 3,
+	shortIterationMs: 30000,
+};
+
 // --- Context trimming config ---
 export interface ContextTrimmingConfig {
 	fullUntil: number;
@@ -337,6 +354,7 @@ export interface RalphConfig {
 	autoDecompose?: AutoDecomposeConfig;
 	knowledge?: KnowledgeConfig;
 	contextTrimming?: ContextTrimmingConfig;
+	struggleDetection?: StruggleDetectionConfig;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -368,6 +386,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	autoDecompose: { ...DEFAULT_AUTO_DECOMPOSE },
 	knowledge: { ...DEFAULT_KNOWLEDGE_CONFIG },
 	contextTrimming: { ...DEFAULT_CONTEXT_TRIMMING },
+	struggleDetection: { ...DEFAULT_STRUGGLE_DETECTION },
 };
 
 // --- Verification ---

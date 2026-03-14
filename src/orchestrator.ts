@@ -17,6 +17,7 @@ import {
 	DEFAULT_KNOWLEDGE_CONFIG,
 	DEFAULT_AUTO_DECOMPOSE,
 	DEFAULT_CONTEXT_TRIMMING,
+	DEFAULT_STRUGGLE_DETECTION,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -43,6 +44,7 @@ import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
 import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
 import { KnowledgeManager } from './knowledge';
+import { StruggleDetector } from './struggleDetector';
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
 
@@ -310,6 +312,16 @@ export class LoopOrchestrator {
 		const knowledgeConfig = this.config.knowledge ?? DEFAULT_KNOWLEDGE_CONFIG;
 		const knowledgeManager = knowledgeConfig.enabled
 			? new KnowledgeManager(knowledgeConfig.path, knowledgeConfig.maxInjectLines)
+			: undefined;
+
+		// Struggle detector
+		const struggleConfig = this.config.struggleDetection ?? DEFAULT_STRUGGLE_DETECTION;
+		const struggleDetector = struggleConfig.enabled
+			? new StruggleDetector({
+				noProgressThreshold: struggleConfig.noProgressThreshold,
+				shortIterationThreshold: struggleConfig.shortIterationThreshold,
+				shortIterationMs: struggleConfig.shortIterationMs,
+			})
 			: undefined;
 
 		// SessionStart hook
@@ -611,6 +623,17 @@ export class LoopOrchestrator {
 					} else if (stagnation.stagnating) {
 						// Tier 1: inject enhanced stagnation nudge
 						additionalContext = 'You appear to be stuck. Progress file has not changed. Try a different approach.';
+					}
+				}
+
+				// Struggle detection after task attempt
+				if (struggleDetector) {
+					const filesChanged = waitResult.hadFileChanges ? 1 : 0;
+					struggleDetector.recordIteration(duration, filesChanged, []);
+					const struggle = struggleDetector.isStruggling();
+					if (struggle.struggling) {
+						additionalContext = `Struggle detected: ${struggle.signals.join(', ')}. Try a completely different approach. If tests keep failing, check your assumptions.`;
+						yield { kind: LoopEventKind.StruggleDetected, signals: struggle.signals, taskId: String(task.id) };
 					}
 				}
 
