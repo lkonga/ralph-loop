@@ -56,6 +56,7 @@ export const enum LoopEventKind {
 	HumanCheckpointRequested = 'human_checkpoint_requested',
 	TaskReviewed = 'task_reviewed',
 	MonitorAlert = 'monitor_alert',
+	TaskCommitted = 'task_committed',
 	ConsistencyCheckPassed = 'consistency_check_passed',
 	ConsistencyCheckFailed = 'consistency_check_failed',
 	Stopped = 'stopped',
@@ -82,6 +83,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.HumanCheckpointRequested; task: Task; reason: string; failCount: number; taskInvocationId: string }
 	| { kind: LoopEventKind.TaskReviewed; task: Task; verdict: ReviewVerdict; taskInvocationId: string }
 	| { kind: LoopEventKind.MonitorAlert; alert: string; taskId: string }
+	| { kind: LoopEventKind.TaskCommitted; task: Task; commitHash: string; taskInvocationId: string }
 	| { kind: LoopEventKind.ConsistencyCheckPassed; phase: string; checks: ConsistencyCheckDetail[] }
 	| { kind: LoopEventKind.ConsistencyCheckFailed; phase: string; checks: ConsistencyCheckDetail[]; failureReason?: string }
 	| { kind: LoopEventKind.Stopped }

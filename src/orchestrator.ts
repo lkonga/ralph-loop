@@ -36,6 +36,7 @@ import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
 import { createDefaultChain, CircuitBreakerChain, type CircuitBreakerState } from './circuitBreaker';
 import { DiffValidator } from './diffValidator';
+import { atomicCommit } from './gitOps';
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
 
@@ -393,6 +394,16 @@ export class LoopOrchestrator {
 									this.completedTasks.add(task.id);
 									appendProgress(progressPath, `[${invId}] Task completed (parallel): ${task.description} (${Math.round(duration / 1000)}s)`);
 									this.onEvent({ kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId: invId });
+
+									// Atomic git commit per task (parallel path)
+									const pCommitResult = await atomicCommit(this.config.workspaceRoot, task, invId);
+									if (pCommitResult.success) {
+										appendProgress(progressPath, `[${invId}] Committed: ${pCommitResult.commitHash}`);
+										this.onEvent({ kind: LoopEventKind.TaskCommitted, task, commitHash: pCommitResult.commitHash!, taskInvocationId: invId });
+									} else {
+										this.logger.warn(`Atomic commit failed for parallel task ${task.id}: ${pCommitResult.error}`);
+										this.onEvent({ kind: LoopEventKind.Error, message: `Atomic commit failed: ${pCommitResult.error}` });
+									}
 								} else {
 									appendProgress(progressPath, `[${invId}] Task timed out (parallel): ${task.description} (${Math.round(duration / 1000)}s)`);
 									this.onEvent({ kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration, taskInvocationId: invId });
@@ -664,6 +675,16 @@ export class LoopOrchestrator {
 							this.completedTasks.delete(task.id);
 							continue;
 						}
+					}
+
+					// Atomic git commit per task
+					const commitResult = await atomicCommit(this.config.workspaceRoot, task, taskInvocationId);
+					if (commitResult.success) {
+						appendProgress(progressPath, `[${taskInvocationId}] Committed: ${commitResult.commitHash}`);
+						yield { kind: LoopEventKind.TaskCommitted, task, commitHash: commitResult.commitHash!, taskInvocationId };
+					} else {
+						this.logger.warn(`Atomic commit failed for task ${task.id}: ${commitResult.error}`);
+						yield { kind: LoopEventKind.Error, message: `Atomic commit failed: ${commitResult.error}` };
 					}
 
 					// Graceful yield: deferred until task completion (autopilot pattern)
