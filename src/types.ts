@@ -58,6 +58,7 @@ export const enum LoopEventKind {
 	MonitorAlert = 'monitor_alert',
 	TaskCommitted = 'task_committed',
 	StagnationDetected = 'stagnation_detected',
+	TaskDecomposed = 'task_decomposed',
 	ConsistencyCheckPassed = 'consistency_check_passed',
 	ConsistencyCheckFailed = 'consistency_check_failed',
 	Stopped = 'stopped',
@@ -86,6 +87,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.MonitorAlert; alert: string; taskId: string }
 	| { kind: LoopEventKind.TaskCommitted; task: Task; commitHash: string; taskInvocationId: string }
 	| { kind: LoopEventKind.StagnationDetected; task: Task; staleIterations: number; filesUnchanged: string[] }
+	| { kind: LoopEventKind.TaskDecomposed; originalTask: Task; subTasks: string[] }
 	| { kind: LoopEventKind.ConsistencyCheckPassed; phase: string; checks: ConsistencyCheckDetail[] }
 	| { kind: LoopEventKind.ConsistencyCheckFailed; phase: string; checks: ConsistencyCheckDetail[]; failureReason?: string }
 	| { kind: LoopEventKind.Stopped }
@@ -232,6 +234,17 @@ export const DEFAULT_PRE_COMPACT_BEHAVIOR: PreCompactBehavior = {
 	injectProgressSummary: true,
 };
 
+// --- Auto-decompose config ---
+export interface AutoDecomposeConfig {
+	enabled: boolean;
+	failThreshold: number;
+}
+
+export const DEFAULT_AUTO_DECOMPOSE: AutoDecomposeConfig = {
+	enabled: true,
+	failThreshold: 3,
+};
+
 // --- Knowledge config ---
 export interface KnowledgeConfig {
 	enabled: boolean;
@@ -308,6 +321,7 @@ export interface RalphConfig {
 	parallelMonitor?: ParallelMonitorConfig;
 	preCompactBehavior?: PreCompactBehavior;
 	stagnationDetection?: StagnationDetectionConfig;
+	autoDecompose?: AutoDecomposeConfig;
 	knowledge?: KnowledgeConfig;
 }
 
@@ -337,6 +351,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	parallelMonitor: { ...DEFAULT_PARALLEL_MONITOR },
 	preCompactBehavior: { ...DEFAULT_PRE_COMPACT_BEHAVIOR },
 	stagnationDetection: { ...DEFAULT_STAGNATION_DETECTION },
+	autoDecompose: { ...DEFAULT_AUTO_DECOMPOSE },
 	knowledge: { ...DEFAULT_KNOWLEDGE_CONFIG },
 };
 

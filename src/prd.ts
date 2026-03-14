@@ -30,6 +30,8 @@ export function parsePrd(content: string): PrdSnapshot {
 
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i];
+		// Skip DECOMPOSED tasks (non-actionable)
+		if (line.includes('[DECOMPOSED]')) { continue; }
 		const unchecked = CHECKBOX_UNCHECKED.exec(line);
 		if (unchecked) {
 			const indent = unchecked[1].length;

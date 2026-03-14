@@ -81,3 +81,53 @@ export class StagnationDetector {
         this.hasPrevious = false;
     }
 }
+
+export class AutoDecomposer {
+    shouldDecompose(taskId: string, failCount: number, threshold: number = 3): boolean {
+        return failCount >= threshold;
+    }
+
+    decomposeTask(task: { description: string; lineNumber: number }, prdContent: string): string {
+        const parts = this.splitAtBoundaries(task.description);
+        const subTasks = parts.slice(0, 3).map(p => `  - [ ] Sub-task: ${p.trim()}`);
+
+        const lines = prdContent.split('\n');
+        const taskLineIdx = lines.findIndex(line => {
+            const unchecked = /^(\s*)-\s*\[\s*\]\s+(.+)$/.exec(line);
+            if (unchecked && unchecked[2].trim() === task.description.trim()) { return true; }
+            return false;
+        });
+
+        if (taskLineIdx >= 0) {
+            lines[taskLineIdx] = lines[taskLineIdx].replace(
+                /^(\s*-\s*\[\s*\]\s+)/,
+                '$1[DECOMPOSED] ',
+            );
+            lines.splice(taskLineIdx + 1, 0, ...subTasks);
+        }
+
+        return lines.join('\n');
+    }
+
+    private splitAtBoundaries(description: string): string[] {
+        // Try numbered steps: (1) ... (2) ... (3) ...
+        const numberedParts = description.split(/\(\d+\)\s*/).filter(s => s.trim().length > 0);
+        if (numberedParts.length >= 2) { return numberedParts.slice(0, 3); }
+
+        // Try semicolons
+        const semiParts = description.split(/;\s*/).filter(s => s.trim().length > 0);
+        if (semiParts.length >= 2) { return semiParts.slice(0, 3); }
+
+        // Try sentence boundaries
+        const sentenceParts = description.split(/\.\s+/).filter(s => s.trim().length > 0);
+        if (sentenceParts.length >= 2) { return sentenceParts.slice(0, 3); }
+
+        // Fallback: split in half
+        const mid = Math.ceil(description.length / 2);
+        const spaceNearMid = description.indexOf(' ', mid);
+        if (spaceNearMid > 0) {
+            return [description.slice(0, spaceNearMid), description.slice(spaceNearMid + 1)];
+        }
+        return [description];
+    }
+}

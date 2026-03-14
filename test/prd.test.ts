@@ -76,3 +76,29 @@ describe('pickNextTask', () => {
 		expect(pickNextTask(snapshot)).toBeUndefined();
 	});
 });
+
+describe('parsePrd skips DECOMPOSED lines', () => {
+	it('skips unchecked tasks with [DECOMPOSED] marker', () => {
+		const content = `- [ ] [DECOMPOSED] Original task\n- [ ] Sub-task: part one\n- [ ] Sub-task: part two\n`;
+		const snapshot = parsePrd(content);
+		// DECOMPOSED line should be skipped entirely
+		expect(snapshot.tasks.every(t => !t.description.includes('[DECOMPOSED]'))).toBe(true);
+		expect(snapshot.tasks.length).toBe(2);
+		expect(snapshot.tasks[0].description).toBe('Sub-task: part one');
+		expect(snapshot.tasks[1].description).toBe('Sub-task: part two');
+	});
+
+	it('skips checked tasks with [DECOMPOSED] marker', () => {
+		const content = `- [x] [DECOMPOSED] Original task\n- [ ] Sub-task: part one\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.every(t => !t.description.includes('[DECOMPOSED]'))).toBe(true);
+		expect(snapshot.tasks.length).toBe(1);
+		expect(snapshot.tasks[0].description).toBe('Sub-task: part one');
+	});
+
+	it('does not affect normal tasks', () => {
+		const content = `- [ ] Normal task\n- [x] Completed task\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.total).toBe(2);
+	});
+});

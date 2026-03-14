@@ -15,6 +15,7 @@ import {
 	DEFAULT_PRE_COMPACT_BEHAVIOR,
 	DEFAULT_STAGNATION_DETECTION,
 	DEFAULT_KNOWLEDGE_CONFIG,
+	DEFAULT_AUTO_DECOMPOSE,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -39,7 +40,7 @@ import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
 import { createDefaultChain, CircuitBreakerChain, type CircuitBreakerState } from './circuitBreaker';
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
-import { StagnationDetector } from './stagnationDetector';
+import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
 import { KnowledgeManager } from './knowledge';
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
@@ -293,6 +294,11 @@ export class LoopOrchestrator {
 		const stagnationDetector = stagnationConfig.enabled
 			? new StagnationDetector(stagnationConfig.hashFiles, stagnationConfig.maxStaleIterations)
 			: undefined;
+
+		// Auto-decomposition
+		const autoDecomposeConfig = this.config.autoDecompose ?? DEFAULT_AUTO_DECOMPOSE;
+		const autoDecomposer = autoDecomposeConfig.enabled ? new AutoDecomposer() : undefined;
+		const taskFailCounts = new Map<number, number>();
 
 		// Knowledge manager
 		const knowledgeConfig = this.config.knowledge ?? DEFAULT_KNOWLEDGE_CONFIG;
@@ -758,6 +764,23 @@ export class LoopOrchestrator {
 					appendProgress(progressPath, `[${taskInvocationId}] Task timed out: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration, taskInvocationId };
 
+					// Track consecutive failures for auto-decomposition
+					if (autoDecomposer) {
+						const count = (taskFailCounts.get(task.id) ?? 0) + 1;
+						taskFailCounts.set(task.id, count);
+						if (autoDecomposer.shouldDecompose(String(task.id), count, autoDecomposeConfig.failThreshold)) {
+							const currentPrdContent = readPrdFile(prdPath);
+							const updatedPrd = autoDecomposer.decomposeTask(task, currentPrdContent);
+							fs.writeFileSync(prdPath, updatedPrd, 'utf-8');
+							const subTaskLines = updatedPrd.split('\n')
+								.filter(l => l.includes('Sub-task:') && /^\s*- \[ \]/.test(l))
+								.map(l => l.trim());
+							yield { kind: LoopEventKind.TaskDecomposed, originalTask: task, subTasks: subTaskLines };
+							taskFailCounts.delete(task.id);
+							continue;
+						}
+					}
+
 					// TaskComplete hook (failure)
 					const failHook = await this.hookService.onTaskComplete({ taskId: String(task.id), result: 'failure', taskInvocationId });
 					if (failHook.additionalContext) { additionalContext = failHook.additionalContext; }
@@ -895,6 +918,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		parallelMonitor: vsConfig.get('parallelMonitor', DEFAULT_CONFIG.parallelMonitor),
 		preCompactBehavior: vsConfig.get('preCompactBehavior', DEFAULT_CONFIG.preCompactBehavior),
 		stagnationDetection: vsConfig.get('stagnationDetection', DEFAULT_CONFIG.stagnationDetection),
+		autoDecompose: vsConfig.get('autoDecompose', DEFAULT_CONFIG.autoDecompose),
 		knowledge: vsConfig.get('knowledge', DEFAULT_CONFIG.knowledge),
 	};
 }

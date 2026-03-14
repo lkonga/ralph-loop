@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { StagnationDetector } from '../src/stagnationDetector';
+import { StagnationDetector, AutoDecomposer } from '../src/stagnationDetector';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import * as path from 'path';
@@ -168,5 +168,78 @@ describe('StagnationDetector', () => {
         expect(r2.staleIterations).toBe(0);
         expect(r2.filesUnchanged).toContain('b.txt');
         expect(r2.filesUnchanged).not.toContain('a.txt');
+    });
+});
+
+describe('AutoDecomposer', () => {
+    it('shouldDecompose returns false below threshold', () => {
+        const decomposer = new AutoDecomposer();
+        expect(decomposer.shouldDecompose('task-1', 1, 3)).toBe(false);
+        expect(decomposer.shouldDecompose('task-1', 2, 3)).toBe(false);
+    });
+
+    it('shouldDecompose returns true at threshold', () => {
+        const decomposer = new AutoDecomposer();
+        expect(decomposer.shouldDecompose('task-1', 3, 3)).toBe(true);
+        expect(decomposer.shouldDecompose('task-1', 5, 3)).toBe(true);
+    });
+
+    it('shouldDecompose uses default threshold of 3', () => {
+        const decomposer = new AutoDecomposer();
+        expect(decomposer.shouldDecompose('task-1', 2)).toBe(false);
+        expect(decomposer.shouldDecompose('task-1', 3)).toBe(true);
+    });
+
+    it('decomposeTask generates valid checkbox lines for sentence boundaries', () => {
+        const decomposer = new AutoDecomposer();
+        const task = { id: 0, description: 'First thing to do. Second thing to do. Third thing to do.', status: 'pending', lineNumber: 5 };
+        const prdContent = '- [ ] First thing to do. Second thing to do. Third thing to do.\n- [ ] Another task\n';
+        const result = decomposer.decomposeTask(task, prdContent);
+
+        // Should contain [DECOMPOSED] marker on parent
+        expect(result).toContain('[DECOMPOSED]');
+        // Should contain sub-task checkbox lines
+        const lines = result.split('\n');
+        const subTaskLines = lines.filter((l: string) => l.match(/^\s*- \[ \] Sub-task:/));
+        expect(subTaskLines.length).toBeGreaterThanOrEqual(2);
+        expect(subTaskLines.length).toBeLessThanOrEqual(3);
+        // Sub-tasks should be below the parent line
+        const decomposedIdx = lines.findIndex((l: string) => l.includes('[DECOMPOSED]'));
+        const firstSubIdx = lines.findIndex((l: string) => l.includes('Sub-task:'));
+        expect(firstSubIdx).toBeGreaterThan(decomposedIdx);
+    });
+
+    it('decomposeTask generates valid checkbox lines for semicolons', () => {
+        const decomposer = new AutoDecomposer();
+        const task = { id: 0, description: 'Do A; Do B; Do C', status: 'pending', lineNumber: 1 };
+        const prdContent = '- [ ] Do A; Do B; Do C\n';
+        const result = decomposer.decomposeTask(task, prdContent);
+
+        const lines = result.split('\n');
+        const subTaskLines = lines.filter((l: string) => l.match(/^\s*- \[ \] Sub-task:/));
+        expect(subTaskLines.length).toBeGreaterThanOrEqual(2);
+        expect(subTaskLines.length).toBeLessThanOrEqual(3);
+    });
+
+    it('decomposeTask generates valid checkbox lines for numbered steps', () => {
+        const decomposer = new AutoDecomposer();
+        const task = { id: 0, description: '(1) Do X (2) Do Y (3) Do Z', status: 'pending', lineNumber: 1 };
+        const prdContent = '- [ ] (1) Do X (2) Do Y (3) Do Z\n';
+        const result = decomposer.decomposeTask(task, prdContent);
+
+        const lines = result.split('\n');
+        const subTaskLines = lines.filter((l: string) => l.match(/^\s*- \[ \] Sub-task:/));
+        expect(subTaskLines.length).toBeGreaterThanOrEqual(2);
+        expect(subTaskLines.length).toBeLessThanOrEqual(3);
+    });
+
+    it('decomposeTask preserves other PRD lines', () => {
+        const decomposer = new AutoDecomposer();
+        const task = { id: 0, description: 'First step. Second step.', status: 'pending', lineNumber: 2 };
+        const prdContent = '# My PRD\n- [ ] First step. Second step.\n- [ ] Another task\n';
+        const result = decomposer.decomposeTask(task, prdContent);
+
+        expect(result).toContain('# My PRD');
+        expect(result).toContain('- [ ] Another task');
     });
 });
