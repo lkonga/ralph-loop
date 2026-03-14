@@ -61,6 +61,7 @@ export const enum LoopEventKind {
 	TaskDecomposed = 'task_decomposed',
 	ConsistencyCheckPassed = 'consistency_check_passed',
 	ConsistencyCheckFailed = 'consistency_check_failed',
+	ContextInjected = 'context_injected',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -90,6 +91,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.TaskDecomposed; originalTask: Task; subTasks: string[] }
 	| { kind: LoopEventKind.ConsistencyCheckPassed; phase: string; checks: ConsistencyCheckDetail[] }
 	| { kind: LoopEventKind.ConsistencyCheckFailed; phase: string; checks: ConsistencyCheckDetail[]; failureReason?: string }
+	| { kind: LoopEventKind.ContextInjected; text: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 

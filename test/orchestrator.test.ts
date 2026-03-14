@@ -5,7 +5,10 @@ import {
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain, parseReviewVerdict } from '../src/orchestrator';
+import { runPreCompleteChain, parseReviewVerdict, LoopOrchestrator } from '../src/orchestrator';
+import {
+	DEFAULT_CONFIG,
+} from '../src/types';
 import type {
 	IRalphHookService,
 	HookResult,
@@ -266,5 +269,43 @@ describe('parseReviewVerdict', () => {
 	it('is case-insensitive for APPROVED', () => {
 		const v = parseReviewVerdict('approved - no issues');
 		expect(v.outcome).toBe('approved');
+	});
+});
+
+describe('LoopOrchestrator.injectContext', () => {
+	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+
+	it('injectContext sets pendingContext that is consumed by buildPrompt', () => {
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp' },
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.injectContext('The bug is in parser.ts line 42');
+		expect((orch as any).pendingContext).toBe('The bug is in parser.ts line 42');
+	});
+
+	it('pendingContext is cleared after being read (consume-after-one-iteration)', () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp' },
+			noopLogger,
+			() => {},
+		);
+		orch.injectContext('temporary context');
+		const ctx = (orch as any).consumePendingContext();
+		expect(ctx).toBe('temporary context');
+		const ctx2 = (orch as any).consumePendingContext();
+		expect(ctx2).toBeUndefined();
+	});
+
+	it('null/undefined pendingContext produces no operator context', () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp' },
+			noopLogger,
+			() => {},
+		);
+		const ctx = (orch as any).consumePendingContext();
+		expect(ctx).toBeUndefined();
 	});
 });

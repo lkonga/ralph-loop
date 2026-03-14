@@ -108,12 +108,24 @@ function renderLearnings(learnings?: string[]): string[] {
 	];
 }
 
+function renderOperatorContext(operatorContext?: string): string[] {
+	if (!operatorContext) { return []; }
+	return [
+		'===================================================================',
+		'                 OPERATOR CONTEXT (injected mid-loop)',
+		'===================================================================',
+		'',
+		operatorContext,
+		'',
+	];
+}
+
 export function buildFinalNudgePrompt(task: string, nudgeCount: number, maxNudges: number): string | undefined {
 	if (nudgeCount < maxNudges - 1) { return undefined; }
 	return `Your remaining time is almost up. Produce your final result NOW: commit any partial work, update progress.txt, and mark the checkbox. If tests fail, document the failure and mark done anyway.`;
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig): string {
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string): string {
 	const sanitized = sanitizeTaskDescription(taskDescription.trim());
 	const ct = contextTrimming ?? DEFAULT_CONTEXT_TRIMMING;
 
@@ -167,6 +179,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		...renderModelHints(capabilities?.modelHint),
 		...renderCapabilities(capabilities),
 		...renderLearnings(effectiveLearnings),
+		...renderOperatorContext(operatorContext),
 		...(trimmingNotes.length > 0 ? [...trimmingNotes, ''] : []),
 		'===================================================================',
 		'    MANDATORY: UPDATE PRD.md AND progress.txt WHEN DONE',

@@ -236,6 +236,21 @@ export function activate(context: vscode.ExtensionContext): void {
 			vscode.window.showInformationMessage('Ralph Loop: Yield requested — will stop after current task completes');
 		}),
 
+		vscode.commands.registerCommand('ralph-loop.injectContext', async () => {
+			if (!orchestrator || orchestrator.getState() !== 'running') {
+				vscode.window.showWarningMessage('Ralph Loop: Not running');
+				return;
+			}
+			const input = await vscode.window.showInputBox({
+				prompt: 'Enter context to inject into the next iteration',
+				placeHolder: 'e.g., The bug is in utils/parser.ts line 42',
+			});
+			if (input) {
+				orchestrator.injectContext(input);
+				vscode.window.showInformationMessage('Ralph Loop: Context injected — will be used in the next iteration');
+			}
+		}),
+
 		outputChannel,
 	);
 

@@ -161,6 +161,7 @@ export class LoopOrchestrator {
 	private readonly circuitBreakerChain: CircuitBreakerChain;
 	private readonly errorHashTracker: ErrorHashTracker;
 	private readonly consistencyChecker?: IConsistencyChecker;
+	private pendingContext?: string;
 
 	constructor(
 		config: RalphConfig,
@@ -242,6 +243,17 @@ export class LoopOrchestrator {
 	requestYield(): void {
 		this.yieldRequested = true;
 		this.logger.log('Yield requested');
+	}
+
+	injectContext(text: string): void {
+		this.pendingContext = text;
+		this.logger.log('Context injected for next iteration');
+	}
+
+	private consumePendingContext(): string | undefined {
+		const ctx = this.pendingContext;
+		this.pendingContext = undefined;
+		return ctx;
 	}
 
 	setSessionId(sessionId: string | undefined): void {
@@ -499,7 +511,11 @@ export class LoopOrchestrator {
 					? knowledgeManager.getRelevantLearnings(this.config.workspaceRoot, task.description)
 					: [];
 				const ctConfig = this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING;
-				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, relevantLearnings, iteration, ctConfig);
+				const operatorContext = this.consumePendingContext();
+				if (operatorContext) {
+					this.onEvent({ kind: LoopEventKind.ContextInjected, text: operatorContext });
+				}
+				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, relevantLearnings, iteration, ctConfig, operatorContext);
 				if (additionalContext) {
 					prompt += '\n\n' + additionalContext;
 					additionalContext = '';

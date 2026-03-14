@@ -309,3 +309,30 @@ describe('progressive context trimming', () => {
 		expect(promptMin).not.toContain('PRIOR LEARNINGS');
 	});
 });
+
+describe('buildPrompt with operatorContext', () => {
+	it('includes OPERATOR CONTEXT section when operatorContext is provided', () => {
+		const prompt = buildPrompt('Task A', '- [ ] Task A', '', 20, undefined, undefined, ['some learning'], 1, undefined, 'The bug is in utils/parser.ts line 42');
+		expect(prompt).toContain('OPERATOR CONTEXT (injected mid-loop)');
+		expect(prompt).toContain('The bug is in utils/parser.ts line 42');
+	});
+
+	it('places OPERATOR CONTEXT section after PRIOR LEARNINGS', () => {
+		const prompt = buildPrompt('Task A', '- [ ] Task A', '', 20, undefined, undefined, ['a learning'], 1, undefined, 'Extra context here');
+		const learningsIdx = prompt.indexOf('PRIOR LEARNINGS');
+		const operatorIdx = prompt.indexOf('OPERATOR CONTEXT (injected mid-loop)');
+		expect(learningsIdx).toBeGreaterThan(-1);
+		expect(operatorIdx).toBeGreaterThan(-1);
+		expect(operatorIdx).toBeGreaterThan(learningsIdx);
+	});
+
+	it('does not include OPERATOR CONTEXT section when operatorContext is undefined', () => {
+		const prompt = buildPrompt('Task A', '- [ ] Task A', '', 20, undefined, undefined, undefined, 1, undefined, undefined);
+		expect(prompt).not.toContain('OPERATOR CONTEXT');
+	});
+
+	it('does not include OPERATOR CONTEXT section when operatorContext is empty string', () => {
+		const prompt = buildPrompt('Task A', '- [ ] Task A', '', 20, undefined, undefined, undefined, 1, undefined, '');
+		expect(prompt).not.toContain('OPERATOR CONTEXT');
+	});
+});
