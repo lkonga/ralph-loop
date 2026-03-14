@@ -7,6 +7,8 @@ import {
 	TimeBudgetBreaker,
 	CircuitBreakerChain,
 	createDefaultChain,
+	ErrorHashTracker,
+	RepeatedErrorBreaker,
 	type CircuitBreakerState,
 } from '../src/circuitBreaker';
 
@@ -283,5 +285,184 @@ describe('createDefaultChain', () => {
 		]);
 		const result = chain.check(makeState({ retryCount: 100 }));
 		expect(result.tripped).toBe(false);
+	});
+});
+
+// --- ErrorHashTracker ---
+
+describe('ErrorHashTracker', () => {
+	it('normalizeError strips ISO 8601 timestamps', () => {
+		const tracker = new ErrorHashTracker();
+		const input = 'Error at 2026-03-14T06:10:30.923Z: something failed';
+		const normalized = tracker.normalizeError(input);
+		expect(normalized).not.toContain('2026-03-14T06:10:30.923Z');
+		expect(normalized).toContain('something failed');
+	});
+
+	it('normalizeError strips line numbers like :123:', () => {
+		const tracker = new ErrorHashTracker();
+		const input = 'Error in file.ts:42:10 something broke';
+		const normalized = tracker.normalizeError(input);
+		expect(normalized).not.toContain(':42:');
+		expect(normalized).not.toContain(':10');
+	});
+
+	it('normalizeError strips ANSI escape codes', () => {
+		const tracker = new ErrorHashTracker();
+		const input = '\x1b[31mError\x1b[0m: something failed';
+		const normalized = tracker.normalizeError(input);
+		expect(normalized).not.toContain('\x1b[');
+		expect(normalized).toContain('Error');
+	});
+
+	it('normalizeError strips stack frame paths', () => {
+		const tracker = new ErrorHashTracker();
+		const input = 'Error: fail\n    at Object.<anonymous> (/home/user/project/src/file.ts:10:5)';
+		const normalized = tracker.normalizeError(input);
+		expect(normalized).not.toContain('/home/user/project/src/file.ts');
+	});
+
+	it('normalizeError collapses whitespace', () => {
+		const tracker = new ErrorHashTracker();
+		const input = 'Error:   something    failed   badly';
+		const normalized = tracker.normalizeError(input);
+		expect(normalized).toBe('Error: something failed badly');
+	});
+
+	it('identical errors produce same hash', () => {
+		const tracker = new ErrorHashTracker();
+		const h1 = tracker.hashError('TypeError: Cannot read property x');
+		const h2 = tracker.hashError('TypeError: Cannot read property x');
+		expect(h1).toBe(h2);
+	});
+
+	it('same error with different timestamps produces same hash', () => {
+		const tracker = new ErrorHashTracker();
+		const h1 = tracker.hashError('Error at 2026-03-14T06:10:30.923Z: fail');
+		const h2 = tracker.hashError('Error at 2026-03-15T12:00:00.000Z: fail');
+		expect(h1).toBe(h2);
+	});
+
+	it('different errors produce different hashes', () => {
+		const tracker = new ErrorHashTracker();
+		const h1 = tracker.hashError('TypeError: Cannot read property x');
+		const h2 = tracker.hashError('ReferenceError: y is not defined');
+		expect(h1).not.toBe(h2);
+	});
+
+	it('record increments count for repeated errors', () => {
+		const tracker = new ErrorHashTracker();
+		const r1 = tracker.record('Error: fail');
+		expect(r1.count).toBe(1);
+		const r2 = tracker.record('Error: fail');
+		expect(r2.count).toBe(2);
+		expect(r2.hash).toBe(r1.hash);
+	});
+
+	it('isRepeating returns false below threshold', () => {
+		const tracker = new ErrorHashTracker();
+		const { hash } = tracker.record('Error: fail');
+		tracker.record('Error: fail');
+		expect(tracker.isRepeating(hash)).toBe(false);
+	});
+
+	it('isRepeating returns true at threshold (default 3)', () => {
+		const tracker = new ErrorHashTracker();
+		const { hash } = tracker.record('Error: fail');
+		tracker.record('Error: fail');
+		tracker.record('Error: fail');
+		expect(tracker.isRepeating(hash)).toBe(true);
+	});
+
+	it('isRepeating respects custom threshold', () => {
+		const tracker = new ErrorHashTracker();
+		const { hash } = tracker.record('Error: fail');
+		tracker.record('Error: fail');
+		expect(tracker.isRepeating(hash, 2)).toBe(true);
+	});
+
+	it('reset clears all counts', () => {
+		const tracker = new ErrorHashTracker();
+		const { hash } = tracker.record('Error: fail');
+		tracker.record('Error: fail');
+		tracker.record('Error: fail');
+		expect(tracker.isRepeating(hash)).toBe(true);
+		tracker.reset();
+		expect(tracker.isRepeating(hash)).toBe(false);
+	});
+});
+
+// --- RepeatedErrorBreaker ---
+
+describe('RepeatedErrorBreaker', () => {
+	it('does not trip when no errors are repeating', () => {
+		const tracker = new ErrorHashTracker();
+		tracker.record('Error: A');
+		const breaker = RepeatedErrorBreaker(tracker);
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(false);
+		expect(result.action).toBe('continue');
+	});
+
+	it('trips when an error hash reaches the threshold', () => {
+		const tracker = new ErrorHashTracker();
+		tracker.record('Error: same thing');
+		tracker.record('Error: same thing');
+		tracker.record('Error: same thing');
+		const breaker = RepeatedErrorBreaker(tracker);
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(true);
+		expect(result.action).toBe('skip');
+		expect(result.reason).toContain('Error: same thing');
+	});
+
+	it('reason includes first 100 chars of the repeated error', () => {
+		const tracker = new ErrorHashTracker();
+		const longError = 'A'.repeat(200);
+		tracker.record(longError);
+		tracker.record(longError);
+		tracker.record(longError);
+		const breaker = RepeatedErrorBreaker(tracker);
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(true);
+		expect(result.reason!.length).toBeLessThanOrEqual(200); // reason length is bounded
+	});
+
+	it('respects custom threshold', () => {
+		const tracker = new ErrorHashTracker();
+		tracker.record('Error: x');
+		tracker.record('Error: x');
+		const breaker = RepeatedErrorBreaker(tracker, 2);
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(true);
+	});
+});
+
+// --- createDefaultChain with repeatedError ---
+
+describe('createDefaultChain with repeatedError', () => {
+	it('repeatedError is disabled by default', () => {
+		const chain = createDefaultChain();
+		// Even with a tracker that would trip, it should be disabled
+		const result = chain.check(makeState());
+		expect(result.tripped).toBe(false);
+	});
+
+	it('repeatedError can be enabled via config', () => {
+		const tracker = new ErrorHashTracker();
+		tracker.record('Error: repeated');
+		tracker.record('Error: repeated');
+		tracker.record('Error: repeated');
+		const chain = createDefaultChain([
+			{ name: 'maxRetries', enabled: true },
+			{ name: 'maxNudges', enabled: true },
+			{ name: 'stagnation', enabled: true },
+			{ name: 'repeatedError', enabled: true, repeatedErrorThreshold: 3 },
+			{ name: 'errorRate', enabled: false },
+			{ name: 'timeBudget', enabled: false },
+		], tracker);
+		const result = chain.check(makeState());
+		expect(result.tripped).toBe(true);
+		expect(result.action).toBe('skip');
 	});
 });

@@ -37,7 +37,7 @@ import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdP
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
-import { createDefaultChain, CircuitBreakerChain, type CircuitBreakerState } from './circuitBreaker';
+import { createDefaultChain, CircuitBreakerChain, ErrorHashTracker, type CircuitBreakerState } from './circuitBreaker';
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
 import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
@@ -158,6 +158,7 @@ export class LoopOrchestrator {
 	private readonly executionStrategy: ITaskExecutionStrategy;
 	private currentSessionId: string | undefined;
 	private readonly circuitBreakerChain: CircuitBreakerChain;
+	private readonly errorHashTracker: ErrorHashTracker;
 	private readonly consistencyChecker?: IConsistencyChecker;
 
 	constructor(
@@ -173,7 +174,8 @@ export class LoopOrchestrator {
 		this.hookService = hookService ?? new NoOpHookService();
 		this.hooksEnabled = hookService !== undefined;
 		this.executionStrategy = this.resolveStrategy();
-		this.circuitBreakerChain = createDefaultChain(this.config.circuitBreakers);
+		this.errorHashTracker = new ErrorHashTracker();
+		this.circuitBreakerChain = createDefaultChain(this.config.circuitBreakers, this.errorHashTracker);
 		this.consistencyChecker = consistencyChecker;
 	}
 
@@ -794,6 +796,7 @@ export class LoopOrchestrator {
 				}
 			} catch (err) {
 				let currentError = err instanceof Error ? err : new Error(String(err));
+				this.errorHashTracker.record(currentError.message);
 				let retryCount = 0;
 				let handled = false;
 
