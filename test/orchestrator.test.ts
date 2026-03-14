@@ -5,7 +5,7 @@ import {
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain, LoopOrchestrator, runBearings } from '../src/orchestrator';
+import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
 import {
 	DEFAULT_CONFIG,
@@ -517,5 +517,72 @@ describe('Bearings phase integration', () => {
 		expect(bearingsChecked).toHaveLength(0);
 		const bearingsFailed = events.filter(e => e.kind === LoopEventKind.BearingsFailed);
 		expect(bearingsFailed).toHaveLength(0);
+	});
+});
+
+describe('LinkedCancellationSource', () => {
+	it('aborts when any source signal aborts', () => {
+		const ac1 = new AbortController();
+		const ac2 = new AbortController();
+		const linked = new LinkedCancellationSource(ac1.signal, ac2.signal);
+
+		expect(linked.signal.aborted).toBe(false);
+		ac2.abort('source2');
+		expect(linked.signal.aborted).toBe(true);
+		linked.dispose();
+	});
+
+	it('manual cancel works', () => {
+		const ac1 = new AbortController();
+		const linked = new LinkedCancellationSource(ac1.signal);
+
+		expect(linked.signal.aborted).toBe(false);
+		linked.cancel('manual stop');
+		expect(linked.signal.aborted).toBe(true);
+		linked.dispose();
+	});
+
+	it('dispose cleans up listeners (subsequent source aborts do not throw)', () => {
+		const ac1 = new AbortController();
+		const ac2 = new AbortController();
+		const linked = new LinkedCancellationSource(ac1.signal, ac2.signal);
+
+		linked.dispose();
+		// After dispose, aborting a source should not propagate (no throw)
+		ac1.abort('late');
+		// The linked signal should NOT have been aborted since we disposed before source aborted
+		expect(linked.signal.aborted).toBe(false);
+	});
+
+	it('multiple signals correctly linked — first abort wins', () => {
+		const ac1 = new AbortController();
+		const ac2 = new AbortController();
+		const ac3 = new AbortController();
+		const linked = new LinkedCancellationSource(ac1.signal, ac2.signal, ac3.signal);
+
+		expect(linked.signal.aborted).toBe(false);
+		ac1.abort('first');
+		expect(linked.signal.aborted).toBe(true);
+		// Aborting others after first should not throw
+		ac2.abort('second');
+		ac3.abort('third');
+		expect(linked.signal.aborted).toBe(true);
+		linked.dispose();
+	});
+
+	it('already-aborted source signal causes immediate abort', () => {
+		const ac1 = new AbortController();
+		ac1.abort('pre-aborted');
+		const linked = new LinkedCancellationSource(ac1.signal);
+		expect(linked.signal.aborted).toBe(true);
+		linked.dispose();
+	});
+
+	it('works with zero source signals (manual-only)', () => {
+		const linked = new LinkedCancellationSource();
+		expect(linked.signal.aborted).toBe(false);
+		linked.cancel('manual');
+		expect(linked.signal.aborted).toBe(true);
+		linked.dispose();
 	});
 });

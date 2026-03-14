@@ -119,6 +119,7 @@ export interface ExecutionOptions {
 	inactivityTimeoutMs: number;
 	useAutopilotMode: boolean;
 	shouldStop: () => boolean;
+	signal?: AbortSignal;
 }
 
 export interface ExecutionResult {

@@ -52,6 +52,38 @@ import { execSync } from 'child_process';
 
 export type BearingsExecFn = (cmd: string, cwd: string) => { exitCode: number; output: string };
 
+export class LinkedCancellationSource {
+	private readonly controller = new AbortController();
+	private readonly cleanups: (() => void)[] = [];
+
+	constructor(...signals: AbortSignal[]) {
+		for (const sig of signals) {
+			if (sig.aborted) {
+				this.controller.abort(sig.reason);
+				return;
+			}
+			const handler = () => this.controller.abort(sig.reason);
+			sig.addEventListener('abort', handler);
+			this.cleanups.push(() => sig.removeEventListener('abort', handler));
+		}
+	}
+
+	get signal(): AbortSignal {
+		return this.controller.signal;
+	}
+
+	cancel(reason?: string): void {
+		this.controller.abort(reason);
+	}
+
+	dispose(): void {
+		for (const cleanup of this.cleanups) {
+			cleanup();
+		}
+		this.cleanups.length = 0;
+	}
+}
+
 function defaultBearingsExec(cmd: string, cwd: string): { exitCode: number; output: string } {
 	try {
 		const output = execSync(cmd, { cwd, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
@@ -191,6 +223,7 @@ export class LoopOrchestrator {
 	private stopRequested = false;
 	private pauseRequested = false;
 	private yieldRequested = false;
+	private stopController = new AbortController();
 	private prdWatcher: vscode.FileSystemWatcher | undefined;
 	private config: RalphConfig;
 	private readonly logger: ILogger;
@@ -204,6 +237,7 @@ export class LoopOrchestrator {
 	private readonly errorHashTracker: ErrorHashTracker;
 	private readonly consistencyChecker?: IConsistencyChecker;
 	private pendingContext?: string;
+	private linkedSignal?: LinkedCancellationSource;
 	bearingsExecFn?: BearingsExecFn;
 
 	constructor(
@@ -247,6 +281,7 @@ export class LoopOrchestrator {
 
 		this.state = LoopState.Running;
 		this.stopRequested = false;
+		this.stopController = new AbortController();
 		this.pauseRequested = false;
 		this.yieldRequested = false;
 		this.logger.log('Loop started');
@@ -269,6 +304,7 @@ export class LoopOrchestrator {
 
 	stop(): void {
 		this.stopRequested = true;
+		this.stopController.abort('stop requested');
 		this.logger.log('Stop requested');
 	}
 
@@ -317,6 +353,8 @@ export class LoopOrchestrator {
 	private cleanup(): void {
 		this.prdWatcher?.dispose();
 		this.prdWatcher = undefined;
+		this.linkedSignal?.dispose();
+		this.linkedSignal = undefined;
 	}
 
 	private get promptCapabilities(): PromptCapabilities {
@@ -335,6 +373,7 @@ export class LoopOrchestrator {
 			inactivityTimeoutMs: this.config.inactivityTimeoutMs,
 			useAutopilotMode: this.config.features.useAutopilotMode,
 			shouldStop: () => this.stopRequested,
+			signal: this.linkedSignal?.signal,
 		};
 	}
 
@@ -346,6 +385,11 @@ export class LoopOrchestrator {
 		let iterationLimitExpanded = false;
 		let effectiveMaxIterations = this.config.maxIterations;
 		const loopStartTime = Date.now();
+
+		// Linked cancellation: combines manual stop signal + timeout
+		const timeoutSignal = AbortSignal.timeout(this.config.inactivityTimeoutMs * effectiveMaxIterations);
+		this.linkedSignal = new LinkedCancellationSource(this.stopController.signal, timeoutSignal);
+		try {
 
 		// Stagnation detection
 		const stagnationConfig = this.config.stagnationDetection ?? DEFAULT_STAGNATION_DETECTION;
@@ -393,7 +437,7 @@ export class LoopOrchestrator {
 
 		while (true) {
 			// Check stop
-			if (this.stopRequested) {
+			if (this.linkedSignal?.signal.aborted || this.stopRequested) {
 				yield { kind: LoopEventKind.Stopped };
 				return;
 			}
@@ -402,7 +446,7 @@ export class LoopOrchestrator {
 			while (this.pauseRequested) {
 				this.state = LoopState.Paused;
 				await this.delay(1000);
-				if (this.stopRequested) {
+				if (this.linkedSignal?.signal.aborted || this.stopRequested) {
 					yield { kind: LoopEventKind.Stopped };
 					return;
 				}
@@ -994,6 +1038,10 @@ export class LoopOrchestrator {
 				yield { kind: LoopEventKind.Countdown, secondsLeft: s };
 				await this.delay(1000);
 			}
+		}
+		} finally {
+			this.linkedSignal?.dispose();
+			this.linkedSignal = undefined;
 		}
 	}
 
