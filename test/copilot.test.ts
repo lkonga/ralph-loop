@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPrompt } from '../src/prompt';
+import { buildPrompt, sanitizeTaskDescription } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
 import { sendReviewPrompt } from '../src/copilot';
 import { parseReviewVerdict } from '../src/orchestrator';
@@ -149,5 +149,78 @@ describe('parseReviewVerdict', () => {
 	it('prefers NEEDS-RETRY when both keywords appear', () => {
 		const verdict = parseReviewVerdict('APPROVED generally but NEEDS-RETRY for edge case.');
 		expect(verdict.outcome).toBe('needs-retry');
+	});
+});
+
+describe('sanitizeTaskDescription', () => {
+	it('strips ASCII control characters except newline and tab', () => {
+		const input = 'Hello\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0E\x0F World';
+		const result = sanitizeTaskDescription(input);
+		expect(result).toBe('Hello World');
+		expect(result).not.toMatch(/[\x00-\x08\x0B\x0C\x0E-\x1F]/);
+	});
+
+	it('preserves newline and tab characters', () => {
+		const input = 'Line1\nLine2\tTabbed';
+		const result = sanitizeTaskDescription(input);
+		expect(result).toBe('Line1\nLine2\tTabbed');
+	});
+
+	it('escapes triple backticks to prevent code fence injection', () => {
+		const input = 'Some text ``` injected ``` end';
+		const result = sanitizeTaskDescription(input);
+		expect(result).toContain('\\`\\`\\`');
+		expect(result).not.toContain('```');
+	});
+
+	it('truncates text exceeding 5000 characters', () => {
+		const input = 'A'.repeat(6000);
+		const result = sanitizeTaskDescription(input);
+		expect(result.length).toBeLessThanOrEqual(5000 + '... [truncated]'.length);
+		expect(result).toMatch(/\.\.\. \[truncated\]$/);
+		expect(result).not.toContain('A'.repeat(5001));
+	});
+
+	it('does not truncate text at exactly 5000 characters', () => {
+		const input = 'B'.repeat(5000);
+		const result = sanitizeTaskDescription(input);
+		expect(result).toBe('B'.repeat(5000));
+	});
+
+	it('strips <prompt> and </prompt> XML-style tags', () => {
+		const input = 'Normal text <prompt>injected instructions</prompt> more text';
+		const result = sanitizeTaskDescription(input);
+		expect(result).not.toContain('<prompt>');
+		expect(result).not.toContain('</prompt>');
+		expect(result).toContain('Normal text');
+		expect(result).toContain('more text');
+	});
+
+	it('leaves normal text unchanged', () => {
+		const input = 'Fix the login bug in src/auth.ts and add tests.';
+		const result = sanitizeTaskDescription(input);
+		expect(result).toBe(input);
+	});
+
+	it('handles combined sanitization', () => {
+		const input = '\x00Hello ``` <prompt>evil</prompt>\x01 world';
+		const result = sanitizeTaskDescription(input);
+		expect(result).not.toMatch(/[\x00-\x08\x0B\x0C\x0E-\x1F]/);
+		expect(result).not.toContain('```');
+		expect(result).not.toContain('<prompt>');
+		expect(result).not.toContain('</prompt>');
+		expect(result).toContain('Hello');
+		expect(result).toContain('world');
+	});
+});
+
+describe('buildPrompt sanitization integration', () => {
+	it('sanitizes the task description in the output', () => {
+		const task = 'Fix bug\x00 with <prompt>injection</prompt> and ``` fences';
+		const prompt = buildPrompt(task, '- [ ] Task', '');
+		expect(prompt).not.toContain('\x00');
+		expect(prompt).not.toContain('<prompt>');
+		expect(prompt).not.toContain('</prompt>');
+		expect(prompt).not.toContain('```\n fences');
 	});
 });

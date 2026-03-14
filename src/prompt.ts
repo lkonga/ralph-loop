@@ -1,3 +1,17 @@
+export function sanitizeTaskDescription(text: string): string {
+	// Strip ASCII control chars (0-31) except newline (0x0A) and tab (0x09)
+	let result = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+	// Strip <prompt> and </prompt> XML-style tags (prompt injection defense)
+	result = result.replace(/<\/?prompt>/gi, '');
+	// Escape triple backticks to prevent code fence injection
+	result = result.replace(/```/g, '\\`\\`\\`');
+	// Enforce 5000 character limit
+	if (result.length > 5000) {
+		result = result.slice(0, 5000) + '... [truncated]';
+	}
+	return result;
+}
+
 function filterPrdContent(prdContent: string): string {
 	const lines = prdContent.split('\n');
 	const checkedCount = lines.filter(l => l.match(/- \[x\]/i)).length;
@@ -94,8 +108,7 @@ export function buildFinalNudgePrompt(task: string, nudgeCount: number, maxNudge
 }
 
 export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[]): string {
-	const MAX_LEN = 5000;
-	const sanitized = taskDescription.trim().slice(0, MAX_LEN);
+	const sanitized = sanitizeTaskDescription(taskDescription.trim());
 
 	const parts: string[] = [
 		'===================================================================',
