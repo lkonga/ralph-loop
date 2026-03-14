@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CopilotMethod, ILogger } from './types';
+import { CopilotMethod, ILogger, DEFAULT_REVIEW_PROMPT_TEMPLATE } from './types';
 export { buildPrompt, buildFinalNudgePrompt, PromptCapabilities } from './prompt';
 
 // 3-level fallback: agent mode → chat → clipboard
@@ -72,4 +72,21 @@ export async function openCopilotWithPrompt(prompt: string, logger: ILogger, opt
 	return 'clipboard';
 }
 
+export async function sendReviewPrompt(
+	taskDescription: string,
+	mode: 'same-session' | 'new-session',
+	reviewPromptTemplate: string | undefined,
+	logger: ILogger,
+): Promise<string> {
+	const template = reviewPromptTemplate ?? DEFAULT_REVIEW_PROMPT_TEMPLATE;
+	const prompt = template.replace('[TASK]', taskDescription);
+
+	if (mode === 'new-session') {
+		await startFreshChatSession(logger);
+	}
+
+	const method = await openCopilotWithPrompt(prompt, logger);
+	logger.log(`Review prompt sent via ${method} (mode: ${mode})`);
+	return prompt;
+}
 

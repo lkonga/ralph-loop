@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { buildPrompt } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
+import { sendReviewPrompt } from '../src/copilot';
+import { parseReviewVerdict } from '../src/orchestrator';
+import { DEFAULT_REVIEW_PROMPT_TEMPLATE } from '../src/types';
+import type { ILogger } from '../src/types';
 
 describe('buildPrompt', () => {
 	it('includes task description', () => {
@@ -94,5 +98,56 @@ describe('generateStopHookScript', () => {
 		expect(script).toContain('npx tsc --noEmit');
 		expect(script).toContain('npx vitest run');
 		expect(script).not.toContain('USE_VERIFICATION_GATE');
+	});
+});
+
+const noopLogger: ILogger = { log() {}, warn() {}, error() {} };
+
+describe('sendReviewPrompt', () => {
+	it('uses default template when none provided', async () => {
+		const result = await sendReviewPrompt('Fix login bug', 'same-session', undefined, noopLogger);
+		expect(result).toContain('Fix login bug');
+		expect(result).toContain('correctness');
+		expect(result).toContain('APPROVED');
+	});
+
+	it('uses custom template with [TASK] substitution', async () => {
+		const custom = 'Please review: [TASK]. Return APPROVED or NEEDS-RETRY.';
+		const result = await sendReviewPrompt('Add tests', 'same-session', custom, noopLogger);
+		expect(result).toBe('Please review: Add tests. Return APPROVED or NEEDS-RETRY.');
+	});
+
+	it('returns the review prompt string for same-session mode', async () => {
+		const result = await sendReviewPrompt('Task X', 'same-session', undefined, noopLogger);
+		expect(result).toBe(DEFAULT_REVIEW_PROMPT_TEMPLATE.replace('[TASK]', 'Task X'));
+	});
+
+	it('returns the review prompt string for new-session mode', async () => {
+		const result = await sendReviewPrompt('Task Y', 'new-session', undefined, noopLogger);
+		expect(result).toBe(DEFAULT_REVIEW_PROMPT_TEMPLATE.replace('[TASK]', 'Task Y'));
+	});
+});
+
+describe('parseReviewVerdict', () => {
+	it('returns approved for output containing APPROVED', () => {
+		const verdict = parseReviewVerdict('All looks good. APPROVED. No issues found.');
+		expect(verdict.outcome).toBe('approved');
+		expect(verdict.summary).toContain('APPROVED');
+	});
+
+	it('returns needs-retry for output containing NEEDS-RETRY', () => {
+		const verdict = parseReviewVerdict('Found issues. NEEDS-RETRY. Fix the following: missing validation.');
+		expect(verdict.outcome).toBe('needs-retry');
+		expect(verdict.summary).toContain('NEEDS-RETRY');
+	});
+
+	it('defaults to approved when neither keyword is found', () => {
+		const verdict = parseReviewVerdict('The code looks fine overall.');
+		expect(verdict.outcome).toBe('approved');
+	});
+
+	it('prefers NEEDS-RETRY when both keywords appear', () => {
+		const verdict = parseReviewVerdict('APPROVED generally but NEEDS-RETRY for edge case.');
+		expect(verdict.outcome).toBe('needs-retry');
 	});
 });

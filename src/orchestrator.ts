@@ -10,6 +10,7 @@ import {
 	DEFAULT_FEATURES,
 	DEFAULT_PRE_COMPLETE_HOOKS,
 	DEFAULT_DIFF_VALIDATION,
+	DEFAULT_REVIEW_AFTER_EXECUTE,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -22,9 +23,11 @@ import {
 	PreCompleteHookResult,
 	PreCompleteHookConfig,
 	VerifyCheck,
+	ReviewVerdict,
+	ReviewAfterExecuteConfig,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
-import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities } from './copilot';
+import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
 import { createDefaultChain, CircuitBreakerChain, type CircuitBreakerState } from './circuitBreaker';
@@ -55,6 +58,15 @@ export async function runPreCompleteChain(
 		if (result.action === 'stop') { return { action: 'stop', results }; }
 	}
 	return { action: 'continue', results };
+}
+
+export function parseReviewVerdict(output: string): ReviewVerdict {
+	const lower = output.toLowerCase();
+	const needsRetry = lower.includes('needs-retry');
+	return {
+		outcome: needsRetry ? 'needs-retry' : 'approved',
+		summary: output,
+	};
 }
 
 export class LoopOrchestrator {
@@ -526,6 +538,24 @@ export class LoopOrchestrator {
 						return;
 					}
 
+					// Review-after-execute
+					const reviewConfig = this.config.reviewAfterExecute ?? DEFAULT_REVIEW_AFTER_EXECUTE;
+					if (reviewConfig.enabled) {
+						const reviewPrompt = await sendReviewPrompt(
+							task.description,
+							reviewConfig.mode,
+							reviewConfig.reviewPromptTemplate,
+							this.logger,
+						);
+						const verdict = parseReviewVerdict(reviewPrompt);
+						appendProgress(progressPath, `[${taskInvocationId}] Review verdict: ${verdict.outcome} — ${verdict.summary}`);
+						yield { kind: LoopEventKind.TaskReviewed, task, verdict, taskInvocationId };
+						if (verdict.outcome === 'needs-retry') {
+							this.completedTasks.delete(task.id);
+							continue;
+						}
+					}
+
 					// Graceful yield: deferred until task completion (autopilot pattern)
 					if (this.yieldRequested) {
 						this.logger.log('Yield honoured after task completion');
@@ -667,5 +697,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		workspaceRoot,
 		diffValidation: vsConfig.get('diffValidation', DEFAULT_CONFIG.diffValidation),
 		maxDiffValidationRetries: vsConfig.get<number>('maxDiffValidationRetries', DEFAULT_CONFIG.maxDiffValidationRetries),
+		reviewAfterExecute: vsConfig.get('reviewAfterExecute', DEFAULT_CONFIG.reviewAfterExecute),
 	};
 }

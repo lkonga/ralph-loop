@@ -54,6 +54,7 @@ export const enum LoopEventKind {
 	CircuitBreakerTripped = 'circuit_breaker_tripped',
 	DiffValidationFailed = 'diff_validation_failed',
 	HumanCheckpointRequested = 'human_checkpoint_requested',
+	TaskReviewed = 'task_reviewed',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -76,6 +77,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.CircuitBreakerTripped; breakerName: string; reason: string; action: string; taskInvocationId: string }
 	| { kind: LoopEventKind.DiffValidationFailed; task: Task; nudge: string; attempt: number; taskInvocationId: string }
 	| { kind: LoopEventKind.HumanCheckpointRequested; task: Task; reason: string; failCount: number; taskInvocationId: string }
+	| { kind: LoopEventKind.TaskReviewed; task: Task; verdict: ReviewVerdict; taskInvocationId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -134,6 +136,26 @@ export const DEFAULT_PRE_COMPLETE_HOOKS: PreCompleteHookConfig[] = [
 	{ name: 'progress-updated', type: 'builtin', enabled: true },
 ];
 
+// --- Review after execute config ---
+export interface ReviewVerdict {
+	outcome: 'approved' | 'needs-retry';
+	summary: string;
+	issues?: string[];
+}
+
+export interface ReviewAfterExecuteConfig {
+	enabled: boolean;
+	mode: 'same-session' | 'new-session';
+	reviewPromptTemplate?: string;
+}
+
+export const DEFAULT_REVIEW_AFTER_EXECUTE: ReviewAfterExecuteConfig = {
+	enabled: false,
+	mode: 'same-session',
+};
+
+export const DEFAULT_REVIEW_PROMPT_TEMPLATE = 'Review the changes just made for the following task: [TASK]. Check for: correctness, code quality, potential bugs, security issues. Provide a structured verdict: APPROVED or NEEDS-RETRY with critical issues.';
+
 // --- Diff validation config ---
 export interface DiffValidationConfig {
 	enabled: boolean;
@@ -189,6 +211,7 @@ export interface RalphConfig {
 	preCompleteHooks?: PreCompleteHookConfig[];
 	diffValidation?: DiffValidationConfig;
 	maxDiffValidationRetries: number;
+	reviewAfterExecute?: ReviewAfterExecuteConfig;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -212,6 +235,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	preCompleteHooks: [...DEFAULT_PRE_COMPLETE_HOOKS],
 	diffValidation: { ...DEFAULT_DIFF_VALIDATION },
 	maxDiffValidationRetries: 3,
+	reviewAfterExecute: { ...DEFAULT_REVIEW_AFTER_EXECUTE },
 };
 
 // --- Verification ---

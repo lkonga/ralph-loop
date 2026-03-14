@@ -5,13 +5,14 @@ import {
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain } from '../src/orchestrator';
+import { runPreCompleteChain, parseReviewVerdict } from '../src/orchestrator';
 import type {
 	IRalphHookService,
 	HookResult,
 	PreCompleteHookConfig,
 	PreCompleteInput,
 	VerifyCheck,
+	ReviewVerdict,
 } from '../src/types';
 import { VerifyResult } from '../src/types';
 
@@ -231,5 +232,39 @@ describe('shouldRetryError', () => {
 
 	it('returns false when stop is requested', () => {
 		expect(shouldRetryError(new Error('timeout'), 0, true)).toBe(false);
+	});
+});
+
+describe('parseReviewVerdict', () => {
+	it('returns approved verdict for APPROVED output', () => {
+		const v = parseReviewVerdict('Everything looks good. APPROVED.');
+		expect(v.outcome).toBe('approved');
+		expect(v.summary).toBe('Everything looks good. APPROVED.');
+	});
+
+	it('returns needs-retry verdict for NEEDS-RETRY output', () => {
+		const v = parseReviewVerdict('Several issues found. NEEDS-RETRY. Fix validation.');
+		expect(v.outcome).toBe('needs-retry');
+		expect(v.summary).toBe('Several issues found. NEEDS-RETRY. Fix validation.');
+	});
+
+	it('defaults to approved when no keyword found', () => {
+		const v = parseReviewVerdict('The code is fine.');
+		expect(v.outcome).toBe('approved');
+	});
+
+	it('prefers needs-retry when both keywords present', () => {
+		const v = parseReviewVerdict('APPROVED but NEEDS-RETRY for edge case.');
+		expect(v.outcome).toBe('needs-retry');
+	});
+
+	it('is case-insensitive for NEEDS-RETRY', () => {
+		const v = parseReviewVerdict('needs-retry: missing error handling');
+		expect(v.outcome).toBe('needs-retry');
+	});
+
+	it('is case-insensitive for APPROVED', () => {
+		const v = parseReviewVerdict('approved - no issues');
+		expect(v.outcome).toBe('approved');
 	});
 });
