@@ -1,5 +1,123 @@
-import { PrdSnapshot, Task, TaskStatus, VerifyResult, VerifyCheck, ILogger } from './types';
+import * as fs from 'fs';
+import * as path from 'path';
+import { execSync } from 'child_process';
+import { PrdSnapshot, Task, TaskStatus, VerifyResult, VerifyCheck, VerifierFn, VerifierConfig, VerificationTemplate, RalphConfig, ILogger } from './types';
 import { readPrdSnapshot } from './prd';
+
+export class VerifierRegistry {
+	private registry = new Map<string, VerifierFn>();
+
+	register(type: string, fn: VerifierFn): void {
+		this.registry.set(type, fn);
+	}
+
+	get(type: string): VerifierFn {
+		const fn = this.registry.get(type);
+		if (!fn) { throw new Error(`Unknown verifier type: ${type}`); }
+		return fn;
+	}
+}
+
+export function createBuiltinRegistry(): VerifierRegistry {
+	const registry = new VerifierRegistry();
+
+	registry.register('checkbox', async (task, workspaceRoot, args) => {
+		const prdPath = args?.prdPath ?? path.join(workspaceRoot, 'PRD.md');
+		const snapshot = readPrdSnapshot(prdPath);
+		const found = snapshot.tasks.find(t => t.description === task.description);
+		const passed = found?.status === TaskStatus.Complete;
+		return { name: 'checkbox', result: passed ? VerifyResult.Pass : VerifyResult.Fail, detail: passed ? 'Checkbox marked' : 'Checkbox not marked' };
+	});
+
+	registry.register('fileExists', async (task, workspaceRoot, args) => {
+		const filePath = path.join(workspaceRoot, args?.path ?? '');
+		const exists = fs.existsSync(filePath);
+		return { name: 'fileExists', result: exists ? VerifyResult.Pass : VerifyResult.Fail, detail: exists ? `File exists: ${args?.path}` : `File missing: ${args?.path}` };
+	});
+
+	registry.register('fileContains', async (task, workspaceRoot, args) => {
+		const filePath = path.join(workspaceRoot, args?.path ?? '');
+		if (!fs.existsSync(filePath)) {
+			return { name: 'fileContains', result: VerifyResult.Fail, detail: `File missing: ${args?.path}` };
+		}
+		const content = fs.readFileSync(filePath, 'utf-8');
+		const has = content.includes(args?.content ?? '');
+		return { name: 'fileContains', result: has ? VerifyResult.Pass : VerifyResult.Fail, detail: has ? 'Content found' : 'Content not found' };
+	});
+
+	registry.register('commandExitCode', async (task, workspaceRoot, args) => {
+		try {
+			execSync(args?.command ?? 'true', { cwd: workspaceRoot, stdio: 'pipe' });
+			return { name: 'commandExitCode', result: VerifyResult.Pass, detail: 'Command exited 0' };
+		} catch {
+			return { name: 'commandExitCode', result: VerifyResult.Fail, detail: 'Command exited non-zero' };
+		}
+	});
+
+	registry.register('tsc', async (task, workspaceRoot) => {
+		try {
+			execSync('npx tsc --noEmit', { cwd: workspaceRoot, stdio: 'pipe' });
+			return { name: 'tsc', result: VerifyResult.Pass, detail: 'TypeScript clean' };
+		} catch {
+			return { name: 'tsc', result: VerifyResult.Fail, detail: 'TypeScript errors' };
+		}
+	});
+
+	registry.register('vitest', async (task, workspaceRoot) => {
+		try {
+			execSync('npx vitest run', { cwd: workspaceRoot, stdio: 'pipe' });
+			return { name: 'vitest', result: VerifyResult.Pass, detail: 'Tests pass' };
+		} catch {
+			return { name: 'vitest', result: VerifyResult.Fail, detail: 'Tests failed' };
+		}
+	});
+
+	registry.register('custom', async (task, workspaceRoot, args) => {
+		try {
+			execSync(args?.command ?? 'true', { cwd: workspaceRoot, stdio: 'pipe', shell: '/bin/sh' });
+			return { name: 'custom', result: VerifyResult.Pass, detail: 'Custom command passed' };
+		} catch {
+			return { name: 'custom', result: VerifyResult.Fail, detail: 'Custom command failed' };
+		}
+	});
+
+	return registry;
+}
+
+export async function runVerifierChain(task: Task, workspaceRoot: string, configs: VerifierConfig[], registry: VerifierRegistry, logger: ILogger): Promise<VerifyCheck[]> {
+	const results: VerifyCheck[] = [];
+	for (const config of configs) {
+		const fn = registry.get(config.type);
+		results.push(await fn(task, workspaceRoot, config.args));
+	}
+	return results;
+}
+
+export function resolveVerifiers(task: Task, config: RalphConfig, registry: VerifierRegistry): VerifierConfig[] {
+	if (config.verifiers && config.verifiers.length > 0) {
+		return config.verifiers;
+	}
+
+	if (config.verificationTemplates) {
+		const descLower = task.description.toLowerCase();
+		for (const tmpl of config.verificationTemplates) {
+			if (descLower.includes(tmpl.name.toLowerCase())) {
+				return tmpl.verifiers;
+			}
+		}
+	}
+
+	const defaults: VerifierConfig[] = [{ type: 'checkbox' }, { type: 'tsc' }];
+
+	if (config.autoClassifyTasks) {
+		const descLower = task.description.toLowerCase();
+		if (descLower.includes('test')) {
+			defaults.push({ type: 'vitest' });
+		}
+	}
+
+	return defaults;
+}
 
 // Binary pass/fail verification — deterministic, no LLM involvement
 export function verifyTaskCompletion(prdPath: string, task: Task, logger: ILogger): VerifyCheck[] {
