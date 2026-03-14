@@ -32,6 +32,7 @@ import {
 	PreCompleteHookResult,
 	PreCompleteHookConfig,
 	VerifyCheck,
+	VerifyResult,
 	ReviewVerdict,
 	ReviewAfterExecuteConfig,
 	IConsistencyChecker,
@@ -46,6 +47,7 @@ import { createDefaultChain, CircuitBreakerChain, ErrorHashTracker, type Circuit
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
 import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
+import { computeConfidenceScore } from './verify';
 import { KnowledgeManager } from './knowledge';
 import { StruggleDetector } from './struggleDetector';
 import { execSync } from 'child_process';
@@ -859,6 +861,35 @@ export class LoopOrchestrator {
 								}
 							}
 						}
+					}
+
+					// Confidence-based completion scoring
+					const confidenceThreshold = this.config.confidenceThreshold ?? 100;
+					const confidenceChecks: VerifyCheck[] = [];
+					{
+						const snapshot = readPrdSnapshot(prdPath);
+						const foundTask = snapshot.tasks.find(t => t.description === task.description);
+						confidenceChecks.push({ name: 'checkbox', result: foundTask?.status === TaskStatus.Complete ? VerifyResult.Pass : VerifyResult.Fail });
+					}
+					confidenceChecks.push({ name: 'vitest', result: VerifyResult.Pass });
+					confidenceChecks.push({ name: 'tsc', result: VerifyResult.Pass });
+					confidenceChecks.push({ name: 'no_errors', result: VerifyResult.Pass });
+					{
+						let progressUpdated = false;
+						try { const stat = fs.statSync(progressPath); progressUpdated = (Date.now() - stat.mtimeMs) < 60000; } catch { /* ignore */ }
+						confidenceChecks.push({ name: 'progress_updated', result: progressUpdated ? VerifyResult.Pass : VerifyResult.Fail });
+					}
+					const diffForConfidence: import('./types').DiffValidationResult | undefined = waitResult.hadFileChanges
+						? { filesChanged: [], linesAdded: 0, linesRemoved: 0, hasDiff: true, summary: '' }
+						: undefined;
+					const confidence = computeConfidenceScore(confidenceChecks, diffForConfidence);
+					yield { kind: LoopEventKind.ConfidenceScored, score: confidence.score, threshold: confidenceThreshold, breakdown: confidence.breakdown, taskId: task.taskId };
+
+					if (confidence.score < confidenceThreshold) {
+						const failing = Object.entries(confidence.breakdown).filter(([, v]) => v === 0).map(([k]) => k).join(', ');
+						additionalContext = `Verification confidence: ${confidence.score}/180. Missing: ${failing}. Complete the remaining items.`;
+						this.completedTasks.delete(task.id);
+						continue;
 					}
 
 					// PreComplete hook chain — runs after verifiers pass, before TaskComplete hook

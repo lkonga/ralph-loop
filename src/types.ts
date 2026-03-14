@@ -67,6 +67,7 @@ export const enum LoopEventKind {
 	CommandBlocked = 'command_blocked',
 	BearingsChecked = 'bearings_checked',
 	BearingsFailed = 'bearings_failed',
+	ConfidenceScored = 'confidence_scored',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -101,6 +102,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.CommandBlocked; command: string; reason: string; taskId: string }
 	| { kind: LoopEventKind.BearingsChecked; healthy: boolean; issues: string[] }
 	| { kind: LoopEventKind.BearingsFailed; issues: string[] }
+	| { kind: LoopEventKind.ConfidenceScored; score: number; threshold: number; breakdown: Record<string, number>; taskId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -383,6 +385,7 @@ export interface RalphConfig {
 	contextTrimming?: ContextTrimmingConfig;
 	struggleDetection?: StruggleDetectionConfig;
 	bearings?: BearingsConfig;
+	confidenceThreshold?: number;
 	promptTemplate?: string;
 }
 

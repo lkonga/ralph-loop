@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { parsePrd } from '../src/prd';
-import { verifyTaskCompletion, allChecksPassed, isAllDone, progressSummary, VerifierRegistry, createBuiltinRegistry, runVerifierChain, resolveVerifiers } from '../src/verify';
-import { Task, TaskStatus, VerifyResult, VerifierConfig, RalphConfig, DEFAULT_CONFIG } from '../src/types';
+import { verifyTaskCompletion, allChecksPassed, isAllDone, progressSummary, VerifierRegistry, createBuiltinRegistry, runVerifierChain, resolveVerifiers, computeConfidenceScore } from '../src/verify';
+import { Task, TaskStatus, VerifyResult, VerifierConfig, RalphConfig, DEFAULT_CONFIG, DiffValidationResult } from '../src/types';
 
 function tmpPrd(content: string): string {
 	const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-test-'));
@@ -315,5 +315,120 @@ describe('allChecksPassed with verifier chain', () => {
 
 	it('returns true for empty checks array', () => {
 		expect(allChecksPassed([])).toBe(true);
+	});
+});
+
+describe('computeConfidenceScore', () => {
+	const diffWithChanges: DiffValidationResult = {
+		filesChanged: ['src/foo.ts'],
+		linesAdded: 10,
+		linesRemoved: 2,
+		hasDiff: true,
+		summary: '+10 -2',
+	};
+
+	const emptyDiff: DiffValidationResult = {
+		filesChanged: [],
+		linesAdded: 0,
+		linesRemoved: 0,
+		hasDiff: false,
+		summary: 'No changes',
+	};
+
+	it('returns max score (180) when all checks pass', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'checkbox', result: VerifyResult.Pass },
+			{ name: 'vitest', result: VerifyResult.Pass },
+			{ name: 'tsc', result: VerifyResult.Pass },
+			{ name: 'no_errors', result: VerifyResult.Pass },
+			{ name: 'progress_updated', result: VerifyResult.Pass },
+		];
+		const result = computeConfidenceScore(checks, diffWithChanges);
+		expect(result.score).toBe(180);
+		expect(result.breakdown['checkbox']).toBe(100);
+		expect(result.breakdown['vitest']).toBe(20);
+		expect(result.breakdown['tsc']).toBe(20);
+		expect(result.breakdown['diff']).toBe(20);
+		expect(result.breakdown['no_errors']).toBe(10);
+		expect(result.breakdown['progress_updated']).toBe(10);
+	});
+
+	it('returns 100 when only checkbox passes', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'checkbox', result: VerifyResult.Pass },
+			{ name: 'vitest', result: VerifyResult.Fail },
+			{ name: 'tsc', result: VerifyResult.Fail },
+			{ name: 'no_errors', result: VerifyResult.Fail },
+			{ name: 'progress_updated', result: VerifyResult.Fail },
+		];
+		const result = computeConfidenceScore(checks, emptyDiff);
+		expect(result.score).toBe(100);
+	});
+
+	it('returns 0 when no checks pass', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'checkbox', result: VerifyResult.Fail },
+			{ name: 'vitest', result: VerifyResult.Fail },
+			{ name: 'tsc', result: VerifyResult.Fail },
+			{ name: 'no_errors', result: VerifyResult.Fail },
+			{ name: 'progress_updated', result: VerifyResult.Fail },
+		];
+		const result = computeConfidenceScore(checks, emptyDiff);
+		expect(result.score).toBe(0);
+	});
+
+	it('returns 0 for empty checks array with no diff', () => {
+		const result = computeConfidenceScore([]);
+		expect(result.score).toBe(0);
+	});
+
+	it('threshold comparison works — score below threshold means incomplete', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'checkbox', result: VerifyResult.Pass },
+		];
+		const result = computeConfidenceScore(checks);
+		const threshold = 100;
+		// score is 100 (checkbox only, no diff), >= threshold
+		expect(result.score).toBeGreaterThanOrEqual(threshold);
+
+		const checks2: VerifyCheck[] = [
+			{ name: 'checkbox', result: VerifyResult.Fail },
+			{ name: 'vitest', result: VerifyResult.Pass },
+		];
+		const result2 = computeConfidenceScore(checks2);
+		expect(result2.score).toBeLessThan(threshold);
+	});
+
+	it('breakdown lists each component', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'checkbox', result: VerifyResult.Pass },
+			{ name: 'vitest', result: VerifyResult.Fail },
+			{ name: 'tsc', result: VerifyResult.Pass },
+			{ name: 'no_errors', result: VerifyResult.Pass },
+			{ name: 'progress_updated', result: VerifyResult.Fail },
+		];
+		const result = computeConfidenceScore(checks, diffWithChanges);
+		expect(Object.keys(result.breakdown)).toEqual(
+			expect.arrayContaining(['checkbox', 'vitest', 'tsc', 'diff', 'no_errors', 'progress_updated'])
+		);
+		expect(result.breakdown['checkbox']).toBe(100);
+		expect(result.breakdown['vitest']).toBe(0);
+		expect(result.breakdown['tsc']).toBe(20);
+		expect(result.breakdown['diff']).toBe(20);
+		expect(result.breakdown['no_errors']).toBe(10);
+		expect(result.breakdown['progress_updated']).toBe(0);
+	});
+
+	it('handles missing diff result (no diff param = 0 for diff)', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'checkbox', result: VerifyResult.Pass },
+			{ name: 'vitest', result: VerifyResult.Pass },
+			{ name: 'tsc', result: VerifyResult.Pass },
+			{ name: 'no_errors', result: VerifyResult.Pass },
+			{ name: 'progress_updated', result: VerifyResult.Pass },
+		];
+		const result = computeConfidenceScore(checks);
+		expect(result.score).toBe(160); // 180 - 20 (no diff)
+		expect(result.breakdown['diff']).toBe(0);
 	});
 });

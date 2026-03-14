@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
-import { PrdSnapshot, Task, TaskStatus, VerifyResult, VerifyCheck, VerifierFn, VerifierConfig, VerificationTemplate, RalphConfig, ILogger } from './types';
+import { PrdSnapshot, Task, TaskStatus, VerifyResult, VerifyCheck, VerifierFn, VerifierConfig, VerificationTemplate, RalphConfig, ILogger, DiffValidationResult } from './types';
 import { readPrdSnapshot } from './prd';
 
 export class VerifierRegistry {
@@ -150,4 +150,37 @@ export function isAllDone(prdPath: string): boolean {
 export function progressSummary(prdPath: string): { total: number; completed: number; remaining: number } {
 	const snapshot = readPrdSnapshot(prdPath);
 	return { total: snapshot.total, completed: snapshot.completed, remaining: snapshot.remaining };
+}
+
+const CONFIDENCE_WEIGHTS: Record<string, number> = {
+	checkbox: 100,
+	vitest: 20,
+	tsc: 20,
+	diff: 20,
+	no_errors: 10,
+	progress_updated: 10,
+};
+
+export function computeConfidenceScore(
+	checks: VerifyCheck[],
+	diffResult?: DiffValidationResult,
+): { score: number; breakdown: Record<string, number> } {
+	const breakdown: Record<string, number> = {};
+
+	for (const key of Object.keys(CONFIDENCE_WEIGHTS)) {
+		breakdown[key] = 0;
+	}
+
+	for (const check of checks) {
+		if (check.name in CONFIDENCE_WEIGHTS && check.result === VerifyResult.Pass) {
+			breakdown[check.name] = CONFIDENCE_WEIGHTS[check.name];
+		}
+	}
+
+	if (diffResult?.hasDiff) {
+		breakdown['diff'] = CONFIDENCE_WEIGHTS['diff'];
+	}
+
+	const score = Object.values(breakdown).reduce((sum, v) => sum + v, 0);
+	return { score, breakdown };
 }
