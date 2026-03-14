@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { containsDangerousChars, DANGEROUS_PATTERNS } from '../src/shellHookProvider';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { containsDangerousChars, DANGEROUS_PATTERNS, killProcessTree } from '../src/shellHookProvider';
 
 describe('DANGEROUS_PATTERNS regex', () => {
 	it('is a RegExp', () => {
@@ -58,5 +58,52 @@ describe('containsDangerousChars', () => {
 
 	it('allows commands with quotes', () => {
 		expect(containsDangerousChars('git commit -m "feat: add feature"')).toBe(false);
+	});
+});
+
+describe('killProcessTree', () => {
+	let killFn: ReturnType<typeof vi.fn>;
+	let execFn: ReturnType<typeof vi.fn>;
+
+	beforeEach(() => {
+		vi.useFakeTimers();
+		killFn = vi.fn().mockReturnValue(true);
+		execFn = vi.fn().mockReturnValue(Buffer.from(''));
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it('sends SIGTERM first', () => {
+		killProcessTree(12345, 'linux', { kill: killFn as never, exec: execFn as never });
+		expect(killFn).toHaveBeenCalledWith(12345, 'SIGTERM');
+	});
+
+	it('sends SIGKILL after 1-second delay', () => {
+		killProcessTree(12345, 'linux', { kill: killFn as never, exec: execFn as never });
+		expect(killFn).not.toHaveBeenCalledWith(12345, 'SIGKILL');
+		vi.advanceTimersByTime(1000);
+		expect(killFn).toHaveBeenCalledWith(12345, 'SIGKILL');
+	});
+
+	it('handles ESRCH error on SIGTERM gracefully', () => {
+		const esrchError = Object.assign(new Error('kill ESRCH'), { code: 'ESRCH' });
+		killFn.mockImplementation(() => { throw esrchError; });
+		expect(() => killProcessTree(12345, 'linux', { kill: killFn as never, exec: execFn as never })).not.toThrow();
+	});
+
+	it('handles ESRCH error on SIGKILL gracefully', () => {
+		killFn.mockImplementationOnce(() => true);
+		const esrchError = Object.assign(new Error('kill ESRCH'), { code: 'ESRCH' });
+		killFn.mockImplementationOnce(() => { throw esrchError; });
+		killProcessTree(12345, 'linux', { kill: killFn as never, exec: execFn as never });
+		expect(() => vi.advanceTimersByTime(1000)).not.toThrow();
+	});
+
+	it('uses taskkill on Windows', () => {
+		killProcessTree(12345, 'win32', { kill: killFn as never, exec: execFn as never });
+		expect(execFn).toHaveBeenCalledWith('taskkill /PID 12345 /T /F');
+		expect(killFn).not.toHaveBeenCalled();
 	});
 });

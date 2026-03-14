@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import {
 	IRalphHookService,
 	SessionStartInput,
@@ -18,6 +18,36 @@ export const DANGEROUS_PATTERNS = /&&|\|\||;|\||>|<|`|\$\(|\$\{/;
 
 export function containsDangerousChars(cmd: string): boolean {
 	return DANGEROUS_PATTERNS.test(cmd);
+}
+
+export function killProcessTree(
+	pid: number,
+	platform: string = process.platform,
+	deps: { kill: typeof process.kill; exec: typeof execSync } = { kill: process.kill.bind(process), exec: execSync },
+): void {
+	if (platform === 'win32') {
+		try {
+			deps.exec(`taskkill /PID ${pid} /T /F`);
+		} catch {
+			// Process already exited — ignore
+		}
+		return;
+	}
+
+	try {
+		deps.kill(pid, 'SIGTERM');
+	} catch {
+		// ESRCH: process already exited — nothing to kill
+		return;
+	}
+
+	setTimeout(() => {
+		try {
+			deps.kill(pid, 'SIGKILL');
+		} catch {
+			// ESRCH: process already exited — ignore
+		}
+	}, 1000);
 }
 
 export class ShellHookProvider implements IRalphHookService {
@@ -55,27 +85,41 @@ export class ShellHookProvider implements IRalphHookService {
 		return new Promise<HookResult>((resolve) => {
 			const child = spawn(this.scriptPath, [hookType], {
 				stdio: ['pipe', 'pipe', 'pipe'],
-				timeout: SHELL_HOOK_TIMEOUT_MS,
 			});
 
 			let stdout = '';
 			let stderr = '';
+			let settled = false;
+
+			const timeoutId = setTimeout(() => {
+				if (!settled) {
+					settled = true;
+					if (child.pid) {
+						killProcessTree(child.pid);
+					}
+					this.logger.warn(`Shell hook timed out (${hookType}) after ${SHELL_HOOK_TIMEOUT_MS}ms`);
+					resolve({ action: 'continue', reason: 'Hook script timed out' });
+				}
+			}, SHELL_HOOK_TIMEOUT_MS);
 
 			child.stdout.on('data', (data: Buffer) => { stdout += data.toString(); });
 			child.stderr.on('data', (data: Buffer) => { stderr += data.toString(); });
 
 			child.on('error', (err: Error) => {
-				this.logger.error(`Shell hook error (${hookType}): ${err.message}`);
-				resolve({ action: 'continue', reason: `Hook script error: ${err.message}` });
+				clearTimeout(timeoutId);
+				if (!settled) {
+					settled = true;
+					this.logger.error(`Shell hook error (${hookType}): ${err.message}`);
+					resolve({ action: 'continue', reason: `Hook script error: ${err.message}` });
+				}
 			});
 
 			child.on('close', (code: number | null) => {
-				if (code === null) {
-					// Killed by timeout
-					this.logger.warn(`Shell hook timed out (${hookType}) after ${SHELL_HOOK_TIMEOUT_MS}ms`);
-					resolve({ action: 'continue', reason: 'Hook script timed out' });
+				clearTimeout(timeoutId);
+				if (settled) {
 					return;
 				}
+				settled = true;
 
 				if (code === 0) {
 					// Exit 0: success/continue — parse stdout as HookResult if available
