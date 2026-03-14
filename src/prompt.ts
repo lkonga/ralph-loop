@@ -1,3 +1,30 @@
+export interface PromptVariables {
+	task: string;
+	prd: string;
+	progress: string;
+	learnings: string;
+	workspace: string;
+	taskId: string;
+	iterationNumber: number;
+}
+
+export const DEFAULT_PROMPT_TEMPLATE = '## Task: {{taskId}}\n{{task}}\n\n## Current PRD State\n{{prd}}\n\n## Recent Progress\n{{progress}}';
+
+export function renderTemplate(template: string, variables: PromptVariables): string {
+	const known: Record<string, string> = {
+		task: variables.task,
+		prd: variables.prd,
+		progress: variables.progress,
+		learnings: variables.learnings,
+		workspace: variables.workspace,
+		taskId: variables.taskId,
+		iterationNumber: String(variables.iterationNumber),
+	};
+	return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+		return key in known ? known[key] : match;
+	});
+}
+
 export function sanitizeTaskDescription(text: string): string {
 	// Strip ASCII control chars (0-31) except newline (0x0A) and tab (0x09)
 	let result = text.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
@@ -125,7 +152,7 @@ export function buildFinalNudgePrompt(task: string, nudgeCount: number, maxNudge
 	return `Your remaining time is almost up. Produce your final result NOW: commit any partial work, update progress.txt, and mark the checkbox. If tests fail, document the failure and mark done anyway.`;
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string, taskId?: string): string {
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string, taskId?: string, promptTemplate?: string): string {
 	const sanitized = sanitizeTaskDescription(taskDescription.trim());
 	const ct = contextTrimming ?? DEFAULT_CONTEXT_TRIMMING;
 
@@ -197,6 +224,25 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		'Commit OFTEN — after each meaningful change, not just at the end.',
 		'All updates are required for the loop to continue!',
 		'',
+	];
+
+	if (promptTemplate) {
+		const filteredPrd = filterPrdContent(prdContent, prdCurrentTaskOnly);
+		const vars: PromptVariables = {
+			task: sanitized,
+			prd: filteredPrd,
+			progress: progressContent.trim(),
+			learnings: (effectiveLearnings ?? []).join('\n'),
+			workspace: '',
+			taskId: taskId ?? '',
+			iterationNumber: iterationNumber,
+		};
+		parts.push(renderTemplate(promptTemplate, vars));
+		parts.push('');
+		return parts.join('\n');
+	}
+
+	parts.push(
 		'===================================================================',
 		'                       PROJECT CONTEXT',
 		'===================================================================',
@@ -206,7 +252,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		filterPrdContent(prdContent, prdCurrentTaskOnly),
 		'```',
 		'',
-	];
+	);
 
 	if (progressContent.trim()) {
 		const lines = progressContent.split('\n');

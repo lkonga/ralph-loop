@@ -383,6 +383,7 @@ export interface RalphConfig {
 	contextTrimming?: ContextTrimmingConfig;
 	struggleDetection?: StruggleDetectionConfig;
 	bearings?: BearingsConfig;
+	promptTemplate?: string;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {

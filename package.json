@@ -61,6 +61,12 @@
 					"type": "number",
 					"default": 300000,
 					"description": "Milliseconds of inactivity before moving to next task."
+				},
+				"ralph-loop.promptTemplate": {
+					"type": "string",
+					"default": "",
+					"description": "Custom prompt template with {{variable}} placeholders. Variables: task, prd, progress, learnings, workspace, taskId, iterationNumber. Built-in ROLE & BEHAVIOR, TDD GATE, and safety sections are always prepended.",
+					"editPresentation": "multilineText"
 				}
 			}
 		}

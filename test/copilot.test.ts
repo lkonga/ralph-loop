@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt } from '../src/prompt';
+import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE } from '../src/prompt';
+import type { PromptVariables } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
 import { sendReviewPrompt, parseReviewVerdict } from '../src/copilot';
 import { DEFAULT_REVIEW_PROMPT_TEMPLATE } from '../src/types';
@@ -375,5 +376,71 @@ describe('buildPrompt with operatorContext', () => {
 	it('does not include OPERATOR CONTEXT section when operatorContext is empty string', () => {
 		const prompt = buildPrompt('Task A', '- [ ] Task A', '', 20, undefined, undefined, undefined, 1, undefined, '');
 		expect(prompt).not.toContain('OPERATOR CONTEXT');
+	});
+});
+
+describe('renderTemplate', () => {
+	it('replaces all variables in a template', () => {
+		const template = '## Task: {{taskId}}\n{{task}}\nPRD: {{prd}}\nProgress: {{progress}}\nLearnings: {{learnings}}\nWorkspace: {{workspace}}\nIteration: {{iterationNumber}}';
+		const vars: PromptVariables = {
+			task: 'Implement login',
+			prd: '- [ ] Login feature',
+			progress: 'Started work',
+			learnings: 'Use bcrypt',
+			workspace: '/home/project',
+			taskId: 'Task-007',
+			iterationNumber: 3,
+		};
+		const result = renderTemplate(template, vars);
+		expect(result).toBe('## Task: Task-007\nImplement login\nPRD: - [ ] Login feature\nProgress: Started work\nLearnings: Use bcrypt\nWorkspace: /home/project\nIteration: 3');
+	});
+
+	it('leaves unknown placeholders as-is', () => {
+		const template = '{{task}} and {{unknown}} placeholder';
+		const vars: PromptVariables = {
+			task: 'Fix bug',
+			prd: '',
+			progress: '',
+			learnings: '',
+			workspace: '',
+			taskId: '',
+			iterationNumber: 1,
+		};
+		const result = renderTemplate(template, vars);
+		expect(result).toBe('Fix bug and {{unknown}} placeholder');
+	});
+
+	it('default template produces expected output', () => {
+		const vars: PromptVariables = {
+			task: 'Add tests',
+			prd: 'Progress: 1/3 tasks completed',
+			progress: 'Previous work done',
+			learnings: '',
+			workspace: '/ws',
+			taskId: 'Task-042',
+			iterationNumber: 1,
+		};
+		const result = renderTemplate(DEFAULT_PROMPT_TEMPLATE, vars);
+		expect(result).toContain('## Task: Task-042');
+		expect(result).toContain('Add tests');
+		expect(result).toContain('## Current PRD State');
+		expect(result).toContain('Progress: 1/3 tasks completed');
+		expect(result).toContain('## Recent Progress');
+		expect(result).toContain('Previous work done');
+	});
+});
+
+describe('buildPrompt with custom promptTemplate', () => {
+	it('uses custom template for task-specific portion while keeping built-in sections', () => {
+		const customTemplate = '## My Custom Task\n{{task}}\n## My PRD\n{{prd}}';
+		const prompt = buildPrompt('Fix the bug', '- [ ] Fix the bug', 'some progress', 20, undefined, undefined, undefined, 1, undefined, undefined, 'Task-001', customTemplate);
+		// Built-in sections are always present
+		expect(prompt).toContain('ROLE & BEHAVIOR');
+		expect(prompt).toContain('TDD GATE');
+		expect(prompt).toContain('You are an autonomous coding agent');
+		// Custom template content is present
+		expect(prompt).toContain('## My Custom Task');
+		expect(prompt).toContain('Fix the bug');
+		expect(prompt).toContain('## My PRD');
 	});
 });
