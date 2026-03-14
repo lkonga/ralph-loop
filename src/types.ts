@@ -65,6 +65,8 @@ export const enum LoopEventKind {
 	ContextInjected = 'context_injected',
 	StruggleDetected = 'struggle_detected',
 	CommandBlocked = 'command_blocked',
+	BearingsChecked = 'bearings_checked',
+	BearingsFailed = 'bearings_failed',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -97,6 +99,8 @@ export type LoopEvent =
 	| { kind: LoopEventKind.ContextInjected; text: string }
 	| { kind: LoopEventKind.StruggleDetected; signals: string[]; taskId: string }
 	| { kind: LoopEventKind.CommandBlocked; command: string; reason: string; taskId: string }
+	| { kind: LoopEventKind.BearingsChecked; healthy: boolean; issues: string[] }
+	| { kind: LoopEventKind.BearingsFailed; issues: string[] }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -260,6 +264,25 @@ export interface StruggleDetectionConfig {
 	shortIterationMs: number;
 }
 
+// --- Bearings (pre-flight health check) ---
+export interface BearingsConfig {
+	enabled: boolean;
+	runTsc: boolean;
+	runTests: boolean;
+}
+
+export const DEFAULT_BEARINGS_CONFIG: BearingsConfig = {
+	enabled: true,
+	runTsc: true,
+	runTests: true,
+};
+
+export interface BearingsResult {
+	healthy: boolean;
+	issues: string[];
+	fixTask?: string;
+}
+
 export const DEFAULT_STRUGGLE_DETECTION: StruggleDetectionConfig = {
 	enabled: true,
 	noProgressThreshold: 3,
@@ -358,6 +381,7 @@ export interface RalphConfig {
 	knowledge?: KnowledgeConfig;
 	contextTrimming?: ContextTrimmingConfig;
 	struggleDetection?: StruggleDetectionConfig;
+	bearings?: BearingsConfig;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -390,6 +414,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	knowledge: { ...DEFAULT_KNOWLEDGE_CONFIG },
 	contextTrimming: { ...DEFAULT_CONTEXT_TRIMMING },
 	struggleDetection: { ...DEFAULT_STRUGGLE_DETECTION },
+	bearings: { ...DEFAULT_BEARINGS_CONFIG },
 };
 
 // --- Verification ---

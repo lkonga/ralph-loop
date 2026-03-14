@@ -5,7 +5,7 @@ import {
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain, LoopOrchestrator } from '../src/orchestrator';
+import { runPreCompleteChain, LoopOrchestrator, runBearings } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
 import {
 	DEFAULT_CONFIG,
@@ -381,5 +381,141 @@ describe('Security rejection as feedback', () => {
 		expect(evt).toHaveProperty('command');
 		expect(evt).toHaveProperty('reason');
 		expect(evt).toHaveProperty('taskId');
+	});
+});
+
+describe('runBearings', () => {
+	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+
+	it('returns healthy when both tsc and vitest pass', async () => {
+		const execFn = () => ({ exitCode: 0, output: '' });
+		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
+		expect(result.healthy).toBe(true);
+		expect(result.issues).toHaveLength(0);
+		expect(result.fixTask).toBeUndefined();
+	});
+
+	it('returns unhealthy when tsc fails', async () => {
+		const execFn = (cmd: string) => {
+			if (cmd.includes('tsc')) return { exitCode: 1, output: 'error TS2345: Argument of type...' };
+			return { exitCode: 0, output: '' };
+		};
+		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
+		expect(result.healthy).toBe(false);
+		expect(result.issues.length).toBeGreaterThan(0);
+		expect(result.issues.some(i => i.includes('TypeScript'))).toBe(true);
+		expect(result.fixTask).toContain('Fix baseline');
+	});
+
+	it('returns unhealthy when vitest fails', async () => {
+		const execFn = (cmd: string) => {
+			if (cmd.includes('vitest')) return { exitCode: 1, output: '3 tests failed' };
+			return { exitCode: 0, output: '' };
+		};
+		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
+		expect(result.healthy).toBe(false);
+		expect(result.issues.length).toBeGreaterThan(0);
+		expect(result.issues.some(i => i.includes('test') || i.includes('Test'))).toBe(true);
+		expect(result.fixTask).toContain('Fix baseline');
+	});
+});
+
+describe('Bearings phase integration', () => {
+	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		const os = require('os');
+		const fs = require('fs');
+		const path = require('path');
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-'));
+	});
+
+	afterEach(() => {
+		const fs = require('fs');
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('healthy bearings proceed to task (BearingsChecked emitted)', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: true },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = () => ({ exitCode: 0, output: '' });
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+		const bearingsChecked = events.filter(e => e.kind === LoopEventKind.BearingsChecked);
+		expect(bearingsChecked.length).toBeGreaterThanOrEqual(1);
+		expect(bearingsChecked[0].healthy).toBe(true);
+		const taskStarted = events.filter(e => e.kind === LoopEventKind.TaskStarted);
+		expect(taskStarted.length).toBeGreaterThanOrEqual(1);
+	});
+
+	it('unhealthy bearings inserts fix task and yields BearingsFailed after fix attempt', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 5, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: true },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => {
+				events.push(e);
+				if (e.kind === LoopEventKind.BearingsFailed) {
+					orch.stop();
+				}
+			},
+		);
+		orch.bearingsExecFn = () => ({ exitCode: 1, output: 'errors found' });
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+
+		await orch.start();
+
+		const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+		expect(prdContent).toContain('Fix baseline');
+		const bearingsFailedEvents = events.filter(e => e.kind === LoopEventKind.BearingsFailed);
+		expect(bearingsFailedEvents.length).toBeGreaterThanOrEqual(1);
+	});
+
+	it('bearings disabled skips check', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [x] Done task\n', 'utf-8');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1,
+				bearings: { enabled: false, runTsc: true, runTests: true },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+		const bearingsChecked = events.filter(e => e.kind === LoopEventKind.BearingsChecked);
+		expect(bearingsChecked).toHaveLength(0);
+		const bearingsFailed = events.filter(e => e.kind === LoopEventKind.BearingsFailed);
+		expect(bearingsFailed).toHaveLength(0);
 	});
 });

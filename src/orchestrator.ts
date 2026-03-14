@@ -18,6 +18,7 @@ import {
 	DEFAULT_AUTO_DECOMPOSE,
 	DEFAULT_CONTEXT_TRIMMING,
 	DEFAULT_STRUGGLE_DETECTION,
+	DEFAULT_BEARINGS_CONFIG,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -34,6 +35,8 @@ import {
 	ReviewVerdict,
 	ReviewAfterExecuteConfig,
 	IConsistencyChecker,
+	BearingsConfig,
+	BearingsResult,
 } from './types';
 import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt, parseReviewVerdict } from './copilot';
@@ -45,6 +48,52 @@ import { atomicCommit } from './gitOps';
 import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
 import { KnowledgeManager } from './knowledge';
 import { StruggleDetector } from './struggleDetector';
+import { execSync } from 'child_process';
+
+export type BearingsExecFn = (cmd: string, cwd: string) => { exitCode: number; output: string };
+
+function defaultBearingsExec(cmd: string, cwd: string): { exitCode: number; output: string } {
+	try {
+		const output = execSync(cmd, { cwd, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
+		return { exitCode: 0, output };
+	} catch (err: any) {
+		return { exitCode: err.status ?? 1, output: (err.stdout ?? '') + (err.stderr ?? '') };
+	}
+}
+
+export async function runBearings(
+	workspaceRoot: string,
+	logger: ILogger,
+	config: BearingsConfig = DEFAULT_BEARINGS_CONFIG,
+	execFn: BearingsExecFn = defaultBearingsExec,
+): Promise<BearingsResult> {
+	const issues: string[] = [];
+
+	if (config.runTsc) {
+		const tscResult = execFn('npx tsc --noEmit', workspaceRoot);
+		if (tscResult.exitCode !== 0) {
+			issues.push(`TypeScript errors: ${tscResult.output.slice(0, 500)}`);
+		}
+	}
+
+	if (config.runTests) {
+		const testResult = execFn('npx vitest run', workspaceRoot);
+		if (testResult.exitCode !== 0) {
+			issues.push(`Test failures: ${testResult.output.slice(0, 500)}`);
+		}
+	}
+
+	if (issues.length === 0) {
+		return { healthy: true, issues: [] };
+	}
+
+	const details = issues.join('; ');
+	return {
+		healthy: false,
+		issues,
+		fixTask: `Fix baseline: ${details}`,
+	};
+}
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
 
@@ -155,6 +204,7 @@ export class LoopOrchestrator {
 	private readonly errorHashTracker: ErrorHashTracker;
 	private readonly consistencyChecker?: IConsistencyChecker;
 	private pendingContext?: string;
+	bearingsExecFn?: BearingsExecFn;
 
 	constructor(
 		config: RalphConfig,
@@ -307,6 +357,11 @@ export class LoopOrchestrator {
 		const autoDecomposeConfig = this.config.autoDecompose ?? DEFAULT_AUTO_DECOMPOSE;
 		const autoDecomposer = autoDecomposeConfig.enabled ? new AutoDecomposer() : undefined;
 		const taskFailCounts = new Map<number, number>();
+
+		// Bearings phase state
+		const bearingsConfig = this.config.bearings ?? DEFAULT_BEARINGS_CONFIG;
+		let bearingsFixAttempted = false;
+		let skipBearingsOnce = false;
 
 		// Knowledge manager
 		const knowledgeConfig = this.config.knowledge ?? DEFAULT_KNOWLEDGE_CONFIG;
@@ -489,6 +544,29 @@ export class LoopOrchestrator {
 			// Skip tasks whose completion latch is already set
 			if (this.completedTasks.has(task.id)) {
 				continue;
+			}
+
+			// Bearings phase: pre-flight health check
+			if (bearingsConfig.enabled && !skipBearingsOnce) {
+				const bearingsResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn);
+				yield { kind: LoopEventKind.BearingsChecked, healthy: bearingsResult.healthy, issues: bearingsResult.issues };
+				if (!bearingsResult.healthy) {
+					if (bearingsFixAttempted) {
+						bearingsFixAttempted = false;
+						yield { kind: LoopEventKind.BearingsFailed, issues: bearingsResult.issues };
+						this.pauseRequested = true;
+						continue;
+					}
+					bearingsFixAttempted = true;
+					skipBearingsOnce = true;
+					const fixLine = '- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing\n';
+					const currentPrd = fs.readFileSync(prdPath, 'utf-8');
+					fs.writeFileSync(prdPath, fixLine + currentPrd, 'utf-8');
+					continue;
+				}
+				bearingsFixAttempted = false;
+			} else if (skipBearingsOnce) {
+				skipBearingsOnce = false;
 			}
 
 			iteration++;
