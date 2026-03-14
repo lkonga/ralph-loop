@@ -3,6 +3,7 @@ import { LoopEventKind, createOutputLogger, IRalphHookService } from './types';
 import { LoopOrchestrator, loadConfig } from './orchestrator';
 import { ShellHookProvider } from './shellHookProvider';
 import { registerHookBridge, HookBridgeDisposable } from './hookBridge';
+import { SessionPersistence } from './sessionPersistence';
 
 let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.OutputChannel;
@@ -255,6 +256,32 @@ export function activate(context: vscode.ExtensionContext): void {
 	);
 
 	logger.log('Ralph Loop extension activated');
+
+	// Check for incomplete session on activation
+	const folders = vscode.workspace.workspaceFolders;
+	if (folders?.length) {
+		const wsRoot = folders[0].uri.fsPath;
+		const persistence = new SessionPersistence();
+		if (persistence.hasIncompleteSession(wsRoot)) {
+			vscode.window.showInformationMessage(
+				'Ralph Loop has an incomplete session. Resume?',
+				'Resume', 'Discard',
+			).then(choice => {
+				if (choice === 'Resume') {
+					const state = persistence.load(wsRoot);
+					if (state) {
+						const config = loadConfig(wsRoot);
+						orchestrator = new LoopOrchestrator(config, logger, event => {
+							logger.log(`[resumed] ${event.kind}`);
+						});
+						orchestrator.start();
+					}
+				} else if (choice === 'Discard') {
+					persistence.clear(wsRoot);
+				}
+			});
+		}
+	}
 }
 
 export function deactivate(): void {

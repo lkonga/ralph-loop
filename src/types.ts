@@ -387,6 +387,7 @@ export interface RalphConfig {
 	bearings?: BearingsConfig;
 	confidenceThreshold?: number;
 	promptTemplate?: string;
+	sessionPersistence?: { enabled: boolean; expireAfterMs: number };
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -420,6 +421,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	contextTrimming: { ...DEFAULT_CONTEXT_TRIMMING },
 	struggleDetection: { ...DEFAULT_STRUGGLE_DETECTION },
 	bearings: { ...DEFAULT_BEARINGS_CONFIG },
+	sessionPersistence: { enabled: true, expireAfterMs: 86400000 },
 };
 
 // --- Verification ---

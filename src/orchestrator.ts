@@ -50,6 +50,7 @@ import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
 import { computeConfidenceScore } from './verify';
 import { KnowledgeManager } from './knowledge';
 import { StruggleDetector } from './struggleDetector';
+import { SessionPersistence } from './sessionPersistence';
 import { execSync } from 'child_process';
 
 export type BearingsExecFn = (cmd: string, cwd: string) => { exitCode: number; output: string };
@@ -240,6 +241,7 @@ export class LoopOrchestrator {
 	private readonly consistencyChecker?: IConsistencyChecker;
 	private pendingContext?: string;
 	private linkedSignal?: LinkedCancellationSource;
+	private readonly sessionPersistence?: SessionPersistence;
 	bearingsExecFn?: BearingsExecFn;
 
 	constructor(
@@ -258,6 +260,10 @@ export class LoopOrchestrator {
 		this.errorHashTracker = new ErrorHashTracker();
 		this.circuitBreakerChain = createDefaultChain(this.config.circuitBreakers, this.errorHashTracker);
 		this.consistencyChecker = consistencyChecker;
+		const spConfig = this.config.sessionPersistence ?? { enabled: true, expireAfterMs: 86400000 };
+		if (spConfig.enabled) {
+			this.sessionPersistence = new SessionPersistence(spConfig.expireAfterMs);
+		}
 	}
 
 	private resolveStrategy(): ITaskExecutionStrategy {
@@ -295,6 +301,7 @@ export class LoopOrchestrator {
 					event.kind === LoopEventKind.AllDone ||
 					event.kind === LoopEventKind.MaxIterations ||
 					event.kind === LoopEventKind.YieldRequested) {
+					this.sessionPersistence?.clear(this.config.workspaceRoot);
 					break;
 				}
 			}
@@ -1063,12 +1070,24 @@ export class LoopOrchestrator {
 			// Countdown between tasks
 			for (let s = this.config.countdownSeconds; s > 0; s--) {
 				if (this.stopRequested) {
+					this.sessionPersistence?.clear(this.config.workspaceRoot);
 					yield { kind: LoopEventKind.Stopped };
 					return;
 				}
 				yield { kind: LoopEventKind.Countdown, secondsLeft: s };
 				await this.delay(1000);
 			}
+
+			// Save session state after each iteration
+			this.sessionPersistence?.save(this.config.workspaceRoot, {
+				currentTaskIndex: task.id,
+				iterationCount: iteration,
+				nudgeCount: 0,
+				retryCount: 0,
+				circuitBreakerState: 'active',
+				timestamp: Date.now(),
+				version: 1,
+			});
 		}
 		} finally {
 			this.linkedSignal?.dispose();
