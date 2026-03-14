@@ -92,7 +92,7 @@ export function startMonitor(
 	logger: ILogger,
 ): { stop: () => void } {
 	if (!config.enabled) {
-		return { stop: () => {} };
+		return { stop: () => { } };
 	}
 
 	let staleIntervalCount = 0;
