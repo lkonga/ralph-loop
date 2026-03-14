@@ -51,6 +51,7 @@ export const enum LoopEventKind {
 	YieldRequested = 'yield_requested',
 	TasksParallelized = 'tasks_parallelized',
 	SessionChanged = 'session_changed',
+	CircuitBreakerTripped = 'circuit_breaker_tripped',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -70,6 +71,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.TasksParallelized; tasks: Task[] }
 	| { kind: LoopEventKind.YieldRequested }
 	| { kind: LoopEventKind.SessionChanged; oldSessionId: string; newSessionId: string }
+	| { kind: LoopEventKind.CircuitBreakerTripped; breakerName: string; reason: string; action: string; taskInvocationId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -116,6 +118,12 @@ export const DEFAULT_FEATURES: RalphFeatures = {
 };
 
 // --- Config ---
+export interface CircuitBreakerConfig {
+	name: string;
+	enabled: boolean;
+	[key: string]: unknown;
+}
+
 export interface RalphConfig {
 	prdPath: string;
 	progressPath: string;
@@ -137,6 +145,7 @@ export interface RalphConfig {
 	verifiers?: VerifierConfig[];
 	verificationTemplates?: VerificationTemplate[];
 	autoClassifyTasks?: boolean;
+	circuitBreakers?: CircuitBreakerConfig[];
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {

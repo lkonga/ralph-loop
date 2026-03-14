@@ -20,6 +20,7 @@ import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdP
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
+import { createDefaultChain, CircuitBreakerChain, type CircuitBreakerState } from './circuitBreaker';
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
 
@@ -44,6 +45,7 @@ export class LoopOrchestrator {
 	private readonly hooksEnabled: boolean;
 	private readonly executionStrategy: ITaskExecutionStrategy;
 	private currentSessionId: string | undefined;
+	private readonly circuitBreakerChain: CircuitBreakerChain;
 
 	constructor(
 		config: RalphConfig,
@@ -57,6 +59,7 @@ export class LoopOrchestrator {
 		this.hookService = hookService ?? new NoOpHookService();
 		this.hooksEnabled = hookService !== undefined;
 		this.executionStrategy = this.resolveStrategy();
+		this.circuitBreakerChain = createDefaultChain(this.config.circuitBreakers);
 	}
 
 	private resolveStrategy(): ITaskExecutionStrategy {
@@ -169,6 +172,7 @@ export class LoopOrchestrator {
 		let additionalContext = '';
 		let iterationLimitExpanded = false;
 		let effectiveMaxIterations = this.config.maxIterations;
+		const loopStartTime = Date.now();
 
 		// SessionStart hook
 		const sessionHook = await this.hookService.onSessionStart({ prdPath });
@@ -197,6 +201,25 @@ export class LoopOrchestrator {
 			}
 
 			// Check iteration limit — auto-expand once if tasks remain
+			// Circuit breaker check before next iteration
+			{
+				const cbState: CircuitBreakerState = {
+					nudgeCount: 0,
+					retryCount: 0,
+					elapsedMs: Date.now() - loopStartTime,
+					fileChanges: 0,
+					errorHistory: [],
+					consecutiveNudgesWithoutFileChanges: 0,
+				};
+				const cbResult = this.circuitBreakerChain.check(cbState);
+				if (cbResult.tripped) {
+					this.logger.log(`Circuit breaker tripped before next iteration: ${cbResult.reason}`);
+					yield { kind: LoopEventKind.CircuitBreakerTripped, breakerName: '', reason: cbResult.reason ?? 'unknown', action: cbResult.action, taskInvocationId: '' };
+					if (cbResult.action === 'stop') { yield { kind: LoopEventKind.Stopped }; return; }
+					if (cbResult.action === 'skip') { /* skip to next task */ }
+				}
+			}
+
 			if (effectiveMaxIterations > 0 && iteration >= effectiveMaxIterations) {
 				if (!iterationLimitExpanded) {
 					// Check if tasks remain before expanding
@@ -327,6 +350,8 @@ export class LoopOrchestrator {
 					additionalContext = '';
 				}
 				const taskState: TaskState = { taskInvocationId, nudgeCount: 0, retryCount: 0, taskCompletedLatch: false };
+				let consecutiveNudgesWithoutFileChanges = 0;
+				const errorHistory: boolean[] = [];
 				const execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
 				yield { kind: LoopEventKind.CopilotTriggered, method: execResult.method, taskInvocationId };
 				yield { kind: LoopEventKind.WaitingForCompletion, task, taskInvocationId };
@@ -334,10 +359,30 @@ export class LoopOrchestrator {
 
 				// Nudge loop: re-send prompt with continuation nudge if timed out
 				while (!waitResult.completed && !this.stopRequested && taskState.nudgeCount < this.config.maxNudgesPerTask) {
+					// Circuit breaker check before nudge
+					const cbState: CircuitBreakerState = {
+						nudgeCount: taskState.nudgeCount,
+						retryCount: taskState.retryCount,
+						elapsedMs: Date.now() - startTime,
+						fileChanges: waitResult.hadFileChanges ? 1 : 0,
+						errorHistory,
+						consecutiveNudgesWithoutFileChanges,
+					};
+					const cbResult = this.circuitBreakerChain.check(cbState);
+					if (cbResult.tripped) {
+						this.logger.log(`Circuit breaker tripped before nudge: ${cbResult.reason}`);
+						yield { kind: LoopEventKind.CircuitBreakerTripped, breakerName: '', reason: cbResult.reason ?? 'unknown', action: cbResult.action, taskInvocationId };
+						if (cbResult.action === 'stop') { yield { kind: LoopEventKind.Stopped }; return; }
+						if (cbResult.action === 'skip') { break; }
+					}
+
 					// Reset nudgeCount if productive file changes occurred during wait
 					if (waitResult.hadFileChanges) {
 						this.logger.log('Productive file changes detected — resetting nudge count');
 						taskState.nudgeCount = 0;
+						consecutiveNudgesWithoutFileChanges = 0;
+					} else {
+						consecutiveNudgesWithoutFileChanges++;
 					}
 
 					taskState.nudgeCount++;
@@ -402,6 +447,23 @@ export class LoopOrchestrator {
 				let handled = false;
 
 				while (this.shouldRetry(currentError, retryCount)) {
+					// Circuit breaker check before retry
+					const cbState: CircuitBreakerState = {
+						nudgeCount: 0,
+						retryCount,
+						elapsedMs: Date.now() - startTime,
+						fileChanges: 0,
+						errorHistory: [true],
+						consecutiveNudgesWithoutFileChanges: 0,
+					};
+					const cbResult = this.circuitBreakerChain.check(cbState);
+					if (cbResult.tripped) {
+						this.logger.log(`Circuit breaker tripped before retry: ${cbResult.reason}`);
+						yield { kind: LoopEventKind.CircuitBreakerTripped, breakerName: '', reason: cbResult.reason ?? 'unknown', action: cbResult.action, taskInvocationId };
+						if (cbResult.action === 'stop') { yield { kind: LoopEventKind.Stopped }; return; }
+						if (cbResult.action === 'skip') { break; }
+					}
+
 					retryCount++;
 					yield { kind: LoopEventKind.TaskRetried, task, retryCount, taskInvocationId };
 					this.logger.log(`Retrying task (${retryCount}/${MAX_RETRIES_PER_TASK}): ${task.description}`);
