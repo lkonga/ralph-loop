@@ -57,6 +57,7 @@ export const enum LoopEventKind {
 	TaskReviewed = 'task_reviewed',
 	MonitorAlert = 'monitor_alert',
 	TaskCommitted = 'task_committed',
+	StagnationDetected = 'stagnation_detected',
 	ConsistencyCheckPassed = 'consistency_check_passed',
 	ConsistencyCheckFailed = 'consistency_check_failed',
 	Stopped = 'stopped',
@@ -84,6 +85,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.TaskReviewed; task: Task; verdict: ReviewVerdict; taskInvocationId: string }
 	| { kind: LoopEventKind.MonitorAlert; alert: string; taskId: string }
 	| { kind: LoopEventKind.TaskCommitted; task: Task; commitHash: string; taskInvocationId: string }
+	| { kind: LoopEventKind.StagnationDetected; task: Task; staleIterations: number; filesUnchanged: string[] }
 	| { kind: LoopEventKind.ConsistencyCheckPassed; phase: string; checks: ConsistencyCheckDetail[] }
 	| { kind: LoopEventKind.ConsistencyCheckFailed; phase: string; checks: ConsistencyCheckDetail[]; failureReason?: string }
 	| { kind: LoopEventKind.Stopped }
@@ -202,6 +204,19 @@ export const DEFAULT_PARALLEL_MONITOR: ParallelMonitorConfig = {
 	stuckThreshold: 3,
 };
 
+// --- Stagnation detection config ---
+export interface StagnationDetectionConfig {
+	enabled: boolean;
+	maxStaleIterations: number;
+	hashFiles: string[];
+}
+
+export const DEFAULT_STAGNATION_DETECTION: StagnationDetectionConfig = {
+	enabled: true,
+	maxStaleIterations: 2,
+	hashFiles: ['progress.txt', 'PRD.md'],
+};
+
 // --- PreCompact behavior ---
 export interface PreCompactBehavior {
 	enabled: boolean;
@@ -279,6 +294,7 @@ export interface RalphConfig {
 	maxConcurrencyPerStage: number;
 	parallelMonitor?: ParallelMonitorConfig;
 	preCompactBehavior?: PreCompactBehavior;
+	stagnationDetection?: StagnationDetectionConfig;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -306,6 +322,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	maxConcurrencyPerStage: 1,
 	parallelMonitor: { ...DEFAULT_PARALLEL_MONITOR },
 	preCompactBehavior: { ...DEFAULT_PRE_COMPACT_BEHAVIOR },
+	stagnationDetection: { ...DEFAULT_STAGNATION_DETECTION },
 };
 
 // --- Verification ---

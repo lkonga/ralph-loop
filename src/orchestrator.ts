@@ -13,6 +13,7 @@ import {
 	DEFAULT_REVIEW_AFTER_EXECUTE,
 	DEFAULT_PARALLEL_MONITOR,
 	DEFAULT_PRE_COMPACT_BEHAVIOR,
+	DEFAULT_STAGNATION_DETECTION,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -37,6 +38,7 @@ import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
 import { createDefaultChain, CircuitBreakerChain, type CircuitBreakerState } from './circuitBreaker';
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
+import { StagnationDetector } from './stagnationDetector';
 
 const NO_OP_HOOK_RESULT: HookResult = { action: 'continue' };
 
@@ -284,6 +286,12 @@ export class LoopOrchestrator {
 		let effectiveMaxIterations = this.config.maxIterations;
 		const loopStartTime = Date.now();
 
+		// Stagnation detection
+		const stagnationConfig = this.config.stagnationDetection ?? DEFAULT_STAGNATION_DETECTION;
+		const stagnationDetector = stagnationConfig.enabled
+			? new StagnationDetector(stagnationConfig.hashFiles, stagnationConfig.maxStaleIterations)
+			: undefined;
+
 		// SessionStart hook
 		const sessionHook = await this.hookService.onSessionStart({ prdPath });
 		this.logger.log(`SessionStart hook: action=${sessionHook.action}`);
@@ -458,6 +466,9 @@ export class LoopOrchestrator {
 				appendProgress(progressPath, `[${taskInvocationId}] Task started: ${task.description}`);
 
 				// Read context for prompt
+				// Stagnation snapshot before prompt
+				stagnationDetector?.snapshot(this.config.workspaceRoot);
+
 				const prdContent = readPrdFile(prdPath);
 				let progressContent = '';
 				try {
@@ -546,6 +557,34 @@ export class LoopOrchestrator {
 				}
 
 				const duration = Date.now() - startTime;
+
+				// Stagnation evaluation after task attempt
+				if (stagnationDetector) {
+					const stagnation = stagnationDetector.evaluate();
+					if (stagnation.staleIterations > 0) {
+						yield { kind: LoopEventKind.StagnationDetected, task, staleIterations: stagnation.staleIterations, filesUnchanged: stagnation.filesUnchanged };
+					}
+					const stagnationThreshold = stagnationConfig.maxStaleIterations;
+					if (stagnation.staleIterations >= stagnationThreshold + 2) {
+						// Tier 3: yield HumanCheckpointRequested and break
+						yield { kind: LoopEventKind.HumanCheckpointRequested, task, reason: 'Stagnation detected — no progress after multiple attempts', failCount: stagnation.staleIterations, taskInvocationId };
+						this.pauseRequested = true;
+						while (this.pauseRequested) {
+							this.state = LoopState.Paused;
+							await this.delay(1000);
+							if (this.stopRequested) {
+								yield { kind: LoopEventKind.Stopped };
+								return;
+							}
+						}
+					} else if (stagnation.staleIterations >= stagnationThreshold + 1) {
+						// Tier 2: trigger circuit breaker
+						yield { kind: LoopEventKind.CircuitBreakerTripped, breakerName: 'stagnation', reason: 'Stagnation detected — progress files unchanged', action: 'skip', taskInvocationId };
+					} else if (stagnation.stagnating) {
+						// Tier 1: inject enhanced stagnation nudge
+						additionalContext = 'You appear to be stuck. Progress file has not changed. Try a different approach.';
+					}
+				}
 
 				if (waitResult.completed) {
 					taskState.taskCompletedLatch = true;
@@ -833,5 +872,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		maxConcurrencyPerStage: vsConfig.get<number>('maxConcurrencyPerStage', DEFAULT_CONFIG.maxConcurrencyPerStage),
 		parallelMonitor: vsConfig.get('parallelMonitor', DEFAULT_CONFIG.parallelMonitor),
 		preCompactBehavior: vsConfig.get('preCompactBehavior', DEFAULT_CONFIG.preCompactBehavior),
+		stagnationDetection: vsConfig.get('stagnationDetection', DEFAULT_CONFIG.stagnationDetection),
 	};
 }
