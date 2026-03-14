@@ -47,7 +47,7 @@ import { createDefaultChain, CircuitBreakerChain, ErrorHashTracker, type Circuit
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
 import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
-import { computeConfidenceScore } from './verify';
+import { computeConfidenceScore, dualExitGateCheck } from './verify';
 import { KnowledgeManager } from './knowledge';
 import { StruggleDetector } from './struggleDetector';
 import { SessionPersistence } from './sessionPersistence';
@@ -771,7 +771,18 @@ export class LoopOrchestrator {
 					}
 				}
 
-				if (waitResult.completed) {
+				// Dual exit gate: require BOTH model signal AND machine verification
+				const dualGateChecks: VerifyCheck[] = [];
+				{
+					const snapshot = readPrdSnapshot(prdPath);
+					const foundTask = snapshot.tasks.find(t => t.description === task.description);
+					dualGateChecks.push({ name: 'checkbox', result: foundTask?.status === TaskStatus.Complete ? VerifyResult.Pass : VerifyResult.Fail });
+				}
+				dualGateChecks.push({ name: 'diff', result: waitResult.hadFileChanges ? VerifyResult.Pass : VerifyResult.Fail, detail: waitResult.hadFileChanges ? 'Files changed' : 'No file changes detected' });
+
+				const gateResult = dualExitGateCheck(waitResult.completed, dualGateChecks);
+
+				if (gateResult.canComplete) {
 					taskState.taskCompletedLatch = true;
 					this.completedTasks.add(task.id);
 					appendProgress(progressPath, `[${taskInvocationId}] [${task.taskId}] Task completed: ${task.description} (${Math.round(duration / 1000)}s)`);
@@ -960,6 +971,12 @@ export class LoopOrchestrator {
 						yield { kind: LoopEventKind.YieldRequested };
 						return;
 					}
+				} else if (waitResult.completed && !gateResult.canComplete) {
+					// Model signaled complete but dual gate rejected — nudge to fix
+					this.logger.warn(`Dual exit gate rejected: ${gateResult.reason}`);
+					additionalContext = gateResult.reason ?? 'Dual exit gate check failed';
+					this.completedTasks.delete(task.id);
+					continue;
 				} else {
 					appendProgress(progressPath, `[${taskInvocationId}] [${task.taskId}] Task timed out: ${task.description} (${Math.round(duration / 1000)}s)`);
 					yield { kind: LoopEventKind.TaskTimedOut, task: { ...task, status: TaskStatus.TimedOut }, durationMs: duration, taskInvocationId };

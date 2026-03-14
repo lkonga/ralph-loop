@@ -184,3 +184,32 @@ export function computeConfidenceScore(
 	const score = Object.values(breakdown).reduce((sum, v) => sum + v, 0);
 	return { score, breakdown };
 }
+
+export function dualExitGateCheck(
+	modelSignal: boolean,
+	machineVerification: VerifyCheck[],
+): { canComplete: boolean; reason?: string } {
+	const machinePassed = allChecksPassed(machineVerification);
+
+	if (modelSignal && machinePassed) {
+		return { canComplete: true };
+	}
+
+	if (modelSignal && !machinePassed) {
+		const failing = machineVerification
+			.filter(c => c.result === VerifyResult.Fail)
+			.map(c => c.detail ? `${c.name}: ${c.detail}` : c.name)
+			.join(', ');
+		return { canComplete: false, reason: `Model claims complete but verification failed: ${failing}` };
+	}
+
+	if (!modelSignal && machinePassed) {
+		return { canComplete: false, reason: 'Verification passes but task not marked complete in PRD' };
+	}
+
+	const failing = machineVerification
+		.filter(c => c.result === VerifyResult.Fail)
+		.map(c => c.detail ? `${c.name}: ${c.detail}` : c.name)
+		.join(', ');
+	return { canComplete: false, reason: `Task not marked complete and verification failed: ${failing}` };
+}

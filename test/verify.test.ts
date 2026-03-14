@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { parsePrd } from '../src/prd';
-import { verifyTaskCompletion, allChecksPassed, isAllDone, progressSummary, VerifierRegistry, createBuiltinRegistry, runVerifierChain, resolveVerifiers, computeConfidenceScore } from '../src/verify';
+import { verifyTaskCompletion, allChecksPassed, isAllDone, progressSummary, VerifierRegistry, createBuiltinRegistry, runVerifierChain, resolveVerifiers, computeConfidenceScore, dualExitGateCheck } from '../src/verify';
 import { Task, TaskStatus, VerifyResult, VerifierConfig, RalphConfig, DEFAULT_CONFIG, DiffValidationResult } from '../src/types';
 
 function tmpPrd(content: string): string {
@@ -430,5 +430,51 @@ describe('computeConfidenceScore', () => {
 		const result = computeConfidenceScore(checks);
 		expect(result.score).toBe(160); // 180 - 20 (no diff)
 		expect(result.breakdown['diff']).toBe(0);
+	});
+});
+
+describe('dualExitGateCheck', () => {
+	it('returns canComplete true when both model signals and machine checks pass', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Pass },
+			{ name: 'vitest', result: VerifyResult.Pass },
+			{ name: 'diff', result: VerifyResult.Pass },
+		];
+		const result = dualExitGateCheck(true, checks);
+		expect(result.canComplete).toBe(true);
+		expect(result.reason).toBeUndefined();
+	});
+
+	it('returns canComplete false when model signals but machine checks fail', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Pass },
+			{ name: 'vitest', result: VerifyResult.Fail, detail: 'Tests failed' },
+			{ name: 'diff', result: VerifyResult.Pass },
+		];
+		const result = dualExitGateCheck(true, checks);
+		expect(result.canComplete).toBe(false);
+		expect(result.reason).toContain('Model claims complete but verification failed');
+		expect(result.reason).toContain('vitest');
+	});
+
+	it('returns canComplete false when machine checks pass but model has not signaled', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Pass },
+			{ name: 'vitest', result: VerifyResult.Pass },
+			{ name: 'diff', result: VerifyResult.Pass },
+		];
+		const result = dualExitGateCheck(false, checks);
+		expect(result.canComplete).toBe(false);
+		expect(result.reason).toBe('Verification passes but task not marked complete in PRD');
+	});
+
+	it('returns canComplete false when neither model signals nor machine checks pass', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Fail, detail: 'TypeScript errors' },
+			{ name: 'vitest', result: VerifyResult.Fail, detail: 'Tests failed' },
+		];
+		const result = dualExitGateCheck(false, checks);
+		expect(result.canComplete).toBe(false);
+		expect(result.reason).toBeDefined();
 	});
 });
