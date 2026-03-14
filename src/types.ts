@@ -245,6 +245,17 @@ export const DEFAULT_AUTO_DECOMPOSE: AutoDecomposeConfig = {
 	failThreshold: 3,
 };
 
+// --- Context trimming config ---
+export interface ContextTrimmingConfig {
+	fullUntil: number;
+	abbreviatedUntil: number;
+}
+
+export const DEFAULT_CONTEXT_TRIMMING: ContextTrimmingConfig = {
+	fullUntil: 3,
+	abbreviatedUntil: 8,
+};
+
 // --- Knowledge config ---
 export interface KnowledgeConfig {
 	enabled: boolean;
@@ -323,6 +334,7 @@ export interface RalphConfig {
 	stagnationDetection?: StagnationDetectionConfig;
 	autoDecompose?: AutoDecomposeConfig;
 	knowledge?: KnowledgeConfig;
+	contextTrimming?: ContextTrimmingConfig;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -353,6 +365,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	stagnationDetection: { ...DEFAULT_STAGNATION_DETECTION },
 	autoDecompose: { ...DEFAULT_AUTO_DECOMPOSE },
 	knowledge: { ...DEFAULT_KNOWLEDGE_CONFIG },
+	contextTrimming: { ...DEFAULT_CONTEXT_TRIMMING },
 };
 
 // --- Verification ---

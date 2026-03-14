@@ -12,12 +12,18 @@ export function sanitizeTaskDescription(text: string): string {
 	return result;
 }
 
-function filterPrdContent(prdContent: string): string {
+import { DEFAULT_CONTEXT_TRIMMING, type ContextTrimmingConfig } from './types';
+
+function filterPrdContent(prdContent: string, currentTask?: string): string {
 	const lines = prdContent.split('\n');
 	const checkedCount = lines.filter(l => l.match(/- \[x\]/i)).length;
 	const uncheckedLines = lines.filter(l => l.match(/- \[ \]/));
 	const totalTasks = checkedCount + uncheckedLines.length;
 	const header = `Progress: ${checkedCount}/${totalTasks} tasks completed`;
+	if (currentTask) {
+		const currentLine = uncheckedLines.find(l => l.includes(currentTask));
+		return [header, '', ...(currentLine ? [currentLine] : [])].join('\n');
+	}
 	return [header, '', ...uncheckedLines].join('\n');
 }
 
@@ -107,8 +113,30 @@ export function buildFinalNudgePrompt(task: string, nudgeCount: number, maxNudge
 	return `Your remaining time is almost up. Produce your final result NOW: commit any partial work, update progress.txt, and mark the checkbox. If tests fail, document the failure and mark done anyway.`;
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[]): string {
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig): string {
 	const sanitized = sanitizeTaskDescription(taskDescription.trim());
+	const ct = contextTrimming ?? DEFAULT_CONTEXT_TRIMMING;
+
+	let effectiveMaxProgressLines = maxProgressLines;
+	let effectiveLearnings = learnings;
+	let prdCurrentTaskOnly: string | undefined;
+	const trimmingNotes: string[] = [];
+
+	if (iterationNumber > ct.abbreviatedUntil) {
+		// Minimal tier
+		effectiveMaxProgressLines = 5;
+		effectiveLearnings = undefined;
+		prdCurrentTaskOnly = taskDescription.trim();
+		trimmingNotes.push('[minimal context mode — focus on current task only]');
+	} else if (iterationNumber > ct.fullUntil) {
+		// Abbreviated tier
+		effectiveMaxProgressLines = 10;
+		if (effectiveLearnings && effectiveLearnings.length > 8) {
+			effectiveLearnings = effectiveLearnings.slice(0, 8);
+		}
+		trimmingNotes.push('[context trimmed for iteration efficiency]');
+	}
+	// else: Full tier — no changes
 
 	const parts: string[] = [
 		'===================================================================',
@@ -138,7 +166,8 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		...renderPromptBlocks(promptBlocks),
 		...renderModelHints(capabilities?.modelHint),
 		...renderCapabilities(capabilities),
-		...renderLearnings(learnings),
+		...renderLearnings(effectiveLearnings),
+		...(trimmingNotes.length > 0 ? [...trimmingNotes, ''] : []),
 		'===================================================================',
 		'    MANDATORY: UPDATE PRD.md AND progress.txt WHEN DONE',
 		'===================================================================',
@@ -161,7 +190,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		'',
 		'## PRD.md:',
 		'```markdown',
-		filterPrdContent(prdContent),
+		filterPrdContent(prdContent, prdCurrentTaskOnly),
 		'```',
 		'',
 	];
@@ -169,9 +198,9 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 	if (progressContent.trim()) {
 		const lines = progressContent.split('\n');
 		let displayContent: string;
-		if (lines.length > maxProgressLines) {
-			const omitted = lines.length - maxProgressLines;
-			const kept = lines.slice(-maxProgressLines);
+		if (lines.length > effectiveMaxProgressLines) {
+			const omitted = lines.length - effectiveMaxProgressLines;
+			const kept = lines.slice(-effectiveMaxProgressLines);
 			displayContent = `[...${omitted} earlier entries omitted]\n${kept.join('\n')}`;
 		} else {
 			displayContent = progressContent;

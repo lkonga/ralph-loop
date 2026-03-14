@@ -224,3 +224,88 @@ describe('buildPrompt sanitization integration', () => {
 		expect(prompt).not.toContain('```\n fences');
 	});
 });
+
+describe('progressive context trimming', () => {
+	const manyProgressLines = Array.from({ length: 30 }, (_, i) => `[line ${i + 1}] did something`).join('\n');
+	const prd = '- [x] Done A\n- [x] Done B\n- [ ] Task C\n- [ ] Task D\n- [ ] Task E';
+	const learnings = ['learning 1', 'learning 2', 'learning 3', 'learning 4', 'learning 5',
+		'learning 6', 'learning 7', 'learning 8', 'learning 9', 'learning 10'];
+
+	it('iteration 1 produces full context (all unchecked tasks, full learnings, full progress)', () => {
+		const prompt = buildPrompt('Task C', prd, manyProgressLines, 20, undefined, undefined, learnings, 1);
+		// Full tier: all unchecked PRD tasks
+		expect(prompt).toContain('- [ ] Task C');
+		expect(prompt).toContain('- [ ] Task D');
+		expect(prompt).toContain('- [ ] Task E');
+		// Full tier: all 10 learnings present
+		for (const l of learnings) {
+			expect(prompt).toContain(l);
+		}
+		// Full tier: default maxProgressLines (20)
+		expect(prompt).toContain('[...10 earlier entries omitted]');
+		expect(prompt).toContain('[line 11] did something');
+		// No trimming notes
+		expect(prompt).not.toContain('[context trimmed for iteration efficiency]');
+		expect(prompt).not.toContain('[minimal context mode');
+	});
+
+	it('iteration 5 produces abbreviated context (10 progress lines, 8 learnings, trimming note)', () => {
+		const prompt = buildPrompt('Task C', prd, manyProgressLines, 20, undefined, undefined, learnings, 5);
+		// Abbreviated tier: still shows all unchecked PRD tasks
+		expect(prompt).toContain('- [ ] Task C');
+		expect(prompt).toContain('- [ ] Task D');
+		expect(prompt).toContain('- [ ] Task E');
+		// Abbreviated tier: only first 8 learnings
+		expect(prompt).toContain('learning 1');
+		expect(prompt).toContain('learning 8');
+		expect(prompt).not.toContain('learning 9');
+		expect(prompt).not.toContain('learning 10');
+		// Abbreviated tier: progress reduced to 10 lines
+		expect(prompt).toContain('[...20 earlier entries omitted]');
+		expect(prompt).toContain('[line 21] did something');
+		expect(prompt).not.toContain('[line 20] did something');
+		// Abbreviated trimming note
+		expect(prompt).toContain('[context trimmed for iteration efficiency]');
+		expect(prompt).not.toContain('[minimal context mode');
+	});
+
+	it('iteration 10 produces minimal context (only current task, no learnings, 5 progress lines)', () => {
+		const prompt = buildPrompt('Task C', prd, manyProgressLines, 20, undefined, undefined, learnings, 10);
+		// Minimal tier: only current task shown in PRD, not other unchecked
+		expect(prompt).toContain('- [ ] Task C');
+		expect(prompt).not.toContain('- [ ] Task D');
+		expect(prompt).not.toContain('- [ ] Task E');
+		// Minimal tier: no learnings
+		expect(prompt).not.toContain('PRIOR LEARNINGS');
+		for (const l of learnings) {
+			expect(prompt).not.toContain(l);
+		}
+		// Minimal tier: progress reduced to 5 lines
+		expect(prompt).toContain('[...25 earlier entries omitted]');
+		expect(prompt).toContain('[line 26] did something');
+		expect(prompt).not.toContain('[line 25] did something');
+		// Minimal trimming note
+		expect(prompt).toContain('[minimal context mode');
+	});
+
+	it('custom tier boundaries are respected', () => {
+		const trimming = { fullUntil: 2, abbreviatedUntil: 5 };
+		// Iteration 2 should be full (within fullUntil=2)
+		const promptFull = buildPrompt('Task C', prd, manyProgressLines, 20, undefined, undefined, learnings, 2, trimming);
+		expect(promptFull).not.toContain('[context trimmed');
+		expect(promptFull).not.toContain('[minimal context mode');
+		for (const l of learnings) {
+			expect(promptFull).toContain(l);
+		}
+
+		// Iteration 3 should be abbreviated (fullUntil=2, abbreviatedUntil=5)
+		const promptAbbr = buildPrompt('Task C', prd, manyProgressLines, 20, undefined, undefined, learnings, 3, trimming);
+		expect(promptAbbr).toContain('[context trimmed for iteration efficiency]');
+		expect(promptAbbr).not.toContain('[minimal context mode');
+
+		// Iteration 6 should be minimal (above abbreviatedUntil=5)
+		const promptMin = buildPrompt('Task C', prd, manyProgressLines, 20, undefined, undefined, learnings, 6, trimming);
+		expect(promptMin).toContain('[minimal context mode');
+		expect(promptMin).not.toContain('PRIOR LEARNINGS');
+	});
+});

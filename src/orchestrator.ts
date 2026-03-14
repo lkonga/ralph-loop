@@ -16,6 +16,7 @@ import {
 	DEFAULT_STAGNATION_DETECTION,
 	DEFAULT_KNOWLEDGE_CONFIG,
 	DEFAULT_AUTO_DECOMPOSE,
+	DEFAULT_CONTEXT_TRIMMING,
 	ILogger,
 	TaskStatus,
 	TaskState,
@@ -410,7 +411,7 @@ export class LoopOrchestrator {
 								const prdContent = readPrdFile(prdPath);
 								let progContent = '';
 								try { progContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
-								const prompt = buildPrompt(task.description, prdContent, progContent, 20, this.config.promptBlocks, this.promptCapabilities);
+								const prompt = buildPrompt(task.description, prdContent, progContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING);
 								const execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
 								const duration = Date.now() - start;
 
@@ -497,7 +498,8 @@ export class LoopOrchestrator {
 				const relevantLearnings = knowledgeManager
 					? knowledgeManager.getRelevantLearnings(this.config.workspaceRoot, task.description)
 					: [];
-				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, relevantLearnings);
+				const ctConfig = this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING;
+				let prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, relevantLearnings, iteration, ctConfig);
 				if (additionalContext) {
 					prompt += '\n\n' + additionalContext;
 					additionalContext = '';
@@ -563,7 +565,7 @@ export class LoopOrchestrator {
 					const finalNudge = buildFinalNudgePrompt(task.description, taskState.nudgeCount, this.config.maxNudgesPerTask);
 					const continuationSuffix = finalNudge
 						?? 'Continue with the current task. You have NOT marked the checkbox yet. Do NOT repeat previous work — pick up where you left off. If you encountered errors, resolve them. If you were planning, start implementing.';
-					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities)
+					const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING)
 						+ '\n\n' + continuationSuffix;
 
 					const nudgeResult = await this.executionStrategy.execute(task, nudgePrompt, this.executionOptions);
@@ -685,7 +687,7 @@ export class LoopOrchestrator {
 							const prdContentRetry = readPrdFile(prdPath);
 							let progressContentRetry = '';
 							try { progressContentRetry = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
-							let retryPrompt = buildPrompt(task.description, prdContentRetry, progressContentRetry, 20, this.config.promptBlocks, this.promptCapabilities);
+							let retryPrompt = buildPrompt(task.description, prdContentRetry, progressContentRetry, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING);
 							retryPrompt += '\n\n' + nudge;
 							const retryExec = await this.executionStrategy.execute(task, retryPrompt, this.executionOptions);
 							waitResult = { completed: retryExec.completed, hadFileChanges: retryExec.hadFileChanges };
@@ -828,7 +830,7 @@ export class LoopOrchestrator {
 						let progressContent = '';
 						try { progressContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 
-						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities);
+						const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING);
 						const retryExecResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
 						yield { kind: LoopEventKind.CopilotTriggered, method: retryExecResult.method, taskInvocationId };
 
@@ -923,5 +925,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		stagnationDetection: vsConfig.get('stagnationDetection', DEFAULT_CONFIG.stagnationDetection),
 		autoDecompose: vsConfig.get('autoDecompose', DEFAULT_CONFIG.autoDecompose),
 		knowledge: vsConfig.get('knowledge', DEFAULT_CONFIG.knowledge),
+		contextTrimming: vsConfig.get('contextTrimming', DEFAULT_CONFIG.contextTrimming),
 	};
 }
