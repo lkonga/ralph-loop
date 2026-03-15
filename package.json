@@ -32,6 +32,10 @@
 			{
 				"command": "ralph-loop.status",
 				"title": "Ralph Loop: Show Status"
+			},
+			{
+				"command": "ralph-loop.chatSend",
+				"title": "Ralph Loop: Send to Chat"
 			}
 		],
 		"configuration": {

@@ -2,7 +2,9 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { ILogger, RalphConfig, DEFAULT_PRE_COMPLETE_HOOKS, PreCompactBehavior, DEFAULT_PRE_COMPACT_BEHAVIOR } from './types';
+import { ILogger, RalphConfig, DEFAULT_PRE_COMPLETE_HOOKS, PreCompactBehavior, DEFAULT_PRE_COMPACT_BEHAVIOR, ChatSendRequest } from './types';
+
+export const CHAT_SEND_SIGNAL_PATH = path.join(os.tmpdir(), 'ralph-loop-chat-send.signal');
 
 export { DEFAULT_PRE_COMPLETE_HOOKS };
 
@@ -320,14 +322,44 @@ export function registerHookBridge(
         logger.warn('Could not watch tool activity marker file');
     }
 
+    // Watch for chatSend signal files from hooks
+    let chatSendWatcher: fs.FSWatcher | undefined;
+    try {
+        if (!fs.existsSync(CHAT_SEND_SIGNAL_PATH)) {
+            fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
+        }
+        chatSendWatcher = fs.watch(CHAT_SEND_SIGNAL_PATH, () => {
+            try {
+                const content = fs.readFileSync(CHAT_SEND_SIGNAL_PATH, 'utf-8').trim();
+                if (!content) {
+                    return;
+                }
+                const request = JSON.parse(content) as ChatSendRequest;
+                // Clear the signal immediately to avoid re-processing
+                fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
+                if (request.query) {
+                    logger.log(`chatSend signal received: ${request.query.slice(0, 80)}`);
+                    vscode.commands.executeCommand('ralph-loop.chatSend', request);
+                }
+            } catch {
+                logger.warn('chatSend signal: could not parse signal file');
+            }
+        });
+        logger.log(`chatSend signal watcher active: ${CHAT_SEND_SIGNAL_PATH}`);
+    } catch {
+        logger.warn('Could not watch chatSend signal file');
+    }
+
     return {
         dispose() {
             markerWatcher?.close();
+            chatSendWatcher?.close();
 
             // Clean up hook scripts
             try { fs.unlinkSync(stopScriptPath); } catch { /* best effort */ }
             try { fs.unlinkSync(postToolUseScriptPath); } catch { /* best effort */ }
             try { fs.unlinkSync(preCompactScriptPath); } catch { /* best effort */ }
+            try { fs.unlinkSync(CHAT_SEND_SIGNAL_PATH); } catch { /* best effort */ }
             try { fs.rmdirSync(tmpDir); } catch { /* best effort */ }
 
             // Remove our hooks from configuration

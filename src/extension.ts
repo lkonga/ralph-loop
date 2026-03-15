@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { LoopEventKind, createOutputLogger, IRalphHookService } from './types';
+import { LoopEventKind, createOutputLogger, IRalphHookService, ChatSendRequest } from './types';
 import { LoopOrchestrator, loadConfig } from './orchestrator';
 import { ShellHookProvider } from './shellHookProvider';
 import { registerHookBridge, HookBridgeDisposable } from './hookBridge';
@@ -235,6 +235,29 @@ export function activate(context: vscode.ExtensionContext): void {
 			}
 			orchestrator.requestYield();
 			vscode.window.showInformationMessage('Ralph Loop: Yield requested — will stop after current task completes');
+		}),
+
+		vscode.commands.registerCommand('ralph-loop.chatSend', async (request?: ChatSendRequest) => {
+			if (!request?.query) {
+				logger.warn('ralph-loop.chatSend: missing query');
+				return;
+			}
+
+			const args: Record<string, unknown> = { query: request.query };
+			if (request.mode) {
+				args.mode = request.mode;
+			}
+			if (request.isPartialQuery) {
+				args.isPartialQuery = true;
+			}
+
+			try {
+				await vscode.commands.executeCommand('workbench.action.chat.open', args);
+				logger.log(`chatSend: opened chat with query (mode=${request.mode ?? 'default'}, partial=${!!request.isPartialQuery})`);
+			} catch (err) {
+				const msg = err instanceof Error ? err.message : String(err);
+				logger.error(`chatSend failed: ${msg}`);
+			}
 		}),
 
 		vscode.commands.registerCommand('ralph-loop.injectContext', async () => {

@@ -474,10 +474,19 @@ export interface TaskCompleteInput {
 	taskInvocationId?: string;
 }
 
+// --- Chat send request (extension command: ralph-loop.chatSend) ---
+export interface ChatSendRequest {
+	query: string;
+	mode?: 'agent' | 'ask' | 'edit';
+	isPartialQuery?: boolean;
+	sessionId?: string;
+}
+
 export interface HookResult {
 	action: 'continue' | 'retry' | 'skip' | 'stop';
 	reason?: string;
 	additionalContext?: string;
+	chatSend?: ChatSendRequest;
 	blocked?: boolean;
 }
 
