@@ -27,8 +27,8 @@ export function startChatSendWatcher(logger: ILogger): HookBridgeDisposable {
         }
         const request = JSON.parse(content) as ChatSendRequest;
         fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
-        if (request.query) {
-          logger.log(`chatSend signal received: ${request.query.slice(0, 80)}`);
+        if (request.mode || request.query) {
+          logger.log(`chatSend signal: mode=${request.mode ?? '-'} query=${request.query?.slice(0, 80) ?? '-'}`);
           vscode.commands.executeCommand('ralph-loop.chatSend', request);
         }
       } catch {
