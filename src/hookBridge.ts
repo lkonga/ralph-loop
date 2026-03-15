@@ -14,38 +14,38 @@ export { DEFAULT_PRE_COMPLETE_HOOKS };
  * Designed to be started from activate() so it works independently of the loop.
  */
 export function startChatSendWatcher(logger: ILogger): HookBridgeDisposable {
-    let watcher: fs.FSWatcher | undefined;
-    try {
-        if (!fs.existsSync(CHAT_SEND_SIGNAL_PATH)) {
-            fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
-        }
-        watcher = fs.watch(CHAT_SEND_SIGNAL_PATH, () => {
-            try {
-                const content = fs.readFileSync(CHAT_SEND_SIGNAL_PATH, 'utf-8').trim();
-                if (!content) {
-                    return;
-                }
-                const request = JSON.parse(content) as ChatSendRequest;
-                fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
-                if (request.query) {
-                    logger.log(`chatSend signal received: ${request.query.slice(0, 80)}`);
-                    vscode.commands.executeCommand('ralph-loop.chatSend', request);
-                }
-            } catch {
-                logger.warn('chatSend signal: could not parse signal file');
-            }
-        });
-        logger.log(`chatSend signal watcher active: ${CHAT_SEND_SIGNAL_PATH}`);
-    } catch {
-        logger.warn('Could not watch chatSend signal file');
+  let watcher: fs.FSWatcher | undefined;
+  try {
+    if (!fs.existsSync(CHAT_SEND_SIGNAL_PATH)) {
+      fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
     }
+    watcher = fs.watch(CHAT_SEND_SIGNAL_PATH, () => {
+      try {
+        const content = fs.readFileSync(CHAT_SEND_SIGNAL_PATH, 'utf-8').trim();
+        if (!content) {
+          return;
+        }
+        const request = JSON.parse(content) as ChatSendRequest;
+        fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
+        if (request.query) {
+          logger.log(`chatSend signal received: ${request.query.slice(0, 80)}`);
+          vscode.commands.executeCommand('ralph-loop.chatSend', request);
+        }
+      } catch {
+        logger.warn('chatSend signal: could not parse signal file');
+      }
+    });
+    logger.log(`chatSend signal watcher active: ${CHAT_SEND_SIGNAL_PATH}`);
+  } catch {
+    logger.warn('Could not watch chatSend signal file');
+  }
 
-    return {
-        dispose() {
-            watcher?.close();
-            try { fs.unlinkSync(CHAT_SEND_SIGNAL_PATH); } catch { /* best effort */ }
-        },
-    };
+  return {
+    dispose() {
+      watcher?.close();
+      try { fs.unlinkSync(CHAT_SEND_SIGNAL_PATH); } catch { /* best effort */ }
+    },
+  };
 }
 
 // Generates the Node.js hook script content that Copilot will invoke on stdin
