@@ -8,12 +8,52 @@ export const CHAT_SEND_SIGNAL_PATH = path.join(os.tmpdir(), 'ralph-loop-chat-sen
 
 export { DEFAULT_PRE_COMPLETE_HOOKS };
 
+/**
+ * Watches the chatSend signal file. Any process (hooks, scripts, etc.) can write
+ * a JSON ChatSendRequest to this path and the extension will forward it to the chat panel.
+ * Designed to be started from activate() so it works independently of the loop.
+ */
+export function startChatSendWatcher(logger: ILogger): HookBridgeDisposable {
+    let watcher: fs.FSWatcher | undefined;
+    try {
+        if (!fs.existsSync(CHAT_SEND_SIGNAL_PATH)) {
+            fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
+        }
+        watcher = fs.watch(CHAT_SEND_SIGNAL_PATH, () => {
+            try {
+                const content = fs.readFileSync(CHAT_SEND_SIGNAL_PATH, 'utf-8').trim();
+                if (!content) {
+                    return;
+                }
+                const request = JSON.parse(content) as ChatSendRequest;
+                fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
+                if (request.query) {
+                    logger.log(`chatSend signal received: ${request.query.slice(0, 80)}`);
+                    vscode.commands.executeCommand('ralph-loop.chatSend', request);
+                }
+            } catch {
+                logger.warn('chatSend signal: could not parse signal file');
+            }
+        });
+        logger.log(`chatSend signal watcher active: ${CHAT_SEND_SIGNAL_PATH}`);
+    } catch {
+        logger.warn('Could not watch chatSend signal file');
+    }
+
+    return {
+        dispose() {
+            watcher?.close();
+            try { fs.unlinkSync(CHAT_SEND_SIGNAL_PATH); } catch { /* best effort */ }
+        },
+    };
+}
+
 // Generates the Node.js hook script content that Copilot will invoke on stdin
 export function generateStopHookScript(prdPath: string, progressPath: string): string {
-    // The script reads a JSON hook invocation from stdin,
-    // checks whether the current task's PRD checkbox is marked,
-    // and runs a full verification gate (TDD is mandatory).
-    return `#!/usr/bin/env node
+  // The script reads a JSON hook invocation from stdin,
+  // checks whether the current task's PRD checkbox is marked,
+  // and runs a full verification gate (TDD is mandatory).
+  return `#!/usr/bin/env node
 'use strict';
 
 const fs = require('fs');
@@ -107,13 +147,13 @@ main().catch(() => {
 }
 
 export function generatePreCompactHookScript(prdPath: string, progressPath: string, config: PreCompactBehavior): string {
-    const maxLines = config.summaryMaxLines;
-    const injectGitDiff = config.injectGitDiff;
-    const injectProgressSummary = config.injectProgressSummary;
+  const maxLines = config.summaryMaxLines;
+  const injectGitDiff = config.injectGitDiff;
+  const injectProgressSummary = config.injectProgressSummary;
 
-    let gitDiffBlock = '';
-    if (injectGitDiff) {
-        gitDiffBlock = `
+  let gitDiffBlock = '';
+  if (injectGitDiff) {
+    gitDiffBlock = `
   // Get recent file changes
   let diffSummary = '';
   try {
@@ -123,11 +163,11 @@ export function generatePreCompactHookScript(prdPath: string, progressPath: stri
   } catch {
     diffSummary = 'Could not run git diff';
   }`;
-    }
+  }
 
-    let progressBlock = '';
-    if (injectProgressSummary) {
-        progressBlock = `
+  let progressBlock = '';
+  if (injectProgressSummary) {
+    progressBlock = `
   // Read last N lines of progress.txt
   let progressSummary = '';
   try {
@@ -138,9 +178,9 @@ export function generatePreCompactHookScript(prdPath: string, progressPath: stri
   } catch {
     progressSummary = 'No progress file found';
   }`;
-    }
+  }
 
-    return `#!/usr/bin/env node
+  return `#!/usr/bin/env node
 'use strict';
 
 const fs = require('fs');
@@ -210,10 +250,10 @@ main().catch(() => {
 }
 
 function generatePostToolUseHookScript(): string {
-    // PostToolUse hook: writes a timestamp marker file so the extension can
-    // detect tool activity and reset its inactivity timer.
-    const markerPath = path.join(os.tmpdir(), 'ralph-loop-tool-activity.marker');
-    return `#!/usr/bin/env node
+  // PostToolUse hook: writes a timestamp marker file so the extension can
+  // detect tool activity and reset its inactivity timer.
+  const markerPath = path.join(os.tmpdir(), 'ralph-loop-tool-activity.marker');
+  return `#!/usr/bin/env node
 'use strict';
 
 const fs = require('fs');
@@ -243,7 +283,7 @@ main().catch(() => {
 }
 
 export interface HookBridgeDisposable {
-    dispose(): void;
+  dispose(): void;
 }
 
 /**
@@ -254,125 +294,95 @@ export interface HookBridgeDisposable {
  * Requires vscode.proposed.chatHooks API — gated behind useHookBridge config flag.
  */
 export function registerHookBridge(
-    config: RalphConfig,
-    logger: ILogger,
+  config: RalphConfig,
+  logger: ILogger,
 ): HookBridgeDisposable {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-hook-'));
-    const stopScriptPath = path.join(tmpDir, 'stop-hook.js');
-    const postToolUseScriptPath = path.join(tmpDir, 'post-tool-use-hook.js');
-    const preCompactScriptPath = path.join(tmpDir, 'pre-compact-hook.js');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-hook-'));
+  const stopScriptPath = path.join(tmpDir, 'stop-hook.js');
+  const postToolUseScriptPath = path.join(tmpDir, 'post-tool-use-hook.js');
+  const preCompactScriptPath = path.join(tmpDir, 'pre-compact-hook.js');
 
-    const prdPath = path.resolve(config.workspaceRoot, config.prdPath);
-    const progressPath = path.resolve(config.workspaceRoot, config.progressPath);
-    const preCompactConfig = config.preCompactBehavior ?? DEFAULT_PRE_COMPACT_BEHAVIOR;
+  const prdPath = path.resolve(config.workspaceRoot, config.prdPath);
+  const progressPath = path.resolve(config.workspaceRoot, config.progressPath);
+  const preCompactConfig = config.preCompactBehavior ?? DEFAULT_PRE_COMPACT_BEHAVIOR;
 
-    // Write the hook scripts to temp files
-    fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath, progressPath), { mode: 0o755 });
-    fs.writeFileSync(postToolUseScriptPath, generatePostToolUseHookScript(), { mode: 0o755 });
-    if (preCompactConfig.enabled) {
-        fs.writeFileSync(preCompactScriptPath, generatePreCompactHookScript(prdPath, progressPath, preCompactConfig), { mode: 0o755 });
-    }
-    logger.log(`Hook bridge scripts written to ${tmpDir}`);
+  // Write the hook scripts to temp files
+  fs.writeFileSync(stopScriptPath, generateStopHookScript(prdPath, progressPath), { mode: 0o755 });
+  fs.writeFileSync(postToolUseScriptPath, generatePostToolUseHookScript(), { mode: 0o755 });
+  if (preCompactConfig.enabled) {
+    fs.writeFileSync(preCompactScriptPath, generatePreCompactHookScript(prdPath, progressPath, preCompactConfig), { mode: 0o755 });
+  }
+  logger.log(`Hook bridge scripts written to ${tmpDir}`);
 
-    // Register hooks via VS Code's chat.hooks configuration
-    const chatHooksConfig = vscode.workspace.getConfiguration('chat');
-    const existingHooks = chatHooksConfig.get<Record<string, unknown>>('hooks', {});
+  // Register hooks via VS Code's chat.hooks configuration
+  const chatHooksConfig = vscode.workspace.getConfiguration('chat');
+  const existingHooks = chatHooksConfig.get<Record<string, unknown>>('hooks', {});
 
-    const stopHookCommand: Record<string, unknown> = {
-        command: process.execPath,
-        args: [stopScriptPath],
+  const stopHookCommand: Record<string, unknown> = {
+    command: process.execPath,
+    args: [stopScriptPath],
+  };
+
+  const postToolUseHookCommand: Record<string, unknown> = {
+    command: process.execPath,
+    args: [postToolUseScriptPath],
+  };
+
+  const updatedHooks: Record<string, unknown> = {
+    ...existingHooks,
+    Stop: stopHookCommand,
+    PostToolUse: postToolUseHookCommand,
+  };
+
+  if (preCompactConfig.enabled) {
+    updatedHooks['PreCompact'] = {
+      command: process.execPath,
+      args: [preCompactScriptPath],
     };
+  }
 
-    const postToolUseHookCommand: Record<string, unknown> = {
-        command: process.execPath,
-        args: [postToolUseScriptPath],
-    };
+  chatHooksConfig.update('hooks', updatedHooks, vscode.ConfigurationTarget.Workspace).then(
+    () => logger.log('Chat hooks registered: Stop, PostToolUse' + (preCompactConfig.enabled ? ', PreCompact' : '')),
+    (err: Error) => logger.error(`Failed to register chat hooks: ${err.message}`),
+  );
 
-    const updatedHooks: Record<string, unknown> = {
-        ...existingHooks,
-        Stop: stopHookCommand,
-        PostToolUse: postToolUseHookCommand,
-    };
+  // Watch the tool activity marker file to reset inactivity timer
+  const markerPath = path.join(os.tmpdir(), 'ralph-loop-tool-activity.marker');
+  let markerWatcher: fs.FSWatcher | undefined;
 
-    if (preCompactConfig.enabled) {
-        updatedHooks['PreCompact'] = {
-            command: process.execPath,
-            args: [preCompactScriptPath],
-        };
+  try {
+    // Ensure the marker file exists so we can watch it
+    if (!fs.existsSync(markerPath)) {
+      fs.writeFileSync(markerPath, '0', 'utf-8');
     }
+    markerWatcher = fs.watch(markerPath, () => {
+      logger.log('PostToolUse hook fired — tool activity detected');
+    });
+  } catch {
+    logger.warn('Could not watch tool activity marker file');
+  }
 
-    chatHooksConfig.update('hooks', updatedHooks, vscode.ConfigurationTarget.Workspace).then(
-        () => logger.log('Chat hooks registered: Stop, PostToolUse' + (preCompactConfig.enabled ? ', PreCompact' : '')),
-        (err: Error) => logger.error(`Failed to register chat hooks: ${err.message}`),
-    );
+  return {
+    dispose() {
+      markerWatcher?.close();
 
-    // Watch the tool activity marker file to reset inactivity timer
-    const markerPath = path.join(os.tmpdir(), 'ralph-loop-tool-activity.marker');
-    let markerWatcher: fs.FSWatcher | undefined;
+      // Clean up hook scripts
+      try { fs.unlinkSync(stopScriptPath); } catch { /* best effort */ }
+      try { fs.unlinkSync(postToolUseScriptPath); } catch { /* best effort */ }
+      try { fs.unlinkSync(preCompactScriptPath); } catch { /* best effort */ }
 
-    try {
-        // Ensure the marker file exists so we can watch it
-        if (!fs.existsSync(markerPath)) {
-            fs.writeFileSync(markerPath, '0', 'utf-8');
-        }
-        markerWatcher = fs.watch(markerPath, () => {
-            logger.log('PostToolUse hook fired — tool activity detected');
-        });
-    } catch {
-        logger.warn('Could not watch tool activity marker file');
-    }
 
-    // Watch for chatSend signal files from hooks
-    let chatSendWatcher: fs.FSWatcher | undefined;
-    try {
-        if (!fs.existsSync(CHAT_SEND_SIGNAL_PATH)) {
-            fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
-        }
-        chatSendWatcher = fs.watch(CHAT_SEND_SIGNAL_PATH, () => {
-            try {
-                const content = fs.readFileSync(CHAT_SEND_SIGNAL_PATH, 'utf-8').trim();
-                if (!content) {
-                    return;
-                }
-                const request = JSON.parse(content) as ChatSendRequest;
-                // Clear the signal immediately to avoid re-processing
-                fs.writeFileSync(CHAT_SEND_SIGNAL_PATH, '', 'utf-8');
-                if (request.query) {
-                    logger.log(`chatSend signal received: ${request.query.slice(0, 80)}`);
-                    vscode.commands.executeCommand('ralph-loop.chatSend', request);
-                }
-            } catch {
-                logger.warn('chatSend signal: could not parse signal file');
-            }
-        });
-        logger.log(`chatSend signal watcher active: ${CHAT_SEND_SIGNAL_PATH}`);
-    } catch {
-        logger.warn('Could not watch chatSend signal file');
-    }
-
-    return {
-        dispose() {
-            markerWatcher?.close();
-            chatSendWatcher?.close();
-
-            // Clean up hook scripts
-            try { fs.unlinkSync(stopScriptPath); } catch { /* best effort */ }
-            try { fs.unlinkSync(postToolUseScriptPath); } catch { /* best effort */ }
-            try { fs.unlinkSync(preCompactScriptPath); } catch { /* best effort */ }
-            try { fs.unlinkSync(CHAT_SEND_SIGNAL_PATH); } catch { /* best effort */ }
-            try { fs.rmdirSync(tmpDir); } catch { /* best effort */ }
-
-            // Remove our hooks from configuration
-            const config = vscode.workspace.getConfiguration('chat');
-            const hooks = config.get<Record<string, unknown>>('hooks', {});
-            const cleaned = { ...hooks };
-            delete cleaned['Stop'];
-            delete cleaned['PostToolUse'];
-            delete cleaned['PreCompact'];
-            config.update('hooks', cleaned, vscode.ConfigurationTarget.Workspace).then(
-                () => logger.log('Chat hooks unregistered'),
-                () => { /* best effort */ },
-            );
-        },
-    };
+      // Remove our hooks from configuration
+      const config = vscode.workspace.getConfiguration('chat');
+      const hooks = config.get<Record<string, unknown>>('hooks', {});
+      const cleaned = { ...hooks };
+      delete cleaned['Stop'];
+      delete cleaned['PostToolUse'];
+      delete cleaned['PreCompact'];
+      config.update('hooks', cleaned, vscode.ConfigurationTarget.Workspace).then(
+        () => logger.log('Chat hooks unregistered'),
+        () => { /* best effort */ },
+      );
+    },
+  };
 }

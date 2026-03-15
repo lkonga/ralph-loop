@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { LoopEventKind, createOutputLogger, IRalphHookService, ChatSendRequest } from './types';
 import { LoopOrchestrator, loadConfig } from './orchestrator';
 import { ShellHookProvider } from './shellHookProvider';
-import { registerHookBridge, HookBridgeDisposable } from './hookBridge';
+import { registerHookBridge, HookBridgeDisposable, startChatSendWatcher } from './hookBridge';
 import { SessionPersistence } from './sessionPersistence';
 
 let orchestrator: LoopOrchestrator | undefined;
@@ -55,6 +55,9 @@ async function resolveWorkspaceRoot(): Promise<string | undefined> {
 export function activate(context: vscode.ExtensionContext): void {
 	outputChannel = vscode.window.createOutputChannel('Ralph Loop');
 	const logger = createOutputLogger(outputChannel);
+
+	// Always-active watcher for chatSend signal files (used by wave hooks, etc.)
+	context.subscriptions.push(startChatSendWatcher(logger));
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('ralph-loop.start', async () => {
