@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE } from '../src/prompt';
+import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE, parseFrontmatter, extractSpecReference, buildSpecContextLine } from '../src/prompt';
 import type { PromptVariables } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
 import { sendReviewPrompt, parseReviewVerdict } from '../src/copilot';
@@ -442,5 +442,87 @@ describe('buildPrompt with custom promptTemplate', () => {
 		expect(prompt).toContain('## My Custom Task');
 		expect(prompt).toContain('Fix the bug');
 		expect(prompt).toContain('## My PRD');
+	});
+});
+
+describe('parseFrontmatter', () => {
+	it('parses simple key-value frontmatter', () => {
+		const content = '---\ntype: spec\nid: 14\nphase: 9\n---\n# Body';
+		const fm = parseFrontmatter(content);
+		expect(fm).not.toBeNull();
+		expect(fm!.type).toBe('spec');
+		expect(fm!.id).toBe(14);
+		expect(fm!.phase).toBe(9);
+	});
+
+	it('parses inline array values', () => {
+		const content = '---\ntasks: [57, 58, 59]\nprinciples: [configurable, composable]\n---\n# Body';
+		const fm = parseFrontmatter(content);
+		expect(fm).not.toBeNull();
+		expect(fm!.tasks).toEqual([57, 58, 59]);
+		expect(fm!.principles).toEqual(['configurable', 'composable']);
+	});
+
+	it('parses YAML list items', () => {
+		const content = '---\ntype: research\nverification:\n  - npx tsc --noEmit\n  - npx vitest run\n---\n# Body';
+		const fm = parseFrontmatter(content);
+		expect(fm).not.toBeNull();
+		expect(fm!.verification).toEqual(['npx tsc --noEmit', 'npx vitest run']);
+	});
+
+	it('returns null when no frontmatter delimiters', () => {
+		const content = '# Just a heading\nSome body text';
+		expect(parseFrontmatter(content)).toBeNull();
+	});
+
+	it('ignores comments in frontmatter', () => {
+		const content = '---\ntype: spec\n# this is a comment\nid: 5\n---\n';
+		const fm = parseFrontmatter(content);
+		expect(fm).not.toBeNull();
+		expect(fm!.type).toBe('spec');
+		expect(fm!.id).toBe(5);
+	});
+});
+
+describe('extractSpecReference', () => {
+	it('extracts spec reference from task description', () => {
+		const desc = 'Add token budget estimation. → Spec: `research/14-phase9-refined-tasks.md` L15-L36';
+		const ref = extractSpecReference(desc);
+		expect(ref).not.toBeNull();
+		expect(ref!.filePath).toBe('research/14-phase9-refined-tasks.md');
+		expect(ref!.startLine).toBe(15);
+		expect(ref!.endLine).toBe(36);
+	});
+
+	it('returns null when no spec reference', () => {
+		const desc = 'Simple task with no spec reference.';
+		expect(extractSpecReference(desc)).toBeNull();
+	});
+
+	it('handles spec reference without backticks', () => {
+		const desc = 'Do something. → Spec: research/specs.md L100-L123';
+		const ref = extractSpecReference(desc);
+		expect(ref).not.toBeNull();
+		expect(ref!.filePath).toBe('research/specs.md');
+		expect(ref!.startLine).toBe(100);
+		expect(ref!.endLine).toBe(123);
+	});
+});
+
+describe('buildSpecContextLine', () => {
+	it('returns null when task has no spec reference', () => {
+		expect(buildSpecContextLine('/tmp', 'Simple task')).toBeNull();
+	});
+
+	it('returns null when spec file does not exist', () => {
+		expect(buildSpecContextLine('/tmp', 'Task. → Spec: `nonexistent.md` L1-L10')).toBeNull();
+	});
+});
+
+describe('buildPrompt with workspaceRoot', () => {
+	it('accepts workspaceRoot parameter without error', () => {
+		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '', 20, undefined, undefined, undefined, 1, undefined, undefined, 'Task-001', undefined, '/tmp/workspace');
+		expect(prompt).toContain('Fix bug');
+		expect(prompt).toContain('SPEC REFERENCE GATE');
 	});
 });

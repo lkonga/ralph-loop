@@ -39,7 +39,88 @@ export function sanitizeTaskDescription(text: string): string {
 	return result;
 }
 
-import { DEFAULT_CONTEXT_TRIMMING, type ContextTrimmingConfig } from './types';
+import { DEFAULT_CONTEXT_TRIMMING, type ContextTrimmingConfig, type ResearchFrontmatter, type SpecFrontmatter } from './types';
+import * as fs from 'fs';
+import * as path from 'path';
+
+export function parseFrontmatter(content: string): Record<string, unknown> | null {
+	const match = content.match(/^---\n([\s\S]*?)\n---/);
+	if (!match) { return null; }
+	const yaml = match[1];
+	const result: Record<string, unknown> = {};
+	for (const line of yaml.split('\n')) {
+		const trimmed = line.trim();
+		if (!trimmed || trimmed.startsWith('#')) { continue; }
+		if (trimmed.startsWith('- ')) { continue; }
+		const colonIdx = trimmed.indexOf(':');
+		if (colonIdx < 0) { continue; }
+		const key = trimmed.slice(0, colonIdx).trim();
+		const rawVal = trimmed.slice(colonIdx + 1).trim();
+		if (rawVal.startsWith('[') && rawVal.endsWith(']')) {
+			result[key] = rawVal.slice(1, -1).split(',').map(s => {
+				const v = s.trim();
+				const num = Number(v);
+				return Number.isNaN(num) ? v : num;
+			});
+		} else {
+			const num = Number(rawVal);
+			result[key] = Number.isNaN(num) ? rawVal : num;
+		}
+	}
+	// Parse list items under their parent key
+	let currentKey: string | null = null;
+	for (const line of yaml.split('\n')) {
+		const trimmed = line.trim();
+		if (!trimmed.startsWith('- ') && trimmed.includes(':')) {
+			const colonIdx = trimmed.indexOf(':');
+			const key = trimmed.slice(0, colonIdx).trim();
+			const val = trimmed.slice(colonIdx + 1).trim();
+			if (!val) { currentKey = key; continue; }
+			currentKey = null;
+		} else if (trimmed.startsWith('- ') && currentKey) {
+			const item = trimmed.slice(2).trim();
+			if (!Array.isArray(result[currentKey])) { result[currentKey] = []; }
+			(result[currentKey] as unknown[]).push(item);
+		} else {
+			currentKey = null;
+		}
+	}
+	return result;
+}
+
+export function extractSpecReference(taskDescription: string): { filePath: string; startLine: number; endLine: number } | null {
+	const match = taskDescription.match(/→\s*Spec:\s*`?([^`\s]+)`?\s+L(\d+)-L(\d+)/);
+	if (!match) { return null; }
+	return { filePath: match[1], startLine: parseInt(match[2], 10), endLine: parseInt(match[3], 10) };
+}
+
+export function buildSpecContextLine(workspaceRoot: string, taskDescription: string): string | null {
+	const ref = extractSpecReference(taskDescription);
+	if (!ref) { return null; }
+	try {
+		const fullPath = path.resolve(workspaceRoot, ref.filePath);
+		const content = fs.readFileSync(fullPath, 'utf-8');
+		const fm = parseFrontmatter(content);
+		if (!fm) { return null; }
+		const parts: string[] = [];
+		if (fm.phase !== undefined) { parts.push(`Phase ${fm.phase}`); }
+		if (Array.isArray(fm.principles) && fm.principles.length > 0) {
+			parts.push(`principles: ${(fm.principles as string[]).join(', ')}`);
+		}
+		if (Array.isArray(fm.verification) && fm.verification.length > 0) {
+			const cmds = (fm.verification as string[]).map(v => {
+				const base = v.split(' ').slice(1, 3).join(' ');
+				return base || v;
+			});
+			parts.push(`verify: ${cmds.join('+')}`);
+		}
+		if (fm.research !== undefined) { parts.push(`research: ${fm.research}`); }
+		if (parts.length === 0) { return null; }
+		return `[Spec context: ${parts.join(' | ')}]`;
+	} catch {
+		return null;
+	}
+}
 
 function filterPrdContent(prdContent: string, currentTask?: string): string {
 	const lines = prdContent.split('\n');
@@ -152,7 +233,7 @@ export function buildFinalNudgePrompt(task: string, nudgeCount: number, maxNudge
 	return `Your remaining time is almost up. Produce your final result NOW: commit any partial work, update progress.txt, and mark the checkbox. If tests fail, document the failure and mark done anyway.`;
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string, taskId?: string, promptTemplate?: string): string {
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string, taskId?: string, promptTemplate?: string, workspaceRoot?: string): string {
 	const sanitized = sanitizeTaskDescription(taskDescription.trim());
 	const ct = contextTrimming ?? DEFAULT_CONTEXT_TRIMMING;
 
@@ -204,6 +285,17 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		'',
 		'If the task description references a spec file (\u2192 Spec: path LN-LN), you MUST read that file at the specified line range BEFORE writing any code. The task summary is intentionally brief \u2014 the spec contains required interfaces, config fields, test expectations, and design decisions. Do not skip this step.',
 		'',
+	];
+
+	// Inject spec context from frontmatter if available
+	if (workspaceRoot) {
+		const specContext = buildSpecContextLine(workspaceRoot, taskDescription);
+		if (specContext) {
+			parts.push(specContext, '');
+		}
+	}
+
+	parts.push(
 		'When done: FIRST append what you did to progress.txt, THEN mark the checkbox in PRD.md. Both updates are required.',
 		'',
 		'Continue working until the task is fully complete. It\'s YOUR RESPONSIBILITY to finish. Do not hand back to the user.',
@@ -230,7 +322,7 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 		'Commit OFTEN — after each meaningful change, not just at the end.',
 		'All updates are required for the loop to continue!',
 		'',
-	];
+	);
 
 	if (promptTemplate) {
 		const filteredPrd = filterPrdContent(prdContent, prdCurrentTaskOnly);

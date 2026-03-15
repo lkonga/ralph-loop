@@ -525,3 +525,26 @@ export function createConsoleLogger(): ILogger {
 		error: (msg: string) => console.error(`[ralph] ${msg}`),
 	};
 }
+
+// --- Research/Spec frontmatter ---
+export interface ResearchFrontmatter {
+	type: 'research';
+	id: number;
+	phase?: number;
+	date?: string;
+	sources?: string[];
+	methodology?: string;
+	derived_specs?: number[];
+	tags?: string[];
+}
+
+export interface SpecFrontmatter {
+	type: 'spec';
+	id: number;
+	phase: number;
+	tasks: number[];
+	research?: number;
+	principles?: string[];
+	verification?: string[];
+	completion_steps?: string[];
+}
