@@ -279,3 +279,9 @@
 - [ ] **Task 66 — Filesystem Inactivity Signal**: Add `InactivityConfig` with configurable `timeoutMs` (default 120s, up from 60s concern), `warningAtPct` (50%), and `adaptive` flag (future). Graduated response: warning at 50%, action at 100%. → Spec: `research/14-phase9-refined-tasks.md` L331-L353
 - [ ] **Task 67 — Atomic Session Writes**: In `src/sessionPersistence.ts`, change `save()` to write to `.tmp` file then `fs.renameSync` to target — atomic on POSIX and Windows. Surgical 3-line fix, no API changes. Add test verifying crash safety. Run `npx tsc --noEmit` and `npx vitest run`.
 - [ ] **Task 68 — Session ID & Isolation**: Extend `SerializedLoopState` with `sessionId` (UUID), `pid`, `workspacePath`. Validate workspace match and PID liveness on `load()`. Prevents cross-window session interference. → Spec: `research/14-phase9-refined-tasks.md` L386-L412
+
+### 9e — Research Infrastructure
+
+- [x] **Task 69 — Frontmatter Parsing in buildPrompt**: Added `parseFrontmatter()`, `extractSpecReference()`, `buildSpecContextLine()` to `src/prompt.ts`. `buildPrompt()` now accepts `workspaceRoot` parameter and injects one-liner spec context from YAML frontmatter when task references a spec file. All 5 orchestrator call sites updated. 11 new tests added.
+- [x] **Task 70 — Research File Frontmatter (13-14)**: Added YAML frontmatter to `research/13-phase9-deep-research.md` (type: research) and `research/14-phase9-refined-tasks.md` (type: spec). Frontmatter includes phase, sources, methodology, derived_specs, tasks, principles, verification, and completion_steps.
+- [ ] **Task 71 — Normalize Remaining Research Files**: Add YAML frontmatter to research files 01-12 using `/normalizeResearchFiles` prompt. Extract metadata from existing blockquote headers (`> Source:`, `> Date:`). Validate with `parseFrontmatter()`. Skip `README.md`, `_raw-*`, `_parsed-*`, and `AI_AGENT_ORCHESTRATION_COMPARISON.md`.
