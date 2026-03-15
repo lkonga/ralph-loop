@@ -243,17 +243,32 @@ export function activate(context: vscode.ExtensionContext): void {
 				return;
 			}
 
-			const args: Record<string, unknown> = { query: request.query };
-			if (request.mode) {
-				args.mode = request.mode;
-			}
-			if (request.isPartialQuery) {
-				args.isPartialQuery = true;
-			}
-
 			try {
-				await vscode.commands.executeCommand('workbench.action.chat.open', args);
-				logger.log(`chatSend: opened chat with query (mode=${request.mode ?? 'default'}, partial=${!!request.isPartialQuery})`);
+				if (request.sessionId) {
+					// Session-targeted: focus chat, switch to session+mode, type query, submit
+					const sessionUri = vscode.Uri.parse(request.sessionId);
+					await vscode.commands.executeCommand('workbench.action.chat.toggleAgentMode', {
+						modeId: request.mode ?? 'agent',
+						sessionResource: sessionUri,
+					});
+					if (!request.isPartialQuery) {
+						await vscode.commands.executeCommand('workbench.panel.chat.view.copilot.focus');
+						await vscode.commands.executeCommand('type', { text: request.query });
+						await vscode.commands.executeCommand('workbench.action.chat.submit');
+					}
+					logger.log(`chatSend: sent to session ${request.sessionId} (mode=${request.mode ?? 'agent'})`);
+				} else {
+					// No session ID: use chat.open which targets the active panel
+					const args: Record<string, unknown> = { query: request.query };
+					if (request.mode) {
+						args.mode = request.mode;
+					}
+					if (request.isPartialQuery) {
+						args.isPartialQuery = true;
+					}
+					await vscode.commands.executeCommand('workbench.action.chat.open', args);
+					logger.log(`chatSend: opened chat with query (mode=${request.mode ?? 'default'}, partial=${!!request.isPartialQuery})`);
+				}
 			} catch (err) {
 				const msg = err instanceof Error ? err.message : String(err);
 				logger.error(`chatSend failed: ${msg}`);
