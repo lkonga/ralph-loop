@@ -241,36 +241,26 @@ export function activate(context: vscode.ExtensionContext): void {
 		}),
 
 		vscode.commands.registerCommand('ralph-loop.chatSend', async (request?: ChatSendRequest) => {
-			if (!request?.query) {
-				logger.warn('ralph-loop.chatSend: missing query');
+			if (!request?.mode && !request?.query) {
+				logger.warn('ralph-loop.chatSend: missing mode or query');
 				return;
 			}
 
 			try {
+				const toggleArgs: Record<string, unknown> = { modeId: request.mode ?? 'agent' };
 				if (request.sessionId) {
-					// Session-targeted: focus chat, switch to session+mode, type query, submit
-					const sessionUri = vscode.Uri.parse(request.sessionId);
-					await vscode.commands.executeCommand('workbench.action.chat.toggleAgentMode', {
-						modeId: request.mode ?? 'agent',
-						sessionResource: sessionUri,
-					});
+					toggleArgs.sessionResource = vscode.Uri.parse(request.sessionId);
+				}
+				await vscode.commands.executeCommand('workbench.action.chat.toggleAgentMode', toggleArgs);
+				logger.log(`chatSend: switched to ${request.mode ?? 'agent'}${request.sessionId ? ` (session: ${request.sessionId})` : ''}`);
+
+				if (request.query) {
+					await vscode.commands.executeCommand('workbench.panel.chat.view.copilot.focus');
+					await vscode.commands.executeCommand('type', { text: request.query });
 					if (!request.isPartialQuery) {
-						await vscode.commands.executeCommand('workbench.panel.chat.view.copilot.focus');
-						await vscode.commands.executeCommand('type', { text: request.query });
 						await vscode.commands.executeCommand('workbench.action.chat.submit');
 					}
-					logger.log(`chatSend: sent to session ${request.sessionId} (mode=${request.mode ?? 'agent'})`);
-				} else {
-					// No session ID: use chat.open which targets the active panel
-					const args: Record<string, unknown> = { query: request.query };
-					if (request.mode) {
-						args.mode = request.mode;
-					}
-					if (request.isPartialQuery) {
-						args.isPartialQuery = true;
-					}
-					await vscode.commands.executeCommand('workbench.action.chat.open', args);
-					logger.log(`chatSend: opened chat with query (mode=${request.mode ?? 'default'}, partial=${!!request.isPartialQuery})`);
+					logger.log(`chatSend: submitted query (partial=${!!request.isPartialQuery})`);
 				}
 			} catch (err) {
 				const msg = err instanceof Error ? err.message : String(err);
