@@ -15,6 +15,8 @@
 | 03 | [ralph-ecosystem-analysis](03-ralph-ecosystem-analysis.md) | Analysis of 7 Ralph implementations (snarktank, frankbria, hehamalainen, Gsaecy, aymenfurter, giocaizzi, awesome-ralph), convergent patterns, workbench commands |
 | 04 | [implementation-plan](04-implementation-plan.md) | Architecture design, autopilot-to-ralph pattern mapping, integration options (A/B/C), PreCompact reset innovation, API design, file structure, phased delivery |
 | 05 | [expert-review-rankings](05-expert-review-rankings.md) | 10-plan scoring matrix, why Hybrid B2+E2 won, rejection reasons, async generator vs EventEmitter, open questions |
+| 13 | [phase9-deep-research](13-phase9-deep-research.md) | Consolidated research from 13 GitHub repos: context/token management, knowledge harvest/GC, thrashing detection, plan regeneration, backpressure, search-before-implement, workflow presets, cooldown, FS signals, session isolation |
+| 14 | [phase9-refined-tasks](14-phase9-refined-tasks.md) | Detailed specifications for 12 Phase 9 tasks (57-68): interfaces, config schemas, test expectations, design decisions. Used as PD reference targets from PRD.md |
 
 ## Raw Data
 

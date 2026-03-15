@@ -1,0 +1,8 @@
+{
+  "permission": {
+    "*": "allow",
+    "external_directory": {
+      "*": "allow"
+    }
+  }
+}

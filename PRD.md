@@ -247,3 +247,35 @@
 ### Verification Architecture
 
 - [x] **Dual exit gate**: In `src/verify.ts`, add `dualExitGateCheck(modelSignal: boolean, machineVerification: VerifyCheck[]): { canComplete: boolean; reason?: string }`. The function requires BOTH: (1) `modelSignal` is true (the model marked the checkbox — existing check), AND (2) ALL machine verifications passed (tsc, vitest, diff non-empty — the `allChecksPassed` function). Neither alone is sufficient. If model signals complete but machine checks fail, return `{ canComplete: false, reason: 'Model claims complete but verification failed: {details}' }`. If machine checks pass but model hasn't signaled, return `{ canComplete: false, reason: 'Verification passes but task not marked complete in PRD' }`. In orchestrator, replace the current sequential check (first checkbox, then verifiers) with `dualExitGateCheck` — only proceed to TaskComplete when both conditions are met simultaneously. This prevents false completions where the model marks done prematurely. Write tests FIRST in `test/verify.test.ts`: both pass = canComplete true, model only = false with reason, machine only = false with reason, neither = false. Run `npx tsc --noEmit` and `npx vitest run` — ALL tests must pass before marking this checkbox.
+
+---
+
+## Phase 9 — Adaptive Intelligence
+
+> Specs: `research/14-phase9-refined-tasks.md` | Research: `research/13-phase9-deep-research.md`
+> **TDD is MANDATORY**. Run `npx tsc --noEmit` and `npx vitest run` — ALL tests must pass before marking ANY checkbox.
+> After completing each task: (1) `npx tsc --noEmit` (exit 0), (2) `npx vitest run` (all pass), (3) append to progress.txt, (4) mark [x], (5) `git add -A && git commit -m "feat: <short description>"`.
+
+### 9a — Context & Knowledge Intelligence
+
+- [ ] **Task 57 — Context Budget Awareness**: Add token budget estimation (`Math.ceil(len/3.5)`) with two configurable modes: `annotate` (inject budget % warning into prompt) and `handoff` (save state + start fresh chat at 90% threshold). → Spec: `research/14-phase9-refined-tasks.md` L15-L36
+- [ ] **Task 58 — Knowledge Harvest Pipeline**: Upgrade `KnowledgeManager` ingestion to composable pipeline: Extract→Dedup→Categorize→Score→Persist. Add `KnowledgeEntry` with hash-based dedup and keyword-based categorization. Each stage is a pure function, toggleable via config. → Spec: `research/14-phase9-refined-tasks.md` L40-L66
+- [ ] **Task 59 — Knowledge Garbage Collection**: Run-count based GC for `knowledge.md` — track retrieval hits per entry, archive stale entries (0 hits + age > threshold) to `knowledge-archive.md`, enforce `maxEntries` hard cap. Non-destructive (recoverable). → Spec: `research/14-phase9-refined-tasks.md` L70-L94
+
+### 9b — Detection & Intelligence
+
+- [ ] **Task 60 — Thrashing Detection**: Add `ThrashingDetector` using region-hash fingerprinting from `git diff` hunk headers. Sliding window of edit hashes — same region 3+ times = thrashing. Integrates as 4th signal in `StruggleDetector`. → Spec: `research/14-phase9-refined-tasks.md` L100-L123
+- [ ] **Task 61 — Backpressure Classification**: Add `BackpressureClassifier` that interprets struggle signals as `productive` (errors decreasing), `stagnant` (errors flat, low unique ratio), or `thrashing` (delegates to ThrashingDetector). Determines orchestrator response per classification. → Spec: `research/14-phase9-refined-tasks.md` L127-L161
+- [ ] **Task 62 — Plan Regeneration**: Add `'regenerate'` circuit breaker action and `PlanRegenerationBreaker`. Triggers after decomposition fails — re-sends prompt with "take a different approach" context. Escalation chain becomes: nudge→decompose→regenerate→skip→stop. → Spec: `research/14-phase9-refined-tasks.md` L165-L192
+
+### 9c — Prompt & Workflow
+
+- [ ] **Task 63 — Search-Before-Implement Gate**: In `src/prompt.ts`, after TDD GATE section, add unconditional `SEARCH-BEFORE-IMPLEMENT GATE` instructing the agent to search the codebase for existing implementations before writing new code. Prevents the #1 agent mistake: accidental duplication. Add test in `test/copilot.test.ts` verifying prompt contains the section. Run `npx tsc --noEmit` and `npx vitest run`.
+- [ ] **Task 64 — Workflow Presets**: Add `src/presets.ts` with named presets (general/feature/bugfix/refactor) as `Partial<RalphConfig>` overrides. Add `resolveConfig(preset, overrides)` merging DEFAULT_CONFIG←preset←user. Expose `ralph-loop.preset` VS Code setting. → Spec: `research/14-phase9-refined-tasks.md` L227-L284
+- [ ] **Task 65 — Inter-Task Cooldown Dialog**: During countdown between tasks, show auto-accepting dialog via `Promise.race` (VS Code has no auto-dismiss API). Buttons: Pause/Stop/Edit Next Task. Auto-continues after `countdownSeconds` timeout. → Spec: `research/14-phase9-refined-tasks.md` L288-L325
+
+### 9d — Signals & Safety
+
+- [ ] **Task 66 — Filesystem Inactivity Signal**: Add `InactivityConfig` with configurable `timeoutMs` (default 120s, up from 60s concern), `warningAtPct` (50%), and `adaptive` flag (future). Graduated response: warning at 50%, action at 100%. → Spec: `research/14-phase9-refined-tasks.md` L331-L353
+- [ ] **Task 67 — Atomic Session Writes**: In `src/sessionPersistence.ts`, change `save()` to write to `.tmp` file then `fs.renameSync` to target — atomic on POSIX and Windows. Surgical 3-line fix, no API changes. Add test verifying crash safety. Run `npx tsc --noEmit` and `npx vitest run`.
+- [ ] **Task 68 — Session ID & Isolation**: Extend `SerializedLoopState` with `sessionId` (UUID), `pid`, `workspacePath`. Validate workspace match and PID liveness on `load()`. Prevents cross-window session interference. → Spec: `research/14-phase9-refined-tasks.md` L386-L412

@@ -112,7 +112,7 @@ describe('generateStopHookScript', () => {
 	});
 });
 
-const noopLogger: ILogger = { log() {}, warn() {}, error() {} };
+const noopLogger: ILogger = { log() { }, warn() { }, error() { } };
 
 describe('sendReviewPrompt', () => {
 	it('uses default template when none provided', async () => {
