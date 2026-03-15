@@ -1,43 +1,71 @@
-# Ralph Loop — Research Index
+# Research
 
-> Research conducted March 14, 2026
-> Source session: `e1c501d2-3106-4e0a-9212-1443d7efd5f2` (VS Code Insiders)
-> Method: Multi-wave parallel subagent research with expert review ranking
+Research artifacts for ralph-loop: source analyses, ecosystem comparisons, gap analyses, and task specifications that feed into the PRD via Progressive Disclosure (PD) references.
 
+For how this fits the overall workflow, see the root [README.md](../README.md). For a file-by-file catalog, see [INDEX.md](INDEX.md).
+
+## File Naming Convention
+
+```
+{NN}-{descriptive-name}.md        # Numbered research or spec file
+_raw-{session-id}.md              # Raw session dumps (not for agent consumption)
+_parsed-{descriptor}.md           # Intermediate parsing artifacts
+```
+
+- `NN` = sequential number (01, 02, ... 14)
+- Files prefixed with `_` are internal artifacts, not referenced by the PD chain
+- Multiple files can share a number with letter suffixes (e.g. `06`, `06b`) for related analyses
+
+## YAML Frontmatter
+
+Research and spec files use YAML frontmatter for machine-readable metadata. This enables `buildPrompt()` in `src/prompt.ts` to extract context without reading the full file.
+
+### Research type
+
+```yaml
 ---
-
-## Documents
-
-| # | File | Contents |
-|---|------|----------|
-| 01 | [copilot-chat-internals](01-copilot-chat-internals.md) | 12 key findings from `microsoft/vscode-copilot-chat` repo: system prompts, model routing, tool selection, agent wizard, retry logic |
-| 02 | [autopilot-deep-dive](02-autopilot-deep-dive.md) | Complete reverse-engineering of autopilot mode: permission levels, `task_complete` tool, continuation loop, nudge injection, self-resetting counter, safety guardrails, state machine |
-| 03 | [ralph-ecosystem-analysis](03-ralph-ecosystem-analysis.md) | Analysis of 7 Ralph implementations (snarktank, frankbria, hehamalainen, Gsaecy, aymenfurter, giocaizzi, awesome-ralph), convergent patterns, workbench commands |
-| 04 | [implementation-plan](04-implementation-plan.md) | Architecture design, autopilot-to-ralph pattern mapping, integration options (A/B/C), PreCompact reset innovation, API design, file structure, phased delivery |
-| 05 | [expert-review-rankings](05-expert-review-rankings.md) | 10-plan scoring matrix, why Hybrid B2+E2 won, rejection reasons, async generator vs EventEmitter, open questions |
-| 13 | [phase9-deep-research](13-phase9-deep-research.md) | Consolidated research from 13 GitHub repos: context/token management, knowledge harvest/GC, thrashing detection, plan regeneration, backpressure, search-before-implement, workflow presets, cooldown, FS signals, session isolation |
-| 14 | [phase9-refined-tasks](14-phase9-refined-tasks.md) | Detailed specifications for 12 Phase 9 tasks (57-68): interfaces, config schemas, test expectations, design decisions. Used as PD reference targets from PRD.md |
-
-## Raw Data
-
-| File | Description |
-|------|-------------|
-| [_raw-session-e1c501d2](_raw-session-e1c501d2.md) | Full extracted conversation (85KB, 1846 lines) from the original research session |
-
+type: research
+id: 13
+phase: 9
+date: 2026-03-14
+sources:
+  - repo-or-url-1
+methodology: wave-explore-fast-direct x12 subagents
+derived_specs:
+  - 14
+tags:
+  - context-management
 ---
+```
 
-## Research Methodology
+### Spec type
 
-1. **Wave 1**: 10 parallel subagents — repo analysis, autopilot reverse-engineering, pattern extraction
-2. **Wave 2**: Aggregation — synthesize findings into coherent analysis
-3. **Wave 3**: 5 implementation plans generated (2 variants each = 10 total)
-4. **Wave 4**: Expert review — scored and ranked all 10 plan variants
-5. **Result**: Hybrid B2+E2 selected (score 8.3/10), implemented as ralph-loop
+```yaml
+---
+type: spec
+id: 14
+phase: 9
+tasks: [57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+research: 13
+principles:
+  - configurable
+  - composable
+verification:
+  - npx tsc --noEmit
+  - npx vitest run
+completion_steps:
+  - Run tsc and vitest (both must pass)
+  - Append to progress.txt
+  - Mark checkbox in PRD.md
+---
+```
 
-## Key Conclusions
+## Key Design Decisions
+
+These conclusions from the original research inform all subsequent development:
 
 1. **Determinism is non-negotiable** — the control plane must be executable code, not LLM prompts
-2. **PreCompact reset** is the killer innovation — hook into compaction signals to reset at the exact right moment
-3. **Async generators** beat EventEmitters for orchestration — better backpressure, cancellation, testability
-4. **PRD.md checkboxes** are the simplest viable DSL — human-readable, git-friendly, completion detection is a regex
-5. **Nudges as user messages** have the highest LLM compliance rate — not system messages
+2. **Async generators** beat EventEmitters for orchestration — better backpressure, cancellation, testability
+3. **PRD.md checkboxes** are the simplest viable DSL — human-readable, git-friendly, completion detection is a regex
+4. **Nudges as user messages** have the highest LLM compliance rate — not system messages
+5. **PreCompact reset** — hook into compaction signals to reset at the exact right moment

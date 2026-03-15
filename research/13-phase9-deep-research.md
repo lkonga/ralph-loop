@@ -1,3 +1,20 @@
+---
+type: research
+id: 13
+phase: 9
+date: 2026-03-14
+sources:
+  - vercel-labs/ralph-loop-agent
+  - mikeyobrien/ralph-orchestrator
+  - ClaytonFarr/ralph-playbook
+  - mj-meyer/choo-choo-ralph
+  - aymenfurter/ralph
+  - vscode-copilot-chat
+methodology: wave-explore-fast-direct x12 + github_repo + crawl4ai
+derived_specs: [14]
+tags: [context-management, knowledge-harvest, thrashing-detection, plan-regeneration, backpressure, search-gate, workflow-presets, cooldown, fs-signals, session-isolation]
+---
+
 # Phase 9 Deep Research: Implementation Patterns for Tasks 61-74
 
 ## Research Sources

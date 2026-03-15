@@ -1,3 +1,24 @@
+---
+type: spec
+id: 14
+phase: 9
+tasks: [57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68]
+research: 13
+principles:
+  - configurable
+  - composable
+  - chainable
+  - deterministic
+  - reproducible
+verification:
+  - npx tsc --noEmit
+  - npx vitest run
+completion_steps:
+  - append to progress.txt
+  - mark checkbox in PRD.md
+  - git add -A && git commit -m 'feat: <description>'
+---
+
 # Phase 9 — Refined Task Specifications
 
 > Based on deep research across ralph-loop-agent, ralph-orchestrator, ralph-playbook, choo-choo-ralph, aymenfurter/ralph, vscode-copilot-chat.
@@ -7,10 +28,6 @@
 > **TDD is MANDATORY**: Every task MUST follow red-green-refactor.
 > Run `npx tsc --noEmit` and `npx vitest run` — ALL tests must pass before marking ANY checkbox.
 > After completing each task: (1) run `npx tsc --noEmit` (must exit 0), (2) run `npx vitest run` (all tests pass), (3) append what you did to progress.txt, (4) mark the checkbox [x] in PRD.md, (5) commit with `git add -A && git commit -m "feat: <short description>"`.
-
----
-
-## Phase 9a — Context & Knowledge Intelligence
 
 ### Task 57 — Context Budget Awareness
 
