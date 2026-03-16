@@ -39,7 +39,20 @@ export function sanitizeTaskDescription(text: string): string {
 	return result;
 }
 
-import { DEFAULT_CONTEXT_TRIMMING, type ContextTrimmingConfig, type ResearchFrontmatter, type SpecFrontmatter } from './types';
+export function estimatePromptTokens(prompt: string): number {
+	if (prompt.length === 0) { return 0; }
+	return Math.ceil(prompt.length / 3.5);
+}
+
+export function annotateBudget(prompt: string, config: ContextBudgetConfig): string {
+	if (config.mode !== 'annotate') { return prompt; }
+	const tokens = estimatePromptTokens(prompt);
+	const pct = (tokens / config.maxEstimatedTokens) * 100;
+	if (pct < config.warningThresholdPct) { return prompt; }
+	return `[Context budget: ~${Math.round(pct)}% utilized — be concise, avoid verbose output]\n${prompt}`;
+}
+
+import { DEFAULT_CONTEXT_TRIMMING, type ContextTrimmingConfig, type ContextBudgetConfig, type ResearchFrontmatter, type SpecFrontmatter } from './types';
 import * as fs from 'fs';
 import * as path from 'path';
 

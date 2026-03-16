@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE, parseFrontmatter, extractSpecReference, buildSpecContextLine } from '../src/prompt';
+import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE, parseFrontmatter, extractSpecReference, buildSpecContextLine, estimatePromptTokens, annotateBudget } from '../src/prompt';
 import type { PromptVariables } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
 import { sendReviewPrompt, parseReviewVerdict } from '../src/copilot';
@@ -524,5 +524,45 @@ describe('buildPrompt with workspaceRoot', () => {
 		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '', 20, undefined, undefined, undefined, 1, undefined, undefined, 'Task-001', undefined, '/tmp/workspace');
 		expect(prompt).toContain('Fix bug');
 		expect(prompt).toContain('SPEC REFERENCE GATE');
+	});
+});
+
+describe('estimatePromptTokens', () => {
+	it('returns correct estimate using Math.ceil(len/3.5)', () => {
+		const text = 'Hello world'; // 11 chars
+		expect(estimatePromptTokens(text)).toBe(Math.ceil(11 / 3.5));
+	});
+
+	it('returns 0 for empty string', () => {
+		expect(estimatePromptTokens('')).toBe(0);
+	});
+
+	it('handles large prompts', () => {
+		const large = 'A'.repeat(150_000);
+		expect(estimatePromptTokens(large)).toBe(Math.ceil(150_000 / 3.5));
+	});
+});
+
+describe('annotateBudget', () => {
+	it('injects budget warning when above warningThresholdPct', () => {
+		// 700 chars => ~200 tokens. With maxEstimatedTokens=250, that's 80% — above 70% threshold
+		const prompt = 'A'.repeat(700);
+		const result = annotateBudget(prompt, { mode: 'annotate', maxEstimatedTokens: 250, warningThresholdPct: 70, handoffThresholdPct: 90 });
+		expect(result).toMatch(/^\[Context budget: ~\d+% utilized/);
+		expect(result).toContain('be concise');
+	});
+
+	it('does not inject when below warningThresholdPct', () => {
+		// 100 chars => ~29 tokens. With maxEstimatedTokens=250, that's 11.6% — below 70%
+		const prompt = 'A'.repeat(100);
+		const result = annotateBudget(prompt, { mode: 'annotate', maxEstimatedTokens: 250, warningThresholdPct: 70, handoffThresholdPct: 90 });
+		expect(result).not.toContain('[Context budget:');
+		expect(result).toBe(prompt);
+	});
+
+	it('returns prompt unchanged in handoff mode', () => {
+		const prompt = 'A'.repeat(700);
+		const result = annotateBudget(prompt, { mode: 'handoff', maxEstimatedTokens: 250, warningThresholdPct: 70, handoffThresholdPct: 90 });
+		expect(result).toBe(prompt);
 	});
 });

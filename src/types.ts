@@ -68,6 +68,7 @@ export const enum LoopEventKind {
 	BearingsChecked = 'bearings_checked',
 	BearingsFailed = 'bearings_failed',
 	ConfidenceScored = 'confidence_scored',
+	ContextHandoff = 'context_handoff',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -103,6 +104,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.BearingsChecked; healthy: boolean; issues: string[] }
 	| { kind: LoopEventKind.BearingsFailed; issues: string[] }
 	| { kind: LoopEventKind.ConfidenceScored; score: number; threshold: number; breakdown: Record<string, number>; taskId: string }
+	| { kind: LoopEventKind.ContextHandoff; estimatedTokens: number; maxTokens: number; pct: number }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -304,6 +306,21 @@ export const DEFAULT_CONTEXT_TRIMMING: ContextTrimmingConfig = {
 	abbreviatedUntil: 8,
 };
 
+// --- Context budget config ---
+export interface ContextBudgetConfig {
+	mode: 'annotate' | 'handoff';
+	maxEstimatedTokens: number;
+	warningThresholdPct: number;
+	handoffThresholdPct: number;
+}
+
+export const DEFAULT_CONTEXT_BUDGET: ContextBudgetConfig = {
+	mode: 'annotate',
+	maxEstimatedTokens: 150_000,
+	warningThresholdPct: 70,
+	handoffThresholdPct: 90,
+};
+
 // --- Knowledge config ---
 export interface KnowledgeConfig {
 	enabled: boolean;
@@ -388,6 +405,7 @@ export interface RalphConfig {
 	confidenceThreshold?: number;
 	promptTemplate?: string;
 	sessionPersistence?: { enabled: boolean; expireAfterMs: number };
+	contextBudget?: ContextBudgetConfig;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -422,6 +440,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	struggleDetection: { ...DEFAULT_STRUGGLE_DETECTION },
 	bearings: { ...DEFAULT_BEARINGS_CONFIG },
 	sessionPersistence: { enabled: true, expireAfterMs: 86400000 },
+	contextBudget: { ...DEFAULT_CONTEXT_BUDGET },
 };
 
 // --- Verification ---

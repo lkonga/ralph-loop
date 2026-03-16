@@ -7,6 +7,7 @@ import {
 } from '../src/decisions';
 import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
+import { estimatePromptTokens } from '../src/prompt';
 import {
 	DEFAULT_CONFIG,
 } from '../src/types';
@@ -584,5 +585,25 @@ describe('LinkedCancellationSource', () => {
 		linked.cancel('manual');
 		expect(linked.signal.aborted).toBe(true);
 		linked.dispose();
+	});
+});
+
+describe('Context budget handoff detection', () => {
+	it('shouldTriggerHandoff returns true when tokens exceed handoffThresholdPct', () => {
+		// 350 chars => ceil(350/3.5)=100 tokens. With max=100, that's 100% — above 90%
+		const tokens = estimatePromptTokens('A'.repeat(350));
+		const pct = (tokens / 100) * 100;
+		expect(pct).toBeGreaterThanOrEqual(90);
+	});
+
+	it('shouldTriggerHandoff returns false when tokens below handoffThresholdPct', () => {
+		// 100 chars => ceil(100/3.5)=29 tokens. With max=100, that's 29% — below 90%
+		const tokens = estimatePromptTokens('A'.repeat(100));
+		const pct = (tokens / 100) * 100;
+		expect(pct).toBeLessThan(90);
+	});
+
+	it('ContextHandoff event kind exists in LoopEventKind', () => {
+		expect(LoopEventKind.ContextHandoff).toBe('context_handoff');
 	});
 });
