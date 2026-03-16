@@ -260,7 +260,7 @@
 
 - [x] **Task 57 — Context Budget Awareness**: Add token budget estimation (`Math.ceil(len/3.5)`) with two configurable modes: `annotate` (inject budget % warning into prompt) and `handoff` (save state + start fresh chat at 90% threshold). → Spec: `research/14-phase9-refined-tasks.md` L15-L36
 - [x] **Task 58 — Knowledge Harvest Pipeline**: Upgrade `KnowledgeManager` ingestion to composable pipeline: Extract→Dedup→Categorize→Score→Persist. Add `KnowledgeEntry` with hash-based dedup and keyword-based categorization. Each stage is a pure function, toggleable via config. → Spec: `research/14-phase9-refined-tasks.md` L40-L66
-- [ ] **Task 59 — Knowledge Garbage Collection**: Run-count based GC for `knowledge.md` — track retrieval hits per entry, archive stale entries (0 hits + age > threshold) to `knowledge-archive.md`, enforce `maxEntries` hard cap. Non-destructive (recoverable). → Spec: `research/14-phase9-refined-tasks.md` L70-L94
+- [x] **Task 59 — Knowledge Garbage Collection**: Run-count based GC for `knowledge.md` — track retrieval hits per entry, archive stale entries (0 hits + age > threshold) to `knowledge-archive.md`, enforce `maxEntries` hard cap. Non-destructive (recoverable). → Spec: `research/14-phase9-refined-tasks.md` L70-L94
 
 ### 9b — Detection & Intelligence
 
