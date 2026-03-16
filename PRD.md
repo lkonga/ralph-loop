@@ -284,7 +284,7 @@
 
 - [x] **Task 69 — Frontmatter Parsing in buildPrompt**: Added `parseFrontmatter()`, `extractSpecReference()`, `buildSpecContextLine()` to `src/prompt.ts`. `buildPrompt()` now accepts `workspaceRoot` parameter and injects one-liner spec context from YAML frontmatter when task references a spec file. All 5 orchestrator call sites updated. 11 new tests added.
 - [x] **Task 70 — Research File Frontmatter (13-14)**: Added YAML frontmatter to `research/13-phase9-deep-research.md` (type: research) and `research/14-phase9-refined-tasks.md` (type: spec). Frontmatter includes phase, sources, methodology, derived_specs, tasks, principles, verification, and completion_steps.
-- [ ] **Task 71 — Normalize Remaining Research Files**: Add YAML frontmatter to research files 01-12 using `/normalizeResearchFiles` prompt. Extract metadata from existing blockquote headers (`> Source:`, `> Date:`). Validate with `parseFrontmatter()`. Skip `README.md`, `_raw-*`, `_parsed-*`, and `AI_AGENT_ORCHESTRATION_COMPARISON.md`.
+- [x] **Task 71 — Normalize Remaining Research Files**: Add YAML frontmatter to research files 01-12 using `/normalizeResearchFiles` prompt. Extract metadata from existing blockquote headers (`> Source:`, `> Date:`). Validate with `parseFrontmatter()`. Skip `README.md`, `_raw-*`, `_parsed-*`, and `AI_AGENT_ORCHESTRATION_COMPARISON.md`.
 
 ### 9f — External Signal Bridge
 
