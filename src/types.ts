@@ -310,6 +310,17 @@ export const DEFAULT_CONTEXT_TRIMMING: ContextTrimmingConfig = {
 	abbreviatedUntil: 8,
 };
 
+// --- Backpressure classification config ---
+export interface BackpressureConfig {
+	enabled: boolean;
+	historySize: number;
+}
+
+export const DEFAULT_BACKPRESSURE_CONFIG: BackpressureConfig = {
+	enabled: true,
+	historySize: 3,
+};
+
 // --- Context budget config ---
 export interface ContextBudgetConfig {
 	mode: 'annotate' | 'handoff';
@@ -441,6 +452,7 @@ export interface RalphConfig {
 	contextTrimming?: ContextTrimmingConfig;
 	struggleDetection?: StruggleDetectionConfig;
 	bearings?: BearingsConfig;
+	backpressure?: BackpressureConfig;
 	confidenceThreshold?: number;
 	promptTemplate?: string;
 	sessionPersistence?: { enabled: boolean; expireAfterMs: number };
@@ -478,6 +490,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	contextTrimming: { ...DEFAULT_CONTEXT_TRIMMING },
 	struggleDetection: { ...DEFAULT_STRUGGLE_DETECTION },
 	bearings: { ...DEFAULT_BEARINGS_CONFIG },
+	backpressure: { ...DEFAULT_BACKPRESSURE_CONFIG },
 	sessionPersistence: { enabled: true, expireAfterMs: 86400000 },
 	contextBudget: { ...DEFAULT_CONTEXT_BUDGET },
 };

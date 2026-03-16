@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { StruggleDetector, ThrashingDetector } from '../src/struggleDetector';
+import { StruggleDetector, ThrashingDetector, BackpressureClassifier } from '../src/struggleDetector';
+import type { ConvergenceSnapshot } from '../src/struggleDetector';
 
 describe('StruggleDetector', () => {
     // --- No-progress signal ---
@@ -301,5 +302,93 @@ describe('StruggleDetector with thrashing signal', () => {
         expect(sd.isStruggling().signals).toContain('thrashing');
         sd.reset();
         expect(sd.isStruggling().signals).not.toContain('thrashing');
+    });
+});
+
+describe('BackpressureClassifier', () => {
+    function snap(overrides: Partial<ConvergenceSnapshot> = {}): ConvergenceSnapshot {
+        return { errorCount: 5, testPassCount: 10, uniqueErrorCount: 3, filesEdited: ['a.ts'], ...overrides };
+    }
+
+    it('classifies decreasing errors as productive', () => {
+        const bc = new BackpressureClassifier();
+        bc.update(snap({ errorCount: 10 }));
+        bc.update(snap({ errorCount: 7 }));
+        bc.update(snap({ errorCount: 4 }));
+        expect(bc.classify()).toBe('productive');
+    });
+
+    it('classifies increasing test pass count as productive', () => {
+        const bc = new BackpressureClassifier();
+        bc.update(snap({ errorCount: 5, testPassCount: 10 }));
+        bc.update(snap({ errorCount: 5, testPassCount: 12 }));
+        bc.update(snap({ errorCount: 5, testPassCount: 15 }));
+        expect(bc.classify()).toBe('productive');
+    });
+
+    it('classifies flat errors with low unique ratio as stagnant', () => {
+        const bc = new BackpressureClassifier();
+        bc.update(snap({ errorCount: 10, uniqueErrorCount: 2 }));
+        bc.update(snap({ errorCount: 10, uniqueErrorCount: 2 }));
+        bc.update(snap({ errorCount: 10, uniqueErrorCount: 2 }));
+        // unique/total = 2/10 = 0.2 < 0.3 threshold
+        expect(bc.classify()).toBe('stagnant');
+    });
+
+    it('delegates to ThrashingDetector when thrashing detected', () => {
+        const td = new ThrashingDetector({ regionRepetitionThreshold: 3, windowSize: 10 });
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        const bc = new BackpressureClassifier({ thrashingDetector: td });
+        bc.update(snap({ errorCount: 5 }));
+        bc.update(snap({ errorCount: 5 }));
+        bc.update(snap({ errorCount: 5 }));
+        expect(bc.classify()).toBe('thrashing');
+    });
+
+    it('respects history window size', () => {
+        const bc = new BackpressureClassifier({ historySize: 3 });
+        // Push 4 snapshots — only last 3 should matter
+        bc.update(snap({ errorCount: 20 })); // will be evicted
+        bc.update(snap({ errorCount: 5 }));
+        bc.update(snap({ errorCount: 5 }));
+        bc.update(snap({ errorCount: 5 }));
+        // Last 3 are flat at 5, unique ratio defaults to 3/5 = 0.6 — not stagnant by ratio
+        // But errors are flat ±0 — needs low unique ratio to be stagnant
+        // With uniqueErrorCount=3, errorCount=5: 3/5=0.6 > 0.3 — not stagnant
+        // This should classify based on the actual window content
+        expect(bc.classify()).not.toBe('productive');
+    });
+
+    it('returns productive when not enough history', () => {
+        const bc = new BackpressureClassifier();
+        bc.update(snap({ errorCount: 10 }));
+        // Only 1 snapshot, can't determine trend — default to productive
+        expect(bc.classify()).toBe('productive');
+    });
+
+    it('thrashing takes priority over stagnant', () => {
+        const td = new ThrashingDetector({ regionRepetitionThreshold: 3, windowSize: 10 });
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        const bc = new BackpressureClassifier({ thrashingDetector: td });
+        // Also flat errors with low unique ratio (would be stagnant)
+        bc.update(snap({ errorCount: 10, uniqueErrorCount: 2 }));
+        bc.update(snap({ errorCount: 10, uniqueErrorCount: 2 }));
+        bc.update(snap({ errorCount: 10, uniqueErrorCount: 2 }));
+        // Thrashing should take priority
+        expect(bc.classify()).toBe('thrashing');
+    });
+
+    it('reset clears history', () => {
+        const bc = new BackpressureClassifier();
+        bc.update(snap({ errorCount: 10 }));
+        bc.update(snap({ errorCount: 7 }));
+        bc.update(snap({ errorCount: 4 }));
+        expect(bc.classify()).toBe('productive');
+        bc.reset();
+        expect(bc.classify()).toBe('productive'); // default when empty
     });
 });

@@ -265,3 +265,4 @@ Implemented session resume on crash. Created src/sessionPersistence.ts with Sess
 
 ### Task 59 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
 [2026-03-16T02:04:04.784Z] [c83df060-7c3d-4227-9f0c-3a93484288a6] Committed: 8f9bea749d9665ac8b8a173b3089d16539d40408
+[2026-03-16T02:04:18.766Z] [f503d8f2-43a9-4516-937d-702c20d4c200] [Task-061] Task started: **Task 61 — Backpressure Classification**: Add `BackpressureClassifier` that interprets struggle signals as `productive` (errors decreasing), `stagnant` (errors flat, low unique ratio), or `thrashing` (delegates to ThrashingDetector). Determines orchestrator response per classification. → Spec: `research/14-phase9-refined-tasks.md` L127-L161

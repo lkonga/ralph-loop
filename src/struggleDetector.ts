@@ -2,6 +2,96 @@ import { ErrorHashTracker } from './circuitBreaker';
 
 const ERROR_PATTERN = /error:|failed:|exception:|typeerror|syntaxerror/i;
 
+export interface ConvergenceSnapshot {
+    errorCount: number;
+    testPassCount: number;
+    uniqueErrorCount: number;
+    filesEdited: string[];
+}
+
+export type BackpressureClassification = 'productive' | 'stagnant' | 'thrashing';
+
+export interface BackpressureClassifierConfig {
+    historySize?: number;
+    thrashingDetector?: ThrashingDetector;
+}
+
+export class BackpressureClassifier {
+    private history: ConvergenceSnapshot[] = [];
+    private readonly historySize: number;
+    private readonly thrashingDetector?: ThrashingDetector;
+
+    constructor(config?: BackpressureClassifierConfig) {
+        this.historySize = config?.historySize ?? 3;
+        this.thrashingDetector = config?.thrashingDetector;
+    }
+
+    update(snapshot: ConvergenceSnapshot): void {
+        this.history.push(snapshot);
+        if (this.history.length > this.historySize) {
+            this.history.shift();
+        }
+    }
+
+    classify(): BackpressureClassification {
+        // Thrashing takes priority — delegate to ThrashingDetector
+        if (this.thrashingDetector?.isThrashing().thrashing) {
+            return 'thrashing';
+        }
+
+        if (this.history.length < 2) {
+            return 'productive';
+        }
+
+        // Check productive: error count decreasing over snapshots
+        let errorsDecreasing = true;
+        for (let i = 1; i < this.history.length; i++) {
+            if (this.history[i].errorCount >= this.history[i - 1].errorCount) {
+                errorsDecreasing = false;
+                break;
+            }
+        }
+        if (errorsDecreasing) {
+            return 'productive';
+        }
+
+        // Check productive: test pass count increasing
+        let testsIncreasing = true;
+        for (let i = 1; i < this.history.length; i++) {
+            if (this.history[i].testPassCount <= this.history[i - 1].testPassCount) {
+                testsIncreasing = false;
+                break;
+            }
+        }
+        if (testsIncreasing) {
+            return 'productive';
+        }
+
+        // Check stagnant: errors flat AND low unique/total ratio
+        const latest = this.history[this.history.length - 1];
+        let errorsFlat = true;
+        for (let i = 1; i < this.history.length; i++) {
+            if (this.history[i].errorCount !== this.history[i - 1].errorCount) {
+                errorsFlat = false;
+                break;
+            }
+        }
+        const uniqueRatio = latest.errorCount > 0
+            ? latest.uniqueErrorCount / latest.errorCount
+            : 1;
+        if (errorsFlat && uniqueRatio < 0.3) {
+            return 'stagnant';
+        }
+
+        // Default: not clearly productive or stagnant
+        return 'stagnant';
+    }
+
+    reset(): void {
+        this.history = [];
+    }
+}
+
 export interface ThrashingConfig {
     regionRepetitionThreshold: number;
     windowSize: number;
