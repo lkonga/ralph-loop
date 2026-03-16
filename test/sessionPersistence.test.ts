@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
@@ -141,5 +141,99 @@ describe('SessionPersistence', () => {
 
         // Cleanup the blocking directory
         fs.rmdirSync(tmpPath);
+    });
+
+    // === Task 68 — Session ID & Isolation ===
+
+    it('save persists sessionId, pid, and workspacePath', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            sessionId: 'test-uuid-1234',
+            pid: 12345,
+            workspacePath: tmpDir,
+        };
+        persistence.save(tmpDir, state);
+        const filePath = path.join(tmpDir, '.ralph', 'session.json');
+        const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        expect(content.sessionId).toBe('test-uuid-1234');
+        expect(content.pid).toBe(12345);
+        expect(content.workspacePath).toBe(tmpDir);
+    });
+
+    it('load returns null when workspacePath does not match', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            sessionId: 'test-uuid-ws',
+            pid: 1, // use PID 1 (init) — always alive, but workspace check comes first
+            workspacePath: '/some/other/workspace',
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).toBeNull();
+    });
+
+    it('load returns state when PID is dead (safe to resume)', () => {
+        const deadPid = 999999999; // extremely unlikely to be running
+        const state: SerializedLoopState = {
+            ...sampleState,
+            sessionId: 'test-uuid-dead',
+            pid: deadPid,
+            workspacePath: tmpDir,
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).not.toBeNull();
+        expect(loaded!.sessionId).toBe('test-uuid-dead');
+    });
+
+    it('load returns null when PID is still alive', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            sessionId: 'test-uuid-alive',
+            pid: process.pid, // current process — definitely alive
+            workspacePath: tmpDir,
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).toBeNull();
+    });
+
+    it('load returns null when PID exists but is owned by another user (EPERM)', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            sessionId: 'test-uuid-eperm',
+            pid: 42,
+            workspacePath: tmpDir,
+        };
+        persistence.save(tmpDir, state);
+
+        const killSpy = vi.spyOn(process, 'kill').mockImplementation((_pid, _signal?) => {
+            const err = new Error('EPERM') as NodeJS.ErrnoException;
+            err.code = 'EPERM';
+            throw err;
+        });
+
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).toBeNull();
+        killSpy.mockRestore();
+    });
+
+    it('load tolerates missing isolation fields in legacy sessions', () => {
+        // Legacy format without sessionId/pid/workspacePath should still load
+        const dir = path.join(tmpDir, '.ralph');
+        fs.mkdirSync(dir, { recursive: true });
+        const legacyState = {
+            currentTaskIndex: 1,
+            iterationCount: 1,
+            nudgeCount: 0,
+            retryCount: 0,
+            circuitBreakerState: 'active',
+            timestamp: Date.now(),
+            version: 1,
+        };
+        fs.writeFileSync(path.join(dir, 'session.json'), JSON.stringify(legacyState), 'utf-8');
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).not.toBeNull();
+        expect(loaded!.currentTaskIndex).toBe(1);
     });
 });

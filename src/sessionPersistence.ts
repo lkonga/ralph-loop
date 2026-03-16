@@ -9,12 +9,29 @@ export interface SerializedLoopState {
     circuitBreakerState: string;
     timestamp: number;
     version: number;
+    sessionId?: string;
+    pid?: number;
+    workspacePath?: string;
 }
 
 const SESSION_DIR = '.ralph';
 const SESSION_FILE = 'session.json';
 const CURRENT_VERSION = 1;
 const DEFAULT_EXPIRE_MS = 86400000; // 24 hours
+
+function isPidAlive(pid: number): boolean {
+    try {
+        process.kill(pid, 0);
+        return true;
+    } catch (err: unknown) {
+        // EPERM means process exists but we don't have permission — still alive
+        if ((err as NodeJS.ErrnoException).code === 'EPERM') {
+            return true;
+        }
+        // ESRCH means no such process — dead, safe to resume
+        return false;
+    }
+}
 
 export class SessionPersistence {
     private readonly expireAfterMs: number;
@@ -41,6 +58,13 @@ export class SessionPersistence {
         try {
             const data = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as SerializedLoopState;
             if (data.version !== CURRENT_VERSION) {
+                return null;
+            }
+            // Session isolation checks (skip for legacy sessions without these fields)
+            if (data.workspacePath && data.workspacePath !== workspaceRoot) {
+                return null;
+            }
+            if (data.pid && isPidAlive(data.pid)) {
                 return null;
             }
             return data;
