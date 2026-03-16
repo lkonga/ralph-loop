@@ -322,16 +322,38 @@ export const DEFAULT_CONTEXT_BUDGET: ContextBudgetConfig = {
 };
 
 // --- Knowledge config ---
+export type KnowledgeCategory = 'pattern' | 'fix' | 'context' | 'gap';
+
+export interface KnowledgeEntry {
+	content: string;
+	category: KnowledgeCategory;
+	timestamp: string;
+	taskId: string;
+	hash: string;
+}
+
+export type HarvestStageName = 'extract' | 'dedup' | 'categorize' | 'score' | 'persist';
+
+export interface HarvestConfig {
+	stages: HarvestStageName[];
+}
+
+export const DEFAULT_HARVEST_CONFIG: HarvestConfig = {
+	stages: ['extract', 'dedup', 'categorize', 'persist'],
+};
+
 export interface KnowledgeConfig {
 	enabled: boolean;
 	path: string;
 	maxInjectLines: number;
+	harvest?: HarvestConfig;
 }
 
 export const DEFAULT_KNOWLEDGE_CONFIG: KnowledgeConfig = {
 	enabled: true,
 	path: 'knowledge.md',
 	maxInjectLines: 15,
+	harvest: { ...DEFAULT_HARVEST_CONFIG },
 };
 
 // --- Consistency checker ---

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { KnowledgeManager } from '../src/knowledge';
+import { KnowledgeManager, HarvestPipeline, computeEntryHash, categorizeEntry, dedup, extract, categorize } from '../src/knowledge';
+import type { KnowledgeEntry, HarvestConfig } from '../src/types';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -171,5 +172,185 @@ more text
 			const result = manager.getRelevantLearnings('/workspace', 'test');
 			expect(result).toEqual([]);
 		});
+	});
+});
+
+describe('computeEntryHash', () => {
+	it('produces consistent hash for same content', () => {
+		const hash1 = computeEntryHash('some content');
+		const hash2 = computeEntryHash('some content');
+		expect(hash1).toBe(hash2);
+	});
+
+	it('normalizes by lowercasing and trimming', () => {
+		const hash1 = computeEntryHash('  Some Content  ');
+		const hash2 = computeEntryHash('some content');
+		expect(hash1).toBe(hash2);
+	});
+
+	it('returns a hex string', () => {
+		const hash = computeEntryHash('test');
+		expect(hash).toMatch(/^[0-9a-f]+$/);
+	});
+});
+
+describe('categorizeEntry', () => {
+	it('classifies "fix"/"resolve"/"error" as fix', () => {
+		expect(categorizeEntry('Fix the broken build')).toBe('fix');
+		expect(categorizeEntry('Resolve the merge conflict')).toBe('fix');
+		expect(categorizeEntry('Error handling is critical')).toBe('fix');
+	});
+
+	it('classifies "pattern"/"approach"/"strategy" as pattern', () => {
+		expect(categorizeEntry('Use the singleton pattern')).toBe('pattern');
+		expect(categorizeEntry('An approach for testing')).toBe('pattern');
+		expect(categorizeEntry('Strategy for deployment')).toBe('pattern');
+	});
+
+	it('classifies [GAP] entries as gap', () => {
+		expect(categorizeEntry('[GAP] Missing test coverage')).toBe('gap');
+	});
+
+	it('classifies remainder as context', () => {
+		expect(categorizeEntry('TypeScript uses type inference')).toBe('context');
+	});
+});
+
+describe('extract stage', () => {
+	it('extracts learnings and gaps into KnowledgeEntry array', () => {
+		const output = '[LEARNING] Always test first\n[GAP] Missing docs\nPlain line';
+		const entries = extract(output, 'task-1');
+		expect(entries).toHaveLength(2);
+		expect(entries[0].content).toBe('Always test first');
+		expect(entries[0].taskId).toBe('task-1');
+		expect(entries[0].hash).toBeTruthy();
+		expect(entries[1].content).toBe('Missing docs');
+	});
+
+	it('returns empty for no tagged lines', () => {
+		expect(extract('plain text only', 'task-1')).toEqual([]);
+	});
+});
+
+describe('dedup stage', () => {
+	it('removes entries whose hash exists in knowledge file', () => {
+		const entries: KnowledgeEntry[] = [
+			{ content: 'new learning', category: 'context', timestamp: '2026-03-16', taskId: 'task-1', hash: 'abc123' },
+			{ content: 'existing learning', category: 'context', timestamp: '2026-03-16', taskId: 'task-1', hash: 'def456' },
+		];
+		const existingContent = '- 2026: existing learning <!-- hash:def456 -->\n';
+		const result = dedup(entries, existingContent);
+		expect(result).toHaveLength(1);
+		expect(result[0].hash).toBe('abc123');
+	});
+
+	it('removes duplicates within the batch itself', () => {
+		const entries: KnowledgeEntry[] = [
+			{ content: 'same thing', category: 'context', timestamp: '2026-03-16', taskId: 'task-1', hash: 'aaa' },
+			{ content: 'same thing', category: 'context', timestamp: '2026-03-16', taskId: 'task-1', hash: 'aaa' },
+		];
+		const result = dedup(entries, '');
+		expect(result).toHaveLength(1);
+	});
+
+	it('passes all entries when no existing hashes', () => {
+		const entries: KnowledgeEntry[] = [
+			{ content: 'new one', category: 'context', timestamp: '2026-03-16', taskId: 'task-1', hash: 'xxx' },
+		];
+		const result = dedup(entries, '');
+		expect(result).toHaveLength(1);
+	});
+});
+
+describe('categorize stage', () => {
+	it('assigns categories based on content keywords', () => {
+		const entries: KnowledgeEntry[] = [
+			{ content: 'Fix the broken test', category: 'context', timestamp: '2026-03-16', taskId: 't1', hash: 'a' },
+			{ content: 'Use strategy pattern', category: 'context', timestamp: '2026-03-16', taskId: 't1', hash: 'b' },
+			{ content: '[GAP] Missing coverage', category: 'context', timestamp: '2026-03-16', taskId: 't1', hash: 'c' },
+			{ content: 'TypeScript inference', category: 'context', timestamp: '2026-03-16', taskId: 't1', hash: 'd' },
+		];
+		const result = categorize(entries);
+		expect(result[0].category).toBe('fix');
+		expect(result[1].category).toBe('pattern');
+		expect(result[2].category).toBe('gap');
+		expect(result[3].category).toBe('context');
+	});
+});
+
+describe('HarvestPipeline', () => {
+	beforeEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('chains stages in order: extract→dedup→categorize→persist', () => {
+		vi.mocked(fs.existsSync).mockReturnValue(false);
+		vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+		vi.mocked(fs.appendFileSync).mockImplementation(() => {});
+
+		const pipeline = new HarvestPipeline({ stages: ['extract', 'dedup', 'categorize', 'persist'] });
+		const output = '[LEARNING] Fix the broken build\n[GAP] Missing error handling';
+		const result = pipeline.run(output, 'task-1', '/workspace', 'knowledge.md');
+
+		expect(result).toHaveLength(2);
+		expect(result[0].category).toBe('fix');
+		expect(result[1].category).toBe('gap');
+	});
+
+	it('persists entries with hash annotations', () => {
+		vi.mocked(fs.existsSync).mockReturnValue(true);
+		vi.mocked(fs.readFileSync).mockReturnValue('# Knowledge\n\n## Learnings\n\n## Gaps\n');
+		const appendCalls: string[] = [];
+		vi.mocked(fs.appendFileSync).mockImplementation((_p: any, c: any) => {
+			appendCalls.push(String(c));
+		});
+
+		const pipeline = new HarvestPipeline({ stages: ['extract', 'dedup', 'categorize', 'persist'] });
+		pipeline.run('[LEARNING] Always test first', 'task-1', '/workspace', 'knowledge.md');
+
+		const appended = appendCalls.join('');
+		expect(appended).toContain('Always test first');
+		expect(appended).toMatch(/<!-- hash:[0-9a-f]+ -->/);
+	});
+
+	it('dedup skips entries already in knowledge file', () => {
+		const existingHash = computeEntryHash('Always test first');
+		const existingContent = `# Knowledge\n\n## Learnings\n\n- 2026-03-16: Always test first <!-- hash:${existingHash} -->\n\n## Gaps\n`;
+		vi.mocked(fs.existsSync).mockReturnValue(true);
+		vi.mocked(fs.readFileSync).mockReturnValue(existingContent);
+		vi.mocked(fs.appendFileSync).mockImplementation(() => {});
+
+		const pipeline = new HarvestPipeline({ stages: ['extract', 'dedup', 'categorize', 'persist'] });
+		const result = pipeline.run('[LEARNING] Always test first', 'task-1', '/workspace', 'knowledge.md');
+
+		expect(result).toHaveLength(0);
+	});
+
+	it('produces no output for empty input', () => {
+		const pipeline = new HarvestPipeline({ stages: ['extract', 'dedup', 'categorize', 'persist'] });
+		const result = pipeline.run('', 'task-1', '/workspace', 'knowledge.md');
+		expect(result).toEqual([]);
+	});
+
+	it('respects stage toggle — skips dedup when not in stages', () => {
+		vi.mocked(fs.existsSync).mockReturnValue(false);
+		vi.mocked(fs.writeFileSync).mockImplementation(() => {});
+		vi.mocked(fs.appendFileSync).mockImplementation(() => {});
+
+		const pipeline = new HarvestPipeline({ stages: ['extract', 'categorize', 'persist'] });
+		const output = '[LEARNING] Fix the issue\n[LEARNING] Fix the issue';
+		const result = pipeline.run(output, 'task-1', '/workspace', 'knowledge.md');
+
+		// Without dedup, both duplicate entries survive
+		expect(result).toHaveLength(2);
+	});
+
+	it('skips persist when not in stages', () => {
+		const pipeline = new HarvestPipeline({ stages: ['extract', 'categorize'] });
+		const result = pipeline.run('[LEARNING] Something new', 'task-1', '/workspace', 'knowledge.md');
+
+		expect(result).toHaveLength(1);
+		expect(fs.appendFileSync).not.toHaveBeenCalled();
+		expect(fs.writeFileSync).not.toHaveBeenCalled();
 	});
 });
