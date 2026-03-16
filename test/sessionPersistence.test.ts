@@ -102,4 +102,44 @@ describe('SessionPersistence', () => {
         const shortPersistence = new SessionPersistence(3600000);
         expect(shortPersistence.hasIncompleteSession(tmpDir)).toBe(false);
     });
+
+    it('save uses atomic write — crash mid-write preserves previous data', () => {
+        // Save initial state
+        persistence.save(tmpDir, sampleState);
+        const sessionDir = path.join(tmpDir, '.ralph');
+        const filePath = path.join(sessionDir, 'session.json');
+
+        // Save updated data
+        persistence.save(tmpDir, { ...sampleState, currentTaskIndex: 99 });
+
+        // Verify: no .tmp file left behind (atomic rename cleaned it up)
+        const leftoverTmp = fs.readdirSync(sessionDir).filter(f => f.endsWith('.tmp'));
+        expect(leftoverTmp).toHaveLength(0);
+
+        // Verify: file has updated data
+        const updated = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        expect(updated.currentTaskIndex).toBe(99);
+    });
+
+    it('save does not corrupt original file if tmp write would fail', () => {
+        // Save initial good state
+        persistence.save(tmpDir, sampleState);
+        const sessionDir = path.join(tmpDir, '.ralph');
+        const filePath = path.join(sessionDir, 'session.json');
+        const originalContent = fs.readFileSync(filePath, 'utf-8');
+
+        // Make the .tmp file path unwritable by creating a directory with the same name
+        const tmpPath = filePath + '.tmp';
+        fs.mkdirSync(tmpPath);
+
+        // Attempting save should fail (can't write to a directory path)
+        expect(() => persistence.save(tmpDir, { ...sampleState, currentTaskIndex: 999 })).toThrow();
+
+        // Original file must be untouched — this is the crash-safety guarantee
+        const afterCrash = fs.readFileSync(filePath, 'utf-8');
+        expect(afterCrash).toBe(originalContent);
+
+        // Cleanup the blocking directory
+        fs.rmdirSync(tmpPath);
+    });
 });

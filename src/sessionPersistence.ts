@@ -27,7 +27,10 @@ export class SessionPersistence {
         const dir = path.join(workspaceRoot, SESSION_DIR);
         fs.mkdirSync(dir, { recursive: true });
         const data: SerializedLoopState = { ...state, version: CURRENT_VERSION };
-        fs.writeFileSync(path.join(dir, SESSION_FILE), JSON.stringify(data), 'utf-8');
+        const target = path.join(dir, SESSION_FILE);
+        const tmp = target + '.tmp';
+        fs.writeFileSync(tmp, JSON.stringify(data), 'utf-8');
+        fs.renameSync(tmp, target);
     }
 
     load(workspaceRoot: string): SerializedLoopState | null {
