@@ -17,7 +17,7 @@ function tmpDir(): string {
 	return fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-verify-'));
 }
 
-const logger = { log: () => {}, warn: () => {}, error: () => {} };
+const logger = { log: () => { }, warn: () => { }, error: () => { } };
 
 function makeTask(overrides: Partial<Task> = {}): Task {
 	return {
