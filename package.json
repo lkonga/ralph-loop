@@ -71,6 +71,12 @@
 					"default": "",
 					"description": "Custom prompt template with {{variable}} placeholders. Variables: task, prd, progress, learnings, workspace, taskId, iterationNumber. Built-in ROLE & BEHAVIOR, TDD GATE, and safety sections are always prepended.",
 					"editPresentation": "multilineText"
+				},
+				"ralph-loop.preset": {
+					"type": "string",
+					"enum": ["general", "feature", "bugfix", "refactor"],
+					"default": "general",
+					"description": "Workflow preset that applies smart defaults for common scenarios. Presets set config values that can still be overridden individually."
 				}
 			}
 		}

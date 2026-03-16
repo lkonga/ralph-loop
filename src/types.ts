@@ -412,6 +412,15 @@ export interface IConsistencyChecker {
 	runLlmVerification(input: ConsistencyCheckInput): Promise<ConsistencyCheckResult>;
 }
 
+// --- Presets ---
+export type PresetName = 'general' | 'feature' | 'bugfix' | 'refactor';
+
+export interface RalphPreset {
+	name: string;
+	description: string;
+	overrides: Partial<RalphConfig>;
+}
+
 // --- Config ---
 export interface CircuitBreakerConfig {
 	name: string;
