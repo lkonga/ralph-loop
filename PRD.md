@@ -264,7 +264,7 @@
 
 ### 9b — Detection & Intelligence
 
-- [ ] **Task 60 — Thrashing Detection**: Add `ThrashingDetector` using region-hash fingerprinting from `git diff` hunk headers. Sliding window of edit hashes — same region 3+ times = thrashing. Integrates as 4th signal in `StruggleDetector`. → Spec: `research/14-phase9-refined-tasks.md` L100-L123
+- [x] **Task 60 — Thrashing Detection**: Add `ThrashingDetector` using region-hash fingerprinting from `git diff` hunk headers. Sliding window of edit hashes — same region 3+ times = thrashing. Integrates as 4th signal in `StruggleDetector`. → Spec: `research/14-phase9-refined-tasks.md` L100-L123
 - [ ] **Task 61 — Backpressure Classification**: Add `BackpressureClassifier` that interprets struggle signals as `productive` (errors decreasing), `stagnant` (errors flat, low unique ratio), or `thrashing` (delegates to ThrashingDetector). Determines orchestrator response per classification. → Spec: `research/14-phase9-refined-tasks.md` L127-L161
 - [ ] **Task 62 — Plan Regeneration**: Add `'regenerate'` circuit breaker action and `PlanRegenerationBreaker`. Triggers after decomposition fails — re-sends prompt with "take a different approach" context. Escalation chain becomes: nudge→decompose→regenerate→skip→stop. → Spec: `research/14-phase9-refined-tasks.md` L165-L192
 
