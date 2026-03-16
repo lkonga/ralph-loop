@@ -270,7 +270,7 @@
 
 ### 9c — Prompt & Workflow
 
-- [ ] **Task 63 — Search-Before-Implement Gate**: In `src/prompt.ts`, after TDD GATE section, add unconditional `SEARCH-BEFORE-IMPLEMENT GATE` instructing the agent to search the codebase for existing implementations before writing new code. Prevents the #1 agent mistake: accidental duplication. Add test in `test/copilot.test.ts` verifying prompt contains the section. Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 63 — Search-Before-Implement Gate**: In `src/prompt.ts`, after TDD GATE section, add unconditional `SEARCH-BEFORE-IMPLEMENT GATE` instructing the agent to search the codebase for existing implementations before writing new code. Prevents the #1 agent mistake: accidental duplication. Add test in `test/copilot.test.ts` verifying prompt contains the section. Run `npx tsc --noEmit` and `npx vitest run`.
 - [ ] **Task 64 — Workflow Presets**: Add `src/presets.ts` with named presets (general/feature/bugfix/refactor) as `Partial<RalphConfig>` overrides. Add `resolveConfig(preset, overrides)` merging DEFAULT_CONFIG←preset←user. Expose `ralph-loop.preset` VS Code setting. → Spec: `research/14-phase9-refined-tasks.md` L227-L284
 - [ ] **Task 65 — Inter-Task Cooldown Dialog**: During countdown between tasks, show auto-accepting dialog via `Promise.race` (VS Code has no auto-dismiss API). Buttons: Pause/Stop/Edit Next Task. Auto-continues after `countdownSeconds` timeout. → Spec: `research/14-phase9-refined-tasks.md` L288-L325
 
