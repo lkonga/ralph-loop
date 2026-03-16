@@ -91,6 +91,12 @@ describe('buildPrompt', () => {
 		expect(prompt).toContain('Write a failing test FIRST');
 	});
 
+	it('contains SEARCH-BEFORE-IMPLEMENT GATE section', () => {
+		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '');
+		expect(prompt).toContain('SEARCH-BEFORE-IMPLEMENT GATE');
+		expect(prompt).toContain('search the codebase for existing implementations');
+	});
+
 	it('includes task ID in YOUR TASK TO IMPLEMENT header when provided', () => {
 		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '', 20, undefined, undefined, undefined, 1, undefined, undefined, 'Task-003');
 		expect(prompt).toContain('YOUR TASK TO IMPLEMENT — Task-003');
