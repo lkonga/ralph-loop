@@ -1,3 +1,8 @@
+---
+type: research
+id: 12
+date: 2025-07-11
+---
 # Detailed Source Analysis: Per-Repository Findings
 
 > Date: 2025-07-11

@@ -1,3 +1,10 @@
+---
+type: research
+id: 9
+date: 2025-07-11
+sources:
+  - 13 repositories analyzed across the ralph ecosystem
+---
 # Ecosystem Patterns Synthesis
 
 > Date: 2025-07-11

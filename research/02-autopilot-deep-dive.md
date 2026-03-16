@@ -1,3 +1,9 @@
+---
+type: research
+id: 2
+sources:
+  - Reverse-engineered from microsoft/vscode-copilot-chat (March 2026)
+---
 # Autopilot Mode — Complete Deep Dive
 
 > Source: Reverse-engineered from `microsoft/vscode-copilot-chat` (March 2026)

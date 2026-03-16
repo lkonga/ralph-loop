@@ -1,3 +1,9 @@
+---
+type: research
+id: 6
+sources:
+  - https://github.com/aymenfurter/ralph (v0.5.1, MIT License)
+---
 # Deep Analysis: aymenfurter/ralph
 
 > Source: https://github.com/aymenfurter/ralph (v0.5.1, MIT License)

@@ -1,3 +1,8 @@
+---
+type: research
+id: 11
+date: 2025-07-11
+---
 # Gap Analysis: ralph-loop vs Ecosystem
 
 > Date: 2025-07-11

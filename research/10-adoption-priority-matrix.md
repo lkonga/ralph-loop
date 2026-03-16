@@ -1,3 +1,8 @@
+---
+type: research
+id: 10
+date: 2025-07-11
+---
 # Adoption Priority Matrix
 
 > Date: 2025-07-11

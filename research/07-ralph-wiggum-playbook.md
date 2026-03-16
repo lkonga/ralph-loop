@@ -1,3 +1,9 @@
+---
+type: research
+id: 7
+sources:
+  - ghuntley/how-to-ralph-wiggum
+---
 # Ralph Wiggum Playbook — Deep Research
 
 > Source: `ghuntley/how-to-ralph-wiggum` (Clayton Farr's compilation of Geoffrey Huntley's methodology)

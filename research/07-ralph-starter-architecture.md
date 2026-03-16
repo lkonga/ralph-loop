@@ -1,3 +1,9 @@
+---
+type: research
+id: 7
+sources:
+  - multivmlabs/ralph-starter (npm v0.4.5, TypeScript 98.6%, 238 commits, MIT)
+---
 # Ralph-Starter Architecture Analysis
 
 > Source: `multivmlabs/ralph-starter` (npm v0.4.5, TypeScript 98.6%, 238 commits, MIT)

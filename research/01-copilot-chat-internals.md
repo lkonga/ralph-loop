@@ -1,3 +1,10 @@
+---
+type: research
+id: 1
+sources:
+  - Analysis of microsoft/vscode-copilot-chat repository (March 2026)
+session: e1c501d2-3106-4e0a-9212-1443d7efd5f2
+---
 # VS Code Copilot Chat Extension — Internal Architecture
 
 > Source: Analysis of `microsoft/vscode-copilot-chat` repository (March 2026)

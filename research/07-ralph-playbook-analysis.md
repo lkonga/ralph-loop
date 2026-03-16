@@ -1,3 +1,9 @@
+---
+type: research
+id: 7
+sources:
+  - ClaytonFarr/ralph-playbook
+---
 # Ralph Playbook — Complete Architectural Analysis
 
 > Source: [ClaytonFarr/ralph-playbook](https://github.com/ClaytonFarr/ralph-playbook)

@@ -1,3 +1,9 @@
+---
+type: research
+id: 4
+sources:
+  - Synthesis of autopilot reverse-engineering + Ralph ecosystem analysis (March 2026)
+---
 # Implementation Plan — Ralph + Autopilot Fusion
 
 > Source: Synthesis of autopilot reverse-engineering + Ralph ecosystem analysis (March 2026)

@@ -1,3 +1,9 @@
+---
+type: research
+id: 6
+sources:
+  - vinitm/ralph-loop
+---
 # vinitm/ralph-loop — Deep Architectural Analysis
 
 ## 1. Architecture Overview

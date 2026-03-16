@@ -1,3 +1,9 @@
+---
+type: research
+id: 3
+sources:
+  - Parallel analysis of 7 Ralph implementations + awesome-ralph catalog (March 2026)
+---
 # Ralph Ecosystem Analysis
 
 > Source: Parallel analysis of 7 Ralph implementations + awesome-ralph catalog (March 2026)

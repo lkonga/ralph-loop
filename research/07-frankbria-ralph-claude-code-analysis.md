@@ -1,3 +1,9 @@
+---
+type: research
+id: 7
+sources:
+  - https://github.com/frankbria/ralph-claude-code
+---
 # Deep Analysis: frankbria/ralph-claude-code
 
 **Repository**: [frankbria/ralph-claude-code](https://github.com/frankbria/ralph-claude-code)

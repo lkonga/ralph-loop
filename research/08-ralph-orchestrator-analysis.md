@@ -1,3 +1,9 @@
+---
+type: research
+id: 8
+sources:
+  - mikeyobrien/ralph-orchestrator
+---
 # Phase 9 — Orchestrator Patterns (from mikeyobrien/ralph-orchestrator analysis)
 
 > Patterns extracted from: mikeyobrien/ralph-orchestrator (Rust multi-crate orchestrator with TypeScript web backend).

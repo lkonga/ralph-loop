@@ -1,3 +1,9 @@
+---
+type: research
+id: 5
+sources:
+  - 10 plan variants evaluated by expert review subagents (March 2026)
+---
 # Expert Review — Plan Scoring & Rankings
 
 > Source: 10 plan variants evaluated by expert review subagents (March 2026)
