@@ -323,6 +323,19 @@ export const DEFAULT_BACKPRESSURE_CONFIG: BackpressureConfig = {
 	historySize: 3,
 };
 
+// --- Inactivity config ---
+export interface InactivityConfig {
+	timeoutMs: number;
+	warningAtPct: number;
+	adaptive: boolean;
+}
+
+export const DEFAULT_INACTIVITY_CONFIG: InactivityConfig = {
+	timeoutMs: 120_000,
+	warningAtPct: 50,
+	adaptive: false,
+};
+
 // --- Context budget config ---
 export interface ContextBudgetConfig {
 	mode: 'annotate' | 'handoff';
@@ -468,6 +481,7 @@ export interface RalphConfig {
 	promptTemplate?: string;
 	sessionPersistence?: { enabled: boolean; expireAfterMs: number };
 	contextBudget?: ContextBudgetConfig;
+	inactivity?: InactivityConfig;
 	cooldownShowDialog?: boolean;
 }
 
@@ -505,6 +519,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	backpressure: { ...DEFAULT_BACKPRESSURE_CONFIG },
 	sessionPersistence: { enabled: true, expireAfterMs: 86400000 },
 	contextBudget: { ...DEFAULT_CONTEXT_BUDGET },
+	inactivity: { ...DEFAULT_INACTIVITY_CONFIG },
 	cooldownShowDialog: true,
 };
 

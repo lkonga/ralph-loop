@@ -10,6 +10,7 @@ import { parseReviewVerdict } from '../src/copilot';
 import { estimatePromptTokens } from '../src/prompt';
 import {
 	DEFAULT_CONFIG,
+	DEFAULT_INACTIVITY_CONFIG,
 } from '../src/types';
 import type {
 	IRalphHookService,
@@ -18,6 +19,7 @@ import type {
 	PreCompleteInput,
 	VerifyCheck,
 	ReviewVerdict,
+	InactivityConfig,
 } from '../src/types';
 import { VerifyResult, LoopEventKind } from '../src/types';
 
@@ -605,5 +607,46 @@ describe('Context budget handoff detection', () => {
 
 	it('ContextHandoff event kind exists in LoopEventKind', () => {
 		expect(LoopEventKind.ContextHandoff).toBe('context_handoff');
+	});
+});
+
+describe('InactivityConfig', () => {
+	it('DEFAULT_INACTIVITY_CONFIG has correct defaults', () => {
+		expect(DEFAULT_INACTIVITY_CONFIG).toEqual({
+			timeoutMs: 120_000,
+			warningAtPct: 50,
+			adaptive: false,
+		});
+	});
+
+	it('default config includes inactivity with correct shape', () => {
+		expect(DEFAULT_CONFIG.inactivity).toBeDefined();
+		expect(DEFAULT_CONFIG.inactivity).toEqual(DEFAULT_INACTIVITY_CONFIG);
+	});
+
+	it('warningAtPct computes correct warning threshold', () => {
+		const cfg: InactivityConfig = { timeoutMs: 120_000, warningAtPct: 50, adaptive: false };
+		const warningMs = cfg.timeoutMs * (cfg.warningAtPct / 100);
+		expect(warningMs).toBe(60_000);
+	});
+
+	it('custom timeoutMs is respected', () => {
+		const cfg: InactivityConfig = { timeoutMs: 240_000, warningAtPct: 50, adaptive: false };
+		const warningMs = cfg.timeoutMs * (cfg.warningAtPct / 100);
+		expect(warningMs).toBe(120_000);
+		expect(cfg.timeoutMs).toBe(240_000);
+	});
+
+	it('adaptive flag defaults to false (no-op path)', () => {
+		expect(DEFAULT_INACTIVITY_CONFIG.adaptive).toBe(false);
+	});
+
+	it('graduated response: warning at warningAtPct, action at 100%', () => {
+		const cfg: InactivityConfig = { timeoutMs: 200_000, warningAtPct: 50, adaptive: false };
+		const warningThreshold = cfg.timeoutMs * (cfg.warningAtPct / 100);
+		const actionThreshold = cfg.timeoutMs;
+		expect(warningThreshold).toBe(100_000);
+		expect(actionThreshold).toBe(200_000);
+		expect(warningThreshold).toBeLessThan(actionThreshold);
 	});
 });

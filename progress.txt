@@ -305,3 +305,4 @@ Implemented session resume on crash. Created src/sessionPersistence.ts with Sess
 
 ### Task 64 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
 [2026-03-16T02:18:24.531Z] [8f12e832-b540-447a-9fc6-33ae28a518f4] Committed: d917c075283c3b548ff7d0e27d595c5bd09bc943
+[2026-03-16T02:18:38.844Z] [79746dcc-c063-4b30-b09d-f24e397b373f] [Task-066] Task started: **Task 66 — Filesystem Inactivity Signal**: Add `InactivityConfig` with configurable `timeoutMs` (default 120s, up from 60s concern), `warningAtPct` (50%), and `adaptive` flag (future). Graduated response: warning at 50%, action at 100%. → Spec: `research/14-phase9-refined-tasks.md` L331-L353
