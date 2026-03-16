@@ -317,3 +317,8 @@ Added InactivityConfig interface (timeoutMs: number, warningAtPct: number, adapt
 [2026-03-16T02:23:45.479Z] [79a2c20e-8ca1-4efc-9cd8-8e2d18125578] [Task-067] Task completed: **Task 67 — Atomic Session Writes**: In `src/sessionPersistence.ts`, change `save()` to write to `.tmp` file then `fs.renameSync` to target — atomic on POSIX and Windows. Surgical 3-line fix, no API changes. Add test verifying crash safety. Run `npx tsc --noEmit` and `npx vitest run`. (131s)
 
 ### Task 66 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +10/-1 | Status: pass
+[2026-03-16T02:23:45.564Z] [79a2c20e-8ca1-4efc-9cd8-8e2d18125578] Committed: 6c31cf3028dfbffe548d39ca139e15f7f9a033f8
+
+### Task 67 — Atomic Session Writes | Files: [src/sessionPersistence.ts, test/sessionPersistence.test.ts] | Lines: +46/-2 | Status: pass
+Changed save() to write JSON to `session.json.tmp` then `fs.renameSync` to `session.json` — atomic on POSIX and Windows. Added 2 tests: (1) verifies no .tmp file remains after save and data is correct, (2) blocks .tmp path with a directory to simulate write failure and confirms original file is untouched (crash-safety guarantee). TDD cycle: wrote failing test first (RED — current impl doesn't write to .tmp so blocking .tmp doesn't throw), implemented 3-line fix (GREEN — all 12 session tests pass), full suite 439/439 pass, tsc --noEmit clean.
+[2026-03-16T02:23:59.769Z] [773acc6c-96a9-428c-ae34-149ae0273604] [Task-068] Task started: **Task 68 — Session ID & Isolation**: Extend `SerializedLoopState` with `sessionId` (UUID), `pid`, `workspacePath`. Validate workspace match and PID liveness on `load()`. Prevents cross-window session interference. → Spec: `research/14-phase9-refined-tasks.md` L386-L412
