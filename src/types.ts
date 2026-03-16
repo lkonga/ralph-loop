@@ -67,6 +67,7 @@ export const enum LoopEventKind {
 	CommandBlocked = 'command_blocked',
 	BearingsChecked = 'bearings_checked',
 	BearingsFailed = 'bearings_failed',
+	PlanRegenerated = 'plan_regenerated',
 	ConfidenceScored = 'confidence_scored',
 	ContextHandoff = 'context_handoff',
 	Stopped = 'stopped',
@@ -103,6 +104,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.CommandBlocked; command: string; reason: string; taskId: string }
 	| { kind: LoopEventKind.BearingsChecked; healthy: boolean; issues: string[] }
 	| { kind: LoopEventKind.BearingsFailed; issues: string[] }
+	| { kind: LoopEventKind.PlanRegenerated; taskId: string; regenerationCount: number }
 	| { kind: LoopEventKind.ConfidenceScored; score: number; threshold: number; breakdown: Record<string, number>; taskId: string }
 	| { kind: LoopEventKind.ContextHandoff; estimatedTokens: number; maxTokens: number; pct: number }
 	| { kind: LoopEventKind.Stopped }

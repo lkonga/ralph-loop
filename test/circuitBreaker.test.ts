@@ -9,6 +9,8 @@ import {
 	createDefaultChain,
 	ErrorHashTracker,
 	RepeatedErrorBreaker,
+	PlanRegenerationBreaker,
+	PlanRegenerationTracker,
 	type CircuitBreakerState,
 } from '../src/circuitBreaker';
 
@@ -464,5 +466,150 @@ describe('createDefaultChain with repeatedError', () => {
 		const result = chain.check(makeState());
 		expect(result.tripped).toBe(true);
 		expect(result.action).toBe('skip');
+	});
+});
+
+// --- PlanRegenerationTracker ---
+
+describe('PlanRegenerationTracker', () => {
+	it('starts with zero counts', () => {
+		const tracker = new PlanRegenerationTracker();
+		expect(tracker.hasDecomposed()).toBe(false);
+		expect(tracker.getFailuresAfterDecomp()).toBe(0);
+		expect(tracker.getRegenerationCount()).toBe(0);
+	});
+
+	it('records decomposition', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordDecomposition();
+		expect(tracker.hasDecomposed()).toBe(true);
+	});
+
+	it('records failure after decomposition', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordDecomposition();
+		tracker.recordFailureAfterDecomp();
+		tracker.recordFailureAfterDecomp();
+		expect(tracker.getFailuresAfterDecomp()).toBe(2);
+	});
+
+	it('records regeneration', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordRegeneration();
+		expect(tracker.getRegenerationCount()).toBe(1);
+	});
+
+	it('reset clears all state', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordDecomposition();
+		tracker.recordFailureAfterDecomp();
+		tracker.recordRegeneration();
+		tracker.reset();
+		expect(tracker.hasDecomposed()).toBe(false);
+		expect(tracker.getFailuresAfterDecomp()).toBe(0);
+		expect(tracker.getRegenerationCount()).toBe(0);
+	});
+});
+
+// --- PlanRegenerationBreaker ---
+
+describe('PlanRegenerationBreaker', () => {
+	it('does not trip without decomposition', () => {
+		const tracker = new PlanRegenerationTracker();
+		const breaker = PlanRegenerationBreaker(tracker);
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(false);
+		expect(result.action).toBe('continue');
+	});
+
+	it('does not trip with decomposition but insufficient failures', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordDecomposition();
+		tracker.recordFailureAfterDecomp(); // only 1, need 2
+		const breaker = PlanRegenerationBreaker(tracker);
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(false);
+	});
+
+	it('trips after decomposition + N failures (default 2)', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordDecomposition();
+		tracker.recordFailureAfterDecomp();
+		tracker.recordFailureAfterDecomp();
+		const breaker = PlanRegenerationBreaker(tracker);
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(true);
+		expect(result.action).toBe('regenerate');
+		expect(result.reason).toContain('Decomposition failed');
+	});
+
+	it('respects custom triggerAfterDecompFailures', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordDecomposition();
+		tracker.recordFailureAfterDecomp();
+		tracker.recordFailureAfterDecomp();
+		tracker.recordFailureAfterDecomp();
+		const breaker = PlanRegenerationBreaker(tracker, { triggerAfterDecompFailures: 3 });
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(true);
+		expect(result.action).toBe('regenerate');
+	});
+
+	it('maxRegenerations cap prevents further trips', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordDecomposition();
+		tracker.recordFailureAfterDecomp();
+		tracker.recordFailureAfterDecomp();
+		tracker.recordRegeneration(); // already regenerated once
+		const breaker = PlanRegenerationBreaker(tracker, { maxRegenerations: 1 });
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(false);
+		expect(result.action).toBe('continue');
+	});
+
+	it('allows regeneration when below max', () => {
+		const tracker = new PlanRegenerationTracker();
+		tracker.recordDecomposition();
+		tracker.recordFailureAfterDecomp();
+		tracker.recordFailureAfterDecomp();
+		const breaker = PlanRegenerationBreaker(tracker, { maxRegenerations: 2 });
+		const result = breaker.check(makeState());
+		expect(result.tripped).toBe(true);
+		expect(result.action).toBe('regenerate');
+	});
+
+	it('has name planRegeneration', () => {
+		const tracker = new PlanRegenerationTracker();
+		const breaker = PlanRegenerationBreaker(tracker);
+		expect(breaker.name).toBe('planRegeneration');
+	});
+});
+
+// --- createDefaultChain with planRegeneration ---
+
+describe('createDefaultChain with planRegeneration', () => {
+	it('planRegeneration is disabled by default', () => {
+		const chain = createDefaultChain();
+		const result = chain.check(makeState());
+		expect(result.tripped).toBe(false);
+	});
+
+	it('planRegeneration placed after stagnation, before repeatedError', () => {
+		const regenTracker = new PlanRegenerationTracker();
+		regenTracker.recordDecomposition();
+		regenTracker.recordFailureAfterDecomp();
+		regenTracker.recordFailureAfterDecomp();
+		const chain = createDefaultChain([
+			{ name: 'maxRetries', enabled: false },
+			{ name: 'maxNudges', enabled: false },
+			{ name: 'stagnation', enabled: false },
+			{ name: 'planRegeneration', enabled: true, maxRegenerations: 1, triggerAfterDecompFailures: 2 },
+			{ name: 'repeatedError', enabled: false },
+			{ name: 'errorRate', enabled: false },
+			{ name: 'timeBudget', enabled: false },
+		], undefined, regenTracker);
+		const result = chain.check(makeState());
+		expect(result.tripped).toBe(true);
+		expect(result.action).toBe('regenerate');
 	});
 });

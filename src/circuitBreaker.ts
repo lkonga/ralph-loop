@@ -13,7 +13,7 @@ export interface CircuitBreakerState {
 export interface CircuitBreakerResult {
 	tripped: boolean;
 	reason?: string;
-	action: 'continue' | 'retry' | 'skip' | 'stop' | 'nudge';
+	action: 'continue' | 'retry' | 'skip' | 'stop' | 'nudge' | 'regenerate';
 }
 
 export interface CircuitBreaker {
@@ -145,6 +145,52 @@ export class ErrorHashTracker {
 	}
 }
 
+// --- Plan Regeneration ---
+
+export interface PlanRegenerationOptions {
+	triggerAfterDecompFailures?: number;
+	maxRegenerations?: number;
+}
+
+export class PlanRegenerationTracker {
+	private decomposed = false;
+	private failuresAfterDecomp = 0;
+	private regenerationCount = 0;
+
+	hasDecomposed(): boolean { return this.decomposed; }
+	getFailuresAfterDecomp(): number { return this.failuresAfterDecomp; }
+	getRegenerationCount(): number { return this.regenerationCount; }
+
+	recordDecomposition(): void { this.decomposed = true; }
+	recordFailureAfterDecomp(): void { this.failuresAfterDecomp++; }
+	recordRegeneration(): void { this.regenerationCount++; }
+
+	reset(): void {
+		this.decomposed = false;
+		this.failuresAfterDecomp = 0;
+		this.regenerationCount = 0;
+	}
+}
+
+export function PlanRegenerationBreaker(
+	tracker: PlanRegenerationTracker,
+	opts?: PlanRegenerationOptions,
+): CircuitBreaker {
+	const triggerAfterDecompFailures = opts?.triggerAfterDecompFailures ?? 2;
+	const maxRegenerations = opts?.maxRegenerations ?? 1;
+	return {
+		name: 'planRegeneration',
+		check(_state: CircuitBreakerState): CircuitBreakerResult {
+			if (!tracker.hasDecomposed()) { return NO_TRIP; }
+			if (tracker.getRegenerationCount() >= maxRegenerations) { return NO_TRIP; }
+			if (tracker.getFailuresAfterDecomp() >= triggerAfterDecompFailures) {
+				return { tripped: true, reason: 'Decomposition failed \u2014 regenerating plan', action: 'regenerate' };
+			}
+			return NO_TRIP;
+		},
+	};
+}
+
 export function RepeatedErrorBreaker(tracker: ErrorHashTracker, threshold: number = 3): CircuitBreaker {
 	return {
 		name: 'repeatedError',
@@ -187,12 +233,13 @@ const DEFAULT_CB_CONFIG: CircuitBreakerConfig[] = [
 	{ name: 'maxRetries', enabled: true },
 	{ name: 'maxNudges', enabled: true },
 	{ name: 'stagnation', enabled: true },
+	{ name: 'planRegeneration', enabled: false },
 	{ name: 'repeatedError', enabled: false },
 	{ name: 'errorRate', enabled: false },
 	{ name: 'timeBudget', enabled: false },
 ];
 
-export function createDefaultChain(config?: CircuitBreakerConfig[], errorHashTracker?: ErrorHashTracker): CircuitBreakerChain {
+export function createDefaultChain(config?: CircuitBreakerConfig[], errorHashTracker?: ErrorHashTracker, planRegenTracker?: PlanRegenerationTracker): CircuitBreakerChain {
 	const cfgs = config ?? DEFAULT_CB_CONFIG;
 	const disabled = new Set<string>();
 	const breakerMap = new Map<string, CircuitBreakerConfig>();
@@ -211,6 +258,12 @@ export function createDefaultChain(config?: CircuitBreakerConfig[], errorHashTra
 
 	const stagnationCfg = breakerMap.get('stagnation');
 	breakers.push(StagnationBreaker(typeof stagnationCfg?.threshold === 'number' ? stagnationCfg.threshold : undefined));
+
+	const regenCfg = breakerMap.get('planRegeneration');
+	breakers.push(PlanRegenerationBreaker(planRegenTracker ?? new PlanRegenerationTracker(), {
+		triggerAfterDecompFailures: typeof regenCfg?.triggerAfterDecompFailures === 'number' ? regenCfg.triggerAfterDecompFailures : undefined,
+		maxRegenerations: typeof regenCfg?.maxRegenerations === 'number' ? regenCfg.maxRegenerations : undefined,
+	}));
 
 	const repeatedErrorCfg = breakerMap.get('repeatedError');
 	const repeatedThreshold = typeof repeatedErrorCfg?.repeatedErrorThreshold === 'number' ? repeatedErrorCfg.repeatedErrorThreshold : 3;
