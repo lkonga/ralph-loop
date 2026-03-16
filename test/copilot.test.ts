@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE, parseFrontmatter, extractSpecReference, buildSpecContextLine, estimatePromptTokens, annotateBudget } from '../src/prompt';
+import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE, parseFrontmatter, extractSpecReference, buildSpecContextLine, estimatePromptTokens, annotateBudget, extractBlockquoteMetadata, normalizeResearchFile } from '../src/prompt';
 import type { PromptVariables } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
 import { sendReviewPrompt, parseReviewVerdict } from '../src/copilot';
@@ -570,5 +570,90 @@ describe('annotateBudget', () => {
 		const prompt = 'A'.repeat(700);
 		const result = annotateBudget(prompt, { mode: 'handoff', maxEstimatedTokens: 250, warningThresholdPct: 70, handoffThresholdPct: 90 });
 		expect(result).toBe(prompt);
+	});
+});
+
+describe('extractBlockquoteMetadata', () => {
+	it('extracts Source from blockquote', () => {
+		const content = '# Title\n\n> Source: Analysis of repo (March 2026)\n> Session: `abc123`\n\n---\n\n## Body';
+		const meta = extractBlockquoteMetadata(content);
+		expect(meta.sources).toEqual(['Analysis of repo (March 2026)']);
+		expect(meta.session).toBe('abc123');
+	});
+
+	it('extracts Date from blockquote', () => {
+		const content = '# Title\n\n> Date: 2025-07-11\n> Purpose: Some purpose\n\n## Body';
+		const meta = extractBlockquoteMetadata(content);
+		expect(meta.date).toBe('2025-07-11');
+	});
+
+	it('returns empty metadata when no blockquotes', () => {
+		const content = '# Title\n\nNo blockquotes here.';
+		const meta = extractBlockquoteMetadata(content);
+		expect(meta.sources).toEqual([]);
+		expect(meta.date).toBeUndefined();
+		expect(meta.session).toBeUndefined();
+	});
+
+	it('extracts multiple source-like fields', () => {
+		const content = '# Title\n\n> Source: https://github.com/example/repo\n> File references: `foo.ts`, `bar.ts`\n';
+		const meta = extractBlockquoteMetadata(content);
+		expect(meta.sources).toEqual(['https://github.com/example/repo']);
+	});
+});
+
+describe('normalizeResearchFile', () => {
+	it('adds frontmatter to file without one', () => {
+		const content = '# Title\n\n> Source: Analysis of repo (March 2026)\n\n---\n\n## Body';
+		const result = normalizeResearchFile(content, '01-copilot-chat-internals.md');
+		expect(result).toMatch(/^---\n/);
+		const fm = parseFrontmatter(result);
+		expect(fm).not.toBeNull();
+		expect(fm!.type).toBe('research');
+		expect(fm!.id).toBe(1);
+	});
+
+	it('extracts numeric id from filename', () => {
+		const content = '# Title\n\n> Date: 2025-07-11\n\n## Body';
+		const result = normalizeResearchFile(content, '12-detailed-source-analysis.md');
+		const fm = parseFrontmatter(result);
+		expect(fm!.id).toBe(12);
+	});
+
+	it('skips files that already have frontmatter', () => {
+		const content = '---\ntype: research\nid: 13\n---\n# Title';
+		const result = normalizeResearchFile(content, '13-phase9-deep-research.md');
+		expect(result).toBe(content);
+	});
+
+	it('preserves original content after frontmatter', () => {
+		const content = '# Title\n\n> Source: some source\n\n## Body\n\nParagraph text.';
+		const result = normalizeResearchFile(content, '03-test.md');
+		expect(result).toContain('# Title');
+		expect(result).toContain('## Body');
+		expect(result).toContain('Paragraph text.');
+	});
+
+	it('includes date in frontmatter when present', () => {
+		const content = '# Title\n\n> Date: 2025-07-11\n> Sources: 13 repositories\n\n## Body';
+		const result = normalizeResearchFile(content, '09-ecosystem.md');
+		const fm = parseFrontmatter(result);
+		expect(fm!.date).toBe('2025-07-11');
+	});
+
+	it('includes sources in frontmatter', () => {
+		const content = '# Title\n\n> Source: https://github.com/example/repo (v0.5.1, MIT)\n\n## Body';
+		const result = normalizeResearchFile(content, '06-test.md');
+		const fm = parseFrontmatter(result);
+		expect(fm!.sources).toBeDefined();
+		expect(Array.isArray(fm!.sources)).toBe(true);
+	});
+
+	it('validates output with parseFrontmatter', () => {
+		const content = '# Ecosystem\n\n> Date: 2025-07-11\n> Sources: 13 repositories analyzed\n> Purpose: Consolidated findings\n\n## Body';
+		const result = normalizeResearchFile(content, '09-ecosystem-patterns-synthesis.md');
+		const fm = parseFrontmatter(result);
+		expect(fm).not.toBeNull();
+		expect(fm!.type).toBe('research');
 	});
 });

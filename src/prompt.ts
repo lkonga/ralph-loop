@@ -101,6 +101,54 @@ export function parseFrontmatter(content: string): Record<string, unknown> | nul
 	return result;
 }
 
+export interface BlockquoteMetadata {
+	sources: string[];
+	date?: string;
+	session?: string;
+}
+
+export function extractBlockquoteMetadata(content: string): BlockquoteMetadata {
+	const meta: BlockquoteMetadata = { sources: [] };
+	const lines = content.split('\n');
+	for (const line of lines) {
+		const trimmed = line.trim();
+		if (!trimmed.startsWith('>')) { continue; }
+		const text = trimmed.slice(1).trim();
+		const sourceMatch = text.match(/^Source:\s*(.+)/);
+		if (sourceMatch) {
+			meta.sources.push(sourceMatch[1].trim());
+			continue;
+		}
+		const dateMatch = text.match(/^Date:\s*(\d{4}-\d{2}-\d{2})/);
+		if (dateMatch) {
+			meta.date = dateMatch[1];
+			continue;
+		}
+		const sessionMatch = text.match(/^Session:\s*`?([^`]+)`?/);
+		if (sessionMatch) {
+			meta.session = sessionMatch[1].trim();
+			continue;
+		}
+	}
+	return meta;
+}
+
+export function normalizeResearchFile(content: string, filename: string): string {
+	if (parseFrontmatter(content) !== null) { return content; }
+	const idMatch = filename.match(/^(\d+)/);
+	const id = idMatch ? parseInt(idMatch[1], 10) : 0;
+	const meta = extractBlockquoteMetadata(content);
+	const fmLines: string[] = ['---', 'type: research', `id: ${id}`];
+	if (meta.date) { fmLines.push(`date: ${meta.date}`); }
+	if (meta.sources.length > 0) {
+		fmLines.push('sources:');
+		for (const s of meta.sources) { fmLines.push(`  - ${s}`); }
+	}
+	if (meta.session) { fmLines.push(`session: ${meta.session}`); }
+	fmLines.push('---');
+	return fmLines.join('\n') + '\n' + content;
+}
+
 export function extractSpecReference(taskDescription: string): { filePath: string; startLine: number; endLine: number } | null {
 	const match = taskDescription.match(/→\s*Spec:\s*`?([^`\s]+)`?\s+L(\d+)-L(\d+)/);
 	if (!match) { return null; }
