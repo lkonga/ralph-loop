@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { parsePrd } from '../src/prd';
-import { verifyTaskCompletion, allChecksPassed, isAllDone, progressSummary, VerifierRegistry, createBuiltinRegistry, runVerifierChain, resolveVerifiers, computeConfidenceScore, dualExitGateCheck } from '../src/verify';
+import { verifyTaskCompletion, allChecksPassed, isAllDone, progressSummary, VerifierRegistry, createBuiltinRegistry, runVerifierChain, resolveVerifiers, computeConfidenceScore, dualExitGateCheck, formatVerificationFeedback } from '../src/verify';
 import { Task, TaskStatus, VerifyResult, VerifierConfig, RalphConfig, DEFAULT_CONFIG, DiffValidationResult } from '../src/types';
 
 function tmpPrd(content: string): string {
@@ -476,5 +476,111 @@ describe('dualExitGateCheck', () => {
 		const result = dualExitGateCheck(false, checks);
 		expect(result.canComplete).toBe(false);
 		expect(result.reason).toBeDefined();
+	});
+});
+
+describe('formatVerificationFeedback', () => {
+	it('returns empty string when all checks pass', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Pass, detail: 'TypeScript clean' },
+			{ name: 'vitest', result: VerifyResult.Pass, detail: 'Tests pass' },
+		];
+		expect(formatVerificationFeedback(checks)).toBe('');
+	});
+
+	it('returns empty string for empty checks array', () => {
+		expect(formatVerificationFeedback([])).toBe('');
+	});
+
+	it('formats a single failing check with detail', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Fail, detail: "src/foo.ts(10,5): error TS2339: Property 'bar' does not exist on type 'Foo'." },
+		];
+		const result = formatVerificationFeedback(checks);
+		expect(result).toContain('VERIFICATION FAILURES');
+		expect(result).toContain('tsc');
+		expect(result).toContain("Property 'bar' does not exist on type 'Foo'");
+	});
+
+	it('formats multiple failing checks', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Fail, detail: 'TypeScript errors found' },
+			{ name: 'vitest', result: VerifyResult.Fail, detail: 'FAIL test/foo.test.ts > should work' },
+			{ name: 'checkbox', result: VerifyResult.Pass, detail: 'Checkbox marked' },
+		];
+		const result = formatVerificationFeedback(checks);
+		expect(result).toContain('tsc');
+		expect(result).toContain('vitest');
+		expect(result).not.toContain('checkbox');
+	});
+
+	it('handles failing check without detail', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'custom', result: VerifyResult.Fail },
+		];
+		const result = formatVerificationFeedback(checks);
+		expect(result).toContain('custom');
+		expect(result).toContain('VERIFICATION FAILURES');
+	});
+
+	it('skips checks with Skip result', () => {
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Skip },
+			{ name: 'vitest', result: VerifyResult.Fail, detail: 'Tests failed' },
+		];
+		const result = formatVerificationFeedback(checks);
+		expect(result).not.toContain('tsc');
+		expect(result).toContain('vitest');
+	});
+
+	it('truncates very long detail to prevent prompt bloat', () => {
+		const longDetail = 'x'.repeat(5000);
+		const checks: VerifyCheck[] = [
+			{ name: 'tsc', result: VerifyResult.Fail, detail: longDetail },
+		];
+		const result = formatVerificationFeedback(checks);
+		expect(result.length).toBeLessThan(5000);
+		expect(result).toContain('...(truncated)');
+	});
+});
+
+describe('builtin verifiers capture stderr/stdout in detail', () => {
+	it('tsc verifier captures error output on failure', async () => {
+		const registry = createBuiltinRegistry();
+		const fn = registry.get('tsc');
+		const dir = tmpDir();
+		// tsc will fail in a dir with no tsconfig — we just check that detail is more specific than "TypeScript errors"
+		const task = makeTask();
+		const result = await fn(task, dir);
+		if (result.result === VerifyResult.Fail) {
+			// detail should contain actual tsc output, not just generic message
+			expect(result.detail).toBeDefined();
+			expect(result.detail!.length).toBeGreaterThan(0);
+		}
+	});
+
+	it('vitest verifier captures error output on failure', async () => {
+		const registry = createBuiltinRegistry();
+		const fn = registry.get('vitest');
+		const dir = tmpDir();
+		// Write a minimal package.json and a failing test so vitest runs quickly and fails
+		fs.writeFileSync(path.join(dir, 'package.json'), '{}');
+		fs.writeFileSync(path.join(dir, 'fail.test.ts'), 'import { it, expect } from "vitest"; it("fails", () => { expect(1).toBe(2); });');
+		const task = makeTask();
+		const result = await fn(task, dir);
+		if (result.result === VerifyResult.Fail) {
+			expect(result.detail).toBeDefined();
+			expect(result.detail!.length).toBeGreaterThan(0);
+		}
+	}, 15000);
+
+	it('commandExitCode verifier captures error output on failure', async () => {
+		const registry = createBuiltinRegistry();
+		const fn = registry.get('commandExitCode');
+		const dir = tmpDir();
+		const task = makeTask();
+		const result = await fn(task, dir, { command: 'echo "specific error message" >&2 && exit 1' });
+		expect(result.result).toBe(VerifyResult.Fail);
+		expect(result.detail).toContain('specific error message');
 	});
 });

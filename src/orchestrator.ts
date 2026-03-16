@@ -48,7 +48,7 @@ import { createDefaultChain, CircuitBreakerChain, ErrorHashTracker, type Circuit
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
 import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
-import { computeConfidenceScore, dualExitGateCheck } from './verify';
+import { computeConfidenceScore, dualExitGateCheck, formatVerificationFeedback } from './verify';
 import { KnowledgeManager } from './knowledge';
 import { StruggleDetector } from './struggleDetector';
 import { SessionPersistence } from './sessionPersistence';
@@ -911,7 +911,11 @@ export class LoopOrchestrator {
 
 						if (confidence.score < confidenceThreshold) {
 							const failing = Object.entries(confidence.breakdown).filter(([, v]) => v === 0).map(([k]) => k).join(', ');
+							const feedback = formatVerificationFeedback(confidenceChecks);
 							additionalContext = `Verification confidence: ${confidence.score}/180. Missing: ${failing}. Complete the remaining items.`;
+							if (feedback) {
+								additionalContext += '\n\n' + feedback;
+							}
 							this.completedTasks.delete(task.id);
 							continue;
 						}
@@ -980,7 +984,11 @@ export class LoopOrchestrator {
 					} else if (waitResult.completed && !gateResult.canComplete) {
 						// Model signaled complete but dual gate rejected — nudge to fix
 						this.logger.warn(`Dual exit gate rejected: ${gateResult.reason}`);
+						const feedback = formatVerificationFeedback(dualGateChecks);
 						additionalContext = gateResult.reason ?? 'Dual exit gate check failed';
+						if (feedback) {
+							additionalContext += '\n\n' + feedback;
+						}
 						this.completedTasks.delete(task.id);
 						continue;
 					} else {

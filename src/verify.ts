@@ -4,6 +4,20 @@ import { execSync } from 'child_process';
 import { PrdSnapshot, Task, TaskStatus, VerifyResult, VerifyCheck, VerifierFn, VerifierConfig, VerificationTemplate, RalphConfig, ILogger, DiffValidationResult } from './types';
 import { readPrdSnapshot } from './prd';
 
+const MAX_DETAIL_LENGTH = 2000;
+
+function extractExecDetail(e: unknown, fallback: string): string {
+	if (e && typeof e === 'object' && 'stderr' in e) {
+		const stderr = String((e as { stderr: unknown }).stderr).trim();
+		const stdout = 'stdout' in e ? String((e as { stdout: unknown }).stdout).trim() : '';
+		const combined = (stderr || stdout).slice(0, MAX_DETAIL_LENGTH);
+		if (combined.length > 0) {
+			return combined.length === MAX_DETAIL_LENGTH ? combined + '...(truncated)' : combined;
+		}
+	}
+	return fallback;
+}
+
 export class VerifierRegistry {
 	private registry = new Map<string, VerifierFn>();
 
@@ -49,8 +63,9 @@ export function createBuiltinRegistry(): VerifierRegistry {
 		try {
 			execSync(args?.command ?? 'true', { cwd: workspaceRoot, stdio: 'pipe' });
 			return { name: 'commandExitCode', result: VerifyResult.Pass, detail: 'Command exited 0' };
-		} catch {
-			return { name: 'commandExitCode', result: VerifyResult.Fail, detail: 'Command exited non-zero' };
+		} catch (e: unknown) {
+			const detail = extractExecDetail(e, 'Command exited non-zero');
+			return { name: 'commandExitCode', result: VerifyResult.Fail, detail };
 		}
 	});
 
@@ -58,8 +73,9 @@ export function createBuiltinRegistry(): VerifierRegistry {
 		try {
 			execSync('npx tsc --noEmit', { cwd: workspaceRoot, stdio: 'pipe' });
 			return { name: 'tsc', result: VerifyResult.Pass, detail: 'TypeScript clean' };
-		} catch {
-			return { name: 'tsc', result: VerifyResult.Fail, detail: 'TypeScript errors' };
+		} catch (e: unknown) {
+			const detail = extractExecDetail(e, 'TypeScript errors');
+			return { name: 'tsc', result: VerifyResult.Fail, detail };
 		}
 	});
 
@@ -67,8 +83,9 @@ export function createBuiltinRegistry(): VerifierRegistry {
 		try {
 			execSync('npx vitest run', { cwd: workspaceRoot, stdio: 'pipe' });
 			return { name: 'vitest', result: VerifyResult.Pass, detail: 'Tests pass' };
-		} catch {
-			return { name: 'vitest', result: VerifyResult.Fail, detail: 'Tests failed' };
+		} catch (e: unknown) {
+			const detail = extractExecDetail(e, 'Tests failed');
+			return { name: 'vitest', result: VerifyResult.Fail, detail };
 		}
 	});
 
@@ -76,8 +93,9 @@ export function createBuiltinRegistry(): VerifierRegistry {
 		try {
 			execSync(args?.command ?? 'true', { cwd: workspaceRoot, stdio: 'pipe', shell: '/bin/sh' });
 			return { name: 'custom', result: VerifyResult.Pass, detail: 'Custom command passed' };
-		} catch {
-			return { name: 'custom', result: VerifyResult.Fail, detail: 'Custom command failed' };
+		} catch (e: unknown) {
+			const detail = extractExecDetail(e, 'Custom command failed');
+			return { name: 'custom', result: VerifyResult.Fail, detail };
 		}
 	});
 
@@ -138,6 +156,34 @@ export function verifyTaskCompletion(prdPath: string, task: Task, logger: ILogge
 
 export function allChecksPassed(checks: readonly VerifyCheck[]): boolean {
 	return checks.every(c => c.result === VerifyResult.Pass || c.result === VerifyResult.Skip);
+}
+
+export function formatVerificationFeedback(checks: VerifyCheck[]): string {
+	const failing = checks.filter(c => c.result === VerifyResult.Fail);
+	if (failing.length === 0) {
+		return '';
+	}
+
+	const lines: string[] = [
+		'=== VERIFICATION FAILURES ===',
+		`${failing.length} check(s) failed. Fix these before marking the task complete:`,
+		'',
+	];
+
+	for (const check of failing) {
+		lines.push(`--- ${check.name} ---`);
+		if (check.detail) {
+			const truncated = check.detail.length > MAX_DETAIL_LENGTH
+				? check.detail.slice(0, MAX_DETAIL_LENGTH) + '...(truncated)'
+				: check.detail;
+			lines.push(truncated);
+		} else {
+			lines.push('(no detail available)');
+		}
+		lines.push('');
+	}
+
+	return lines.join('\n');
 }
 
 // Dual exit gate: checks if ALL tasks are done
