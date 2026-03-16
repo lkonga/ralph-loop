@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
+import { showCooldownDialog, type CooldownDialogResult } from './cooldownDialog';
 import {
 	LoopState,
 	LoopEvent,
@@ -243,6 +244,7 @@ export class LoopOrchestrator {
 	private linkedSignal?: LinkedCancellationSource;
 	private readonly sessionPersistence?: SessionPersistence;
 	bearingsExecFn?: BearingsExecFn;
+	showCooldownDialogFn: (nextTask: string, timeoutMs: number) => Promise<CooldownDialogResult>;
 
 	constructor(
 		config: RalphConfig,
@@ -264,6 +266,7 @@ export class LoopOrchestrator {
 		if (spConfig.enabled) {
 			this.sessionPersistence = new SessionPersistence(spConfig.expireAfterMs);
 		}
+		this.showCooldownDialogFn = showCooldownDialog;
 	}
 
 	private resolveStrategy(): ITaskExecutionStrategy {
@@ -1087,15 +1090,38 @@ export class LoopOrchestrator {
 					}
 				}
 
-				// Countdown between tasks
-				for (let s = this.config.countdownSeconds; s > 0; s--) {
-					if (this.stopRequested) {
-						this.sessionPersistence?.clear(this.config.workspaceRoot);
+				// Countdown between tasks with optional cooldown dialog
+				if (this.config.cooldownShowDialog !== false) {
+					const nextTask = snapshot.tasks.find(t => t.status === 'pending');
+					const dialogResult = await this.showCooldownDialogFn(
+						nextTask?.description ?? 'next task',
+						this.config.countdownSeconds * 1000,
+					);
+					if (dialogResult === 'pause') {
+						yield { kind: LoopEventKind.YieldRequested };
+						return;
+					}
+					if (dialogResult === 'stop') {
 						yield { kind: LoopEventKind.Stopped };
 						return;
 					}
-					yield { kind: LoopEventKind.Countdown, secondsLeft: s };
-					await this.delay(1000);
+					if (dialogResult === 'edit') {
+						const userInput = await vscode.window.showInputBox({ prompt: 'Provide context for the next task' });
+						if (userInput) {
+							this.injectContext(userInput);
+							yield { kind: LoopEventKind.ContextInjected, text: userInput };
+						}
+					}
+				} else {
+					for (let s = this.config.countdownSeconds; s > 0; s--) {
+						if (this.stopRequested) {
+							this.sessionPersistence?.clear(this.config.workspaceRoot);
+							yield { kind: LoopEventKind.Stopped };
+							return;
+						}
+						yield { kind: LoopEventKind.Countdown, secondsLeft: s };
+						await this.delay(1000);
+					}
 				}
 
 				// Save session state after each iteration
@@ -1165,5 +1191,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		autoDecompose: vsConfig.get('autoDecompose', DEFAULT_CONFIG.autoDecompose),
 		knowledge: vsConfig.get('knowledge', DEFAULT_CONFIG.knowledge),
 		contextTrimming: vsConfig.get('contextTrimming', DEFAULT_CONFIG.contextTrimming),
+		cooldownShowDialog: vsConfig.get<boolean>('cooldownShowDialog', DEFAULT_CONFIG.cooldownShowDialog ?? true),
 	};
 }

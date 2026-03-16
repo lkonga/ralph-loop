@@ -61,6 +61,11 @@
 					"default": 12,
 					"description": "Seconds to wait between tasks."
 				},
+				"ralph-loop.cooldownShowDialog": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show an auto-accepting dialog during inter-task countdown with Pause/Stop/Edit buttons."
+				},
 				"ralph-loop.inactivityTimeoutMs": {
 					"type": "number",
 					"default": 300000,

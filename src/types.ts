@@ -468,6 +468,7 @@ export interface RalphConfig {
 	promptTemplate?: string;
 	sessionPersistence?: { enabled: boolean; expireAfterMs: number };
 	contextBudget?: ContextBudgetConfig;
+	cooldownShowDialog?: boolean;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -504,6 +505,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	backpressure: { ...DEFAULT_BACKPRESSURE_CONFIG },
 	sessionPersistence: { enabled: true, expireAfterMs: 86400000 },
 	contextBudget: { ...DEFAULT_CONTEXT_BUDGET },
+	cooldownShowDialog: true,
 };
 
 // --- Verification ---

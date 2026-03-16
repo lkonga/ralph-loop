@@ -4,7 +4,10 @@ export const workspace = {
 		update: () => Promise.resolve(),
 	}),
 };
-export const window = {};
+export const window = {
+	showInformationMessage: async () => undefined,
+	showInputBox: async () => undefined,
+};
 export const env = {
 	clipboard: {
 		writeText: async () => {},
