@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { StruggleDetector } from '../src/struggleDetector';
+import { StruggleDetector, ThrashingDetector } from '../src/struggleDetector';
 
 describe('StruggleDetector', () => {
     // --- No-progress signal ---
@@ -184,5 +184,122 @@ describe('StruggleDetector', () => {
             const result = sd.isStruggling();
             expect(result.signals).not.toContain('repeated-error');
         });
+    });
+});
+
+describe('ThrashingDetector', () => {
+    it('does not trigger when same region hash appears fewer than threshold times', () => {
+        const td = new ThrashingDetector();
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        const result = td.isThrashing();
+        expect(result.thrashing).toBe(false);
+    });
+
+    it('triggers when same region hash appears >= threshold (3) times', () => {
+        const td = new ThrashingDetector();
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        const result = td.isThrashing();
+        expect(result.thrashing).toBe(true);
+        expect(result.file).toBe('src/foo.ts');
+        expect(result.editCount).toBe(3);
+    });
+
+    it('does not trigger with different region hashes', () => {
+        const td = new ThrashingDetector();
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-b');
+        td.recordEdit('src/foo.ts', 'hash-c');
+        const result = td.isThrashing();
+        expect(result.thrashing).toBe(false);
+    });
+
+    it('slides the window correctly (old entries evicted)', () => {
+        const td = new ThrashingDetector({ windowSize: 4, regionRepetitionThreshold: 3 });
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        // Fill window to push out first hash-a
+        td.recordEdit('src/foo.ts', 'hash-b');
+        td.recordEdit('src/foo.ts', 'hash-c');
+        // Window now: [hash-a, hash-b, hash-c, ...], first hash-a evicted
+        td.recordEdit('src/foo.ts', 'hash-a');
+        // Window: [hash-b, hash-c, hash-a, hash-a] — only 2 hash-a in window
+        const result = td.isThrashing();
+        expect(result.thrashing).toBe(false);
+    });
+
+    it('respects custom regionRepetitionThreshold', () => {
+        const td = new ThrashingDetector({ regionRepetitionThreshold: 2, windowSize: 10 });
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        const result = td.isThrashing();
+        expect(result.thrashing).toBe(true);
+        expect(result.editCount).toBe(2);
+    });
+
+    it('respects custom windowSize', () => {
+        const td = new ThrashingDetector({ windowSize: 3, regionRepetitionThreshold: 3 });
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-b'); // pushes out first hash-a
+        td.recordEdit('src/foo.ts', 'hash-a');
+        // Window: [hash-a, hash-b, hash-a] — only 2 hash-a
+        const result = td.isThrashing();
+        expect(result.thrashing).toBe(false);
+    });
+
+    it('reset clears thrashing state', () => {
+        const td = new ThrashingDetector();
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        expect(td.isThrashing().thrashing).toBe(true);
+        td.reset();
+        expect(td.isThrashing().thrashing).toBe(false);
+    });
+
+    it('tracks multiple files independently', () => {
+        const td = new ThrashingDetector();
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/bar.ts', 'hash-b');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        td.recordEdit('src/bar.ts', 'hash-b');
+        td.recordEdit('src/foo.ts', 'hash-a');
+        // foo.ts hash-a appears 3x
+        const result = td.isThrashing();
+        expect(result.thrashing).toBe(true);
+        expect(result.file).toBe('src/foo.ts');
+    });
+});
+
+describe('StruggleDetector with thrashing signal', () => {
+    it('thrashing signal appears in isStruggling when integrated', () => {
+        const sd = new StruggleDetector({}, { regionRepetitionThreshold: 3, windowSize: 10 });
+        sd.recordEdit('src/foo.ts', 'hash-a');
+        sd.recordEdit('src/foo.ts', 'hash-a');
+        sd.recordEdit('src/foo.ts', 'hash-a');
+        const result = sd.isStruggling();
+        expect(result.struggling).toBe(true);
+        expect(result.signals).toContain('thrashing');
+    });
+
+    it('thrashing signal does not appear when below threshold', () => {
+        const sd = new StruggleDetector({}, { regionRepetitionThreshold: 3, windowSize: 10 });
+        sd.recordEdit('src/foo.ts', 'hash-a');
+        sd.recordEdit('src/foo.ts', 'hash-b');
+        const result = sd.isStruggling();
+        expect(result.signals).not.toContain('thrashing');
+    });
+
+    it('reset clears thrashing state in StruggleDetector', () => {
+        const sd = new StruggleDetector({}, { regionRepetitionThreshold: 3, windowSize: 10 });
+        sd.recordEdit('src/foo.ts', 'hash-a');
+        sd.recordEdit('src/foo.ts', 'hash-a');
+        sd.recordEdit('src/foo.ts', 'hash-a');
+        expect(sd.isStruggling().signals).toContain('thrashing');
+        sd.reset();
+        expect(sd.isStruggling().signals).not.toContain('thrashing');
     });
 });

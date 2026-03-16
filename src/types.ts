@@ -267,6 +267,8 @@ export interface StruggleDetectionConfig {
 	noProgressThreshold: number;
 	shortIterationThreshold: number;
 	shortIterationMs: number;
+	thrashingThreshold: number;
+	thrashingWindowSize: number;
 }
 
 // --- Bearings (pre-flight health check) ---
@@ -293,6 +295,8 @@ export const DEFAULT_STRUGGLE_DETECTION: StruggleDetectionConfig = {
 	noProgressThreshold: 3,
 	shortIterationThreshold: 3,
 	shortIterationMs: 30000,
+	thrashingThreshold: 3,
+	thrashingWindowSize: 10,
 };
 
 // --- Context trimming config ---

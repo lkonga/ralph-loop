@@ -429,6 +429,9 @@ export class LoopOrchestrator {
 					noProgressThreshold: struggleConfig.noProgressThreshold,
 					shortIterationThreshold: struggleConfig.shortIterationThreshold,
 					shortIterationMs: struggleConfig.shortIterationMs,
+				}, {
+					regionRepetitionThreshold: struggleConfig.thrashingThreshold,
+					windowSize: struggleConfig.thrashingWindowSize,
 				})
 				: undefined;
 
