@@ -277,7 +277,7 @@
 ### 9d — Signals & Safety
 
 - [x] **Task 66 — Filesystem Inactivity Signal**: Add `InactivityConfig` with configurable `timeoutMs` (default 120s, up from 60s concern), `warningAtPct` (50%), and `adaptive` flag (future). Graduated response: warning at 50%, action at 100%. → Spec: `research/14-phase9-refined-tasks.md` L331-L353
-- [ ] **Task 67 — Atomic Session Writes**: In `src/sessionPersistence.ts`, change `save()` to write to `.tmp` file then `fs.renameSync` to target — atomic on POSIX and Windows. Surgical 3-line fix, no API changes. Add test verifying crash safety. Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 67 — Atomic Session Writes**: In `src/sessionPersistence.ts`, change `save()` to write to `.tmp` file then `fs.renameSync` to target — atomic on POSIX and Windows. Surgical 3-line fix, no API changes. Add test verifying crash safety. Run `npx tsc --noEmit` and `npx vitest run`.
 - [ ] **Task 68 — Session ID & Isolation**: Extend `SerializedLoopState` with `sessionId` (UUID), `pid`, `workspacePath`. Validate workspace match and PID liveness on `load()`. Prevents cross-window session interference. → Spec: `research/14-phase9-refined-tasks.md` L386-L412
 
 ### 9e — Research Infrastructure
