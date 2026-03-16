@@ -356,6 +356,19 @@ export const DEFAULT_KNOWLEDGE_CONFIG: KnowledgeConfig = {
 	harvest: { ...DEFAULT_HARVEST_CONFIG },
 };
 
+// --- Knowledge GC ---
+export interface GCPolicy {
+	triggerEveryNRuns: number;
+	maxEntries: number;
+	stalenessThreshold: number;
+}
+
+export const DEFAULT_GC_POLICY: GCPolicy = {
+	triggerEveryNRuns: 10,
+	maxEntries: 200,
+	stalenessThreshold: 20,
+};
+
 // --- Consistency checker ---
 export interface ConsistencyCheckDetail {
 	name: string;

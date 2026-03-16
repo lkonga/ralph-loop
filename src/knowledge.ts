@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import type { KnowledgeEntry, KnowledgeCategory, HarvestConfig } from './types';
+import type { KnowledgeEntry, KnowledgeCategory, HarvestConfig, GCPolicy } from './types';
 
 export function computeEntryHash(content: string): string {
 	return crypto.createHash('md5').update(content.toLowerCase().trim()).digest('hex');
@@ -187,5 +187,114 @@ export class KnowledgeManager {
 		const regex = new RegExp(`## ${sectionName}\\s*\\n([\\s\\S]*?)(?=\\n## |$)`);
 		const match = content.match(regex);
 		return match ? match[1] : '';
+	}
+}
+
+export interface EntryMeta {
+	hits: number;
+	createdAtRun: number;
+	lastHitRun: number;
+}
+
+export interface GCResult {
+	kept: string[];
+	archived: string[];
+}
+
+export class KnowledgeGC {
+	private readonly policy: GCPolicy;
+
+	constructor(policy: GCPolicy) {
+		this.policy = policy;
+	}
+
+	shouldTrigger(runCount: number): boolean {
+		return runCount > 0 && runCount % this.policy.triggerEveryNRuns === 0;
+	}
+
+	recordHit(meta: Record<string, EntryMeta>, hash: string, currentRun: number): void {
+		if (!meta[hash]) {
+			meta[hash] = { hits: 0, createdAtRun: currentRun, lastHitRun: 0 };
+		}
+		meta[hash].hits++;
+		meta[hash].lastHitRun = currentRun;
+	}
+
+	collectGarbage(knowledgeContent: string, meta: Record<string, EntryMeta>, currentRun: number): GCResult {
+		const hashPattern = /<!-- hash:([0-9a-f]+) -->/;
+		const lines = knowledgeContent.split('\n').filter(l => l.trim().startsWith('- ') && hashPattern.test(l));
+
+		if (lines.length === 0) {
+			return { kept: [], archived: [] };
+		}
+
+		const scored = lines.map(line => {
+			const match = line.match(hashPattern);
+			const hash = match ? match[1] : '';
+			const entry = meta[hash];
+			if (!entry) {
+				return { line, hash, score: 1, stale: false };
+			}
+			const age = currentRun - entry.createdAtRun;
+			const isStale = entry.hits === 0 && age > this.policy.stalenessThreshold;
+			const score = entry.hits + (entry.lastHitRun > 0 ? 1 : 0);
+			return { line, hash, score, stale: isStale };
+		});
+
+		// First pass: archive stale entries
+		let kept = scored.filter(e => !e.stale);
+		let archived = scored.filter(e => e.stale);
+
+		// Second pass: enforce maxEntries cap
+		if (kept.length > this.policy.maxEntries) {
+			kept.sort((a, b) => b.score - a.score);
+			const overflow = kept.splice(this.policy.maxEntries);
+			archived = archived.concat(overflow);
+		}
+
+		return {
+			kept: kept.map(e => e.line),
+			archived: archived.map(e => e.line),
+		};
+	}
+
+	runGC(workspaceRoot: string, knowledgePath: string, currentRun: number): void {
+		const filePath = path.join(workspaceRoot, knowledgePath);
+		if (!fs.existsSync(filePath)) { return; }
+
+		const knowledgeContent = fs.readFileSync(filePath, 'utf-8');
+
+		const metaPath = path.join(workspaceRoot, 'knowledge-meta.json');
+		const meta: Record<string, EntryMeta> = fs.existsSync(metaPath)
+			? JSON.parse(fs.readFileSync(metaPath, 'utf-8'))
+			: {};
+
+		const hashPattern = /<!-- hash:([0-9a-f]+) -->/;
+		const entryLines = knowledgeContent.split('\n').filter(l => l.trim().startsWith('- ') && hashPattern.test(l));
+		const nonEntryLines = knowledgeContent.split('\n').filter(l => !(l.trim().startsWith('- ') && hashPattern.test(l)));
+
+		const result = this.collectGarbage(entryLines.join('\n'), meta, currentRun);
+
+		if (result.archived.length === 0) { return; }
+
+		const archivePath = path.join(workspaceRoot, 'knowledge-archive.md');
+		let archiveContent = '';
+		if (fs.existsSync(archivePath)) {
+			archiveContent = fs.readFileSync(archivePath, 'utf-8');
+		} else {
+			archiveContent = '# Knowledge Archive\n\n';
+		}
+		archiveContent += result.archived.join('\n') + '\n';
+		fs.writeFileSync(archivePath, archiveContent);
+
+		const newContent = nonEntryLines.join('\n') + (result.kept.length > 0 ? '\n' + result.kept.join('\n') + '\n' : '\n');
+		fs.writeFileSync(filePath, newContent);
+
+		// Clean up meta for archived entries
+		for (const line of result.archived) {
+			const match = line.match(hashPattern);
+			if (match) { delete meta[match[1]]; }
+		}
+		fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
 	}
 }
