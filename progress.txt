@@ -340,3 +340,12 @@ Extended `SerializedLoopState` with optional `sessionId`, `pid`, `workspacePath`
 [2026-03-16T02:35:15.968Z] [1f686f24-b3be-47b9-8f2c-b688b74c7c6e] [Task-075] Task completed: **Task 75 — Verification Feedback Injection**: When verifiers fail, capture stderr/stdout diagnostic details in `VerifyCheck.detail` and inject structured failure reasons into the next prompt via `additionalContext` → `buildPrompt()`. Add `formatVerificationFeedback(checks: VerifyCheck[]): string` to `src/verify.ts`. Wire into orchestrator's verification-failed path so the agent receives actionable failure context (e.g., specific tsc errors, failing test names) instead of generic "verification failed" messages. Pattern from vercel-labs/Reflexion — highest-impact gap identified in wave research. → Spec: `research/_wave/2026-03-16-ralph-deep-verification/research-1.md`, `research/_wave/2026-03-16-ralph-deep-verification/research-7.md` (227s)
 
 ### Task 74 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +10/-1 | Status: pass
+[2026-03-16T02:35:16.084Z] [1f686f24-b3be-47b9-8f2c-b688b74c7c6e] Committed: 8fadf19f6fb3399b8ab308574f362259aeeade3a
+
+### Task 75 Implementation | Files: [src/verify.ts, src/orchestrator.ts, test/verify.test.ts] | Lines: +172/-11 | Status: pass
+- Added `extractExecDetail()` helper to capture stderr/stdout from failed `execSync` calls
+- Updated tsc, vitest, commandExitCode, custom verifiers to capture actual error output in `VerifyCheck.detail` instead of generic messages
+- Added `formatVerificationFeedback(checks: VerifyCheck[]): string` to `src/verify.ts` — formats failing checks into structured `=== VERIFICATION FAILURES ===` block with per-check detail, truncated at 2000 chars
+- Wired into orchestrator: confidence-score-failed path (L912-918) and dual-exit-gate-rejected path (L984-993) now append formatted feedback to `additionalContext`
+- TDD: 10 new tests in `test/verify.test.ts` covering: empty/pass arrays, single/multiple failures, missing detail, skip filtering, truncation, and stderr capture for tsc/vitest/commandExitCode verifiers
+- All 466 tests pass, tsc --noEmit clean
