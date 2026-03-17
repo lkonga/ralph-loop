@@ -350,3 +350,13 @@ Extended `SerializedLoopState` with optional `sessionId`, `pid`, `workspacePath`
 - TDD: 10 new tests in `test/verify.test.ts` covering: empty/pass arrays, single/multiple failures, missing detail, skip filtering, truncation, and stderr capture for tsc/vitest/commandExitCode verifiers
 - All 466 tests pass, tsc --noEmit clean
 [2026-03-17T03:05:06.277Z] [0b609276-27af-48ce-9638-deb03a7a5917] [Task-001] Task started: Fix baseline: resolve TypeScript errors and failing tests before continuing
+
+### Task 001 (Bearings Fix) | Files: [src/verify.ts] | Lines: +42/-6 | Status: pass
+- Root cause: `formatVerificationFeedback` function was removed from `src/verify.ts` in a prior refactor, breaking its import in `src/orchestrator.ts` (1 tsc error) and 8 test failures in `test/verify.test.ts`
+- Restored `export function formatVerificationFeedback(checks: VerifyCheck[]): string` — formats failing checks into `=== VERIFICATION FAILURES ===` block with per-check detail, truncated at 2000 chars
+- Added `extractExecDetail(err)` helper to capture stderr/stdout from failed `execSync` calls
+- Fixed `commandExitCode`, `tsc`, and `vitest` verifiers to use `extractExecDetail` instead of generic messages
+- tsc --noEmit clean, all 470/470 tests pass
+[2026-03-17T03:07:06.505Z] [0b609276-27af-48ce-9638-deb03a7a5917] [Task-001] Task completed: Fix baseline: resolve TypeScript errors and failing tests before continuing (120s)
+
+### Task 0 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +17/-1 | Status: pass
