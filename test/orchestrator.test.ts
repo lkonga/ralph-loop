@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
 	shouldContinueLoop,
 	shouldNudge,
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource } from '../src/orchestrator';
+import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
 import { estimatePromptTokens } from '../src/prompt';
 import {
@@ -20,6 +20,8 @@ import type {
 	VerifyCheck,
 	ReviewVerdict,
 	InactivityConfig,
+	ILogger,
+	ExecutionOptions,
 } from '../src/types';
 import { VerifyResult, LoopEventKind } from '../src/types';
 
@@ -648,5 +650,64 @@ describe('InactivityConfig', () => {
 		expect(warningThreshold).toBe(100_000);
 		expect(actionThreshold).toBe(200_000);
 		expect(warningThreshold).toBeLessThan(actionThreshold);
+	});
+});
+
+// --- Agent-Routed Execution (Task 84) ---
+describe('resolveAgentMode', () => {
+	const mockLogger: ILogger = {
+		log: vi.fn(),
+		warn: vi.fn(),
+		error: vi.fn(),
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('returns ralph-{agent} when task.agent is set', () => {
+		const result = resolveAgentMode({ agent: 'explore' }, 'ralph-executor', mockLogger);
+		expect(result).toBe('ralph-explore');
+	});
+
+	it('returns config default when task.agent is undefined', () => {
+		const result = resolveAgentMode({}, 'ralph-executor', mockLogger);
+		expect(result).toBe('ralph-executor');
+	});
+
+	it('returns config default when task.agent is empty string', () => {
+		const result = resolveAgentMode({ agent: '' }, 'ralph-executor', mockLogger);
+		expect(result).toBe('ralph-executor');
+	});
+
+	it('falls back to config default with warning for unknown agent', () => {
+		const result = resolveAgentMode({ agent: 'nonexistent' }, 'ralph-executor', mockLogger);
+		expect(result).toBe('ralph-executor');
+		expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('nonexistent'));
+	});
+
+	it('passes through known agents without warning', () => {
+		resolveAgentMode({ agent: 'explore' }, 'ralph-executor', mockLogger);
+		expect(mockLogger.warn).not.toHaveBeenCalled();
+
+		resolveAgentMode({ agent: 'research' }, 'ralph-executor', mockLogger);
+		expect(mockLogger.warn).not.toHaveBeenCalled();
+
+		resolveAgentMode({ agent: 'executor' }, 'ralph-executor', mockLogger);
+		expect(mockLogger.warn).not.toHaveBeenCalled();
+	});
+});
+
+describe('ExecutionOptions agentMode passthrough', () => {
+	it('ExecutionOptions includes agentMode field', () => {
+		const opts: ExecutionOptions = {
+			prdPath: '/tmp/PRD.md',
+			workspaceRoot: '/tmp',
+			inactivityTimeoutMs: 120000,
+			useAutopilotMode: false,
+			shouldStop: () => false,
+			agentMode: 'ralph-explore',
+		};
+		expect(opts.agentMode).toBe('ralph-explore');
 	});
 });

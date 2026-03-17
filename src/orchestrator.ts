@@ -54,6 +54,24 @@ import { StruggleDetector } from './struggleDetector';
 import { SessionPersistence } from './sessionPersistence';
 import { execSync } from 'child_process';
 
+const KNOWN_AGENTS = new Set(['executor', 'explore', 'research']);
+
+export function resolveAgentMode(
+	task: { agent?: string },
+	defaultAgentMode: string,
+	logger: ILogger,
+): string {
+	if (!task.agent) {
+		return defaultAgentMode;
+	}
+	const modeId = `ralph-${task.agent}`;
+	if (!KNOWN_AGENTS.has(task.agent)) {
+		logger.warn(`Unknown agent "${task.agent}" — falling back to default "${defaultAgentMode}"`);
+		return defaultAgentMode;
+	}
+	return modeId;
+}
+
 export type BearingsExecFn = (cmd: string, cwd: string) => { exitCode: number; output: string };
 
 export class LinkedCancellationSource {
@@ -379,6 +397,13 @@ export class LoopOrchestrator {
 	}
 
 	private get executionOptions(): ExecutionOptions {
+		return this.executionOptionsForTask();
+	}
+
+	private executionOptionsForTask(task?: { agent?: string }): ExecutionOptions {
+		const agentMode = task
+			? resolveAgentMode(task, this.config.agentMode ?? 'ralph-executor', this.logger)
+			: this.config.agentMode;
 		return {
 			prdPath: resolvePrdPath(this.config.workspaceRoot, this.config.prdPath),
 			workspaceRoot: this.config.workspaceRoot,
@@ -386,6 +411,7 @@ export class LoopOrchestrator {
 			useAutopilotMode: this.config.features.useAutopilotMode,
 			shouldStop: () => this.stopRequested,
 			signal: this.linkedSignal?.signal,
+			agentMode,
 		};
 	}
 
@@ -544,7 +570,7 @@ export class LoopOrchestrator {
 									let progContent = '';
 									try { progContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 									const prompt = buildPrompt(task.description, prdContent, progContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId, undefined, this.config.workspaceRoot);
-									const execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
+									const execResult = await this.executionStrategy.execute(task, prompt, this.executionOptionsForTask(task));
 									const duration = Date.now() - start;
 
 									if (execResult.completed) {
@@ -706,7 +732,7 @@ export class LoopOrchestrator {
 
 					let execResult;
 					try {
-						execResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
+						execResult = await this.executionStrategy.execute(task, prompt, this.executionOptionsForTask(task));
 					} catch (execErr) {
 						monitor.stop();
 						throw execErr;
@@ -754,7 +780,7 @@ export class LoopOrchestrator {
 						const nudgePrompt = buildPrompt(task.description, readPrdFile(prdPath), (() => { try { return fs.readFileSync(progressPath, 'utf-8'); } catch { return ''; } })(), 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId, undefined, this.config.workspaceRoot)
 							+ '\n\n' + continuationSuffix;
 
-						const nudgeResult = await this.executionStrategy.execute(task, nudgePrompt, this.executionOptions);
+						const nudgeResult = await this.executionStrategy.execute(task, nudgePrompt, this.executionOptionsForTask(task));
 						waitResult = { completed: nudgeResult.completed, hadFileChanges: nudgeResult.hadFileChanges };
 					}
 
@@ -908,7 +934,7 @@ export class LoopOrchestrator {
 								try { progressContentRetry = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 								let retryPrompt = buildPrompt(task.description, prdContentRetry, progressContentRetry, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId, undefined, this.config.workspaceRoot);
 								retryPrompt += '\n\n' + nudge;
-								const retryExec = await this.executionStrategy.execute(task, retryPrompt, this.executionOptions);
+								const retryExec = await this.executionStrategy.execute(task, retryPrompt, this.executionOptionsForTask(task));
 								waitResult = { completed: retryExec.completed, hadFileChanges: retryExec.hadFileChanges };
 							}
 
@@ -1100,7 +1126,7 @@ export class LoopOrchestrator {
 							try { progressContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 
 							const prompt = buildPrompt(task.description, prdContent, progressContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId, undefined, this.config.workspaceRoot);
-							const retryExecResult = await this.executionStrategy.execute(task, prompt, this.executionOptions);
+							const retryExecResult = await this.executionStrategy.execute(task, prompt, this.executionOptionsForTask(task));
 							yield { kind: LoopEventKind.CopilotTriggered, method: retryExecResult.method, taskInvocationId };
 
 							const retryResult = { completed: retryExecResult.completed, hadFileChanges: retryExecResult.hadFileChanges };

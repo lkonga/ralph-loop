@@ -128,6 +128,7 @@ export interface ExecutionOptions {
 	useAutopilotMode: boolean;
 	shouldStop: () => boolean;
 	signal?: AbortSignal;
+	agentMode?: string;
 }
 
 export interface ExecutionResult {

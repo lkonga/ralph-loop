@@ -18,6 +18,7 @@ export class CopilotCommandStrategy implements ITaskExecutionStrategy {
 
 		const requestOptions: CopilotRequestOptions = {
 			useAutopilotMode: options.useAutopilotMode,
+			agentMode: options.agentMode,
 		};
 		const method = await openCopilotWithPrompt(prompt, this.logger, requestOptions);
 
