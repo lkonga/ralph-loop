@@ -1,3 +1,4 @@
+- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing
 # Ralph Loop V2 — Phase 1 Self-Fix PRD
 
 > Being executed BY ralph-loop ON itself.

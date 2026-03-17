@@ -4,6 +4,19 @@ import { execSync } from 'child_process';
 import { PrdSnapshot, Task, TaskStatus, VerifyResult, VerifyCheck, VerifierFn, VerifierConfig, VerificationTemplate, RalphConfig, ILogger, DiffValidationResult } from './types';
 import { readPrdSnapshot } from './prd';
 
+function extractExecDetail(err: unknown): string {
+	if (err && typeof err === 'object' && 'stderr' in err) {
+		const stderr = String((err as { stderr: unknown }).stderr).trim();
+		if (stderr) { return stderr; }
+	}
+	if (err && typeof err === 'object' && 'stdout' in err) {
+		const stdout = String((err as { stdout: unknown }).stdout).trim();
+		if (stdout) { return stdout; }
+	}
+	if (err instanceof Error) { return err.message; }
+	return String(err);
+}
+
 export class VerifierRegistry {
 	private registry = new Map<string, VerifierFn>();
 
@@ -49,8 +62,8 @@ export function createBuiltinRegistry(): VerifierRegistry {
 		try {
 			execSync(args?.command ?? 'true', { cwd: workspaceRoot, stdio: 'pipe' });
 			return { name: 'commandExitCode', result: VerifyResult.Pass, detail: 'Command exited 0' };
-		} catch {
-			return { name: 'commandExitCode', result: VerifyResult.Fail, detail: 'Command exited non-zero' };
+		} catch (err) {
+			return { name: 'commandExitCode', result: VerifyResult.Fail, detail: extractExecDetail(err) };
 		}
 	});
 
@@ -58,8 +71,8 @@ export function createBuiltinRegistry(): VerifierRegistry {
 		try {
 			execSync('npx tsc --noEmit', { cwd: workspaceRoot, stdio: 'pipe' });
 			return { name: 'tsc', result: VerifyResult.Pass, detail: 'TypeScript clean' };
-		} catch {
-			return { name: 'tsc', result: VerifyResult.Fail, detail: 'TypeScript errors' };
+		} catch (err) {
+			return { name: 'tsc', result: VerifyResult.Fail, detail: extractExecDetail(err) };
 		}
 	});
 
@@ -67,8 +80,8 @@ export function createBuiltinRegistry(): VerifierRegistry {
 		try {
 			execSync('npx vitest run', { cwd: workspaceRoot, stdio: 'pipe' });
 			return { name: 'vitest', result: VerifyResult.Pass, detail: 'Tests pass' };
-		} catch {
-			return { name: 'vitest', result: VerifyResult.Fail, detail: 'Tests failed' };
+		} catch (err) {
+			return { name: 'vitest', result: VerifyResult.Fail, detail: extractExecDetail(err) };
 		}
 	});
 
@@ -212,4 +225,25 @@ export function dualExitGateCheck(
 		.map(c => c.detail ? `${c.name}: ${c.detail}` : c.name)
 		.join(', ');
 	return { canComplete: false, reason: `Task not marked complete and verification failed: ${failing}` };
+}
+
+const MAX_FEEDBACK_LENGTH = 2000;
+
+export function formatVerificationFeedback(checks: VerifyCheck[]): string {
+	const failing = checks.filter(c => c.result === VerifyResult.Fail);
+	if (failing.length === 0) { return ''; }
+
+	const lines: string[] = ['=== VERIFICATION FAILURES ==='];
+	for (const check of failing) {
+		lines.push(`--- ${check.name} ---`);
+		if (check.detail) {
+			lines.push(check.detail);
+		}
+	}
+
+	let result = lines.join('\n');
+	if (result.length > MAX_FEEDBACK_LENGTH) {
+		result = result.slice(0, MAX_FEEDBACK_LENGTH) + '\n...(truncated)';
+	}
+	return result;
 }

@@ -349,3 +349,4 @@ Extended `SerializedLoopState` with optional `sessionId`, `pid`, `workspacePath`
 - Wired into orchestrator: confidence-score-failed path (L912-918) and dual-exit-gate-rejected path (L984-993) now append formatted feedback to `additionalContext`
 - TDD: 10 new tests in `test/verify.test.ts` covering: empty/pass arrays, single/multiple failures, missing detail, skip filtering, truncation, and stderr capture for tsc/vitest/commandExitCode verifiers
 - All 466 tests pass, tsc --noEmit clean
+[2026-03-17T03:05:06.277Z] [0b609276-27af-48ce-9638-deb03a7a5917] [Task-001] Task started: Fix baseline: resolve TypeScript errors and failing tests before continuing
