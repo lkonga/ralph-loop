@@ -282,6 +282,7 @@ export function activate(context: vscode.ExtensionContext): void {
 			}
 
 			try {
+				outputChannel.show(true);
 				await orchestrator.start();
 			} catch (err) {
 				const message = err instanceof Error ? err.message : String(err);

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as crypto from 'crypto';
 import { showCooldownDialog, type CooldownDialogResult } from './cooldownDialog';
 import {
@@ -124,16 +125,28 @@ export async function runBearings(
 	const issues: string[] = [];
 
 	if (config.runTsc) {
-		const tscResult = execFn('npx tsc --noEmit', workspaceRoot);
-		if (tscResult.exitCode !== 0) {
-			issues.push(`TypeScript errors: ${tscResult.output.slice(0, 500)}`);
+		const tsconfigPath = path.join(workspaceRoot, 'tsconfig.json');
+		if (fs.existsSync(tsconfigPath)) {
+			const tscResult = execFn('npx tsc --noEmit', workspaceRoot);
+			if (tscResult.exitCode !== 0) {
+				issues.push(`TypeScript errors: ${tscResult.output.slice(0, 500)}`);
+			}
+		} else {
+			logger.log('Bearings: skipping tsc (no tsconfig.json)');
 		}
 	}
 
 	if (config.runTests) {
-		const testResult = execFn('npx vitest run', workspaceRoot);
-		if (testResult.exitCode !== 0) {
-			issues.push(`Test failures: ${testResult.output.slice(0, 500)}`);
+		const hasVitest = fs.existsSync(path.join(workspaceRoot, 'vite.config.ts'))
+			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.ts'))
+			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.js'));
+		if (hasVitest) {
+			const testResult = execFn('npx vitest run', workspaceRoot);
+			if (testResult.exitCode !== 0) {
+				issues.push(`Test failures: ${testResult.output.slice(0, 500)}`);
+			}
+		} else {
+			logger.log('Bearings: skipping tests (no vitest config)');
 		}
 	}
 
@@ -687,8 +700,9 @@ export class LoopOrchestrator {
 						bearingsFixAttempted = true;
 						skipBearingsOnce = true;
 						const fixLine = '- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing';
+						const fixLineChecked = '- [x] Fix baseline: resolve TypeScript errors and failing tests before continuing';
 						const currentPrd = fs.readFileSync(prdPath, 'utf-8');
-						if (!currentPrd.includes(fixLine)) {
+						if (!currentPrd.includes(fixLine) && !currentPrd.includes(fixLineChecked)) {
 							fs.writeFileSync(prdPath, fixLine + '\n' + currentPrd, 'utf-8');
 						}
 						continue;

@@ -400,12 +400,31 @@ describe('runBearings', () => {
 		expect(result.fixTask).toBeUndefined();
 	});
 
+	it('returns healthy when no tsconfig.json or vitest config exists (skips checks)', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const os = require('os');
+		const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-noconfig-'));
+		const execFn = () => ({ exitCode: 1, output: 'should never be called' });
+		const result = await runBearings(tmpDir, noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+		expect(result.healthy).toBe(true);
+		expect(result.issues).toHaveLength(0);
+	});
+
 	it('returns unhealthy when tsc fails', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const os = require('os');
+		const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-tsc-'));
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
 		const execFn = (cmd: string) => {
 			if (cmd.includes('tsc')) return { exitCode: 1, output: 'error TS2345: Argument of type...' };
 			return { exitCode: 0, output: '' };
 		};
-		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
+		const result = await runBearings(tmpDir, noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
+		fs.rmSync(tmpDir, { recursive: true, force: true });
 		expect(result.healthy).toBe(false);
 		expect(result.issues.length).toBeGreaterThan(0);
 		expect(result.issues.some(i => i.includes('TypeScript'))).toBe(true);
@@ -413,11 +432,18 @@ describe('runBearings', () => {
 	});
 
 	it('returns unhealthy when vitest fails', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const os = require('os');
+		const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-vitest-'));
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
 		const execFn = (cmd: string) => {
 			if (cmd.includes('vitest')) return { exitCode: 1, output: '3 tests failed' };
 			return { exitCode: 0, output: '' };
 		};
-		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
+		const result = await runBearings(tmpDir, noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
+		fs.rmSync(tmpDir, { recursive: true, force: true });
 		expect(result.healthy).toBe(false);
 		expect(result.issues.length).toBeGreaterThan(0);
 		expect(result.issues.some(i => i.includes('test') || i.includes('Test'))).toBe(true);
@@ -474,6 +500,8 @@ describe('Bearings phase integration', () => {
 		const fs = require('fs');
 		const path = require('path');
 		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
 		const events: any[] = [];
 		const orch = new LoopOrchestrator(
 			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 5, countdownSeconds: 0,
