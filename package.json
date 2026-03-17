@@ -92,11 +92,12 @@
 		}
 	},
 	"scripts": {
+		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"package": "vsce package"
+		"package": "npm test && vsce package --no-dependencies --allow-missing-repository"
 	},
 	"devDependencies": {
 		"@types/node": "^20.11.0",
