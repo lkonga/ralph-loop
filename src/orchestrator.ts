@@ -417,6 +417,7 @@ export class LoopOrchestrator {
 		const agentMode = task
 			? resolveAgentMode(task, this.config.agentMode ?? 'ralph-executor', this.logger)
 			: this.config.agentMode;
+		this.logger.log(`Agent mode resolved: ${agentMode} (config: ${this.config.agentMode}, task.agent: ${task?.agent ?? 'none'})`);
 		return {
 			prdPath: resolvePrdPath(this.config.workspaceRoot, this.config.prdPath),
 			workspaceRoot: this.config.workspaceRoot,
@@ -1295,5 +1296,6 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		knowledge: vsConfig.get('knowledge', DEFAULT_CONFIG.knowledge),
 		contextTrimming: vsConfig.get('contextTrimming', DEFAULT_CONFIG.contextTrimming),
 		cooldownShowDialog: vsConfig.get<boolean>('cooldownShowDialog', DEFAULT_CONFIG.cooldownShowDialog ?? true),
+		agentMode: vsConfig.get<string>('agentMode', DEFAULT_CONFIG.agentMode ?? 'ralph-executor'),
 	};
 }
