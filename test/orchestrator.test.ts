@@ -279,7 +279,7 @@ describe('parseReviewVerdict', () => {
 });
 
 describe('LoopOrchestrator.injectContext', () => {
-	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
 
 	it('injectContext sets pendingContext that is consumed by buildPrompt', () => {
 		const events: any[] = [];
@@ -296,7 +296,7 @@ describe('LoopOrchestrator.injectContext', () => {
 		const orch = new LoopOrchestrator(
 			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp' },
 			noopLogger,
-			() => {},
+			() => { },
 		);
 		orch.injectContext('temporary context');
 		const ctx = (orch as any).consumePendingContext();
@@ -309,7 +309,7 @@ describe('LoopOrchestrator.injectContext', () => {
 		const orch = new LoopOrchestrator(
 			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp' },
 			noopLogger,
-			() => {},
+			() => { },
 		);
 		const ctx = (orch as any).consumePendingContext();
 		expect(ctx).toBeUndefined();
@@ -317,7 +317,7 @@ describe('LoopOrchestrator.injectContext', () => {
 });
 
 describe('Security rejection as feedback', () => {
-	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
 	let tmpDir: string;
 
 	beforeEach(() => {
@@ -390,7 +390,7 @@ describe('Security rejection as feedback', () => {
 });
 
 describe('runBearings', () => {
-	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
 
 	it('returns healthy when both tsc and vitest pass', async () => {
 		const execFn = () => ({ exitCode: 0, output: '' });
@@ -452,7 +452,7 @@ describe('runBearings', () => {
 });
 
 describe('Bearings phase integration', () => {
-	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
 	let tmpDir: string;
 
 	beforeEach(() => {
@@ -473,7 +473,8 @@ describe('Bearings phase integration', () => {
 		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
 		const events: any[] = [];
 		const orch = new LoopOrchestrator(
-			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
 				bearings: { enabled: true, runTsc: true, runTests: true },
 				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
 			},
@@ -504,7 +505,8 @@ describe('Bearings phase integration', () => {
 		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
 		const events: any[] = [];
 		const orch = new LoopOrchestrator(
-			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 5, countdownSeconds: 0,
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 5, countdownSeconds: 0,
 				bearings: { enabled: true, runTsc: true, runTests: true },
 				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
 			},
@@ -539,7 +541,8 @@ describe('Bearings phase integration', () => {
 		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [x] Done task\n', 'utf-8');
 		const events: any[] = [];
 		const orch = new LoopOrchestrator(
-			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1,
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1,
 				bearings: { enabled: false, runTsc: true, runTests: true },
 			},
 			noopLogger,
