@@ -343,6 +343,37 @@
 
 ---
 
+## Phase 11 — Wave Pipeline & Research Automation
+
+> Automates the research → spec → PRD pipeline using wave-orchestrator subagents. Introduces the frontmatter sealing pattern, context grounding, and spec/PRD generation agents.
+> **TDD is MANDATORY**. Run `npx tsc --noEmit` and `npx vitest run` — ALL tests must pass before marking ANY checkbox.
+
+### 11a — Patterns & Documentation
+
+- [x] **Task 24 — Frontmatter Sealing Pattern**: Document the "frontmatter as sealed source of truth" pattern in `docs/patterns/frontmatter-sealing.md`. Key constraint: frontmatter (tasks, verification, completion_steps, principles) must be the **last transformation** applied to spec files — after all research, synthesis, and user refinement is complete. Ralph's `buildPrompt()` reads frontmatter to drive execution; applying it mid-pipeline with incomplete data causes partial specs. Sequence: `Research → Spec (raw, no frontmatter) → User refines → Seal (apply frontmatter) → PRD entries with → Spec: pointers`. Include examples from existing research files.
+
+### 11b — Context & Generation Agents
+
+- [ ] **Task 25 — Context Grounder Agent**: Create `agents/wave-context-grounder.agent.md`. Reads `PRD.md` + `README.md` from the target workspace → produces a ContextBrief (≤2K tokens, ≤30 lines). The ContextBrief captures: what the project already has (prevents researching solved problems), naming conventions, current architecture, existing phase/task numbering. This gets injected into all subsequent subagent prompts as grounding context. v1 reads only PRD + README; commit-sampling is deferred to Task 32.
+- [ ] **Task 26 — Spec Generator Agent**: Create `agents/wave-spec-generator.agent.md`. Reads `FINAL-REPORT.md` + ContextBrief → produces raw task specs (interfaces, config, tests) as markdown. Auto-detects next phase number from `## Phase N` headers in PRD.md (`max(N) + 1`), next task number from `- [ ] **Task NN` patterns (`max(NN) + 1`), next research file number from `research/NN-*.md` filenames (`max(NN) + 1`). Writes: `research/{NN}-phase{P}-deep-research.md` (raw, NO frontmatter — see Task 24). This is the refactored core of `/researchPhase` Waves 3-4 minus the fan-out/synthesis (which wave-orchestrator handles).
+- [ ] **Task 27 — PRD Generator Agent**: Create `agents/wave-prd-generator.agent.md`. Reads sealed spec file (with frontmatter) → produces PRD entries. Classifies each task as Tier 1 (inline description) or Tier 2 (description + `→ Spec:` reference with line ranges). Generates the phase section header + task entries in ralph-loop PRD format (`- [ ] **Task NN — Name**: Description`). Output is presented to user for review before writing to PRD.md.
+
+### 11c — Prompt & Pipeline Refactoring
+
+- [ ] **Task 28 — Refactor researchPhase Prompt**: Strip Waves 1-2 (fan-out + synthesis) from `prompts/researchPhase.prompt.md` — wave-orchestrator already handles these better with parallel subagents. Keep only the spec generation logic (Wave 3: transform findings → task specs) and frontmatter application (Wave 4). The prompt now delegates fan-out/synthesis to wave-orchestrator and focuses on spec transformation. Update any references in other prompts that point to the old `/researchPhase` flow. Depends on Task 26 (spec generator agent) existing as the replacement for the stripped logic.
+- [ ] **Task 29 — Update updatePRD Prompt**: Minor edit to `prompts/updatePRD.prompt.md` — add a handoff entry point that accepts a spec file path as input (for invocation from the `--ralph-prd` pipeline). Currently requires manual spec file selection; this makes it callable as a pipeline step.
+- [ ] **Task 30 — wave-orchestrator --ralph-prd Mode**: Add `--ralph-prd` mode to `agents/wave-orchestrator.agent.md` after the existing aggregate mode section. Implements the 6-phase flow with 3 human checkpoints.
+- [ ] **Task 31 — wave-explore-fast --ralph-prd**: Update `prompts/wave-explore-fast.prompt.md` to add `--ralph-prd` to its argument-hint. When this flag is present, delegate to wave-orchestrator's `--ralph-prd` mode instead of the standard explore flow. Depends on Task 30.
+
+### 11d — Advanced Context & Caching
+
+- [ ] **Task 32 — Commit-Sampling Hook**: Implement 3-zone git log analysis for richer ContextBrief in wave-context-grounder. Samples: first 10 commits (founding intentions) + middle 10 (evolutionary trajectory) + last 10 (current state). Runs `git log --oneline` + `git show --stat` → LLM summarizes into codebase fingerprint (top files by churn, key function signatures, dependency list). Adds ~30s latency. Consider pre-computed cache (see Task 35). Depends on Task 25.
+- [ ] **Task 33 — Go-Back / Checkpoint Retry Pattern**: Implement file-state based go-back at any `--ralph-prd` checkpoint. Each phase writes `research/_wave/{WAVE_ID}/phase-{N}-state.json` (inputs, outputs, user steering, timestamp). "Go back" = re-run phase N subagent with same inputs + appended user feedback. This generalizes the existing ralph-loop `sessionPersistence.ts` pattern to the wave pipeline. Document as a reusable pattern in `docs/patterns/checkpoint-retry.md`. Depends on Task 30.
+- [ ] **Task 34 — Configurable Context Source Chain**: Make the context grounder's sources composable: `contextSources: [prd, commits-3zone, readme, changelog]`. Each source is a pure function `(workspace) → ContextSnippet`. The chain concatenates and trims to a token budget. Users can add custom sources (e.g., `architecture.md`) or disable any. Depends on Tasks 25 and 32.
+- [ ] **Task 35 — Codebase Brief Cache**: Pre-computed `.ralph/codebase-brief.md` regenerated on significant changes (via git hook or periodic script). Makes Phase 0 near-instant instead of requiring LLM summarization each run. The cache is invalidated when `git diff --stat HEAD~5` shows significant changes. Depends on Task 32.
+
+---
+
 ## Phase 11 — Wave Pipeline & Documentation
 
 > Wave pipeline agents and pattern documentation for the `--ralph-prd` research-to-PRD flow.

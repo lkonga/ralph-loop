@@ -431,3 +431,15 @@ Extended `SerializedLoopState` with optional `sessionId`, `pid`, `workspacePath`
 [2026-03-17T08:16:56Z] [Task-025] Documented frontmatter sealing pattern in docs/patterns/frontmatter-sealing.md (139 lines). Covers: core constraint (frontmatter = last transformation), pipeline sequence (Research → raw Spec → User refines → Seal → PRD pointers), frontmatter fields table (tasks/verification/completion_steps/principles), sealed vs unsealed examples from research/13 and research/14, → Spec: pointer pattern, anti-pattern section. Test in test/frontmatterSealing.test.ts (10 tests). All 548 tests pass, tsc clean.
 
 ### Task 88 State | Files: [docs/patterns/frontmatter-sealing.md, test/frontmatterSealing.test.ts, PRD.md] | Lines: +139/+63 | Status: pass
+[2026-03-17T13:42:00Z] [Task-025] Created docs/patterns/frontmatter-sealing.md documenting the "frontmatter as sealed source of truth" pattern:
+  - Core constraint: frontmatter is the last transformation applied to spec files
+  - Pipeline sequence: Research → Spec (raw) → User refines → Seal → PRD entries with Spec: pointers
+  - Explains why premature sealing causes partial specs via buildPrompt()
+  - Documents all frontmatter fields (tasks, verification, completion_steps, principles)
+  - Includes unsealed vs sealed examples from research/13 and research/14
+  - Documents the → Spec: pointer pattern for PRD entries
+  - Fixed beforeAll import in test/frontmatterSealing.test.ts
+  - Added Phase 11 section to PRD.md for wave pipeline tasks
+  All 548 tests pass, tsc clean.
+
+### Task 24 State | Files: [docs/patterns/frontmatter-sealing.md, test/frontmatterSealing.test.ts, PRD.md] | Lines: +140/-1 | Status: pass
