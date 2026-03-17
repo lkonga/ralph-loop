@@ -274,7 +274,7 @@ export class LoopOrchestrator {
 	private pendingContext?: string;
 	private linkedSignal?: LinkedCancellationSource;
 	private readonly sessionPersistence?: SessionPersistence;
-	private _currentTaskDescription = '';
+	private _currentTaskId = '';
 	bearingsExecFn?: BearingsExecFn;
 	showCooldownDialogFn: (nextTask: string, timeoutMs: number) => Promise<CooldownDialogResult>;
 
@@ -312,8 +312,8 @@ export class LoopOrchestrator {
 		return this.state;
 	}
 
-	getCurrentTaskDescription(): string {
-		return this._currentTaskDescription;
+	getCurrentTaskId(): string {
+		return this._currentTaskId;
 	}
 
 	updateConfig(config: Partial<RalphConfig>): void {
@@ -720,7 +720,7 @@ export class LoopOrchestrator {
 
 				iteration++;
 				task.status = TaskStatus.InProgress;
-				this._currentTaskDescription = task.description;
+				this._currentTaskId = task.taskId;
 				const taskInvocationId = crypto.randomUUID();
 				yield { kind: LoopEventKind.TaskStarted, task, iteration, taskInvocationId };
 
@@ -1253,7 +1253,7 @@ export class LoopOrchestrator {
 				});
 			}
 		} finally {
-			this._currentTaskDescription = '';
+			this._currentTaskId = '';
 			this.linkedSignal?.dispose();
 			this.linkedSignal = undefined;
 		}

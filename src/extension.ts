@@ -308,7 +308,7 @@ export function activate(context: vscode.ExtensionContext): void {
 		}),
 
 		vscode.commands.registerCommand('ralph-loop.taskName', () => {
-			return orchestrator?.getCurrentTaskDescription() ?? '';
+			return orchestrator?.getCurrentTaskId() ?? '';
 		}),
 
 		vscode.commands.registerCommand('ralph-loop.yield', () => {
