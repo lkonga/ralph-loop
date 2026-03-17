@@ -28,6 +28,10 @@ describe('updatePRD prompt handoff entry (Task 29)', () => {
 			expect(content).toMatch(/pipeline.*spec|spec.*pipeline|wave-orchestrator|--ralph-prd/i);
 		});
 
+		it('should use {SPEC_FILE_PATH} placeholder for pipeline argument', () => {
+			expect(content).toContain('{SPEC_FILE_PATH}');
+		});
+
 		it('should still support manual invocation', () => {
 			expect(content).toMatch(/manual/i);
 		});
