@@ -6,11 +6,23 @@ const CHECKBOX_UNCHECKED = /^(\s*)-\s*\[\s*\]\s+(.+)$/;
 const CHECKBOX_CHECKED = /^(\s*)-\s*\[x\]\s+(.+)$/i;
 const DEPENDS_ANNOTATION = /depends:\s*([\w,\s-]+)/i;
 const MISSING_DEP_PATTERN = /MISSING_DEP:\s*(\S+)/i;
+const AGENT_ANNOTATION = /\[AGENT:(\w+)\]/g;
 
 function parseTaskId(description: string): string {
 	const match = /^\*\*([^*]+)\*\*/.exec(description);
 	if (match) { return match[1].trim(); }
 	return `task-${description.slice(0, 30).replace(/\s+/g, '-').toLowerCase()}`;
+}
+
+function parseAgentAnnotation(text: string): string | undefined {
+	const matches = [...text.matchAll(AGENT_ANNOTATION)];
+	if (matches.length > 1) {
+		throw new Error(`Multiple [AGENT:...] annotations found in task: "${text}". Only one is allowed.`);
+	}
+	if (matches.length === 1) {
+		return matches[0][1];
+	}
+	return undefined;
 }
 
 function parseDependsOn(description: string): string[] | undefined {
@@ -37,10 +49,11 @@ export function parsePrd(content: string): PrdSnapshot {
 		const unchecked = CHECKBOX_UNCHECKED.exec(line);
 		if (unchecked) {
 			const indent = unchecked[1].length;
-			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').trim();
+			const agent = parseAgentAnnotation(unchecked[2]);
+			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent },
 				indent,
 				rawDescription: description,
 			});
@@ -49,10 +62,11 @@ export function parsePrd(content: string): PrdSnapshot {
 		const checked = CHECKBOX_CHECKED.exec(line);
 		if (checked) {
 			const indent = checked[1].length;
-			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').trim();
+			const agent = parseAgentAnnotation(checked[2]);
+			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent },
 				indent,
 				rawDescription: description,
 			});

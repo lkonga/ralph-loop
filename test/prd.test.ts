@@ -180,6 +180,64 @@ describe('parsePrd handles CHECKPOINT annotation', () => {
 	});
 });
 
+describe('parsePrd handles AGENT annotation', () => {
+	it('parses [AGENT:explore] and strips it from description', () => {
+		const content = `- [ ] [AGENT:explore] Research the codebase\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.length).toBe(1);
+		expect(snapshot.tasks[0].agent).toBe('explore');
+		expect(snapshot.tasks[0].description).toBe('Research the codebase');
+		expect(snapshot.tasks[0].description).not.toContain('[AGENT:');
+	});
+
+	it('parses [AGENT:implement] annotation', () => {
+		const content = `- [ ] [AGENT:implement] Build the feature\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBe('implement');
+		expect(snapshot.tasks[0].description).toBe('Build the feature');
+	});
+
+	it('parses [AGENT:research] annotation', () => {
+		const content = `- [ ] [AGENT:research] Find best practices online\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBe('research');
+		expect(snapshot.tasks[0].description).toBe('Find best practices online');
+	});
+
+	it('agent defaults to undefined when no annotation', () => {
+		const content = `- [ ] Normal task without agent\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBeUndefined();
+	});
+
+	it('works on checked tasks too', () => {
+		const content = `- [x] [AGENT:explore] Already done research\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBe('explore');
+		expect(snapshot.tasks[0].description).toBe('Already done research');
+		expect(snapshot.tasks[0].status).toBe('complete');
+	});
+
+	it('rejects multiple [AGENT:...] annotations in same task', () => {
+		const content = `- [ ] [AGENT:explore] [AGENT:implement] Conflicting agents\n`;
+		expect(() => parsePrd(content)).toThrow(/multiple.*agent/i);
+	});
+
+	it('coexists with [CHECKPOINT] annotation', () => {
+		const content = `- [ ] [CHECKPOINT] [AGENT:explore] Review before proceeding\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].checkpoint).toBe(true);
+		expect(snapshot.tasks[0].agent).toBe('explore');
+		expect(snapshot.tasks[0].description).toBe('Review before proceeding');
+	});
+
+	it('agent annotation is case-sensitive for the tag but preserves name', () => {
+		const content = `- [ ] [AGENT:Explore] Mixed case agent\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBe('Explore');
+	});
+});
+
 describe('analyzeMissingDependency', () => {
 	let tmpDir: string;
 
