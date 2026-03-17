@@ -37,19 +37,29 @@ export function parsePrd(content: string): PrdSnapshot {
 	const lines = content.split('\n');
 	const tasks: Task[] = [];
 	let id = 0;
+	let currentPhaseAgent: string | undefined;
 
 	// First pass: collect tasks with indentation info
 	const taskEntries: Array<{ task: Task; indent: number; rawDescription: string }> = [];
 
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i];
+
+		// Detect phase headers (### level) and extract agent annotation
+		if (/^#{1,6}\s/.test(line)) {
+			const headerAgent = parseAgentAnnotation(line);
+			currentPhaseAgent = headerAgent;
+			continue;
+		}
+
 		// Skip DECOMPOSED tasks (non-actionable)
 		if (line.includes('[DECOMPOSED]')) { continue; }
 		const isCheckpoint = line.includes('[CHECKPOINT]');
 		const unchecked = CHECKBOX_UNCHECKED.exec(line);
 		if (unchecked) {
 			const indent = unchecked[1].length;
-			const agent = parseAgentAnnotation(unchecked[2]);
+			const taskAgent = parseAgentAnnotation(unchecked[2]);
+			const agent = taskAgent ?? currentPhaseAgent;
 			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
@@ -62,7 +72,8 @@ export function parsePrd(content: string): PrdSnapshot {
 		const checked = CHECKBOX_CHECKED.exec(line);
 		if (checked) {
 			const indent = checked[1].length;
-			const agent = parseAgentAnnotation(checked[2]);
+			const taskAgent = parseAgentAnnotation(checked[2]);
+			const agent = taskAgent ?? currentPhaseAgent;
 			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({

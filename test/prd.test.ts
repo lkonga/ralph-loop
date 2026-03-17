@@ -385,3 +385,97 @@ describe('pickReadyTasks parallel safety', () => {
 		expect(ready.length).toBe(1);
 	});
 });
+
+describe('phase-level agent override', () => {
+	it('tasks inherit agent from phase header', () => {
+		const content = [
+			'### 9e — Research Infrastructure [AGENT:explore]',
+			'- [ ] Research the codebase',
+			'- [ ] Analyze dependencies',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks).toHaveLength(2);
+		expect(snapshot.tasks[0].agent).toBe('explore');
+		expect(snapshot.tasks[1].agent).toBe('explore');
+	});
+
+	it('task-level agent overrides phase-level agent', () => {
+		const content = [
+			'### 9e — Research Infrastructure [AGENT:explore]',
+			'- [ ] [AGENT:implement] Build the module',
+			'- [ ] Analyze dependencies',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBe('implement');
+		expect(snapshot.tasks[1].agent).toBe('explore');
+	});
+
+	it('no phase agent leaves task agent as default (undefined)', () => {
+		const content = [
+			'### 9e — Research Infrastructure',
+			'- [ ] Research the codebase',
+			'- [ ] Analyze dependencies',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBeUndefined();
+		expect(snapshot.tasks[1].agent).toBeUndefined();
+	});
+
+	it('phase agent stripped from header text (not leaked into task descriptions)', () => {
+		const content = [
+			'### 9e — Research Infrastructure [AGENT:explore]',
+			'- [ ] Research the codebase',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].description).not.toContain('[AGENT:');
+		expect(snapshot.tasks[0].description).not.toContain('explore');
+		expect(snapshot.tasks[0].description).toBe('Research the codebase');
+	});
+
+	it('different phases can have different agents', () => {
+		const content = [
+			'### Phase A [AGENT:explore]',
+			'- [ ] Task in explore phase',
+			'### Phase B [AGENT:implement]',
+			'- [ ] Task in implement phase',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBe('explore');
+		expect(snapshot.tasks[1].agent).toBe('implement');
+	});
+
+	it('phase without agent resets inherited agent to undefined', () => {
+		const content = [
+			'### Phase A [AGENT:explore]',
+			'- [ ] Task in explore phase',
+			'### Phase B — No agent',
+			'- [ ] Task without agent',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBe('explore');
+		expect(snapshot.tasks[1].agent).toBeUndefined();
+	});
+
+	it('phase agent sets readOnly correctly for inherited tasks', () => {
+		const content = [
+			'### Phase A [AGENT:explore]',
+			'- [ ] Task in explore phase',
+			'### Phase B [AGENT:implement]',
+			'- [ ] Task in implement phase',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].readOnly).toBe(true);
+		expect(snapshot.tasks[1].readOnly).toBeUndefined();
+	});
+
+	it('works with checked tasks too', () => {
+		const content = [
+			'### Phase A [AGENT:explore]',
+			'- [x] Completed explore task',
+			'- [ ] Pending explore task',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].agent).toBe('explore');
+		expect(snapshot.tasks[1].agent).toBe('explore');
+	});
+});
