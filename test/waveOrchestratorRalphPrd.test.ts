@@ -71,16 +71,28 @@ describe('Wave Orchestrator --ralph-prd Mode', () => {
 			expect(content).toMatch(/Checkpoint\s*3/);
 		});
 
-		it('should offer Continue/Refine/Stop at Checkpoint 1', () => {
-			expect(content).toMatch(/\[Continue\].*\[Refine\].*\[Stop\]|\[Continue\][\s\S]*\[Refine\][\s\S]*\[Stop\]/);
+		it('should offer Continue/Refine/Back/Stop at Checkpoint 1', () => {
+			const cp1Section = content.split(/### Checkpoint 1/i)[1]?.split(/### (Phase|Checkpoint)/i)[0] ?? '';
+			expect(cp1Section).toMatch(/\[Continue\]/);
+			expect(cp1Section).toMatch(/\[Refine\]/);
+			expect(cp1Section).toMatch(/\[Back\]/);
+			expect(cp1Section).toMatch(/\[Stop\]/);
 		});
 
 		it('should offer Continue/Refine/Back/Stop at Checkpoint 2', () => {
-			expect(content).toMatch(/\[Continue\][\s\S]*\[Refine\][\s\S]*\[Back\][\s\S]*\[Stop\]/);
+			const cp2Section = content.split(/### Checkpoint 2/i)[1]?.split(/### (Phase|Checkpoint)/i)[0] ?? '';
+			expect(cp2Section).toMatch(/\[Continue\]/);
+			expect(cp2Section).toMatch(/\[Refine\]/);
+			expect(cp2Section).toMatch(/\[Back\]/);
+			expect(cp2Section).toMatch(/\[Stop\]/);
 		});
 
-		it('should offer Apply/Refine/Back/Stop at Checkpoint 3', () => {
-			expect(content).toMatch(/\[Apply\][\s\S]*\[Refine\][\s\S]*\[Back\][\s\S]*\[Stop\]/);
+		it('should offer Continue/Refine/Back/Stop at Checkpoint 3', () => {
+			const cp3Section = content.split(/### Checkpoint 3/i)[1]?.split(/### (Phase|Checkpoint)/i)[0] ?? '';
+			expect(cp3Section).toMatch(/\[Continue\]/);
+			expect(cp3Section).toMatch(/\[Refine\]/);
+			expect(cp3Section).toMatch(/\[Back\]/);
+			expect(cp3Section).toMatch(/\[Stop\]/);
 		});
 	});
 
