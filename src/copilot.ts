@@ -33,6 +33,7 @@ export async function startFreshChatSession(logger: ILogger): Promise<boolean> {
 
 export interface CopilotRequestOptions {
 	useAutopilotMode?: boolean;
+	agentMode?: string;
 }
 
 export async function openCopilotWithPrompt(prompt: string, logger: ILogger, options?: CopilotRequestOptions): Promise<CopilotMethod> {
@@ -47,6 +48,11 @@ export async function openCopilotWithPrompt(prompt: string, logger: ILogger, opt
 		} catch {
 			logger.warn('Autopilot mode requested but chatParticipantPrivate API unavailable');
 		}
+	}
+
+	// Switch to the specified agent mode before opening the session
+	if (options?.agentMode) {
+		await tryCommand('workbench.action.chat.toggleAgentMode', { modeId: options.agentMode });
 	}
 
 	// Level 1: Agent mode (edit session)

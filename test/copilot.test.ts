@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE, parseFrontmatter, extractSpecReference, buildSpecContextLine, estimatePromptTokens, annotateBudget, extractBlockquoteMetadata, normalizeResearchFile } from '../src/prompt';
 import type { PromptVariables } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
-import { sendReviewPrompt, parseReviewVerdict } from '../src/copilot';
+import { sendReviewPrompt, parseReviewVerdict, openCopilotWithPrompt } from '../src/copilot';
 import { DEFAULT_REVIEW_PROMPT_TEMPLATE } from '../src/types';
 import type { ILogger } from '../src/types';
+import * as vscode from 'vscode';
 
 describe('buildPrompt', () => {
 	it('includes task description', () => {
@@ -655,5 +656,58 @@ describe('normalizeResearchFile', () => {
 		const fm = parseFrontmatter(result);
 		expect(fm).not.toBeNull();
 		expect(fm!.type).toBe('research');
+	});
+});
+
+describe('agent mode switching in openCopilotWithPrompt', () => {
+	let executedCommands: { command: string; args: unknown[] }[];
+	const testLogger: ILogger = { log() { }, warn() { }, error() { } };
+
+	beforeEach(() => {
+		executedCommands = [];
+		vi.spyOn(vscode.commands, 'executeCommand').mockImplementation(async (command: string, ...args: unknown[]) => {
+			executedCommands.push({ command, args });
+			if (command === 'workbench.action.chat.openEditSession') {
+				return undefined;
+			}
+			return undefined;
+		});
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('calls toggleAgentMode before openEditSession when agentMode is provided', async () => {
+		await openCopilotWithPrompt('test prompt', testLogger, { agentMode: 'ralph-executor' });
+
+		const toggleIdx = executedCommands.findIndex(c => c.command === 'workbench.action.chat.toggleAgentMode');
+		const editIdx = executedCommands.findIndex(c => c.command === 'workbench.action.chat.openEditSession');
+
+		expect(toggleIdx).toBeGreaterThanOrEqual(0);
+		expect(editIdx).toBeGreaterThanOrEqual(0);
+		expect(toggleIdx).toBeLessThan(editIdx);
+	});
+
+	it('passes modeId in toggleAgentMode args', async () => {
+		await openCopilotWithPrompt('test prompt', testLogger, { agentMode: 'ralph-executor' });
+
+		const toggleCall = executedCommands.find(c => c.command === 'workbench.action.chat.toggleAgentMode');
+		expect(toggleCall).toBeDefined();
+		expect(toggleCall!.args[0]).toEqual({ modeId: 'ralph-executor' });
+	});
+
+	it('uses default agentMode when not overridden (no agentMode in options)', async () => {
+		await openCopilotWithPrompt('test prompt', testLogger);
+
+		const toggleCall = executedCommands.find(c => c.command === 'workbench.action.chat.toggleAgentMode');
+		expect(toggleCall).toBeUndefined();
+	});
+
+	it('does not call toggleAgentMode when agentMode is undefined', async () => {
+		await openCopilotWithPrompt('test prompt', testLogger, { useAutopilotMode: true });
+
+		const toggleCall = executedCommands.find(c => c.command === 'workbench.action.chat.toggleAgentMode');
+		expect(toggleCall).toBeUndefined();
 	});
 });

@@ -484,6 +484,7 @@ export interface RalphConfig {
 	contextBudget?: ContextBudgetConfig;
 	inactivity?: InactivityConfig;
 	cooldownShowDialog?: boolean;
+	agentMode?: string;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -522,6 +523,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	contextBudget: { ...DEFAULT_CONTEXT_BUDGET },
 	inactivity: { ...DEFAULT_INACTIVITY_CONFIG },
 	cooldownShowDialog: true,
+	agentMode: 'ralph-executor',
 };
 
 // --- Verification ---
