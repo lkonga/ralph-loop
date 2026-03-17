@@ -6,7 +6,7 @@ import { registerHookBridge, HookBridgeDisposable, startChatSendWatcher } from '
 import { SessionPersistence } from './sessionPersistence';
 
 let orchestrator: LoopOrchestrator | undefined;
-let outputChannel: vscode.OutputChannel;
+let outputChannel: vscode.LogOutputChannel;
 let hookBridgeDisposable: HookBridgeDisposable | undefined;
 let sessionTrackingDisposable: vscode.Disposable | undefined;
 
@@ -53,7 +53,7 @@ async function resolveWorkspaceRoot(): Promise<string | undefined> {
 }
 
 export function activate(context: vscode.ExtensionContext): void {
-	outputChannel = vscode.window.createOutputChannel('Ralph Loop');
+	outputChannel = vscode.window.createOutputChannel('Ralph Loop', { log: true });
 	const logger = createOutputLogger(outputChannel);
 
 	// Always-active watcher for chatSend signal files (used by wave hooks, etc.)
@@ -122,46 +122,61 @@ export function activate(context: vscode.ExtensionContext): void {
 			orchestrator = new LoopOrchestrator(config, logger, event => {
 				switch (event.kind) {
 					case LoopEventKind.TaskStarted:
-						logger.log(`[${event.iteration}] Starting: ${event.task.description}`);
+						logger.log(`▶ [iter ${event.iteration}] Starting: ${event.task.description}`);
 						vscode.window.setStatusBarMessage(`$(sync~spin) Ralph: ${event.task.description}`, 5000);
 						break;
 					case LoopEventKind.CopilotTriggered:
-						logger.log(`Copilot triggered via ${event.method}`);
+						logger.log(`⚡ Copilot triggered via ${event.method}`);
 						break;
 					case LoopEventKind.WaitingForCompletion:
-						logger.log(`Waiting for completion: ${event.task.description}`);
+						logger.log(`⏳ Waiting for completion: ${event.task.description}`);
 						break;
 					case LoopEventKind.TaskCompleted:
-						logger.log(`Completed in ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
+						logger.log(`✔ Completed in ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
 						break;
 					case LoopEventKind.TaskTimedOut:
-						logger.warn(`Timed out after ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
+						logger.warn(`⏰ Timed out after ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
 						vscode.window.showWarningMessage(`Ralph Loop: Task timed out — ${event.task.description}`);
+						break;
+					case LoopEventKind.TaskNudged:
+						logger.log(`👉 Nudge #${event.nudgeCount}: ${event.task.description}`);
+						break;
+					case LoopEventKind.TaskRetried:
+						logger.warn(`🔄 Retry #${event.retryCount}: ${event.task.description}`);
 						break;
 					case LoopEventKind.Countdown:
 						vscode.window.setStatusBarMessage(`$(clock) Ralph: Next task in ${event.secondsLeft}s`, 1100);
 						break;
 					case LoopEventKind.AllDone:
+						logger.log(`🏁 All ${event.total} tasks completed`);
 						vscode.window.showInformationMessage(`Ralph Loop: All ${event.total} tasks completed!`);
-						logger.log(`All ${event.total} tasks done`);
 						break;
 					case LoopEventKind.MaxIterations:
+						logger.warn(`🛑 Hit max iterations: ${event.limit}`);
 						vscode.window.showWarningMessage(`Ralph Loop: Reached ${event.limit} iteration limit`);
-						logger.warn(`Hit max iterations: ${event.limit}`);
+						break;
+					case LoopEventKind.IterationLimitExpanded:
+						logger.log(`📈 Iteration limit expanded: ${event.oldLimit} → ${event.newLimit}`);
+						break;
+					case LoopEventKind.TasksParallelized:
+						logger.log(`⚡ Running ${event.tasks.length} tasks in parallel: ${event.tasks.map(t => t.taskId).join(', ')}`);
 						break;
 					case LoopEventKind.YieldRequested:
-						logger.log('Loop yielded gracefully');
+						logger.log('⏸ Loop yielded gracefully');
 						vscode.window.showInformationMessage('Ralph Loop: Yielded gracefully after task completion');
 						break;
 					case LoopEventKind.SessionChanged:
-						logger.log(`Chat session changed: ${event.oldSessionId} → ${event.newSessionId}`);
+						logger.warn(`🔀 Chat session changed: ${event.oldSessionId} → ${event.newSessionId}`);
 						vscode.window.showWarningMessage('Ralph Loop: Chat session changed — loop paused');
 						break;
+					case LoopEventKind.CircuitBreakerTripped:
+						logger.warn(`⚠ Circuit breaker tripped: ${event.reason} (action: ${event.action})`);
+						break;
 					case LoopEventKind.DiffValidationFailed:
-						logger.warn(`Diff validation failed (attempt ${event.attempt}): ${event.nudge}`);
+						logger.warn(`📋 Diff validation failed (attempt ${event.attempt}): ${event.nudge}`);
 						break;
 					case LoopEventKind.HumanCheckpointRequested:
-						logger.warn(`Human checkpoint requested: ${event.reason}`);
+						logger.warn(`🚧 Human checkpoint: ${event.reason}`);
 						(async () => {
 							const choice = await vscode.window.showWarningMessage(
 								`Ralph Loop: ${event.reason}`,
@@ -183,16 +198,73 @@ export function activate(context: vscode.ExtensionContext): void {
 								}
 								orchestrator?.resume();
 							} else {
-								// Dismissed — resume
 								orchestrator?.resume();
 							}
 						})();
 						break;
-					case LoopEventKind.Stopped:
-						logger.log('Loop stopped');
+					case LoopEventKind.TaskReviewed:
+						logger.log(`📝 Review verdict for ${event.task.taskId}: ${event.verdict.outcome} — ${event.verdict.summary}`);
 						break;
+					case LoopEventKind.MonitorAlert:
+						logger.warn(`🔔 Monitor alert [${event.taskId}]: ${event.alert}`);
+						break;
+					case LoopEventKind.TaskCommitted:
+						logger.log(`📦 Committed ${event.task.taskId}: ${event.commitHash}`);
+						break;
+					case LoopEventKind.StagnationDetected:
+						logger.warn(`🔄 Stagnation detected: ${event.staleIterations} stale iterations (${event.filesUnchanged.length} files unchanged)`);
+						break;
+					case LoopEventKind.TaskDecomposed:
+						logger.log(`🔀 Task decomposed: ${event.originalTask.taskId} → ${event.subTasks.length} sub-tasks`);
+						break;
+					case LoopEventKind.ConsistencyCheckPassed:
+						logger.log(`✔ Consistency check passed (${event.phase})`);
+						break;
+					case LoopEventKind.ConsistencyCheckFailed:
+						logger.warn(`✘ Consistency check failed (${event.phase}): ${event.failureReason ?? 'unknown'}`);
+						break;
+					case LoopEventKind.ContextInjected:
+						logger.log(`💉 Context injected: ${event.text.slice(0, 100)}${event.text.length > 100 ? '...' : ''}`);
+						break;
+					case LoopEventKind.StruggleDetected:
+						logger.warn(`😵 Struggle detected [${event.taskId}]: ${event.signals.join(', ')}`);
+						break;
+					case LoopEventKind.CommandBlocked:
+						logger.warn(`🚫 Command blocked [${event.taskId}]: ${event.command} — ${event.reason}`);
+						break;
+					case LoopEventKind.BearingsChecked:
+						if (event.healthy) {
+							logger.log('🧭 Bearings check: healthy');
+						} else {
+							logger.warn(`🧭 Bearings check: unhealthy — ${event.issues.join(', ')}`);
+						}
+						break;
+					case LoopEventKind.BearingsFailed:
+						logger.error(`🧭 Bearings failed: ${event.issues.join(', ')}`);
+						break;
+					case LoopEventKind.PlanRegenerated:
+						logger.log(`🔁 Plan regenerated for ${event.taskId} (#${event.regenerationCount})`);
+						break;
+					case LoopEventKind.ConfidenceScored: {
+						const parts = Object.entries(event.breakdown).map(([k, v]) => `${k}=${v}`).join(' ');
+						const status = event.score >= event.threshold ? '✔' : '✘';
+						logger.log(`📊 Confidence ${status} ${event.score}/${event.threshold} [${event.taskId}]: ${parts}`);
+						break;
+					}
+					case LoopEventKind.ContextHandoff:
+						logger.warn(`📤 Context handoff: ${event.estimatedTokens}/${event.maxTokens} tokens (${event.pct}%)`);
+						break;
+					case LoopEventKind.Stopped:
+						logger.log('⏹ Loop stopped');
+						break;
+					case LoopEventKind.PrdValidationFailed: {
+						const msgs = event.errors.map(e => `  ${e.level}: ${e.message}`).join('\n');
+						logger.error(`PRD validation failed:\n${msgs}`);
+						vscode.window.showErrorMessage(`Ralph Loop: PRD validation failed — ${event.errors.length} error(s). Check output for details.`);
+						break;
+					}
 					case LoopEventKind.Error:
-						logger.error(event.message);
+						logger.error(`❌ ${event.message}`);
 						vscode.window.showErrorMessage(`Ralph Loop: ${event.message}`);
 						break;
 				}

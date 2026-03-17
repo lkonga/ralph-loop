@@ -40,7 +40,7 @@ import {
 	BearingsConfig,
 	BearingsResult,
 } from './types';
-import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress, markTaskComplete, analyzeMissingDependency, addDependsAnnotation } from './prd';
+import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress, markTaskComplete, analyzeMissingDependency, addDependsAnnotation, validatePrd } from './prd';
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt, parseReviewVerdict } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
@@ -476,6 +476,21 @@ export class LoopOrchestrator {
 				return;
 			}
 
+			// Pre-flight PRD validation
+			{
+				const preflight = readPrdSnapshot(prdPath);
+				const validation = validatePrd(preflight);
+				if (!validation.valid) {
+					yield { kind: LoopEventKind.PrdValidationFailed, errors: validation.errors };
+					return;
+				}
+				if (validation.errors.length > 0) {
+					for (const w of validation.errors) {
+						this.logger.warn(`PRD warning: ${w.message}`);
+					}
+				}
+			}
+
 			while (true) {
 				// Check stop
 				if (this.linkedSignal?.signal.aborted || this.stopRequested) {
@@ -671,9 +686,11 @@ export class LoopOrchestrator {
 						}
 						bearingsFixAttempted = true;
 						skipBearingsOnce = true;
-						const fixLine = '- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing\n';
+						const fixLine = '- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing';
 						const currentPrd = fs.readFileSync(prdPath, 'utf-8');
-						fs.writeFileSync(prdPath, fixLine + currentPrd, 'utf-8');
+						if (!currentPrd.includes(fixLine)) {
+							fs.writeFileSync(prdPath, fixLine + '\n' + currentPrd, 'utf-8');
+						}
 						continue;
 					}
 					bearingsFixAttempted = false;

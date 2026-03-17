@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Task, TaskStatus, PrdSnapshot } from './types';
+import { Task, TaskStatus, PrdSnapshot, PrdValidationError, PrdValidationResult } from './types';
 
 const CHECKBOX_UNCHECKED = /^(\s*)-\s*\[\s*\]\s+(.+)$/;
 const CHECKBOX_CHECKED = /^(\s*)-\s*\[x\]\s+(.+)$/i;
@@ -114,6 +114,82 @@ export function parsePrd(content: string): PrdSnapshot {
 		completed,
 		remaining: allTasks.length - completed,
 	};
+}
+
+export function validatePrd(snapshot: PrdSnapshot): PrdValidationResult {
+	const errors: PrdValidationError[] = [];
+
+	if (snapshot.total === 0) {
+		errors.push({ level: 'error', message: 'PRD contains no tasks' });
+		return { valid: false, errors };
+	}
+
+	// Duplicate descriptions (case-insensitive, among pending tasks with same status)
+	const descMap = new Map<string, Task[]>();
+	for (const task of snapshot.tasks) {
+		const key = task.description.toLowerCase().trim();
+		const existing = descMap.get(key) ?? [];
+		existing.push(task);
+		descMap.set(key, existing);
+	}
+	for (const [, tasks] of descMap) {
+		if (tasks.length > 1) {
+			const pending = tasks.filter(t => t.status === TaskStatus.Pending);
+			if (pending.length > 1) {
+				errors.push({
+					level: 'error',
+					message: `Duplicate pending task: "${pending[0].description}" (lines ${pending.map(t => t.lineNumber).join(', ')})`,
+					line: pending[1].lineNumber,
+				});
+			}
+		}
+	}
+
+	// Dangling dependency references
+	const knownTaskIds = new Set(snapshot.tasks.map(t => parseTaskId(t.description)));
+	for (const task of snapshot.tasks) {
+		if (!task.dependsOn) { continue; }
+		for (const dep of task.dependsOn) {
+			if (!knownTaskIds.has(dep)) {
+				errors.push({
+					level: 'warning',
+					message: `Task "${task.description}" depends on unknown task "${dep}"`,
+					line: task.lineNumber,
+				});
+			}
+		}
+	}
+
+	// Circular dependency detection (DFS)
+	const taskByParsedId = new Map<string, Task>();
+	for (const task of snapshot.tasks) {
+		taskByParsedId.set(parseTaskId(task.description), task);
+	}
+	const visited = new Set<string>();
+	const inStack = new Set<string>();
+	function hasCycle(taskId: string): boolean {
+		if (inStack.has(taskId)) { return true; }
+		if (visited.has(taskId)) { return false; }
+		visited.add(taskId);
+		inStack.add(taskId);
+		const t = taskByParsedId.get(taskId);
+		if (t?.dependsOn) {
+			for (const dep of t.dependsOn) {
+				if (hasCycle(dep)) { return true; }
+			}
+		}
+		inStack.delete(taskId);
+		return false;
+	}
+	for (const taskId of taskByParsedId.keys()) {
+		if (hasCycle(taskId)) {
+			errors.push({ level: 'error', message: `Circular dependency detected involving task "${taskId}"` });
+			break;
+		}
+	}
+
+	const hasErrors = errors.some(e => e.level === 'error');
+	return { valid: !hasErrors, errors };
 }
 
 export function readPrdFile(prdPath: string): string {

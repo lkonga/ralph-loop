@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation } from '../src/prd';
+import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd } from '../src/prd';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -477,5 +477,75 @@ describe('phase-level agent override', () => {
 		const snapshot = parsePrd(content);
 		expect(snapshot.tasks[0].agent).toBe('explore');
 		expect(snapshot.tasks[1].agent).toBe('explore');
+	});
+});
+
+describe('validatePrd', () => {
+	it('passes for a valid PRD', () => {
+		const snapshot = parsePrd('- [ ] Task A\n- [ ] Task B\n');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(true);
+		expect(result.errors).toEqual([]);
+	});
+
+	it('errors on empty PRD', () => {
+		const snapshot = parsePrd('');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(false);
+		expect(result.errors).toHaveLength(1);
+		expect(result.errors[0].message).toBe('PRD contains no tasks');
+	});
+
+	it('errors on duplicate pending tasks', () => {
+		const snapshot = parsePrd('- [ ] Do something\n- [ ] Do something\n');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(false);
+		expect(result.errors.some(e => e.message.includes('Duplicate pending task'))).toBe(true);
+	});
+
+	it('allows duplicate if one is checked and one is pending', () => {
+		const snapshot = parsePrd('- [x] Do something\n- [ ] Do something\n');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(true);
+	});
+
+	it('allows different task descriptions', () => {
+		const snapshot = parsePrd('- [ ] Task A\n- [ ] Task B\n- [ ] Task C\n');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(true);
+		expect(result.errors).toEqual([]);
+	});
+
+	it('warns on dangling dependency', () => {
+		const snapshot = parsePrd('- [ ] **Alpha** My task depends: NonExistent\n');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(true);
+		expect(result.errors.some(e => e.level === 'warning' && e.message.includes('unknown task'))).toBe(true);
+	});
+
+	it('no warning when dependency exists', () => {
+		const snapshot = parsePrd('- [ ] **Dep** Prerequisite\n- [ ] **Main** My task depends: Dep\n');
+		const result = validatePrd(snapshot);
+		expect(result.errors).toEqual([]);
+	});
+
+	it('errors on circular dependencies', () => {
+		const snapshot = parsePrd('- [ ] **A** Task A depends: B\n- [ ] **B** Task B depends: A\n');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(false);
+		expect(result.errors.some(e => e.message.includes('Circular dependency'))).toBe(true);
+	});
+
+	it('passes PRD with only completed tasks', () => {
+		const snapshot = parsePrd('- [x] Done one\n- [x] Done two\n');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(true);
+	});
+
+	it('detects duplicate pending tasks case-insensitively', () => {
+		const snapshot = parsePrd('- [ ] Install packages\n- [ ] install packages\n');
+		const result = validatePrd(snapshot);
+		expect(result.valid).toBe(false);
+		expect(result.errors.some(e => e.message.includes('Duplicate pending task'))).toBe(true);
 	});
 });

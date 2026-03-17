@@ -36,6 +36,17 @@ export interface PrdSnapshot {
 	readonly remaining: number;
 }
 
+export interface PrdValidationError {
+	readonly level: 'error' | 'warning';
+	readonly message: string;
+	readonly line?: number;
+}
+
+export interface PrdValidationResult {
+	readonly valid: boolean;
+	readonly errors: readonly PrdValidationError[];
+}
+
 // --- Copilot result ---
 export type CopilotMethod = 'agent' | 'chat' | 'clipboard';
 
@@ -73,6 +84,7 @@ export const enum LoopEventKind {
 	PlanRegenerated = 'plan_regenerated',
 	ConfidenceScored = 'confidence_scored',
 	ContextHandoff = 'context_handoff',
+	PrdValidationFailed = 'prd_validation_failed',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -110,6 +122,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.PlanRegenerated; taskId: string; regenerationCount: number }
 	| { kind: LoopEventKind.ConfidenceScored; score: number; threshold: number; breakdown: Record<string, number>; taskId: string }
 	| { kind: LoopEventKind.ContextHandoff; estimatedTokens: number; maxTokens: number; pct: number }
+	| { kind: LoopEventKind.PrdValidationFailed; errors: readonly PrdValidationError[] }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
@@ -622,21 +635,30 @@ export interface ILogger {
 	error(message: string): void;
 }
 
-// Minimal VS Code output channel logger
-export function createOutputLogger(channel: vscode.OutputChannel): ILogger {
+function timestamp(): string {
+	return new Date().toISOString().slice(11, 23);
+}
+
+// VS Code LogOutputChannel logger — provides colored, timestamped output
+export function createOutputLogger(channel: vscode.LogOutputChannel): ILogger {
 	return {
-		log: (msg: string) => channel.appendLine(`[ralph-loop] ${msg}`),
-		warn: (msg: string) => channel.appendLine(`[ralph-loop WARN] ${msg}`),
-		error: (msg: string) => channel.appendLine(`[ralph-loop ERROR] ${msg}`),
+		log: (msg: string) => channel.info(`${msg}`),
+		warn: (msg: string) => channel.warn(`${msg}`),
+		error: (msg: string) => channel.error(`${msg}`),
 	};
 }
 
-// Console logger for CLI
+// Console logger for CLI with ANSI colors
 export function createConsoleLogger(): ILogger {
+	const reset = '\x1b[0m';
+	const cyan = '\x1b[36m';
+	const yellow = '\x1b[33m';
+	const red = '\x1b[31m';
+	const dim = '\x1b[2m';
 	return {
-		log: (msg: string) => console.log(`[ralph] ${msg}`),
-		warn: (msg: string) => console.warn(`[ralph] ${msg}`),
-		error: (msg: string) => console.error(`[ralph] ${msg}`),
+		log: (msg: string) => console.log(`${dim}${timestamp()}${reset} ${cyan}[ralph]${reset} ${msg}`),
+		warn: (msg: string) => console.warn(`${dim}${timestamp()}${reset} ${yellow}[ralph WARN]${reset} ${msg}`),
+		error: (msg: string) => console.error(`${dim}${timestamp()}${reset} ${red}[ralph ERROR]${reset} ${msg}`),
 	};
 }
 
