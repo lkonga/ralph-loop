@@ -98,12 +98,43 @@ describe('Wave Context Grounder Agent — Task 25', () => {
 
 		it('should reference pre-computed cache at .ralph/codebase-brief.md (Task 35)', () => {
 			expect(content).toMatch(/\.ralph\/codebase-brief\.md/);
-			expect(content).toMatch(/Task 35/);
+			expect(content).toMatch(/cache|pre-computed/i);
 		});
 
 		it('should mention latency and cache as mitigation', () => {
 			expect(content).toMatch(/30s|latency/i);
 			expect(content).toMatch(/cache|pre-computed/i);
+		});
+	});
+
+	describe('Task 35 — Codebase Brief Cache', () => {
+		let content: string;
+
+		beforeAll(() => {
+			content = readFileSync(CANONICAL_PATH, 'utf-8');
+		});
+
+		it('should document cache file location at .ralph/codebase-brief.md', () => {
+			expect(content).toMatch(/\.ralph\/codebase-brief\.md/);
+		});
+
+		it('should describe regeneration trigger via git hook or periodic script', () => {
+			expect(content).toMatch(/git\s+hook|post-commit|periodic\s+script|regenerat/i);
+		});
+
+		it('should describe cache invalidation using git diff --stat HEAD~5', () => {
+			expect(content).toMatch(/git diff --stat HEAD~5/);
+			expect(content).toMatch(/invalidat|stale|significant\s+change/i);
+		});
+
+		it('should describe fallback to live summarization when cache is stale', () => {
+			expect(content).toMatch(/fallback|fall\s+back/i);
+			expect(content).toMatch(/live\s+summariz|commit-sampling/i);
+		});
+
+		it('should document the .ralph/ directory convention', () => {
+			expect(content).toMatch(/\.ralph\//);
+			expect(content).toMatch(/directory|folder|convention/i);
 		});
 	});
 
