@@ -121,3 +121,37 @@ describe('parsePrd skips DECOMPOSED lines', () => {
 		expect(snapshot.total).toBe(2);
 	});
 });
+
+describe('parsePrd handles CHECKPOINT annotation', () => {
+	it('marks unchecked tasks with [CHECKPOINT] as checkpoint', () => {
+		const content = `- [ ] [CHECKPOINT] Review auth before payments\n- [ ] Implement payments\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.length).toBe(2);
+		expect(snapshot.tasks[0].checkpoint).toBe(true);
+		expect(snapshot.tasks[0].description).toBe('Review auth before payments');
+		expect(snapshot.tasks[1].checkpoint).toBeUndefined();
+	});
+
+	it('strips [CHECKPOINT] from description of checked tasks', () => {
+		const content = `- [x] [CHECKPOINT] Review auth before payments\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].checkpoint).toBe(true);
+		expect(snapshot.tasks[0].description).toBe('Review auth before payments');
+		expect(snapshot.tasks[0].status).toBe('complete');
+	});
+
+	it('does not set checkpoint on normal tasks', () => {
+		const content = `- [ ] Normal task\n- [ ] Another task\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.every(t => t.checkpoint === undefined)).toBe(true);
+	});
+
+	it('checkpoint tasks are not skipped like DECOMPOSED', () => {
+		const content = `- [ ] [CHECKPOINT] Gate task\n- [ ] [DECOMPOSED] Old task\n- [ ] Real task\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.length).toBe(2);
+		expect(snapshot.tasks[0].checkpoint).toBe(true);
+		expect(snapshot.tasks[0].description).toBe('Gate task');
+		expect(snapshot.tasks[1].description).toBe('Real task');
+	});
+});

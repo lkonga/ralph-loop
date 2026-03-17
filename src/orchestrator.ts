@@ -40,7 +40,7 @@ import {
 	BearingsConfig,
 	BearingsResult,
 } from './types';
-import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress } from './prd';
+import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress, markTaskComplete } from './prd';
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt, parseReviewVerdict } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
@@ -602,6 +602,33 @@ export class LoopOrchestrator {
 
 				// Skip tasks whose completion latch is already set
 				if (this.completedTasks.has(task.id)) {
+					continue;
+				}
+
+				// DSL checkpoint gate: pause immediately for human review, no agent execution
+				if (task.checkpoint) {
+					const checkpointInvocationId = crypto.randomUUID();
+					yield {
+						kind: LoopEventKind.HumanCheckpointRequested,
+						task,
+						reason: `Checkpoint: ${task.description}`,
+						failCount: 0,
+						taskInvocationId: checkpointInvocationId,
+					};
+					this.pauseRequested = true;
+					while (this.pauseRequested) {
+						this.state = LoopState.Paused;
+						await this.delay(1000);
+						if (this.stopRequested) {
+							yield { kind: LoopEventKind.Stopped };
+							return;
+						}
+					}
+					this.state = LoopState.Running;
+					this.completedTasks.add(task.id);
+					markTaskComplete(prdPath, task);
+					appendProgress(progressPath, `[${checkpointInvocationId}] [${task.taskId}] Checkpoint cleared: ${task.description}`);
+					yield { kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: 0, taskInvocationId: checkpointInvocationId };
 					continue;
 				}
 

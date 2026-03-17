@@ -32,13 +32,14 @@ export function parsePrd(content: string): PrdSnapshot {
 		const line = lines[i];
 		// Skip DECOMPOSED tasks (non-actionable)
 		if (line.includes('[DECOMPOSED]')) { continue; }
+		const isCheckpoint = line.includes('[CHECKPOINT]');
 		const unchecked = CHECKBOX_UNCHECKED.exec(line);
 		if (unchecked) {
 			const indent = unchecked[1].length;
-			const description = unchecked[2].trim();
+			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined },
 				indent,
 				rawDescription: description,
 			});
@@ -47,10 +48,10 @@ export function parsePrd(content: string): PrdSnapshot {
 		const checked = CHECKBOX_CHECKED.exec(line);
 		if (checked) {
 			const indent = checked[1].length;
-			const description = checked[2].trim();
+			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined },
 				indent,
 				rawDescription: description,
 			});
