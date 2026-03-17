@@ -313,7 +313,7 @@ PRD.md (one-liner tasks)
 
 | Command | Purpose |
 |---------|---------|
-| `/researchPhase` | Run a multi-wave research phase: fan-out analysis → synthesis → task specs → PRD entries |
+| `/researchPhase` | Transform consolidated research findings into spec files with frontmatter and PRD entries (research collection delegated to wave-orchestrator) |
 | `/normalizeResearchFiles` | Add YAML frontmatter to research files that lack it |
 | `/updatePRD` | Add tasks to PRD using two-tier PD format |
 
