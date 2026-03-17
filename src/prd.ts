@@ -101,7 +101,7 @@ export function readPrdSnapshot(prdPath: string): PrdSnapshot {
 }
 
 export function pickNextTask(snapshot: PrdSnapshot): Task | undefined {
-	return snapshot.tasks.find(t => t.status === TaskStatus.Pending);
+	return pickReadyTasks(snapshot, 1)[0];
 }
 
 export function pickReadyTasks(snapshot: PrdSnapshot, maxTasks: number = 1): Task[] {

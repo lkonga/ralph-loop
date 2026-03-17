@@ -97,6 +97,27 @@ describe('pickNextTask', () => {
 		const snapshot = parsePrd('');
 		expect(pickNextTask(snapshot)).toBeUndefined();
 	});
+
+	it('skips task with unmet dependency', () => {
+		const content = `- [ ] **Task A** First task depends: Task B\n- [ ] **Task B** Second task\n`;
+		const snapshot = parsePrd(content);
+		const task = pickNextTask(snapshot);
+		expect(task?.description).toContain('**Task B**');
+	});
+
+	it('picks task with met dependency', () => {
+		const content = `- [x] **Task A** First task\n- [ ] **Task B** Second task depends: Task A\n`;
+		const snapshot = parsePrd(content);
+		const task = pickNextTask(snapshot);
+		expect(task?.description).toContain('**Task B**');
+	});
+
+	it('picks task with no deps as before', () => {
+		const content = `- [x] Done\n- [ ] No deps here\n- [ ] Also pending\n`;
+		const snapshot = parsePrd(content);
+		const task = pickNextTask(snapshot);
+		expect(task?.description).toBe('No deps here');
+	});
 });
 
 describe('parsePrd skips DECOMPOSED lines', () => {
