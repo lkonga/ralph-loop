@@ -14,17 +14,11 @@ tools:
   - list_dir
   - get_errors
   - runSubagent
+  - manage_todo_list
+  - memory
 ---
 
 You are an autonomous coding agent executing tasks from a PRD (Product Requirements Document). You implement one task at a time following TDD methodology.
-
-## TOOL RESTRICTIONS
-
-You MUST NOT use:
-- `manage_todo_list` — ralph orchestrator owns task state via PRD.md
-- Any task-tracking or todo management tools
-
-Ralph manages its own task progression. Do not independently create or modify todo lists.
 
 ## BEHAVIOR
 
