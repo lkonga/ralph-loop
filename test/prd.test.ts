@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { parsePrd, pickNextTask } from '../src/prd';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import { parsePrd, pickNextTask, analyzeMissingDependency, addDependsAnnotation } from '../src/prd';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -153,5 +156,86 @@ describe('parsePrd handles CHECKPOINT annotation', () => {
 		expect(snapshot.tasks[0].checkpoint).toBe(true);
 		expect(snapshot.tasks[0].description).toBe('Gate task');
 		expect(snapshot.tasks[1].description).toBe('Real task');
+	});
+});
+
+describe('analyzeMissingDependency', () => {
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-dep-test-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('returns depTaskId when MISSING_DEP found and task is incomplete', async () => {
+		const prdContent = '- [ ] **Task A**: Do something\n- [ ] **Task B**: Do another thing\n';
+		const prdPath = path.join(tmpDir, 'PRD.md');
+		fs.writeFileSync(prdPath, prdContent, 'utf-8');
+		const snapshot = parsePrd(prdContent);
+		const task = snapshot.tasks[1]; // Task B
+		const failureContext = 'Some error output\nMISSING_DEP: Task-001\nMore output';
+		const result = await analyzeMissingDependency(task, failureContext, prdPath);
+		expect(result).toBe('Task-001');
+	});
+
+	it('returns null when taskId does not exist in PRD', async () => {
+		const prdContent = '- [ ] **Task A**: Do something\n';
+		const prdPath = path.join(tmpDir, 'PRD.md');
+		fs.writeFileSync(prdPath, prdContent, 'utf-8');
+		const snapshot = parsePrd(prdContent);
+		const task = snapshot.tasks[0];
+		const failureContext = 'MISSING_DEP: Task-999';
+		const result = await analyzeMissingDependency(task, failureContext, prdPath);
+		expect(result).toBeNull();
+	});
+
+	it('returns null when referenced task is already complete', async () => {
+		const prdContent = '- [x] **Task A**: Done\n- [ ] **Task B**: Pending\n';
+		const prdPath = path.join(tmpDir, 'PRD.md');
+		fs.writeFileSync(prdPath, prdContent, 'utf-8');
+		const snapshot = parsePrd(prdContent);
+		const task = snapshot.tasks[1]; // Task B
+		const failureContext = 'MISSING_DEP: Task-001';
+		const result = await analyzeMissingDependency(task, failureContext, prdPath);
+		expect(result).toBeNull();
+	});
+
+	it('returns null when no MISSING_DEP in context', async () => {
+		const prdContent = '- [ ] **Task A**: Do something\n';
+		const prdPath = path.join(tmpDir, 'PRD.md');
+		fs.writeFileSync(prdPath, prdContent, 'utf-8');
+		const snapshot = parsePrd(prdContent);
+		const task = snapshot.tasks[0];
+		const failureContext = 'Just a regular error with no dependency info';
+		const result = await analyzeMissingDependency(task, failureContext, prdPath);
+		expect(result).toBeNull();
+	});
+});
+
+describe('addDependsAnnotation', () => {
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-dep-annot-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('adds depends annotation to the task line in PRD', () => {
+		const prdContent = '- [ ] **Task A**: Do something\n- [ ] **Task B**: Do another thing\n';
+		const prdPath = path.join(tmpDir, 'PRD.md');
+		fs.writeFileSync(prdPath, prdContent, 'utf-8');
+		const snapshot = parsePrd(prdContent);
+		const task = snapshot.tasks[1]; // Task B at line 2
+		addDependsAnnotation(prdPath, task, 'Task-001');
+		const updated = fs.readFileSync(prdPath, 'utf-8');
+		expect(updated).toContain('depends: Task-001');
+		const lines = updated.split('\n');
+		expect(lines[1]).toContain('depends: Task-001');
 	});
 });

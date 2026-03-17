@@ -5,6 +5,7 @@ import { Task, TaskStatus, PrdSnapshot } from './types';
 const CHECKBOX_UNCHECKED = /^(\s*)-\s*\[\s*\]\s+(.+)$/;
 const CHECKBOX_CHECKED = /^(\s*)-\s*\[x\]\s+(.+)$/i;
 const DEPENDS_ANNOTATION = /depends:\s*([\w,\s-]+)/i;
+const MISSING_DEP_PATTERN = /MISSING_DEP:\s*(\S+)/i;
 
 function parseTaskId(description: string): string {
 	const match = /^\*\*([^*]+)\*\*/.exec(description);
@@ -145,4 +146,27 @@ export function resolvePrdPath(workspaceRoot: string, prdRelative: string): stri
 
 export function resolveProgressPath(workspaceRoot: string, progressRelative: string): string {
 	return path.resolve(workspaceRoot, progressRelative);
+}
+
+export async function analyzeMissingDependency(task: Task, failureContext: string, prdPath: string): Promise<string | null> {
+	const match = MISSING_DEP_PATTERN.exec(failureContext);
+	if (!match) { return null; }
+
+	const depTaskId = match[1];
+	const snapshot = readPrdSnapshot(prdPath);
+	const depTask = snapshot.tasks.find(t => t.taskId === depTaskId);
+	if (!depTask) { return null; }
+	if (depTask.status === TaskStatus.Complete) { return null; }
+
+	return depTaskId;
+}
+
+export function addDependsAnnotation(prdPath: string, task: Task, depTaskId: string): void {
+	const content = fs.readFileSync(prdPath, 'utf-8');
+	const lines = content.split('\n');
+	const lineIdx = task.lineNumber - 1;
+	if (lineIdx >= 0 && lineIdx < lines.length) {
+		lines[lineIdx] = lines[lineIdx].trimEnd() + ` depends: ${depTaskId}`;
+		fs.writeFileSync(prdPath, lines.join('\n'), 'utf-8');
+	}
 }

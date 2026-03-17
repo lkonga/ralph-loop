@@ -40,7 +40,7 @@ import {
 	BearingsConfig,
 	BearingsResult,
 } from './types';
-import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress, markTaskComplete } from './prd';
+import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress, markTaskComplete, analyzeMissingDependency, addDependsAnnotation } from './prd';
 import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt, parseReviewVerdict } from './copilot';
 import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
@@ -785,6 +785,17 @@ export class LoopOrchestrator {
 								}
 							}
 						} else if (stagnation.staleIterations >= stagnationThreshold + 1) {
+							// Tier 2.5: dynamic dependency discovery before circuit breaker
+							let progressContent = '';
+							try { progressContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
+							const depTaskId = await analyzeMissingDependency(task, progressContent, prdPath);
+							if (depTaskId) {
+								addDependsAnnotation(prdPath, task, depTaskId);
+								additionalContext = `Dependency discovered: ${task.taskId} depends on ${depTaskId}. Switching to dependency task.`;
+								break;
+							}
+							// Inject prompt for next iteration so agent can report MISSING_DEP
+							additionalContext = `Analyze WHY this task keeps failing. Identify if there is a prerequisite task that should have been completed first. If so, respond with MISSING_DEP: <taskId>.`;
 							// Tier 2: trigger circuit breaker
 							yield { kind: LoopEventKind.CircuitBreakerTripped, breakerName: 'stagnation', reason: 'Stagnation detected — progress files unchanged', action: 'skip', taskInvocationId };
 						} else if (stagnation.stagnating) {
