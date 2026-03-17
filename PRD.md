@@ -309,7 +309,7 @@
 
 ### 9i — Bug Fixes
 
-- [ ] **Task 80 — Fix formatVerificationFeedback Export**: In `src/verify.ts`, restore the `export` on `formatVerificationFeedback(checks: VerifyCheck[]): string`. This function was implemented in Task 75 but its export was removed in a subsequent refactor (`b08b68c`), causing 8 test failures in `test/verify.test.ts` that import it. Surgical fix — add `export` keyword back to the function declaration. Run `npx tsc --noEmit` and `npx vitest run` — all 8 failing verify tests must now pass, bringing total from 462/470 to 470/470. No new tests needed — existing tests already cover this.
+- [x] **Task 80 — Fix formatVerificationFeedback Export**: In `src/verify.ts`, restore the `export` on `formatVerificationFeedback(checks: VerifyCheck[]): string`. This function was implemented in Task 75 but its export was removed in a subsequent refactor (`b08b68c`), causing 8 test failures in `test/verify.test.ts` that import it. Surgical fix — add `export` keyword back to the function declaration. Run `npx tsc --noEmit` and `npx vitest run` — all 8 failing verify tests must now pass, bringing total from 462/470 to 470/470. No new tests needed — existing tests already cover this.
 
 ---
 
