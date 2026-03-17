@@ -115,6 +115,32 @@ describe('Wave Orchestrator --ralph-prd Mode', () => {
 		});
 	});
 
+	describe('checkpoint state persistence', () => {
+		it('should reference phase-state.json files for checkpoint state', () => {
+			expect(content).toMatch(/phase-\d+-state\.json/);
+		});
+
+		it('should describe go-back behavior at Checkpoint 2', () => {
+			expect(content).toMatch(/\[Back\].*Checkpoint 1|go.?back.*phase/i);
+		});
+
+		it('should describe go-back behavior at Checkpoint 3', () => {
+			expect(content).toMatch(/\[Back\].*Checkpoint 2/);
+		});
+
+		it('should reference checkpoint-retry pattern documentation', () => {
+			expect(content).toMatch(/checkpoint-retry/);
+		});
+
+		it('should specify state schema fields (waveId, phase, inputs, outputs, userSteering, timestamp)', () => {
+			expect(content).toMatch(/waveId/);
+			expect(content).toMatch(/userSteering/);
+			expect(content).toMatch(/inputs/);
+			expect(content).toMatch(/outputs/);
+			expect(content).toMatch(/timestamp/);
+		});
+	});
+
 	describe('section placement', () => {
 		it('should appear after the existing aggregate mode section', () => {
 			const aggregatePos = content.indexOf('## Aggregate Mode');
