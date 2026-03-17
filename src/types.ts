@@ -27,6 +27,7 @@ export interface Task {
 	readonly checkpoint?: boolean;
 	readonly agent?: string;
 	readonly readOnly?: boolean;
+	readonly noDiff?: boolean;
 }
 
 export interface PrdSnapshot {

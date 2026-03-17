@@ -794,8 +794,10 @@ export class LoopOrchestrator {
 						}
 
 						// Reset nudgeCount if productive file changes occurred during wait
-						if (waitResult.hadFileChanges) {
-							this.logger.log('Productive file changes detected — resetting nudge count');
+						if (waitResult.hadFileChanges || task.noDiff) {
+							if (waitResult.hadFileChanges) {
+								this.logger.log('Productive file changes detected — resetting nudge count');
+							}
 							taskState.nudgeCount = 0;
 							consecutiveNudgesWithoutFileChanges = 0;
 						} else {
@@ -880,7 +882,12 @@ export class LoopOrchestrator {
 						const foundTask = snapshot.tasks.find(t => t.description === task.description);
 						dualGateChecks.push({ name: 'checkbox', result: foundTask?.status === TaskStatus.Complete ? VerifyResult.Pass : VerifyResult.Fail });
 					}
-					dualGateChecks.push({ name: 'diff', result: waitResult.hadFileChanges ? VerifyResult.Pass : VerifyResult.Fail, detail: waitResult.hadFileChanges ? 'Files changed' : 'No file changes detected' });
+					// noDiff tasks (documentation, meta) skip the diff requirement
+					if (task.noDiff) {
+						dualGateChecks.push({ name: 'diff', result: VerifyResult.Skip, detail: 'Skipped (noDiff task)' });
+					} else {
+						dualGateChecks.push({ name: 'diff', result: waitResult.hadFileChanges ? VerifyResult.Pass : VerifyResult.Fail, detail: waitResult.hadFileChanges ? 'Files changed' : 'No file changes detected' });
+					}
 
 					const gateResult = dualExitGateCheck(waitResult.completed, dualGateChecks);
 
@@ -921,7 +928,7 @@ export class LoopOrchestrator {
 
 						// Diff validation after TaskCompleted
 						const diffConfig = this.config.diffValidation ?? DEFAULT_DIFF_VALIDATION;
-						if (diffConfig.enabled) {
+						if (diffConfig.enabled && !task.noDiff) {
 							const diffValidator = new DiffValidator(diffConfig);
 							let diffAttempt = 0;
 							let diffPassed = false;

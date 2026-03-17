@@ -7,6 +7,23 @@ const CHECKBOX_CHECKED = /^(\s*)-\s*\[x\]\s+(.+)$/i;
 const DEPENDS_ANNOTATION = /depends:\s*([\w,\s-]+)/i;
 const MISSING_DEP_PATTERN = /MISSING_DEP:\s*(\S+)/i;
 const AGENT_ANNOTATION = /\[AGENT:(\w+)\]/g;
+const NO_DIFF_ANNOTATION = /\[NO_DIFF\]/i;
+
+const DOC_TASK_PATTERNS = [
+	/^document\b/i,
+	/^write\s+(a\s+)?documentation\b/i,
+	/\bdocumentation\b/i,
+	/\bwrite\s+.*\bREADME\b/i,
+	/\bwrite\s+.*\.md\b/i,
+	/\badd\s+.*\bdocs?\b/i,
+	/\bupdate\s+.*\bdocs?\b/i,
+	/\bmark\b.*\bas\s+(deprecated|stale)\b/i,
+	/\bpush\s*&\s*tag\b/i,
+];
+
+export function isDocumentationTask(description: string): boolean {
+	return DOC_TASK_PATTERNS.some(p => p.test(description));
+}
 
 function parseTaskId(description: string): string {
 	const match = /^\*\*([^*]+)\*\*/.exec(description);
@@ -55,15 +72,17 @@ export function parsePrd(content: string): PrdSnapshot {
 		// Skip DECOMPOSED tasks (non-actionable)
 		if (line.includes('[DECOMPOSED]')) { continue; }
 		const isCheckpoint = line.includes('[CHECKPOINT]');
+		const hasNoDiffAnnotation = NO_DIFF_ANNOTATION.test(line);
 		const unchecked = CHECKBOX_UNCHECKED.exec(line);
 		if (unchecked) {
 			const indent = unchecked[1].length;
 			const taskAgent = parseAgentAnnotation(unchecked[2]);
 			const agent = taskAgent ?? currentPhaseAgent;
-			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
+			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').replace(NO_DIFF_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
+			const noDiff = hasNoDiffAnnotation || isDocumentationTask(description) || undefined;
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined, noDiff: noDiff || undefined },
 				indent,
 				rawDescription: description,
 			});
@@ -74,10 +93,11 @@ export function parsePrd(content: string): PrdSnapshot {
 			const indent = checked[1].length;
 			const taskAgent = parseAgentAnnotation(checked[2]);
 			const agent = taskAgent ?? currentPhaseAgent;
-			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
+			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').replace(NO_DIFF_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
+			const noDiff = hasNoDiffAnnotation || isDocumentationTask(description) || undefined;
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined, noDiff: noDiff || undefined },
 				indent,
 				rawDescription: description,
 			});
