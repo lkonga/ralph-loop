@@ -299,8 +299,11 @@ export function activate(context: vscode.ExtensionContext): void {
 			orchestrator.stop();
 		}),
 
-		vscode.commands.registerCommand('ralph-loop.status', () => {
+		vscode.commands.registerCommand('ralph-loop.status', (silent?: boolean) => {
 			const state = orchestrator?.getState() ?? 'idle';
+			if (!silent) {
+				vscode.window.showInformationMessage(`Ralph Loop: ${state}`);
+			}
 			return state;
 		}),
 
