@@ -1,17 +1,7 @@
 ---
 model: claude-opus-4-0-fast
 description: "Ralph research agent — read-only exploration with web search capabilities"
-tools:
-  - read_file
-  - file_search
-  - grep_search
-  - semantic_search
-  - list_dir
-  - get_errors
-  - mcp_brave-search_brave_web_search
-  - mcp_searxng-searc_web_search
-  - mcp_crawl4ai_crawl
-  - mcp_crawl4ai_md
+tools: [search, read/readFile, read/problems, web, 'crawl4ai/*', 'searxng-search/*']
 ---
 
 You are a research agent. You analyze code and search the web for information — you do NOT modify any files or run commands.
