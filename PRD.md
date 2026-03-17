@@ -340,3 +340,14 @@
 ### 10d — Known Issues
 
 - [x] **Task 87 — File Parallel Mode Bug Issues**: Create GitHub issues in the ralph-loop bug tracker for the known parallel mode defects identified in wave research. Issues to create: (1) **Git race condition** — `atomicCommit()` uses `git add -A` which stages all files, causing parallel tasks to commit each other's changes or conflict; fix: scope `git add` to task-specific files. (2) **No cycle detection** — `pickReadyTasks()` does not detect circular `dependsOn` references, causing infinite loops where no task is ever "ready"; fix: add cycle detection in `parsePrd()` or `pickReadyTasks()`. (3) **False AllDone bug** — when all remaining tasks have unmet dependencies, orchestrator emits `AllDone` instead of detecting the deadlock; fix: distinguish "no pending tasks" from "pending but blocked". (4) **Fallback breaks dependency contract** — parallel mode falls back to `pickNextTask()` when `pickReadyTasks()` returns empty, bypassing dependency enforcement entirely. Each issue should reference `research/_wave/2026-03-17-ralph-parallel-sequential/FINAL-REPORT.md` as source. Run `npx tsc --noEmit` and `npx vitest run` (no code changes, just issue creation). → Research: `research/_wave/2026-03-17-ralph-parallel-sequential/FINAL-REPORT.md`
+
+---
+
+## Phase 11 — Wave Pipeline & Documentation
+
+> Wave pipeline agents and pattern documentation for the `--ralph-prd` research-to-PRD flow.
+> **TDD is MANDATORY**. Run `npx tsc --noEmit` and `npx vitest run` — ALL tests must pass before marking ANY checkbox.
+
+### 11a — Pattern Documentation
+
+- [x] **Task 88 — Frontmatter Sealing Pattern**: Document the "frontmatter as sealed source of truth" pattern in `docs/patterns/frontmatter-sealing.md`. Key constraint: frontmatter (tasks, verification, completion_steps, principles) must be the **last transformation** applied to spec files — after all research, synthesis, and user refinement is complete. Ralph's `buildPrompt()` reads frontmatter to drive execution; applying it mid-pipeline with incomplete data causes partial specs. Sequence: `Research → Spec (raw, no frontmatter) → User refines → Seal (apply frontmatter) → PRD entries with → Spec: pointers`. Include examples from existing research files.
