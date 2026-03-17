@@ -72,6 +72,41 @@ describe('Wave Context Grounder Agent — Task 25', () => {
 		});
 	});
 
+	describe('Task 32 — commit-sampling git commands and fingerprint', () => {
+		let content: string;
+
+		beforeAll(() => {
+			content = readFileSync(CANONICAL_PATH, 'utf-8');
+		});
+
+		it('should contain explicit git log commands for all 3 zones', () => {
+			expect(content).toMatch(/git log --oneline --reverse.*head.*10/i);
+			expect(content).toMatch(/git log --oneline --skip.*-10/i);
+			expect(content).toMatch(/git log --oneline -10/);
+		});
+
+		it('should contain git show --stat for inspecting each commit', () => {
+			expect(content).toMatch(/git show --stat/);
+		});
+
+		it('should define codebase fingerprint output with churn, signatures, and dependencies', () => {
+			expect(content).toMatch(/[Cc]odebase [Ff]ingerprint/);
+			expect(content).toMatch(/top files by churn/i);
+			expect(content).toMatch(/key function signatures/i);
+			expect(content).toMatch(/[Dd]ependenc/);
+		});
+
+		it('should reference pre-computed cache at .ralph/codebase-brief.md (Task 35)', () => {
+			expect(content).toMatch(/\.ralph\/codebase-brief\.md/);
+			expect(content).toMatch(/Task 35/);
+		});
+
+		it('should mention latency and cache as mitigation', () => {
+			expect(content).toMatch(/30s|latency/i);
+			expect(content).toMatch(/cache|pre-computed/i);
+		});
+	});
+
 	describe('symlink integration', () => {
 		it('should have a symlink at ralph-loop/agents/wave-context-grounder.agent.md', () => {
 			expect(existsSync(SYMLINK_PATH)).toBe(true);
