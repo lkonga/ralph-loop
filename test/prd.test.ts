@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, pickNextTask, analyzeMissingDependency, addDependsAnnotation } from '../src/prd';
+import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation } from '../src/prd';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -316,5 +316,72 @@ describe('addDependsAnnotation', () => {
 		expect(updated).toContain('depends: Task-001');
 		const lines = updated.split('\n');
 		expect(lines[1]).toContain('depends: Task-001');
+	});
+});
+
+describe('isReadOnlyAgent', () => {
+	it('returns true for explore agent', () => {
+		expect(isReadOnlyAgent('explore')).toBe(true);
+	});
+
+	it('returns true for research agent', () => {
+		expect(isReadOnlyAgent('research')).toBe(true);
+	});
+
+	it('returns false for implement agent', () => {
+		expect(isReadOnlyAgent('implement')).toBe(false);
+	});
+
+	it('returns false for executor agent', () => {
+		expect(isReadOnlyAgent('executor')).toBe(false);
+	});
+
+	it('returns false for undefined/empty agent', () => {
+		expect(isReadOnlyAgent('')).toBe(false);
+		expect(isReadOnlyAgent(undefined as unknown as string)).toBe(false);
+	});
+
+	it('returns false for unknown agent names', () => {
+		expect(isReadOnlyAgent('custom-agent')).toBe(false);
+	});
+});
+
+describe('pickReadyTasks parallel safety', () => {
+	it('all-explore batch runs parallel (returns multiple tasks)', () => {
+		const content = `- [ ] [AGENT:explore] Research A\n- [ ] [AGENT:explore] Research B\n- [ ] [AGENT:explore] Research C\n`;
+		const snapshot = parsePrd(content);
+		const ready = pickReadyTasks(snapshot, 3);
+		expect(ready.length).toBe(3);
+		expect(ready.every(t => isReadOnlyAgent(t.agent ?? ''))).toBe(true);
+	});
+
+	it('mixed batch falls back to sequential (returns single task)', () => {
+		const content = `- [ ] [AGENT:explore] Research A\n- [ ] [AGENT:implement] Build B\n- [ ] [AGENT:explore] Research C\n`;
+		const snapshot = parsePrd(content);
+		const ready = pickReadyTasks(snapshot, 3);
+		// When batch contains non-read-only agents, should return only 1 task
+		expect(ready.length).toBe(1);
+	});
+
+	it('all-research batch runs parallel', () => {
+		const content = `- [ ] [AGENT:research] Web search A\n- [ ] [AGENT:research] Web search B\n`;
+		const snapshot = parsePrd(content);
+		const ready = pickReadyTasks(snapshot, 2);
+		expect(ready.length).toBe(2);
+	});
+
+	it('single task always returned regardless of agent type', () => {
+		const content = `- [ ] [AGENT:implement] Build feature\n`;
+		const snapshot = parsePrd(content);
+		const ready = pickReadyTasks(snapshot, 1);
+		expect(ready.length).toBe(1);
+	});
+
+	it('tasks without agent annotation treated as non-read-only', () => {
+		const content = `- [ ] No agent task A\n- [ ] No agent task B\n`;
+		const snapshot = parsePrd(content);
+		const ready = pickReadyTasks(snapshot, 2);
+		// No agent = default (executor) = not read-only, so sequential
+		expect(ready.length).toBe(1);
 	});
 });

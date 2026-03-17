@@ -26,6 +26,7 @@ export interface Task {
 	readonly dependsOn?: string[];
 	readonly checkpoint?: boolean;
 	readonly agent?: string;
+	readonly readOnly?: boolean;
 }
 
 export interface PrdSnapshot {

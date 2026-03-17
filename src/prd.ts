@@ -53,7 +53,7 @@ export function parsePrd(content: string): PrdSnapshot {
 			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined },
 				indent,
 				rawDescription: description,
 			});
@@ -66,7 +66,7 @@ export function parsePrd(content: string): PrdSnapshot {
 			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined },
 				indent,
 				rawDescription: description,
 			});
@@ -118,6 +118,13 @@ export function pickNextTask(snapshot: PrdSnapshot): Task | undefined {
 	return pickReadyTasks(snapshot, 1)[0];
 }
 
+const READ_ONLY_AGENTS = new Set(['explore', 'research']);
+
+export function isReadOnlyAgent(agentName: string | undefined): boolean {
+	if (!agentName) { return false; }
+	return READ_ONLY_AGENTS.has(agentName);
+}
+
 export function pickReadyTasks(snapshot: PrdSnapshot, maxTasks: number = 1): Task[] {
 	const completedDescriptions = new Set(
 		snapshot.tasks.filter(t => t.status === TaskStatus.Complete).map(t => parseTaskId(t.description)),
@@ -134,6 +141,12 @@ export function pickReadyTasks(snapshot: PrdSnapshot, maxTasks: number = 1): Tas
 			ready.push(task);
 		}
 	}
+
+	// Parallel safety: if batch has >1 task and any uses a write agent, fall back to sequential
+	if (ready.length > 1 && !ready.every(t => isReadOnlyAgent(t.agent))) {
+		return [ready[0]];
+	}
+
 	return ready;
 }
 
