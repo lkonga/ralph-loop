@@ -474,7 +474,7 @@
 
 ### 13d — Task Detail Hover
 
-- [ ] **Task 101 — Rich task hover tooltip**: When hovering on the Ralph status bar section, show a `MarkdownString` tooltip with details about the current task being processed. Use `ralph-loop.getStateSnapshot` (Task 94) to fetch: task ID, task description, iteration count, nudge count, and current state. Format as a compact floating summary, e.g.: `**Ralph Loop** \n State: Running \n Task: Task-111 \n Description: Implement context thrashing detection \n Iterations: 3 \n Nudges: 1`. If ralph-loop is idle, show the last completed task info. If ralph-loop is not installed, omit the Ralph section from the tooltip entirely. Depends on Task 100 (rich state via getStateSnapshot).
+- [x] **Task 101 — Rich task hover tooltip**: When hovering on the Ralph status bar section, show a `MarkdownString` tooltip with details about the current task being processed. Use `ralph-loop.getStateSnapshot` (Task 94) to fetch: task ID, task description, iteration count, nudge count, and current state. Format as a compact floating summary, e.g.: `**Ralph Loop** \n State: Running \n Task: Task-111 \n Description: Implement context thrashing detection \n Iterations: 3 \n Nudges: 1`. If ralph-loop is idle, show the last completed task info. If ralph-loop is not installed, omit the Ralph section from the tooltip entirely. Depends on Task 100 (rich state via getStateSnapshot).
 
 ---
 

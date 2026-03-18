@@ -1,59 +1,55 @@
-import * as vscode from 'vscode';
+import { execSync } from 'child_process';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as crypto from 'crypto';
+import * as vscode from 'vscode';
+import { CircuitBreakerChain, createDefaultChain, ErrorHashTracker, type CircuitBreakerState } from './circuitBreaker';
 import { showCooldownDialog, type CooldownDialogResult } from './cooldownDialog';
-import {
-	LoopState,
-	LoopEvent,
-	LoopEventKind,
-	RalphConfig,
-	DEFAULT_CONFIG,
-	DEFAULT_FEATURES,
-	DEFAULT_PRE_COMPLETE_HOOKS,
-	DEFAULT_DIFF_VALIDATION,
-	DEFAULT_REVIEW_AFTER_EXECUTE,
-	DEFAULT_PARALLEL_MONITOR,
-	DEFAULT_PRE_COMPACT_BEHAVIOR,
-	DEFAULT_STAGNATION_DETECTION,
-	DEFAULT_KNOWLEDGE_CONFIG,
-	DEFAULT_AUTO_DECOMPOSE,
-	DEFAULT_CONTEXT_TRIMMING,
-	DEFAULT_STRUGGLE_DETECTION,
-	DEFAULT_BEARINGS_CONFIG,
-	ILogger,
-	TaskStatus,
-	TaskState,
-	DiffValidationConfig,
-	ParallelMonitorConfig,
-	IRalphHookService,
-	HookResult,
-	ITaskExecutionStrategy,
-	ExecutionOptions,
-	PreCompleteInput,
-	PreCompleteHookResult,
-	PreCompleteHookConfig,
-	VerifyCheck,
-	VerifyResult,
-	ReviewVerdict,
-	ReviewAfterExecuteConfig,
-	IConsistencyChecker,
-	BearingsConfig,
-	BearingsResult,
-} from './types';
-import { readPrdFile, readPrdSnapshot, pickNextTask, pickReadyTasks, resolvePrdPath, resolveProgressPath, appendProgress, markTaskComplete, analyzeMissingDependency, addDependsAnnotation, validatePrd } from './prd';
-import { buildPrompt, buildFinalNudgePrompt, PromptCapabilities, sendReviewPrompt, parseReviewVerdict } from './copilot';
-import { shouldRetryError, MAX_RETRIES_PER_TASK } from './decisions';
-import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
-import { createDefaultChain, CircuitBreakerChain, ErrorHashTracker, type CircuitBreakerState } from './circuitBreaker';
+import { buildFinalNudgePrompt, buildPrompt, parseReviewVerdict, PromptCapabilities, sendReviewPrompt } from './copilot';
+import { MAX_RETRIES_PER_TASK, shouldRetryError } from './decisions';
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
-import { StagnationDetector, AutoDecomposer } from './stagnationDetector';
-import { computeConfidenceScore, dualExitGateCheck, formatVerificationFeedback } from './verify';
 import { KnowledgeManager } from './knowledge';
-import { StruggleDetector } from './struggleDetector';
+import { addDependsAnnotation, analyzeMissingDependency, appendProgress, markTaskComplete, pickNextTask, pickReadyTasks, readPrdFile, readPrdSnapshot, resolvePrdPath, resolveProgressPath, validatePrd } from './prd';
 import { SessionPersistence } from './sessionPersistence';
-import { execSync } from 'child_process';
+import { AutoDecomposer, StagnationDetector } from './stagnationDetector';
+import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
+import { StruggleDetector } from './struggleDetector';
+import {
+	BearingsConfig,
+	BearingsResult,
+	DEFAULT_AUTO_DECOMPOSE,
+	DEFAULT_BEARINGS_CONFIG,
+	DEFAULT_CONFIG,
+	DEFAULT_CONTEXT_TRIMMING,
+	DEFAULT_DIFF_VALIDATION,
+	DEFAULT_FEATURES,
+	DEFAULT_KNOWLEDGE_CONFIG,
+	DEFAULT_PARALLEL_MONITOR,
+	DEFAULT_PRE_COMPLETE_HOOKS,
+	DEFAULT_REVIEW_AFTER_EXECUTE,
+	DEFAULT_STAGNATION_DETECTION,
+	DEFAULT_STRUGGLE_DETECTION,
+	ExecutionOptions,
+	HookResult,
+	IConsistencyChecker,
+	ILogger,
+	IRalphHookService,
+	ITaskExecutionStrategy,
+	LoopEvent,
+	LoopEventKind,
+	LoopState,
+	ParallelMonitorConfig,
+	PreCompleteHookConfig,
+	PreCompleteHookResult,
+	PreCompleteInput,
+	RalphConfig,
+	TaskState,
+	TaskStatus,
+	VerifyCheck,
+	VerifyResult
+} from './types';
+import { computeConfidenceScore, dualExitGateCheck, formatVerificationFeedback } from './verify';
 
 const KNOWN_AGENTS = new Set(['executor', 'explore', 'research']);
 

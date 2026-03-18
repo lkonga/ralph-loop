@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import { LoopEventKind, LoopState, createOutputLogger, IRalphHookService, ChatSendRequest } from './types';
+import { HookBridgeDisposable, registerHookBridge, startChatSendWatcher } from './hookBridge';
 import { LoopOrchestrator, loadConfig } from './orchestrator';
-import { ShellHookProvider } from './shellHookProvider';
-import { registerHookBridge, HookBridgeDisposable, startChatSendWatcher } from './hookBridge';
 import { SessionPersistence } from './sessionPersistence';
+import { ShellHookProvider } from './shellHookProvider';
 import { fireStateChangeNotification } from './stateNotification';
+import { ChatSendRequest, IRalphHookService, LoopEventKind, LoopState, createOutputLogger } from './types';
 
 let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.LogOutputChannel;
