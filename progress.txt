@@ -689,3 +689,4 @@ Verified Task 108 — tests for both [DECOMPOSED] and [CHECKPOINT] coexisting in
 [2026-03-18T10:54:11.589Z] [38287014-f57f-4078-83f6-4bcc55def253] [Task-122] Task completed: **Task 108 — Verify both [DECOMPOSED] and coexist in description safely**: A task referencing both tags in description text. Neither should trigger annotation behavior. Write a test in `test/prd.test.ts` that parses `- [ ] **Task N — mentions [DECOMPOSED] and in text**:` and asserts it appears as a normal pending task with `checkpoint` not set. Run `npx vitest run` — all must pass. (47s)
 
 ### Task 121 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
+[2026-03-18T10:54:11.716Z] [38287014-f57f-4078-83f6-4bcc55def253] Committed: 03a7be2684d39550f03a2f774fe0942b399b4485
