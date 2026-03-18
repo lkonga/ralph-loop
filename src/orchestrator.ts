@@ -10,7 +10,7 @@ import { MAX_RETRIES_PER_TASK, shouldRetryError } from './decisions';
 import { DiffValidator } from './diffValidator';
 import { atomicCommit } from './gitOps';
 import { KnowledgeManager } from './knowledge';
-import { addDependsAnnotation, analyzeMissingDependency, appendProgress, markTaskComplete, pickNextTask, pickReadyTasks, readPrdFile, readPrdSnapshot, resolvePrdPath, resolveProgressPath, validatePrd } from './prd';
+import { addDependsAnnotation, analyzeMissingDependency, appendProgress, markTaskComplete, pickNextTask, pickReadyTasks, readPrdFile, readPrdSnapshot, resolvePrdPath, resolveProgressPath, validatePrd, validatePrdEdit } from './prd';
 import { SessionPersistence } from './sessionPersistence';
 import { AutoDecomposer, StagnationDetector } from './stagnationDetector';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
@@ -626,7 +626,8 @@ export class LoopOrchestrator {
 
 								try {
 									appendProgress(progressPath, `[${invId}] Task started (parallel): ${task.description}`);
-									const prdContent = readPrdFile(prdPath);
+									const prdContentBeforeParallel = readPrdFile(prdPath);
+									const prdContent = prdContentBeforeParallel;
 									let progContent = '';
 									try { progContent = fs.readFileSync(progressPath, 'utf-8'); } catch { /* may not exist */ }
 									const prompt = buildPrompt(task.description, prdContent, progContent, 20, this.config.promptBlocks, this.promptCapabilities, undefined, iteration, this.config.contextTrimming ?? DEFAULT_CONTEXT_TRIMMING, undefined, task.taskId, undefined, this.config.workspaceRoot);
@@ -637,6 +638,15 @@ export class LoopOrchestrator {
 										this.completedTasks.add(task.id);
 										appendProgress(progressPath, `[${invId}] Task completed (parallel): ${task.description} (${Math.round(duration / 1000)}s)`);
 										this.onEvent({ kind: LoopEventKind.TaskCompleted, task: { ...task, status: TaskStatus.Complete }, durationMs: duration, taskInvocationId: invId });
+
+										// PRD write protection (parallel path)
+										const prdAfterParallel = readPrdFile(prdPath);
+										const pEditValidation = validatePrdEdit(prdContentBeforeParallel, prdAfterParallel);
+										if (!pEditValidation.allowed) {
+											this.logger.warn(`PRD write protection (parallel): ${pEditValidation.reason}`);
+											fs.writeFileSync(prdPath, prdContentBeforeParallel, 'utf-8');
+											this.onEvent({ kind: LoopEventKind.Error, message: `PRD write protection: ${pEditValidation.reason}` });
+										}
 
 										// Atomic git commit per task (parallel path)
 										const pCommitResult = await atomicCommit(this.config.workspaceRoot, task, invId);
@@ -761,7 +771,8 @@ export class LoopOrchestrator {
 					// Stagnation snapshot before prompt
 					stagnationDetector?.snapshot(this.config.workspaceRoot);
 
-					const prdContent = readPrdFile(prdPath);
+					const prdContentBeforeTask = readPrdFile(prdPath);
+					const prdContent = prdContentBeforeTask;
 					let progressContent = '';
 					try {
 						progressContent = fs.readFileSync(progressPath, 'utf-8');
@@ -1102,6 +1113,16 @@ export class LoopOrchestrator {
 								this.completedTasks.delete(task.id);
 								continue;
 							}
+						}
+
+						// PRD write protection: validate edits before commit
+						const prdContentAfterTask = readPrdFile(prdPath);
+						const prdEditValidation = validatePrdEdit(prdContentBeforeTask, prdContentAfterTask);
+						if (!prdEditValidation.allowed) {
+							this.logger.warn(`PRD write protection: ${prdEditValidation.reason}`);
+							fs.writeFileSync(prdPath, prdContentBeforeTask, 'utf-8');
+							additionalContext = `PRD write protection rejected your edit: ${prdEditValidation.reason}. Only checkbox toggles, DECOMPOSED prefixes, and depends annotations are allowed.`;
+							yield { kind: LoopEventKind.Error, message: `PRD write protection: ${prdEditValidation.reason}` };
 						}
 
 						// Atomic git commit per task

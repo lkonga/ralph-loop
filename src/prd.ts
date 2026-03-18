@@ -1,29 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Task, TaskStatus, PrdSnapshot, PrdValidationError, PrdValidationResult, StalePointer } from './types';
+import { Task, TaskStatus, PrdSnapshot, PrdValidationError, PrdValidationResult } from './types';
 
 const CHECKBOX_UNCHECKED = /^(\s*)-\s*\[\s*\]\s+(.+)$/;
 const CHECKBOX_CHECKED = /^(\s*)-\s*\[x\]\s+(.+)$/i;
 const DEPENDS_ANNOTATION = /depends:\s*([\w,\s-]+)/i;
 const MISSING_DEP_PATTERN = /MISSING_DEP:\s*(\S+)/i;
 const AGENT_ANNOTATION = /\[AGENT:(\w+)\]/g;
-const NO_DIFF_ANNOTATION = /\[NO_DIFF\]/i;
-
-const DOC_TASK_PATTERNS = [
-	/^document\b/i,
-	/^write\s+(a\s+)?documentation\b/i,
-	/\bdocumentation\b/i,
-	/\bwrite\s+.*\bREADME\b/i,
-	/\bwrite\s+.*\.md\b/i,
-	/\badd\s+.*\bdocs?\b/i,
-	/\bupdate\s+.*\bdocs?\b/i,
-	/\bmark\b.*\bas\s+(deprecated|stale)\b/i,
-	/\bpush\s*&\s*tag\b/i,
-];
-
-export function isDocumentationTask(description: string): boolean {
-	return DOC_TASK_PATTERNS.some(p => p.test(description));
-}
 
 function parseTaskId(description: string): string {
 	const match = /^\*\*([^*]+)\*\*/.exec(description);
@@ -72,17 +55,15 @@ export function parsePrd(content: string): PrdSnapshot {
 		// Skip DECOMPOSED tasks (non-actionable)
 		if (line.includes('[DECOMPOSED]')) { continue; }
 		const isCheckpoint = line.includes('[CHECKPOINT]');
-		const hasNoDiffAnnotation = NO_DIFF_ANNOTATION.test(line);
 		const unchecked = CHECKBOX_UNCHECKED.exec(line);
 		if (unchecked) {
 			const indent = unchecked[1].length;
 			const taskAgent = parseAgentAnnotation(unchecked[2]);
 			const agent = taskAgent ?? currentPhaseAgent;
-			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').replace(NO_DIFF_ANNOTATION, '').trim();
+			const description = unchecked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
-			const noDiff = hasNoDiffAnnotation || isDocumentationTask(description) || undefined;
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined, noDiff: noDiff || undefined },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Pending, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined },
 				indent,
 				rawDescription: description,
 			});
@@ -93,11 +74,10 @@ export function parsePrd(content: string): PrdSnapshot {
 			const indent = checked[1].length;
 			const taskAgent = parseAgentAnnotation(checked[2]);
 			const agent = taskAgent ?? currentPhaseAgent;
-			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').replace(NO_DIFF_ANNOTATION, '').trim();
+			const description = checked[2].replace(/\[CHECKPOINT\]\s*/g, '').replace(AGENT_ANNOTATION, '').trim();
 			const dependsOn = parseDependsOn(description);
-			const noDiff = hasNoDiffAnnotation || isDocumentationTask(description) || undefined;
 			taskEntries.push({
-				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined, noDiff: noDiff || undefined },
+				task: { id: id++, taskId: '', description, status: TaskStatus.Complete, lineNumber: i + 1, dependsOn, checkpoint: isCheckpoint || undefined, agent, readOnly: isReadOnlyAgent(agent) || undefined },
 				indent,
 				rawDescription: description,
 			});
@@ -305,44 +285,77 @@ export function addDependsAnnotation(prdPath: string, task: Task, depTaskId: str
 	}
 }
 
-const SPEC_POINTER_PATTERN = /→\s*Spec:\s*(.+)/;
-const SPEC_FILE_PATTERN = /`([^`]+)`(?:\s+L(\d+)-L(\d+))?/g;
+const CHECKBOX_LINE = /^(\s*-\s*\[)[ x](\]\s*)(.*)$/i;
+const PHASE_HEADER = /^(#{1,6}\s+.*)$/;
+const DEPENDS_SUFFIX = /\s*depends:\s*[\w,\s-]+$/i;
 
-export function validateSpecPointers(prdContent: string, researchDir: string): StalePointer[] {
-	const stale: StalePointer[] = [];
-	const lines = prdContent.split('\n');
+function stripCheckboxState(line: string): string {
+	return line.replace(/^(\s*-\s*\[)[ x](\])/, '$1 $2');
+}
 
-	for (let i = 0; i < lines.length; i++) {
-		const match = SPEC_POINTER_PATTERN.exec(lines[i]);
-		if (!match) { continue; }
+function stripDecomposedPrefix(line: string): string {
+	return line.replace(/^(\s*-\s*\[[ x]\]\s*)\[DECOMPOSED\]\s*/i, '$1');
+}
 
-		const specPart = match[1];
-		let fileMatch: RegExpExecArray | null;
-		SPEC_FILE_PATTERN.lastIndex = 0;
+function stripDependsAnnotation(line: string): string {
+	return line.replace(DEPENDS_SUFFIX, '');
+}
 
-		while ((fileMatch = SPEC_FILE_PATTERN.exec(specPart)) !== null) {
-			const filePath = fileMatch[1];
-			const startLine = fileMatch[2] ? parseInt(fileMatch[2], 10) : undefined;
-			const endLine = fileMatch[3] ? parseInt(fileMatch[3], 10) : undefined;
+function normalizeForComparison(line: string): string {
+	return stripDependsAnnotation(stripDecomposedPrefix(stripCheckboxState(line)));
+}
 
-			// Strip leading "research/" prefix since researchDir already points there
-			const relativePath = filePath.startsWith('research/') ? filePath.slice('research/'.length) : filePath;
-			const fullPath = path.join(researchDir, relativePath);
+export function validatePrdEdit(before: string, after: string): { allowed: boolean; reason?: string } {
+	if (before === after) { return { allowed: true }; }
 
-			if (!fs.existsSync(fullPath)) {
-				stale.push({ file: filePath, line: i + 1, reason: 'file_missing', startLine, endLine });
-				continue;
+	const beforeLines = before.split('\n');
+	const afterLines = after.split('\n');
+
+	// Build a map of before lines for matching
+	const beforeNonEmpty = beforeLines.filter(l => l.trim().length > 0);
+	const afterNonEmpty = afterLines.filter(l => l.trim().length > 0);
+
+	// Check for deleted lines: every before non-empty line must appear in after (by normalized content)
+	let afterIdx = 0;
+	for (let i = 0; i < beforeNonEmpty.length; i++) {
+		const bLine = beforeNonEmpty[i];
+		let found = false;
+		for (let j = afterIdx; j < afterNonEmpty.length; j++) {
+			if (linesMatch(bLine, afterNonEmpty[j])) {
+				afterIdx = j + 1;
+				found = true;
+				break;
 			}
-
-			if (startLine !== undefined && endLine !== undefined) {
-				const fileContent = fs.readFileSync(fullPath, 'utf-8');
-				const fileLines = fileContent.split('\n');
-				if (fileLines.length < endLine) {
-					stale.push({ file: filePath, line: i + 1, reason: 'line_range_out_of_bounds', startLine, endLine });
-				}
+		}
+		if (!found) {
+			// Check if the line was reordered (exists anywhere after current position)
+			const existsAnywhere = afterNonEmpty.some((aLine, idx) => idx >= afterIdx && linesMatch(bLine, aLine));
+			if (existsAnywhere) {
+				return { allowed: false, reason: `PRD structure change detected: lines were reordered` };
 			}
+			return { allowed: false, reason: `PRD line removed or altered: "${bLine.trim()}"` };
 		}
 	}
 
-	return stale;
+	return { allowed: true };
+}
+
+function linesMatch(beforeLine: string, afterLine: string): boolean {
+	if (beforeLine === afterLine) { return true; }
+
+	const bTrimmed = beforeLine.trim();
+	const aTrimmed = afterLine.trim();
+
+	// Phase headers must be identical
+	if (PHASE_HEADER.test(bTrimmed)) {
+		return bTrimmed === aTrimmed;
+	}
+
+	// Checkbox lines: allow checkbox toggle, DECOMPOSED prefix, depends annotation
+	if (CHECKBOX_LINE.test(bTrimmed) || CHECKBOX_LINE.test(aTrimmed)) {
+		return normalizeForComparison(bTrimmed) === normalizeForComparison(aTrimmed);
+	}
+
+	// Non-task lines must be identical
+	return bTrimmed === aTrimmed;
 }

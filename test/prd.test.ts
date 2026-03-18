@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validateSpecPointers } from '../src/prd';
+import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit } from '../src/prd';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -550,104 +550,85 @@ describe('validatePrd', () => {
 	});
 });
 
-describe('validateSpecPointers', () => {
-	let tmpDir: string;
-	let researchDir: string;
-
-	beforeEach(() => {
-		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-ptr-'));
-		researchDir = path.join(tmpDir, 'research');
-		fs.mkdirSync(researchDir, { recursive: true });
+describe('validatePrdEdit', () => {
+	it('allows checkbox toggle [ ] → [x]', () => {
+		const before = '- [ ] **Task 1 — Setup**: Install deps\n- [ ] **Task 2 — Build**: Run build\n';
+		const after  = '- [x] **Task 1 — Setup**: Install deps\n- [ ] **Task 2 — Build**: Run build\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(true);
 	});
 
-	afterEach(() => {
-		fs.rmSync(tmpDir, { recursive: true, force: true });
+	it('allows DECOMPOSED prefix prepended to a task', () => {
+		const before = '- [ ] **Task 1 — Setup**: Install deps\n';
+		const after  = '- [ ] [DECOMPOSED] **Task 1 — Setup**: Install deps\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(true);
 	});
 
-	it('returns empty array when no spec pointers exist', () => {
-		const prd = '- [ ] Task with no pointer\n- [x] Done task\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toEqual([]);
+	it('allows adding depends annotation', () => {
+		const before = '- [ ] **Task 2 — Build**: Run build\n';
+		const after  = '- [ ] **Task 2 — Build**: Run build depends: Task 1\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(true);
 	});
 
-	it('valid pointer with existing file passes', () => {
-		fs.writeFileSync(path.join(researchDir, 'spec.md'), 'line1\nline2\nline3\n');
-		const prd = '- [ ] Task → Spec: `research/spec.md`\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toEqual([]);
+	it('allows modifying depends annotation', () => {
+		const before = '- [ ] **Task 2 — Build**: Run build depends: Task 1\n';
+		const after  = '- [ ] **Task 2 — Build**: Run build depends: Task 1, Task 3\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(true);
 	});
 
-	it('valid pointer with line range passes when file has enough lines', () => {
-		const lines = Array.from({ length: 50 }, (_, i) => `Line ${i + 1}`).join('\n');
-		fs.writeFileSync(path.join(researchDir, 'spec.md'), lines);
-		const prd = '- [ ] Task → Spec: `research/spec.md` L10-L50\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toEqual([]);
+	it('rejects description text change', () => {
+		const before = '- [ ] **Task 1 — Setup**: Install deps\n';
+		const after  = '- [ ] **Task 1 — Setup**: Install simplified deps\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(false);
+		expect(result.reason).toBeDefined();
 	});
 
-	it('detects missing file', () => {
-		const prd = '- [ ] Task → Spec: `research/nonexistent.md` L10-L50\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toHaveLength(1);
-		expect(result[0].reason).toBe('file_missing');
-		expect(result[0].file).toBe('research/nonexistent.md');
-		expect(result[0].line).toBe(1);
+	it('rejects phase header change', () => {
+		const before = '## Phase 1 — Foundation\n- [ ] Task A\n';
+		const after  = '## Phase 1 — Easy Phase\n- [ ] Task A\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(false);
+		expect(result.reason).toBeDefined();
 	});
 
-	it('detects shifted line range (file too short)', () => {
-		fs.writeFileSync(path.join(researchDir, 'spec.md'), 'line1\nline2\nline3\n');
-		const prd = '- [ ] Task → Spec: `research/spec.md` L10-L50\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toHaveLength(1);
-		expect(result[0].reason).toBe('line_range_out_of_bounds');
-		expect(result[0].file).toBe('research/spec.md');
+	it('allows adding new lines (sub-tasks from decomposition)', () => {
+		const before = '- [ ] [DECOMPOSED] **Task 1**: Big task\n';
+		const after  = '- [ ] [DECOMPOSED] **Task 1**: Big task\n- [ ] Sub-task 1a\n- [ ] Sub-task 1b\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(true);
 	});
 
-	it('handles multiple pointers in same PRD', () => {
-		fs.writeFileSync(path.join(researchDir, 'a.md'), 'content\n');
-		// b.md does not exist
-		const prd = [
-			'- [ ] Task A → Spec: `research/a.md`',
-			'- [ ] Task B → Spec: `research/b.md`',
-		].join('\n');
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toHaveLength(1);
-		expect(result[0].file).toBe('research/b.md');
-		expect(result[0].reason).toBe('file_missing');
+	it('rejects deletion of existing task lines', () => {
+		const before = '- [ ] **Task 1**: Setup\n- [ ] **Task 2**: Build\n';
+		const after  = '- [ ] **Task 1**: Setup\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(false);
+		expect(result.reason).toBeDefined();
 	});
 
-	it('handles multiple file pointers on one line (comma-separated)', () => {
-		fs.writeFileSync(path.join(researchDir, 'a.md'), 'content\n');
-		// b.md does not exist
-		const prd = '- [ ] Task → Spec: `research/a.md`, `research/b.md`\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toHaveLength(1);
-		expect(result[0].file).toBe('research/b.md');
-		expect(result[0].reason).toBe('file_missing');
+	it('allows identical content (no-op)', () => {
+		const before = '- [ ] **Task 1**: Setup\n';
+		const after  = '- [ ] **Task 1**: Setup\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(true);
 	});
 
-	it('handles subdirectory paths', () => {
-		const subDir = path.join(researchDir, '_wave', 'deep');
-		fs.mkdirSync(subDir, { recursive: true });
-		fs.writeFileSync(path.join(subDir, 'r1.md'), 'content\n');
-		const prd = '- [ ] Task → Spec: `research/_wave/deep/r1.md`\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toEqual([]);
+	it('allows multiple allowed changes together', () => {
+		const before = '- [ ] **Task 1**: Setup\n- [ ] **Task 2**: Build\n';
+		const after  = '- [x] **Task 1**: Setup\n- [ ] **Task 2**: Build depends: Task 1\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(true);
 	});
 
-	it('includes the PRD line number in stale pointer', () => {
-		const prd = 'Header\n\n- [ ] Task → Spec: `research/missing.md`\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toHaveLength(1);
-		expect(result[0].line).toBe(3);
-	});
-
-	it('includes startLine and endLine for line range pointers', () => {
-		fs.writeFileSync(path.join(researchDir, 'spec.md'), 'a\nb\nc\n');
-		const prd = '- [ ] Task → Spec: `research/spec.md` L10-L50\n';
-		const result = validateSpecPointers(prd, researchDir);
-		expect(result).toHaveLength(1);
-		expect(result[0].startLine).toBe(10);
-		expect(result[0].endLine).toBe(50);
+	it('rejects structure change (reordering lines)', () => {
+		const before = '- [ ] **Task 1**: Setup\n- [ ] **Task 2**: Build\n';
+		const after  = '- [ ] **Task 2**: Build\n- [ ] **Task 1**: Setup\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(false);
+		expect(result.reason).toBeDefined();
 	});
 });
