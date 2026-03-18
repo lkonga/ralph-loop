@@ -52,9 +52,9 @@ export function parsePrd(content: string): PrdSnapshot {
 			continue;
 		}
 
-		// Skip DECOMPOSED tasks (non-actionable)
-		if (line.includes('[DECOMPOSED]')) { continue; }
-		const isCheckpoint = line.includes('[CHECKPOINT]');
+		// Skip DECOMPOSED tasks (non-actionable) — anchored to annotation position only
+		if (/^-\s*\[[ x]\]\s*\[DECOMPOSED\]/i.test(line)) { continue; }
+		const isCheckpoint = /^-\s*\[[ x]\]\s*\[CHECKPOINT\]/i.test(line);
 		const unchecked = CHECKBOX_UNCHECKED.exec(line);
 		if (unchecked) {
 			const indent = unchecked[1].length;

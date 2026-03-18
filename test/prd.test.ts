@@ -144,6 +144,13 @@ describe('parsePrd skips DECOMPOSED lines', () => {
 		const snapshot = parsePrd(content);
 		expect(snapshot.total).toBe(2);
 	});
+
+	it('does NOT skip tasks that mention [DECOMPOSED] in description text', () => {
+		const content = `- [ ] **Task N — Fix the [DECOMPOSED] detection**:\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.length).toBe(1);
+		expect(snapshot.tasks[0].status).toBe('pending');
+	});
 });
 
 describe('parsePrd handles CHECKPOINT annotation', () => {
@@ -177,6 +184,13 @@ describe('parsePrd handles CHECKPOINT annotation', () => {
 		expect(snapshot.tasks[0].checkpoint).toBe(true);
 		expect(snapshot.tasks[0].description).toBe('Gate task');
 		expect(snapshot.tasks[1].description).toBe('Real task');
+	});
+
+	it('does NOT flag checkpoint when [CHECKPOINT] is in description text', () => {
+		const content = `- [ ] **Task N — Fix the [CHECKPOINT] detection**:\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.length).toBe(1);
+		expect(snapshot.tasks[0].checkpoint).toBeUndefined();
 	});
 });
 

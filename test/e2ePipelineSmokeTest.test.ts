@@ -377,10 +377,10 @@ describe('E2E Pipeline Smoke Test — Task 90', () => {
 			researcherContent = readFileSync(researcherPath, 'utf-8');
 		});
 
-		it('frontmatter tools list should include github_repo', () => {
+		it('frontmatter tools list should include githubRepo', () => {
 			const fm = researcherContent.match(/^---\n([\s\S]*?)\n---/);
 			expect(fm).not.toBeNull();
-			expect(fm![1]).toContain('github_repo');
+			expect(fm![1]).toContain('githubRepo');
 		});
 
 		it('body should contain github_repo usage instruction', () => {
