@@ -642,3 +642,9 @@ Extended `SerializedLoopState` with optional `sessionId`, `pid`, `workspacePath`
 ### Task 113 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
 [2026-03-18T00:56:28.767Z] [8d2da18f-0c3b-4323-8abd-825ad94a2d04] Committed: 5bd9c822a0d1ecfd96eefba89fe6923922d03081
 [2026-03-18T00:56:45.400Z] [61ffa824-e732-49d1-917e-e8e1f0dfeb8d] [Task-115] Task started: **Task 103 — Add github_repo to ralph-research tools**: In `vscode-config-files/agents/ralph-research.agent.md`, add `github_repo` to the `tools:` list alongside existing web tools: `tools: [search, read/readFile, read/problems, web, 'crawl4ai/*', 'searxng-search/*', github_repo]`. The ralph-research agent already has web search capabilities — `github_repo` complements these for GitHub-specific source code inspection. **Verification**: run `grep 'github_repo' agents/ralph-research.agent.md` — expect match.
+
+### Task 115 (Task 103) | Files: [vscode-config-files/agents/ralph-research.agent.md] | Lines: +1/-1 | Status: pass
+Added `github_repo` to the tools list in ralph-research.agent.md frontmatter. Verified with grep — match confirmed. tsc clean, 851 tests pass.
+[2026-03-18T00:57:26.111Z] [61ffa824-e732-49d1-917e-e8e1f0dfeb8d] [Task-115] Task completed: **Task 103 — Add github_repo to ralph-research tools**: In `vscode-config-files/agents/ralph-research.agent.md`, add `github_repo` to the `tools:` list alongside existing web tools: `tools: [search, read/readFile, read/problems, web, 'crawl4ai/*', 'searxng-search/*', github_repo]`. The ralph-research agent already has web search capabilities — `github_repo` complements these for GitHub-specific source code inspection. **Verification**: run `grep 'github_repo' agents/ralph-research.agent.md` — expect match. (41s)
+
+### Task 114 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
