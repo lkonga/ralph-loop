@@ -447,7 +447,7 @@
 
 - [x] **Task 97 — Effort quick pick toggle**: Register command `copilot.ralph.cycleEffort` that shows a `window.showQuickPick` with the allowed values for the current model family. Current value marked with `$(check)` icon or `(current)` description. On selection, update the setting via `workspace.getConfiguration('github.copilot').update(key, value, ConfigurationTarget.Global)`. For `'other'` model families, show info message "No reasoning effort setting for this model". Register the command lazily in `ensureItem()` (guarded by a boolean flag) to avoid wiring into extension activation. Set `item.command = 'copilot.ralph.cycleEffort'` on the status bar item.
 
-- [ ] **Task 98 — Tooltip enhancement**: Set `item.tooltip` to show a summary of the current state: model name, billing mode, PR count, effort level, ralph-loop status. Use a multi-line `MarkdownString` for rich formatting. Include "Click to change reasoning effort" guidance.
+- [x] **Task 98 — Tooltip enhancement**: Set `item.tooltip` to show a summary of the current state: model name, billing mode, PR count, effort level, ralph-loop status. Use a multi-line `MarkdownString` for rich formatting. Include "Click to change reasoning effort" guidance.
 
 ### 13c — Push-Based Ralph State Updates
 

@@ -602,3 +602,10 @@ Extended `SerializedLoopState` with optional `sessionId`, `pid`, `workspacePath`
 
 ### Task 108 State | Files: [.ralph/session.json, PRD.md, knowledge.md, progress.txt] | Lines: +15/-2 | Status: pass
 [2026-03-18T00:38:47.392Z] [12eaa497-0b63-4dc4-81a9-265610337822] Committed: 8f6c715f00ebec7ae714b0abb05215040bb629b3
+[2026-03-18T00:39:08.629Z] [59c161dd-45f8-4e73-89d0-0e2dee12422e] [Task-110] Task started: **Task 98 — Tooltip enhancement**: Set `item.tooltip` to show a summary of the current state: model name, billing mode, PR count, effort level, ralph-loop status. Use a multi-line `MarkdownString` for rich formatting. Include "Click to change reasoning effort" guidance.
+
+### Task 110 — Tooltip enhancement (Task 98) | Status: pass
+[2026-03-18] In `vscode-copilot-chat/src/extension/prompt/node/ralphStatusBar.ts`: Added `TooltipParams` interface and `buildTooltipMarkdown(p)` pure function that produces a multi-line markdown string with model name, billing mode, PR count, effort level, ralph-loop status, and "Click to change reasoning effort" guidance. Added `applyTooltip()` helper that creates a `MarkdownString` from `buildTooltipMarkdown` output and sets `item.tooltip`. Called `applyTooltip()` at the end of both `ralphStatusActive` and `ralphStatusIdle`. Added 9 new tests in `ralphStatusBar.spec.ts` covering model name, billing, PR count, effort (including N/A fallback), loop state (running/inactive), click guidance, and markdown formatting. All 42 tests pass, tsc clean (no new errors).
+[2026-03-18T00:42:55.391Z] [59c161dd-45f8-4e73-89d0-0e2dee12422e] [Task-110] Task completed: **Task 98 — Tooltip enhancement**: Set `item.tooltip` to show a summary of the current state: model name, billing mode, PR count, effort level, ralph-loop status. Use a multi-line `MarkdownString` for rich formatting. Include "Click to change reasoning effort" guidance. (227s)
+
+### Task 109 State | Files: [.ralph/session.json, PRD.md, knowledge.md, progress.txt] | Lines: +15/-2 | Status: pass
