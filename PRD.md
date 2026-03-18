@@ -455,7 +455,7 @@
 
 - [x] **Task 99 — Register notification listener**: Register a `ralph-loop.onStateChange` command handler in `ralphStatusBar.ts` that receives `{ state, taskId }` payload and immediately updates `loopState` and `loopTaskName`, then refreshes the status bar text. Remove the `setInterval` poll timer. Keep a fallback: on extension activation, do a single initial poll via `ralph-loop.status` + `ralph-loop.taskName` to sync state (the push notification only fires on transitions, not on activation). If `ralph-loop.onStateChange` registration fails (ralph-loop not installed), fall back to the current 5-second polling. Depends on Task 93.
 
-- [ ] **Task 100 — Rich state via getStateSnapshot**: When Task 94 is available, replace the two-call pattern (`ralph-loop.status` + `ralph-loop.taskName`) with a single `ralph-loop.getStateSnapshot` call that returns `{ state, taskId, taskDescription, iterationCount, nudgeCount }`. Use `iterationCount` and `nudgeCount` in the tooltip for richer diagnostics. Depends on Task 94.
+- [x] **Task 100 — Rich state via getStateSnapshot**: When Task 94 is available, replace the two-call pattern (`ralph-loop.status` + `ralph-loop.taskName`) with a single `ralph-loop.getStateSnapshot` call that returns `{ state, taskId, taskDescription, iterationCount, nudgeCount }`. Use `iterationCount` and `nudgeCount` in the tooltip for richer diagnostics. Depends on Task 94.
 
 ### Visual Summary (After Phase 13)
 
@@ -471,3 +471,19 @@
 **Ralph icons**: `↻` $(sync~spin) = running (animated), `⏸` $(debug-pause) = paused, `○` $(circle-outline) = idle
 
 **Click behavior**: Opens quick pick with all allowed values for the current model's provider. Current value marked. Selection updates the VS Code setting immediately.
+
+### 13d — Task Detail Hover
+
+- [ ] **Task 101 — Rich task hover tooltip**: When hovering on the Ralph status bar section, show a `MarkdownString` tooltip with details about the current task being processed. Use `ralph-loop.getStateSnapshot` (Task 94) to fetch: task ID, task description, iteration count, nudge count, and current state. Format as a compact floating summary, e.g.: `**Ralph Loop** \n State: Running \n Task: Task-111 \n Description: Implement context thrashing detection \n Iterations: 3 \n Nudges: 1`. If ralph-loop is idle, show the last completed task info. If ralph-loop is not installed, omit the Ralph section from the tooltip entirely. Depends on Task 100 (rich state via getStateSnapshot).
+
+---
+
+## Phase 14 — Wave Agent Tool Wiring
+
+> The wave research pipeline agents (`wave-researcher`) do not declare `github_repo` in their `tools:` frontmatter, despite it being used in actual research runs (evidenced by `methodology: wave-explore-fast-direct x12 + github_repo + crawl4ai` in sealed research frontmatter). The tool is available in the environment but not explicitly declared, so there is no guarantee the agent will use it or that it will be available. Phase 14 fixes this gap.
+
+### 14a — GitHub Repo Tool Declaration
+
+- [ ] **Task 102 — Add github_repo to wave-researcher tools**: In `vscode-config-files/agents/wave-researcher.agent.md`, add `github_repo` to the `tools:` frontmatter list: `tools: [read, search, edit/createFile, github_repo]`. Verify the symlink in `ralph-loop/agents/` resolves correctly after editing the canonical file. Also add a brief instruction in the agent body: "When research questions reference GitHub repositories or when search results point to open-source repos, use the `github_repo` tool to inspect source code directly." **Verification**: run `grep 'github_repo' agents/wave-researcher.agent.md` — expect match in tools line and in body text.
+
+- [ ] **Task 103 — Add github_repo to ralph-research tools**: In `vscode-config-files/agents/ralph-research.agent.md`, add `github_repo` to the `tools:` list alongside existing web tools: `tools: [search, read/readFile, read/problems, web, 'crawl4ai/*', 'searxng-search/*', github_repo]`. The ralph-research agent already has web search capabilities — `github_repo` complements these for GitHub-specific source code inspection. **Verification**: run `grep 'github_repo' agents/ralph-research.agent.md` — expect match.
