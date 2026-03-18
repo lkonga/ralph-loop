@@ -8,6 +8,12 @@ const DEPENDS_ANNOTATION = /depends:\s*([\w,\s-]+)/i;
 const MISSING_DEP_PATTERN = /MISSING_DEP:\s*(\S+)/i;
 const AGENT_ANNOTATION = /\[AGENT:(\w+)\]/g;
 
+export function parseLineAnnotations(line: string): { decomposed: boolean; checkpoint: boolean } {
+	const decomposed = /^-\s*\[[ x]\]\s*\[DECOMPOSED\]/i.test(line);
+	const checkpoint = /^-\s*\[[ x]\]\s*\[CHECKPOINT\]/i.test(line);
+	return { decomposed, checkpoint };
+}
+
 function parseTaskId(description: string): string {
 	const match = /^\*\*([^*]+)\*\*/.exec(description);
 	if (match) { return match[1].trim(); }
@@ -52,9 +58,9 @@ export function parsePrd(content: string): PrdSnapshot {
 			continue;
 		}
 
-		// Skip DECOMPOSED tasks (non-actionable) — anchored to annotation position only
-		if (/^-\s*\[[ x]\]\s*\[DECOMPOSED\]/i.test(line)) { continue; }
-		const isCheckpoint = /^-\s*\[[ x]\]\s*\[CHECKPOINT\]/i.test(line);
+		const annotations = parseLineAnnotations(line);
+		if (annotations.decomposed) { continue; }
+		const isCheckpoint = annotations.checkpoint;
 		const unchecked = CHECKBOX_UNCHECKED.exec(line);
 		if (unchecked) {
 			const indent = unchecked[1].length;

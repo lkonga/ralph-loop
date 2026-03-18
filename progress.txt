@@ -663,3 +663,4 @@ Replaced naive `line.includes('[DECOMPOSED]')` and `line.includes('[CHECKPOINT]'
 
 ### Task 116 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
 [2026-03-18T06:44:09.546Z] [67dd72ee-77e6-487c-8fcb-e8def6c3050d] Committed: b2a6ef316748a63e7181e54b54d4955eaaf8890c
+[2026-03-18T06:44:26.402Z] [9e952241-796a-4a06-8c93-4e78eb3fa937] [Task-118] Task started: **Task 105 — Extract annotation parser helper**: Extract annotation detection from `src/prd.ts` into a `parseLineAnnotations()` helper returning `{ decomposed, checkpoint }`. See `docs/specs/phase15-annotation-strictness.md` for interface and implementation details. Unit test directly. Run `npx tsc --noEmit && npx vitest run` — all must pass.

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit } from '../src/prd';
+import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, parseLineAnnotations } from '../src/prd';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -644,5 +644,51 @@ describe('validatePrdEdit', () => {
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(false);
 		expect(result.reason).toBeDefined();
+	});
+});
+
+describe('parseLineAnnotations', () => {
+	it('detects [DECOMPOSED] at annotation position (unchecked)', () => {
+		const result = parseLineAnnotations('- [ ] [DECOMPOSED] Original task');
+		expect(result.decomposed).toBe(true);
+		expect(result.checkpoint).toBe(false);
+	});
+
+	it('detects [DECOMPOSED] at annotation position (checked)', () => {
+		const result = parseLineAnnotations('- [x] [DECOMPOSED] Original task');
+		expect(result.decomposed).toBe(true);
+	});
+
+	it('detects [CHECKPOINT] at annotation position', () => {
+		const result = parseLineAnnotations('- [ ] [CHECKPOINT] Gate task');
+		expect(result.checkpoint).toBe(true);
+		expect(result.decomposed).toBe(false);
+	});
+
+	it('does not flag [DECOMPOSED] in description text', () => {
+		const result = parseLineAnnotations('- [ ] **Task N — Fix [DECOMPOSED] detection**: some desc');
+		expect(result.decomposed).toBe(false);
+	});
+
+	it('does not flag [CHECKPOINT] in description text', () => {
+		const result = parseLineAnnotations('- [ ] **Task N — Fix [CHECKPOINT] detection**: some desc');
+		expect(result.checkpoint).toBe(false);
+	});
+
+	it('returns both false for a normal task line', () => {
+		const result = parseLineAnnotations('- [ ] **Task 1 — Build feature**: do stuff');
+		expect(result.decomposed).toBe(false);
+		expect(result.checkpoint).toBe(false);
+	});
+
+	it('returns both false for non-task lines', () => {
+		const result = parseLineAnnotations('## Phase 1 — Setup');
+		expect(result.decomposed).toBe(false);
+		expect(result.checkpoint).toBe(false);
+	});
+
+	it('handles extra whitespace between checkbox and annotation', () => {
+		const result = parseLineAnnotations('-  [ ]   [DECOMPOSED] task');
+		expect(result.decomposed).toBe(true);
 	});
 });
