@@ -1,0 +1,1 @@
+../../vscode-config-files/agents/wave-researcher.agent.md
