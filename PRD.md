@@ -406,3 +406,68 @@
 - [ ] **Task 93 — State Change Notification Command**: In `src/extension.ts`, after each state transition in the orchestrator event handler (TaskStarted, TaskCompleted, Paused, Stopped, Resumed, etc.), fire `vscode.commands.executeCommand('ralph-loop.onStateChange', { state, taskId })` where `state` is the current `LoopState` string and `taskId` is the current task's ID (or empty string if idle). This is a fire-and-forget notification — the command may not be registered (copilot fork not installed) and that's fine (`executeCommand` returns a rejected promise that we catch and ignore). Add `LoopEventKind.StateNotified` for telemetry. In the orchestrator, yield a `StateNotified` event after each state transition. Write tests: notification fired on TaskStarted, fired on TaskCompleted, fired on stop, taskId is empty when idle. Run `npx tsc --noEmit` and `npx vitest run`.
 
 - [ ] **Task 94 — Expose State Snapshot Command**: Add `ralph-loop.getStateSnapshot` command in `src/extension.ts` that returns `{ state: string, taskId: string, taskDescription: string, iterationCount: number, nudgeCount: number }` — a richer payload than the existing `ralph-loop.status` (which returns only the state string) and `ralph-loop.taskName` (which returns only the task ID). This gives consumers a single call to get all ralph-loop state. The existing `ralph-loop.status` and `ralph-loop.taskName` commands remain for backward compatibility. Run `npx tsc --noEmit` and `npx vitest run`.
+
+---
+
+## Phase 13 — Copilot Chat Fork Status Bar Enhancements
+
+> Enhancements to the copilot-chat fork's status bar (`vscode-copilot-chat/src/extension/prompt/node/ralphStatusBar.ts`). These tasks modify fork code, not ralph-loop code, but are tracked here since they are part of the ralph-loop project scope.
+> **Before implementing any task, verify the current code state** — read `ralphStatusBar.ts` and `chatParticipantRequestHandler.ts` to confirm what is/isn't already implemented.
+
+### Current Code State (as-is, verified 2026-03-18)
+
+**What IS implemented** in `ralphStatusBar.ts`:
+- `loopTag()` function with icon map: `running → $(sync~spin)`, `paused → $(debug-pause)`, `idle → $(circle-outline)`
+- `pollRalphLoop()` polls every 5 seconds via `ralph-loop.status` and `ralph-loop.taskName`
+- `loopState` is set to empty string when state is `'idle'` (`state && state !== 'idle' ? state : ''`), so the idle icon is **never rendered** — `loopTag()` returns `''` when `loopState` is empty
+- Task name is only fetched when `loopState` is non-empty (i.e., running or paused)
+- `ralphStatusActive(modelName, multiplier, billingTag)` — no `modelFamily` parameter
+- `ralphStatusIdle(modelName, multiplier, billingTag, prTag, duration)` — no `modelFamily` parameter
+- PR counter in both active and idle states
+- `↑`/`—` indicator only in idle state
+
+**What is NOT implemented**:
+- Idle icon never displays (filtered out before `loopTag()` is called)
+- No effort tag (`E:high` etc.) — no model family detection, no setting reads
+- No click-to-change reasoning effort
+- No tooltip enhancement
+- No push-based state updates (depends on Phase 12 Tasks 93-94)
+
+### 13a — Ralph Status Icon Fixes
+
+> The idle icon `$(circle-outline)` is defined in `loopTag()` but never rendered because `pollRalphLoop()` sets `loopState = ''` when state is `'idle'`.
+
+- [ ] **Task 95 — Show idle state icon**: In `pollRalphLoop()`, change the idle filtering logic from `loopState = state && state !== 'idle' ? state : ''` to `loopState = state || ''`. This makes `loopTag()` render `Ralph: $(circle-outline)` when ralph-loop is idle. Also fetch `loopTaskName` regardless of state (not only when running/paused) so the last task ID is shown in idle too. In `loopTag()`, change the separator between icon and taskName from ` • ` (bullet) to ` ` (space) so the format matches the agreed visual: `Ralph: $(sync~spin) T3` not `Ralph: $(sync~spin) • T3`. **Verification**: with ralph-loop installed and idle, status bar should show `… • Ralph: $(circle-outline) T3` (last completed task ID). With ralph-loop running, should show `… • Ralph: $(sync~spin) T3`. With ralph-loop not installed, no Ralph section.
+
+### 13b — Reasoning Effort Display & Toggle
+
+> Show the current reasoning effort setting next to the model name in the status bar, with a click-to-change quick pick dropdown. Provider-aware: Anthropic models show `anthropic.thinking.effort`, OpenAI models show `responsesApiReasoningEffort`.
+
+- [ ] **Task 96 — Effort tag display**: Add model family detection (`resolveModelFamily(family: string): 'anthropic' | 'openai' | 'other'`) to `ralphStatusBar.ts`. Detection logic: family string starting with `claude` or `Anthropic` → `'anthropic'`, starting with `gpt`/`o1`/`o3`/`o4` → `'openai'`, otherwise → `'other'`. Add `modelFamily` parameter to both `ralphStatusActive(modelName, multiplier, billingTag, modelFamily)` and `ralphStatusIdle(modelName, multiplier, billingTag, prTag, duration, modelFamily)`. Read the relevant setting on each status bar update: Anthropic reads `github.copilot.chat.anthropic.thinking.effort` (enum values: `low`, `medium`, `high`; default: `high`), OpenAI reads `github.copilot.chat.responsesApiReasoningEffort` (enum values: `low`, `medium`, `high`, `xhigh`, `default`; default: `default`). Build effort tag: `effortTag(family) → ' • E:{value}'` for anthropic/openai, `''` for other. Insert between billing/PR counter and Ralph section. In `chatParticipantRequestHandler.ts`, pass `endpoint.family` as the new `modelFamily` argument to both `ralphStatusActive` and `ralphStatusIdle` (lines ~250 and ~271). Settings are read synchronously via `workspace.getConfiguration().get()` — no listener needed since the tag is re-read on every status bar update.
+
+- [ ] **Task 97 — Effort quick pick toggle**: Register command `copilot.ralph.cycleEffort` that shows a `window.showQuickPick` with the allowed values for the current model family. Current value marked with `$(check)` icon or `(current)` description. On selection, update the setting via `workspace.getConfiguration('github.copilot').update(key, value, ConfigurationTarget.Global)`. For `'other'` model families, show info message "No reasoning effort setting for this model". Register the command lazily in `ensureItem()` (guarded by a boolean flag) to avoid wiring into extension activation. Set `item.command = 'copilot.ralph.cycleEffort'` on the status bar item.
+
+- [ ] **Task 98 — Tooltip enhancement**: Set `item.tooltip` to show a summary of the current state: model name, billing mode, PR count, effort level, ralph-loop status. Use a multi-line `MarkdownString` for rich formatting. Include "Click to change reasoning effort" guidance.
+
+### 13c — Push-Based Ralph State Updates
+
+> Depends on Phase 12 (Tasks 93-94). Replace 5-second polling with instant push notifications.
+
+- [ ] **Task 99 — Register notification listener**: Register a `ralph-loop.onStateChange` command handler in `ralphStatusBar.ts` that receives `{ state, taskId }` payload and immediately updates `loopState` and `loopTaskName`, then refreshes the status bar text. Remove the `setInterval` poll timer. Keep a fallback: on extension activation, do a single initial poll via `ralph-loop.status` + `ralph-loop.taskName` to sync state (the push notification only fires on transitions, not on activation). If `ralph-loop.onStateChange` registration fails (ralph-loop not installed), fall back to the current 5-second polling. Depends on Task 93.
+
+- [ ] **Task 100 — Rich state via getStateSnapshot**: When Task 94 is available, replace the two-call pattern (`ralph-loop.status` + `ralph-loop.taskName`) with a single `ralph-loop.getStateSnapshot` call that returns `{ state, taskId, taskDescription, iterationCount, nudgeCount }`. Use `iterationCount` and `nudgeCount` in the tooltip for richer diagnostics. Depends on Task 94.
+
+### Visual Summary (After Phase 13)
+
+| State | Status Bar Text |
+|-------|----------------|
+| Active (Anthropic, NB), ralph running | `⟳ Claude Opus 4 • 30x • NB/PR:0 • E:high • Ralph: ↻ T3` |
+| Active (OpenAI, DEF), ralph running | `⟳ GPT-4o • 1x • DEF/PR:12 • E:xhigh • Ralph: ↻ T5` |
+| Idle (Anthropic, DEF), ralph paused | `✓ Claude Opus 4 • 12s • 30x • DEF/PR:6↑ • E:high • Ralph: ⏸ T3` |
+| Idle (OpenAI, DEF), ralph idle | `✓ GPT-4o • 8s • 1x • DEF/PR:12— • E:default • Ralph: ○ T12` |
+| Active (Gemini, NB), no ralph | `⟳ Gemini 2.5 • 1x • NB/PR:0` *(no effort tag, no ralph)* |
+| Idle, no ralph-loop | `✓ Claude Opus 4 • 5s • 30x • NB/PR:0↑ • E:high` |
+
+**Ralph icons**: `↻` $(sync~spin) = running (animated), `⏸` $(debug-pause) = paused, `○` $(circle-outline) = idle
+
+**Click behavior**: Opens quick pick with all allowed values for the current model's provider. Current value marked. Selection updates the VS Code setting immediately.

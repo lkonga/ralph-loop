@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
-import { LoopEventKind, createOutputLogger, IRalphHookService, ChatSendRequest } from './types';
+import { LoopEventKind, LoopState, createOutputLogger, IRalphHookService, ChatSendRequest } from './types';
 import { LoopOrchestrator, loadConfig } from './orchestrator';
 import { ShellHookProvider } from './shellHookProvider';
 import { registerHookBridge, HookBridgeDisposable, startChatSendWatcher } from './hookBridge';
 import { SessionPersistence } from './sessionPersistence';
+import { fireStateChangeNotification } from './stateNotification';
 
 let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.LogOutputChannel;
@@ -124,6 +125,7 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.TaskStarted:
 						logger.log(`▶ [iter ${event.iteration}] Starting: ${event.task.description}`);
 						vscode.window.setStatusBarMessage(`$(sync~spin) Ralph: ${event.task.description}`, 5000);
+						fireStateChangeNotification(LoopState.Running, event.task.taskId);
 						break;
 					case LoopEventKind.CopilotTriggered:
 						logger.log(`⚡ Copilot triggered via ${event.method}`);
@@ -133,6 +135,7 @@ export function activate(context: vscode.ExtensionContext): void {
 						break;
 					case LoopEventKind.TaskCompleted:
 						logger.log(`✔ Completed in ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
+						fireStateChangeNotification(LoopState.Running, event.task.taskId);
 						break;
 					case LoopEventKind.TaskTimedOut:
 						logger.warn(`⏰ Timed out after ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
@@ -150,10 +153,12 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.AllDone:
 						logger.log(`🏁 All ${event.total} tasks completed`);
 						vscode.window.showInformationMessage(`Ralph Loop: All ${event.total} tasks completed!`);
+						fireStateChangeNotification(LoopState.Idle, '');
 						break;
 					case LoopEventKind.MaxIterations:
 						logger.warn(`🛑 Hit max iterations: ${event.limit}`);
 						vscode.window.showWarningMessage(`Ralph Loop: Reached ${event.limit} iteration limit`);
+						fireStateChangeNotification(LoopState.Idle, '');
 						break;
 					case LoopEventKind.IterationLimitExpanded:
 						logger.log(`📈 Iteration limit expanded: ${event.oldLimit} → ${event.newLimit}`);
@@ -164,10 +169,12 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.YieldRequested:
 						logger.log('⏸ Loop yielded gracefully');
 						vscode.window.showInformationMessage('Ralph Loop: Yielded gracefully after task completion');
+						fireStateChangeNotification(LoopState.Idle, '');
 						break;
 					case LoopEventKind.SessionChanged:
 						logger.warn(`🔀 Chat session changed: ${event.oldSessionId} → ${event.newSessionId}`);
 						vscode.window.showWarningMessage('Ralph Loop: Chat session changed — loop paused');
+						fireStateChangeNotification(LoopState.Paused, '');
 						break;
 					case LoopEventKind.CircuitBreakerTripped:
 						logger.warn(`⚠ Circuit breaker tripped: ${event.reason} (action: ${event.action})`);
@@ -254,8 +261,12 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.ContextHandoff:
 						logger.warn(`📤 Context handoff: ${event.estimatedTokens}/${event.maxTokens} tokens (${event.pct}%)`);
 						break;
+					case LoopEventKind.StateNotified:
+						logger.log(`📡 State notified: ${event.state} (task: ${event.taskId || 'none'})`);
+						break;
 					case LoopEventKind.Stopped:
 						logger.log('⏹ Loop stopped');
+						fireStateChangeNotification(LoopState.Idle, '');
 						break;
 					case LoopEventKind.PrdValidationFailed: {
 						const msgs = event.errors.map(e => `  ${e.level}: ${e.message}`).join('\n');

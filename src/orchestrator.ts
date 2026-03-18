@@ -320,6 +320,16 @@ export class LoopOrchestrator {
 		this.config = { ...this.config, ...config };
 	}
 
+	private static readonly STATE_CHANGE_EVENTS = new Set<LoopEventKind>([
+		LoopEventKind.TaskStarted,
+		LoopEventKind.TaskCompleted,
+		LoopEventKind.Stopped,
+		LoopEventKind.AllDone,
+		LoopEventKind.MaxIterations,
+		LoopEventKind.YieldRequested,
+		LoopEventKind.SessionChanged,
+	]);
+
 	async start(): Promise<void> {
 		if (this.state === LoopState.Running) {
 			this.logger.warn('Loop already running');
@@ -336,6 +346,13 @@ export class LoopOrchestrator {
 		try {
 			for await (const event of this.runLoop()) {
 				this.onEvent(event);
+
+				if (LoopOrchestrator.STATE_CHANGE_EVENTS.has(event.kind)) {
+					const stateStr = this.state as string;
+					const taskId = this._currentTaskId;
+					this.onEvent({ kind: LoopEventKind.StateNotified, state: stateStr, taskId });
+				}
+
 				if (event.kind === LoopEventKind.Stopped ||
 					event.kind === LoopEventKind.AllDone ||
 					event.kind === LoopEventKind.MaxIterations ||

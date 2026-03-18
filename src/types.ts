@@ -86,6 +86,7 @@ export const enum LoopEventKind {
 	ConfidenceScored = 'confidence_scored',
 	ContextHandoff = 'context_handoff',
 	PrdValidationFailed = 'prd_validation_failed',
+	StateNotified = 'state_notified',
 	Stopped = 'stopped',
 	Error = 'error',
 }
@@ -124,6 +125,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.ConfidenceScored; score: number; threshold: number; breakdown: Record<string, number>; taskId: string }
 	| { kind: LoopEventKind.ContextHandoff; estimatedTokens: number; maxTokens: number; pct: number }
 	| { kind: LoopEventKind.PrdValidationFailed; errors: readonly PrdValidationError[] }
+	| { kind: LoopEventKind.StateNotified; state: string; taskId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
 
