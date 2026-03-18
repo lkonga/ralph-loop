@@ -453,7 +453,7 @@
 
 > Depends on Phase 12 (Tasks 93-94). Replace 5-second polling with instant push notifications.
 
-- [ ] **Task 99 — Register notification listener**: Register a `ralph-loop.onStateChange` command handler in `ralphStatusBar.ts` that receives `{ state, taskId }` payload and immediately updates `loopState` and `loopTaskName`, then refreshes the status bar text. Remove the `setInterval` poll timer. Keep a fallback: on extension activation, do a single initial poll via `ralph-loop.status` + `ralph-loop.taskName` to sync state (the push notification only fires on transitions, not on activation). If `ralph-loop.onStateChange` registration fails (ralph-loop not installed), fall back to the current 5-second polling. Depends on Task 93.
+- [x] **Task 99 — Register notification listener**: Register a `ralph-loop.onStateChange` command handler in `ralphStatusBar.ts` that receives `{ state, taskId }` payload and immediately updates `loopState` and `loopTaskName`, then refreshes the status bar text. Remove the `setInterval` poll timer. Keep a fallback: on extension activation, do a single initial poll via `ralph-loop.status` + `ralph-loop.taskName` to sync state (the push notification only fires on transitions, not on activation). If `ralph-loop.onStateChange` registration fails (ralph-loop not installed), fall back to the current 5-second polling. Depends on Task 93.
 
 - [ ] **Task 100 — Rich state via getStateSnapshot**: When Task 94 is available, replace the two-call pattern (`ralph-loop.status` + `ralph-loop.taskName`) with a single `ralph-loop.getStateSnapshot` call that returns `{ state, taskId, taskDescription, iterationCount, nudgeCount }`. Use `iterationCount` and `nudgeCount` in the tooltip for richer diagnostics. Depends on Task 94.
 
