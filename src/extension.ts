@@ -322,6 +322,13 @@ export function activate(context: vscode.ExtensionContext): void {
 			return orchestrator?.getCurrentTaskId() ?? '';
 		}),
 
+		vscode.commands.registerCommand('ralph-loop.getStateSnapshot', () => {
+			if (!orchestrator) {
+				return { state: 'idle', taskId: '', taskDescription: '', iterationCount: 0, nudgeCount: 0 };
+			}
+			return orchestrator.getStateSnapshot();
+		}),
+
 		vscode.commands.registerCommand('ralph-loop.yield', () => {
 			if (!orchestrator || orchestrator.getState() !== 'running') {
 				vscode.window.showWarningMessage('Ralph Loop: Not running');

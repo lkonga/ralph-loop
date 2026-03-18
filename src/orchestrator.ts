@@ -275,6 +275,9 @@ export class LoopOrchestrator {
 	private linkedSignal?: LinkedCancellationSource;
 	private readonly sessionPersistence?: SessionPersistence;
 	private _currentTaskId = '';
+	private _currentTaskDescription = '';
+	private _currentIteration = 0;
+	private _currentNudgeCount = 0;
 	bearingsExecFn?: BearingsExecFn;
 	showCooldownDialogFn: (nextTask: string, timeoutMs: number) => Promise<CooldownDialogResult>;
 
@@ -314,6 +317,16 @@ export class LoopOrchestrator {
 
 	getCurrentTaskId(): string {
 		return this._currentTaskId;
+	}
+
+	getStateSnapshot(): import('./types').StateSnapshot {
+		return {
+			state: this.state,
+			taskId: this._currentTaskId,
+			taskDescription: this._currentTaskDescription,
+			iterationCount: this._currentIteration,
+			nudgeCount: this._currentNudgeCount,
+		};
 	}
 
 	updateConfig(config: Partial<RalphConfig>): void {
@@ -738,6 +751,9 @@ export class LoopOrchestrator {
 				iteration++;
 				task.status = TaskStatus.InProgress;
 				this._currentTaskId = task.taskId;
+				this._currentTaskDescription = task.description;
+				this._currentIteration = iteration;
+				this._currentNudgeCount = 0;
 				const taskInvocationId = crypto.randomUUID();
 				yield { kind: LoopEventKind.TaskStarted, task, iteration, taskInvocationId };
 
@@ -828,6 +844,7 @@ export class LoopOrchestrator {
 						}
 
 						taskState.nudgeCount++;
+						this._currentNudgeCount = taskState.nudgeCount;
 						yield { kind: LoopEventKind.TaskNudged, task, nudgeCount: taskState.nudgeCount, taskInvocationId };
 						this.logger.log(`Nudging task (${taskState.nudgeCount}/${this.config.maxNudgesPerTask}): ${task.description}`);
 

@@ -30,6 +30,14 @@ export interface Task {
 	readonly noDiff?: boolean;
 }
 
+export interface StateSnapshot {
+	readonly state: string;
+	readonly taskId: string;
+	readonly taskDescription: string;
+	readonly iterationCount: number;
+	readonly nudgeCount: number;
+}
+
 export interface PrdSnapshot {
 	readonly tasks: readonly Task[];
 	readonly total: number;
