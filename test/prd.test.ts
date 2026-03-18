@@ -77,6 +77,13 @@ describe('parsePrd', () => {
 		const snapshot = parsePrd(content);
 		expect(snapshot.tasks[0].taskId).toBe('Task-001');
 	});
+
+	it('DOES NOT skip task when [DECOMPOSED] is in description text (Task 106)', () => {
+		const content = `- [ ] **Task 106 — Verify [DECOMPOSED] in description**:\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.total).toBe(1);
+		expect(snapshot.tasks[0].description).toContain('[DECOMPOSED]');
+	});
 });
 
 describe('pickNextTask', () => {
@@ -567,35 +574,35 @@ describe('validatePrd', () => {
 describe('validatePrdEdit', () => {
 	it('allows checkbox toggle [ ] → [x]', () => {
 		const before = '- [ ] **Task 1 — Setup**: Install deps\n- [ ] **Task 2 — Build**: Run build\n';
-		const after  = '- [x] **Task 1 — Setup**: Install deps\n- [ ] **Task 2 — Build**: Run build\n';
+		const after = '- [x] **Task 1 — Setup**: Install deps\n- [ ] **Task 2 — Build**: Run build\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(true);
 	});
 
 	it('allows DECOMPOSED prefix prepended to a task', () => {
 		const before = '- [ ] **Task 1 — Setup**: Install deps\n';
-		const after  = '- [ ] [DECOMPOSED] **Task 1 — Setup**: Install deps\n';
+		const after = '- [ ] [DECOMPOSED] **Task 1 — Setup**: Install deps\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(true);
 	});
 
 	it('allows adding depends annotation', () => {
 		const before = '- [ ] **Task 2 — Build**: Run build\n';
-		const after  = '- [ ] **Task 2 — Build**: Run build depends: Task 1\n';
+		const after = '- [ ] **Task 2 — Build**: Run build depends: Task 1\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(true);
 	});
 
 	it('allows modifying depends annotation', () => {
 		const before = '- [ ] **Task 2 — Build**: Run build depends: Task 1\n';
-		const after  = '- [ ] **Task 2 — Build**: Run build depends: Task 1, Task 3\n';
+		const after = '- [ ] **Task 2 — Build**: Run build depends: Task 1, Task 3\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(true);
 	});
 
 	it('rejects description text change', () => {
 		const before = '- [ ] **Task 1 — Setup**: Install deps\n';
-		const after  = '- [ ] **Task 1 — Setup**: Install simplified deps\n';
+		const after = '- [ ] **Task 1 — Setup**: Install simplified deps\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(false);
 		expect(result.reason).toBeDefined();
@@ -603,7 +610,7 @@ describe('validatePrdEdit', () => {
 
 	it('rejects phase header change', () => {
 		const before = '## Phase 1 — Foundation\n- [ ] Task A\n';
-		const after  = '## Phase 1 — Easy Phase\n- [ ] Task A\n';
+		const after = '## Phase 1 — Easy Phase\n- [ ] Task A\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(false);
 		expect(result.reason).toBeDefined();
@@ -611,14 +618,14 @@ describe('validatePrdEdit', () => {
 
 	it('allows adding new lines (sub-tasks from decomposition)', () => {
 		const before = '- [ ] [DECOMPOSED] **Task 1**: Big task\n';
-		const after  = '- [ ] [DECOMPOSED] **Task 1**: Big task\n- [ ] Sub-task 1a\n- [ ] Sub-task 1b\n';
+		const after = '- [ ] [DECOMPOSED] **Task 1**: Big task\n- [ ] Sub-task 1a\n- [ ] Sub-task 1b\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(true);
 	});
 
 	it('rejects deletion of existing task lines', () => {
 		const before = '- [ ] **Task 1**: Setup\n- [ ] **Task 2**: Build\n';
-		const after  = '- [ ] **Task 1**: Setup\n';
+		const after = '- [ ] **Task 1**: Setup\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(false);
 		expect(result.reason).toBeDefined();
@@ -626,21 +633,21 @@ describe('validatePrdEdit', () => {
 
 	it('allows identical content (no-op)', () => {
 		const before = '- [ ] **Task 1**: Setup\n';
-		const after  = '- [ ] **Task 1**: Setup\n';
+		const after = '- [ ] **Task 1**: Setup\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(true);
 	});
 
 	it('allows multiple allowed changes together', () => {
 		const before = '- [ ] **Task 1**: Setup\n- [ ] **Task 2**: Build\n';
-		const after  = '- [x] **Task 1**: Setup\n- [ ] **Task 2**: Build depends: Task 1\n';
+		const after = '- [x] **Task 1**: Setup\n- [ ] **Task 2**: Build depends: Task 1\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(true);
 	});
 
 	it('rejects structure change (reordering lines)', () => {
 		const before = '- [ ] **Task 1**: Setup\n- [ ] **Task 2**: Build\n';
-		const after  = '- [ ] **Task 2**: Build\n- [ ] **Task 1**: Setup\n';
+		const after = '- [ ] **Task 2**: Build\n- [ ] **Task 1**: Setup\n';
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(false);
 		expect(result.reason).toBeDefined();
@@ -690,5 +697,66 @@ describe('parseLineAnnotations', () => {
 	it('handles extra whitespace between checkbox and annotation', () => {
 		const result = parseLineAnnotations('-  [ ]   [DECOMPOSED] task');
 		expect(result.decomposed).toBe(true);
+	});
+});
+
+describe('Task 106 — [DECOMPOSED] in description is not skipped', () => {
+	it('parses a task that mentions [DECOMPOSED] in its title as pending', () => {
+		const content = `- [ ] **Task N — Verify [DECOMPOSED] in description**:\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.length).toBe(1);
+		expect(snapshot.tasks[0].status).toBe('pending');
+		expect(snapshot.tasks[0].description).toContain('[DECOMPOSED]');
+	});
+
+	it('does not silently drop tasks with [DECOMPOSED] in description text', () => {
+		const content = [
+			'- [x] **Task A — Setup**: done',
+			'- [ ] **Task B — Verify [DECOMPOSED] in description is not skipped**: canary task',
+			'- [ ] **Task C — Normal task**: do stuff',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.total).toBe(3);
+		const pending = snapshot.tasks.filter(t => t.status === 'pending');
+		expect(pending.length).toBe(2);
+		expect(pending.some(t => t.description.includes('[DECOMPOSED]'))).toBe(true);
+	});
+
+	it('only skips lines with [DECOMPOSED] in annotation position', () => {
+		const content = [
+			'- [ ] [DECOMPOSED] This parent was decomposed',
+			'- [ ] **Task N — mentions [DECOMPOSED] inside**: still actionable',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.total).toBe(1);
+		expect(snapshot.tasks[0].description).toContain('[DECOMPOSED]');
+		expect(snapshot.tasks[0].status).toBe('pending');
+	});
+});
+
+describe('Task 108 — [DECOMPOSED] and [CHECKPOINT] coexist in description safely', () => {
+	it('parses a task mentioning both [DECOMPOSED] and [CHECKPOINT] in text as normal pending', () => {
+		const content = `- [ ] **Task N — mentions [DECOMPOSED] and [CHECKPOINT] in text**:\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.length).toBe(1);
+		expect(snapshot.tasks[0].status).toBe('pending');
+		expect(snapshot.tasks[0].checkpoint).toBeFalsy();
+	});
+
+	it('does not trigger annotation behavior for either tag in description', () => {
+		const content = [
+			'- [ ] **Task X — references [DECOMPOSED] and [CHECKPOINT] patterns**: verify both',
+			'- [ ] [CHECKPOINT] Actual checkpoint gate',
+			'- [ ] [DECOMPOSED] Actually decomposed parent',
+		].join('\n');
+		const snapshot = parsePrd(content);
+		expect(snapshot.total).toBe(2);
+		const taskX = snapshot.tasks.find(t => t.description.includes('Task X'));
+		expect(taskX).toBeDefined();
+		expect(taskX!.status).toBe('pending');
+		expect(taskX!.checkpoint).toBeFalsy();
+		const gate = snapshot.tasks.find(t => t.description.includes('checkpoint gate'));
+		expect(gate).toBeDefined();
+		expect(gate!.checkpoint).toBe(true);
 	});
 });
