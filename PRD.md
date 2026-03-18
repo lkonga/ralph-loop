@@ -492,7 +492,7 @@
 
 - [x] **Task 104 — Fix naive annotation substring matching in prd parser**: In `src/prd.ts` lines 56-57, replace `line.includes(...)` checks with regexes anchored to annotation position only. Full spec with exact code changes and regex patterns: `docs/specs/phase15-annotation-strictness.md`. Add tests. Run `npx tsc --noEmit && npx vitest run` — all must pass.
 
-- [ ] **Task 105 — Extract annotation parser helper**: Extract annotation detection from `src/prd.ts` into a `parseLineAnnotations()` helper returning `{ decomposed, checkpoint }`. See `docs/specs/phase15-annotation-strictness.md` for interface and implementation details. Unit test directly. Run `npx tsc --noEmit && npx vitest run` — all must pass.
+- [x] **Task 105 — Extract annotation parser helper**: Extract annotation detection from `src/prd.ts` into a `parseLineAnnotations()` helper returning `{ decomposed, checkpoint }`. See `docs/specs/phase15-annotation-strictness.md` for interface and implementation details. Unit test directly. Run `npx tsc --noEmit && npx vitest run` — all must pass.
 
 - [ ] **Task 106 — Verify [DECOMPOSED] in description is not skipped**: This task mentions [DECOMPOSED] in its title on purpose. If the parser still skips it, Task 104 failed. Write a test in `test/prd.test.ts` that parses a PRD line like `- [ ] **Task N — Verify [DECOMPOSED] in description**:` and asserts it appears in the parsed output as a pending task, not silently dropped. Run `npx vitest run` — all must pass.
 

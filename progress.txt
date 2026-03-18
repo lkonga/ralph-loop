@@ -664,3 +664,10 @@ Replaced naive `line.includes('[DECOMPOSED]')` and `line.includes('[CHECKPOINT]'
 ### Task 116 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
 [2026-03-18T06:44:09.546Z] [67dd72ee-77e6-487c-8fcb-e8def6c3050d] Committed: b2a6ef316748a63e7181e54b54d4955eaaf8890c
 [2026-03-18T06:44:26.402Z] [9e952241-796a-4a06-8c93-4e78eb3fa937] [Task-118] Task started: **Task 105 — Extract annotation parser helper**: Extract annotation detection from `src/prd.ts` into a `parseLineAnnotations()` helper returning `{ decomposed, checkpoint }`. See `docs/specs/phase15-annotation-strictness.md` for interface and implementation details. Unit test directly. Run `npx tsc --noEmit && npx vitest run` — all must pass.
+
+### Task 118 (Task 105) | Files: [src/prd.ts, test/prd.test.ts] | Lines: +14/-4 | Status: pass
+Extracted `parseLineAnnotations(line)` helper in `src/prd.ts` and integrated it into the `parsePrd` main loop. The helper returns `{ decomposed, checkpoint }` as specified. Added unit tests for the helper in `test/prd.test.ts` covering annotation position, case-insensitivity, whitespace, and description text false positives. All 862 tests pass, tsc clean.
+[2026-03-18T06:48:42Z] [Task-118] Task completed: Task 105 — Extract annotation parser helper.
+[2026-03-18T06:50:12.800Z] [9e952241-796a-4a06-8c93-4e78eb3fa937] [Task-118] Task completed: **Task 105 — Extract annotation parser helper**: Extract annotation detection from `src/prd.ts` into a `parseLineAnnotations()` helper returning `{ decomposed, checkpoint }`. See `docs/specs/phase15-annotation-strictness.md` for interface and implementation details. Unit test directly. Run `npx tsc --noEmit && npx vitest run` — all must pass. (346s)
+
+### Task 117 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
