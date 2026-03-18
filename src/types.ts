@@ -685,3 +685,11 @@ export interface SpecFrontmatter {
 	verification?: string[];
 	completion_steps?: string[];
 }
+
+export interface StalePointer {
+	file: string;
+	line: number;
+	reason: 'file_missing' | 'line_range_out_of_bounds';
+	startLine?: number;
+	endLine?: number;
+}

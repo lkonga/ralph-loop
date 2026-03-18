@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Task, TaskStatus, PrdSnapshot, PrdValidationError, PrdValidationResult } from './types';
+import { Task, TaskStatus, PrdSnapshot, PrdValidationError, PrdValidationResult, StalePointer } from './types';
 
 const CHECKBOX_UNCHECKED = /^(\s*)-\s*\[\s*\]\s+(.+)$/;
 const CHECKBOX_CHECKED = /^(\s*)-\s*\[x\]\s+(.+)$/i;
@@ -303,4 +303,46 @@ export function addDependsAnnotation(prdPath: string, task: Task, depTaskId: str
 		lines[lineIdx] = lines[lineIdx].trimEnd() + ` depends: ${depTaskId}`;
 		fs.writeFileSync(prdPath, lines.join('\n'), 'utf-8');
 	}
+}
+
+const SPEC_POINTER_PATTERN = /→\s*Spec:\s*(.+)/;
+const SPEC_FILE_PATTERN = /`([^`]+)`(?:\s+L(\d+)-L(\d+))?/g;
+
+export function validateSpecPointers(prdContent: string, researchDir: string): StalePointer[] {
+	const stale: StalePointer[] = [];
+	const lines = prdContent.split('\n');
+
+	for (let i = 0; i < lines.length; i++) {
+		const match = SPEC_POINTER_PATTERN.exec(lines[i]);
+		if (!match) { continue; }
+
+		const specPart = match[1];
+		let fileMatch: RegExpExecArray | null;
+		SPEC_FILE_PATTERN.lastIndex = 0;
+
+		while ((fileMatch = SPEC_FILE_PATTERN.exec(specPart)) !== null) {
+			const filePath = fileMatch[1];
+			const startLine = fileMatch[2] ? parseInt(fileMatch[2], 10) : undefined;
+			const endLine = fileMatch[3] ? parseInt(fileMatch[3], 10) : undefined;
+
+			// Strip leading "research/" prefix since researchDir already points there
+			const relativePath = filePath.startsWith('research/') ? filePath.slice('research/'.length) : filePath;
+			const fullPath = path.join(researchDir, relativePath);
+
+			if (!fs.existsSync(fullPath)) {
+				stale.push({ file: filePath, line: i + 1, reason: 'file_missing', startLine, endLine });
+				continue;
+			}
+
+			if (startLine !== undefined && endLine !== undefined) {
+				const fileContent = fs.readFileSync(fullPath, 'utf-8');
+				const fileLines = fileContent.split('\n');
+				if (fileLines.length < endLine) {
+					stale.push({ file: filePath, line: i + 1, reason: 'line_range_out_of_bounds', startLine, endLine });
+				}
+			}
+		}
+	}
+
+	return stale;
 }

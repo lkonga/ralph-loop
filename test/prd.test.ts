@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd } from '../src/prd';
+import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validateSpecPointers } from '../src/prd';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -547,5 +547,107 @@ describe('validatePrd', () => {
 		const result = validatePrd(snapshot);
 		expect(result.valid).toBe(false);
 		expect(result.errors.some(e => e.message.includes('Duplicate pending task'))).toBe(true);
+	});
+});
+
+describe('validateSpecPointers', () => {
+	let tmpDir: string;
+	let researchDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-ptr-'));
+		researchDir = path.join(tmpDir, 'research');
+		fs.mkdirSync(researchDir, { recursive: true });
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('returns empty array when no spec pointers exist', () => {
+		const prd = '- [ ] Task with no pointer\n- [x] Done task\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toEqual([]);
+	});
+
+	it('valid pointer with existing file passes', () => {
+		fs.writeFileSync(path.join(researchDir, 'spec.md'), 'line1\nline2\nline3\n');
+		const prd = '- [ ] Task → Spec: `research/spec.md`\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toEqual([]);
+	});
+
+	it('valid pointer with line range passes when file has enough lines', () => {
+		const lines = Array.from({ length: 50 }, (_, i) => `Line ${i + 1}`).join('\n');
+		fs.writeFileSync(path.join(researchDir, 'spec.md'), lines);
+		const prd = '- [ ] Task → Spec: `research/spec.md` L10-L50\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toEqual([]);
+	});
+
+	it('detects missing file', () => {
+		const prd = '- [ ] Task → Spec: `research/nonexistent.md` L10-L50\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toHaveLength(1);
+		expect(result[0].reason).toBe('file_missing');
+		expect(result[0].file).toBe('research/nonexistent.md');
+		expect(result[0].line).toBe(1);
+	});
+
+	it('detects shifted line range (file too short)', () => {
+		fs.writeFileSync(path.join(researchDir, 'spec.md'), 'line1\nline2\nline3\n');
+		const prd = '- [ ] Task → Spec: `research/spec.md` L10-L50\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toHaveLength(1);
+		expect(result[0].reason).toBe('line_range_out_of_bounds');
+		expect(result[0].file).toBe('research/spec.md');
+	});
+
+	it('handles multiple pointers in same PRD', () => {
+		fs.writeFileSync(path.join(researchDir, 'a.md'), 'content\n');
+		// b.md does not exist
+		const prd = [
+			'- [ ] Task A → Spec: `research/a.md`',
+			'- [ ] Task B → Spec: `research/b.md`',
+		].join('\n');
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toHaveLength(1);
+		expect(result[0].file).toBe('research/b.md');
+		expect(result[0].reason).toBe('file_missing');
+	});
+
+	it('handles multiple file pointers on one line (comma-separated)', () => {
+		fs.writeFileSync(path.join(researchDir, 'a.md'), 'content\n');
+		// b.md does not exist
+		const prd = '- [ ] Task → Spec: `research/a.md`, `research/b.md`\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toHaveLength(1);
+		expect(result[0].file).toBe('research/b.md');
+		expect(result[0].reason).toBe('file_missing');
+	});
+
+	it('handles subdirectory paths', () => {
+		const subDir = path.join(researchDir, '_wave', 'deep');
+		fs.mkdirSync(subDir, { recursive: true });
+		fs.writeFileSync(path.join(subDir, 'r1.md'), 'content\n');
+		const prd = '- [ ] Task → Spec: `research/_wave/deep/r1.md`\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toEqual([]);
+	});
+
+	it('includes the PRD line number in stale pointer', () => {
+		const prd = 'Header\n\n- [ ] Task → Spec: `research/missing.md`\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toHaveLength(1);
+		expect(result[0].line).toBe(3);
+	});
+
+	it('includes startLine and endLine for line range pointers', () => {
+		fs.writeFileSync(path.join(researchDir, 'spec.md'), 'a\nb\nc\n');
+		const prd = '- [ ] Task → Spec: `research/spec.md` L10-L50\n';
+		const result = validateSpecPointers(prd, researchDir);
+		expect(result).toHaveLength(1);
+		expect(result[0].startLine).toBe(10);
+		expect(result[0].endLine).toBe(50);
 	});
 });
