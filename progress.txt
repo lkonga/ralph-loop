@@ -662,3 +662,4 @@ Replaced naive `line.includes('[DECOMPOSED]')` and `line.includes('[CHECKPOINT]'
 [2026-03-18T06:44:09.407Z] [67dd72ee-77e6-487c-8fcb-e8def6c3050d] [Task-117] Task completed: **Task 104 — Fix naive annotation substring matching in prd parser**: In `src/prd.ts` lines 56-57, replace `line.includes(...)` checks with regexes anchored to annotation position only. Full spec with exact code changes and regex patterns: `docs/specs/phase15-annotation-strictness.md`. Add tests. Run `npx tsc --noEmit && npx vitest run` — all must pass. (73s)
 
 ### Task 116 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
+[2026-03-18T06:44:09.546Z] [67dd72ee-77e6-487c-8fcb-e8def6c3050d] Committed: b2a6ef316748a63e7181e54b54d4955eaaf8890c
