@@ -366,4 +366,34 @@ describe('E2E Pipeline Smoke Test — Task 90', () => {
 			expect(phase4Section).toMatch(/sealed\s*spec/i);
 		});
 	});
+
+	describe('Task 102 — wave-researcher github_repo tool', () => {
+		const researcherPath = resolve(AGENTS_DIR, 'wave-researcher.agent.md');
+		const researcherSymlink = resolve(SYMLINKS_DIR, 'wave-researcher.agent.md');
+		let researcherContent: string;
+
+		beforeAll(() => {
+			expect(existsSync(researcherPath), `Missing agent: ${researcherPath}`).toBe(true);
+			researcherContent = readFileSync(researcherPath, 'utf-8');
+		});
+
+		it('frontmatter tools list should include github_repo', () => {
+			const fm = researcherContent.match(/^---\n([\s\S]*?)\n---/);
+			expect(fm).not.toBeNull();
+			expect(fm![1]).toContain('github_repo');
+		});
+
+		it('body should contain github_repo usage instruction', () => {
+			const body = researcherContent.replace(/^---\n[\s\S]*?\n---/, '');
+			expect(body).toContain('github_repo');
+		});
+
+		it('symlink in ralph-loop/agents/ should resolve correctly', () => {
+			expect(existsSync(researcherSymlink), `Missing symlink: ${researcherSymlink}`).toBe(true);
+			const stat = lstatSync(researcherSymlink);
+			expect(stat.isSymbolicLink(), 'wave-researcher.agent.md is not a symlink').toBe(true);
+			const target = realpathSync(researcherSymlink);
+			expect(target).toContain('vscode-config-files/agents/');
+		});
+	});
 });
