@@ -678,3 +678,7 @@ Extracted `parseLineAnnotations(line)` helper in `src/prd.ts` and integrated it 
 [2026-03-18T10:53:08.432Z] [42705405-375c-4a40-8c3c-f0db1ca3e7cd] [Task-120] Task completed: **Task 106 — Verify [DECOMPOSED] in description is not skipped**: This task mentions [DECOMPOSED] in its title on purpose. If the parser still skips it, Task 104 failed. Write a test in `test/prd.test.ts` that parses a PRD line like `- [ ] **Task N — Verify [DECOMPOSED] in description**:` and asserts it appears in the parsed output as a pending task, not silently dropped. Run `npx vitest run` — all must pass. (45s)
 
 ### Task 119 State | Files: [.opencode/opencode.json, PRD.md, knowledge.md, progress.txt, test/prd.test.ts] | Lines: +95/-13 | Status: pass
+[2026-03-18T10:53:08.531Z] [42705405-375c-4a40-8c3c-f0db1ca3e7cd] Committed: 975eaf42f96f5328c671507ef44b576df2ca7b1b
+
+### Task 120 (Task 106) | Files: [test/prd.test.ts] | Lines: +0/-0 | Status: pass
+Verified Task 106 — tests for [DECOMPOSED] in description text not being skipped already exist in test/prd.test.ts (added during Task 104). Three tests in 'Task 106 — [DECOMPOSED] in description is not skipped' describe block cover: parsing title with [DECOMPOSED] as pending, not silently dropping such tasks in multi-task PRD, and only skipping annotation-position [DECOMPOSED]. All 868 tests pass, tsc clean.
