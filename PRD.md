@@ -516,7 +516,7 @@
 
 ### 16b — Non-Blocking Verification
 
-- [ ] **Task 111 — Async Verification Runner**: Replace synchronous `execSync()` bearings execution with async process spawning/streaming so the VS Code extension host stays responsive while preflight validation runs. → Spec: `research/16-phase16-refined-tasks.md` L71-L89
+- [x] **Task 111 — Async Verification Runner**: Replace synchronous `execSync()` bearings execution with async process spawning/streaming so the VS Code extension host stays responsive while preflight validation runs. → Spec: `research/16-phase16-refined-tasks.md` L71-L89
 
 - [ ] **Task 112 — CHECKPOINT: Non-Blocking Verification Verification**: Prove the extension host remains responsive during startup verification and that users see progress before verification completes. → Spec: `research/16-phase16-refined-tasks.md` L91-L106
 
