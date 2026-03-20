@@ -528,6 +528,6 @@
 
 ### 16d — Startup UX Transparency
 
-- [ ] **Task 115 — Startup UX Transparency**: Add explicit bearings lifecycle events/status (`BearingsStarted`, `BearingsProgress`, `BearingsCompleted`, `BearingsSkipped`) and surface them immediately in logs/UI so startup is visible, understandable, and cancellable rather than silently stalling. → Spec: `research/16-phase16-refined-tasks.md` L144-L166
+- [x] **Task 115 — Startup UX Transparency**: Add explicit bearings lifecycle events/status (`BearingsStarted`, `BearingsProgress`, `BearingsCompleted`, `BearingsSkipped`) and surface them immediately in logs/UI so startup is visible, understandable, and cancellable rather than silently stalling. → Spec: `research/16-phase16-refined-tasks.md` L144-L166
 
 - [ ] **Task 116 — CHECKPOINT: Startup DX Verification**: Final gate proving Ralph startup is transparent, bounded, and stable: no silent 1–2 minute wait, no default full `vitest` worker swarm on ordinary task start, and clear logs explaining what is running or why it was skipped. → Spec: `research/16-phase16-refined-tasks.md` L168-L184
