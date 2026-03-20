@@ -702,3 +702,7 @@ Bearings Policy Split: Replaced boolean bearings with stage-aware policy. Added 
 [2026-03-20T05:35:06.466Z] [c06e099f-9220-4de2-9fda-8688f3d25461] [Task-124] Task completed: **Task 110 — CHECKPOINT: Bearings Policy Verification**: Verify startup no longer triggers full-suite validation by default and that checkpoints still run the configured stronger validation path. → Spec: `research/16-phase16-refined-tasks.md` L54-L69 (170s)
 
 ### Task 123 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +10/-1 | Status: pass
+[2026-03-20T05:35:06.613Z] [c06e099f-9220-4de2-9fda-8688f3d25461] Committed: 8f5bde15844568adf0c2ac5f8a2759afa5e13c33
+
+### Task 124 (Task 110) | Files: [src/orchestrator.ts, test/orchestrator.test.ts] | Lines: +95/-2 | Status: pass
+CHECKPOINT: Bearings Policy Verification. Wrote 2 TDD tests in 'CHECKPOINT: Bearings Policy Verification (Task 110)' describe block: (1) startup path emits no full-suite trigger under default policy — only tsc runs, vitest not called; (2) checkpoint path triggers configured validation at checkpoint level — vitest called when checkpoint='full'. Test 2 initially failed (red) because checkpoint gate short-circuited before bearings. Fixed orchestrator: checkpoint tasks now run bearings at bearingsConfig.checkpoint level before pausing for human review. If checkpoint bearings fail, BearingsFailed is yielded and loop pauses. tsc clean, all 876 tests pass.
