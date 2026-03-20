@@ -751,3 +751,10 @@ Added 4 new LoopEventKind values: BearingsStarted, BearingsProgress, BearingsCom
 ### Task 128 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
 [2026-03-20T05:57:40.217Z] [79095331-4db5-451b-b40c-6b1ce560ef31] Committed: 52962224b86fc2f3453e934512469349c6b239b5
 [2026-03-20T05:57:56.200Z] [8c8d5130-0003-4fdb-b6ac-f52d622c05bd] [Task-130] Task started: **Task 116 — CHECKPOINT: Startup DX Verification**: Final gate proving Ralph startup is transparent, bounded, and stable: no silent 1–2 minute wait, no default full `vitest` worker swarm on ordinary task start, and clear logs explaining what is running or why it was skipped. → Spec: `research/16-phase16-refined-tasks.md` L168-L184
+
+### Task 130 (Task 116) | Files: [test/orchestrator.test.ts] | Lines: +140/-0 | Status: pass
+Added 5 CHECKPOINT tests in 'CHECKPOINT: Startup DX Verification (Task 116)' describe block verifying: (1) end-to-end startup uses new bearings policy — tsc-only startup, none per-task, no vitest swarm across 2 iterations, (2) DEFAULT_BEARINGS_CONFIG invariants — startup='tsc', perTask='none', checkpoint='full', (3) logs explain what is running during startup bearings (tsc log message + BearingsProgress events), (4) logs explain why bearings are skipped on per-task iterations (BearingsSkipped with reason string), (5) runBearings and defaultBearingsExec are async (Promise-returning, non-blocking). tsc clean, all 913 tests pass.
+[2026-03-20T12:20:00.000Z] [Task-130] Task completed: **Task 116 — CHECKPOINT: Startup DX Verification**
+[2026-03-20T06:48:42.486Z] [8c8d5130-0003-4fdb-b6ac-f52d622c05bd] [Task-130] Task completed: **Task 116 — CHECKPOINT: Startup DX Verification**: Final gate proving Ralph startup is transparent, bounded, and stable: no silent 1–2 minute wait, no default full `vitest` worker swarm on ordinary task start, and clear logs explaining what is running or why it was skipped. → Spec: `research/16-phase16-refined-tasks.md` L168-L184 (3046s)
+
+### Task 129 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
