@@ -88,6 +88,10 @@ export const enum LoopEventKind {
 	ContextInjected = 'context_injected',
 	StruggleDetected = 'struggle_detected',
 	CommandBlocked = 'command_blocked',
+	BearingsStarted = 'bearings_started',
+	BearingsProgress = 'bearings_progress',
+	BearingsCompleted = 'bearings_completed',
+	BearingsSkipped = 'bearings_skipped',
 	BearingsChecked = 'bearings_checked',
 	BearingsFailed = 'bearings_failed',
 	PlanRegenerated = 'plan_regenerated',
@@ -127,6 +131,10 @@ export type LoopEvent =
 	| { kind: LoopEventKind.ContextInjected; text: string }
 	| { kind: LoopEventKind.StruggleDetected; signals: string[]; taskId: string }
 	| { kind: LoopEventKind.CommandBlocked; command: string; reason: string; taskId: string }
+	| { kind: LoopEventKind.BearingsStarted; level: BearingsLevel }
+	| { kind: LoopEventKind.BearingsProgress; stage: string; status: 'running' | 'done' | 'skipped' }
+	| { kind: LoopEventKind.BearingsCompleted; healthy: boolean; durationMs: number; issues: string[] }
+	| { kind: LoopEventKind.BearingsSkipped; reason: string }
 	| { kind: LoopEventKind.BearingsChecked; healthy: boolean; issues: string[] }
 	| { kind: LoopEventKind.BearingsFailed; issues: string[] }
 	| { kind: LoopEventKind.PlanRegenerated; taskId: string; regenerationCount: number }

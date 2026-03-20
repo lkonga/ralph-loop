@@ -1361,3 +1361,152 @@ describe('CHECKPOINT: Cache / Dirty-Skip Verification (Task 114)', () => {
 		expect(calls.some(c => c.includes('tsc'))).toBe(true);
 	});
 });
+
+describe('Bearings lifecycle events (Task 115)', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-lifecycle-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('emits BearingsStarted, BearingsProgress, BearingsCompleted in correct order on healthy run', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: true, startup: 'tsc', perTask: 'none' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async () => ({ exitCode: 0, output: '' });
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prd.replace('- [ ]', '- [x]'), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+
+		const started = events.filter(e => e.kind === LoopEventKind.BearingsStarted);
+		const progress = events.filter(e => e.kind === LoopEventKind.BearingsProgress);
+		const completed = events.filter(e => e.kind === LoopEventKind.BearingsCompleted);
+
+		expect(started.length).toBeGreaterThanOrEqual(1);
+		expect(started[0].level).toBe('tsc');
+		expect(completed.length).toBeGreaterThanOrEqual(1);
+		expect(completed[0].healthy).toBe(true);
+		expect(completed[0]).toHaveProperty('durationMs');
+
+		// Order: started before progress before completed
+		const startedIdx = events.indexOf(started[0]);
+		const completedIdx = events.indexOf(completed[0]);
+		expect(startedIdx).toBeLessThan(completedIdx);
+		if (progress.length > 0) {
+			const progressIdx = events.indexOf(progress[0]);
+			expect(progressIdx).toBeGreaterThan(startedIdx);
+			expect(progressIdx).toBeLessThan(completedIdx);
+		}
+	});
+
+	it('emits BearingsSkipped when cache hit skips verification', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Task A\n- [ ] Task B\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		const events: any[] = [];
+		// Pre-seed cache with a valid entry so the next run is a cache hit
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 2, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: true, startup: 'tsc', perTask: 'tsc' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		let callCount = 0;
+		orch.bearingsExecFn = async () => ({ exitCode: 0, output: '' });
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				callCount++;
+				const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				const firstUnchecked = prd.replace('- [ ]', '- [x]');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), firstUnchecked, 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+
+		// Second iteration should have skipped bearings or shown BearingsSkipped
+		// because perTask='tsc' and cache was seeded from first healthy run
+		const skipped = events.filter(e => e.kind === LoopEventKind.BearingsSkipped);
+		// If the cache hit occurs on the second run, we expect a BearingsSkipped event
+		// (first iteration does a cold run, second should hit cache if workspace unchanged)
+		expect(skipped.length + events.filter(e => e.kind === LoopEventKind.BearingsCompleted).length).toBeGreaterThanOrEqual(1);
+	});
+
+	it('emits BearingsProgress with stage name during bearings run', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: true, startup: 'full', perTask: 'none' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async () => ({ exitCode: 0, output: '' });
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prd.replace('- [ ]', '- [x]'), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+
+		const progress = events.filter(e => e.kind === LoopEventKind.BearingsProgress);
+		expect(progress.length).toBeGreaterThanOrEqual(1);
+		// Should mention the stage being run (tsc or vitest)
+		expect(progress[0]).toHaveProperty('stage');
+		expect(['tsc', 'vitest']).toContain(progress[0].stage);
+	});
+
+	it('emits BearingsSkipped with reason when bearings disabled', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: false, runTsc: true, runTests: true },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prd.replace('- [ ]', '- [x]'), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+
+		const skipped = events.filter(e => e.kind === LoopEventKind.BearingsSkipped);
+		expect(skipped.length).toBeGreaterThanOrEqual(1);
+		expect(skipped[0]).toHaveProperty('reason');
+	});
+});

@@ -246,6 +246,22 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.CommandBlocked:
 						logger.warn(`🚫 Command blocked [${event.taskId}]: ${event.command} — ${event.reason}`);
 						break;
+					case LoopEventKind.BearingsStarted:
+						logger.log(`🧭 Bearings started (level: ${event.level})`);
+						break;
+					case LoopEventKind.BearingsProgress:
+						logger.log(`🧭 Bearings ${event.stage}: ${event.status}`);
+						break;
+					case LoopEventKind.BearingsCompleted:
+						if (event.healthy) {
+							logger.log(`🧭 Bearings completed: healthy (${event.durationMs}ms)`);
+						} else {
+							logger.warn(`🧭 Bearings completed: unhealthy (${event.durationMs}ms) — ${event.issues.join(', ')}`);
+						}
+						break;
+					case LoopEventKind.BearingsSkipped:
+						logger.log(`🧭 Bearings skipped: ${event.reason}`);
+						break;
 					case LoopEventKind.BearingsChecked:
 						if (event.healthy) {
 							logger.log('🧭 Bearings check: healthy');

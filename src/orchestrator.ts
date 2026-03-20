@@ -149,12 +149,15 @@ export function defaultBearingsExec(cmd: string, cwd: string, signal?: AbortSign
 	});
 }
 
+export type BearingsProgressFn = (stage: string, status: 'running' | 'done' | 'skipped') => void;
+
 export async function runBearings(
 	workspaceRoot: string,
 	logger: ILogger,
 	config: BearingsConfig = DEFAULT_BEARINGS_CONFIG,
 	execFn: BearingsExecFn = defaultBearingsExec,
 	level?: BearingsLevel,
+	onProgress?: BearingsProgressFn,
 ): Promise<BearingsResult> {
 	const effectiveLevel = level ?? 'full';
 	if (effectiveLevel === 'none') {
@@ -169,12 +172,15 @@ export async function runBearings(
 	if (shouldRunTsc) {
 		const tsconfigPath = path.join(workspaceRoot, 'tsconfig.json');
 		if (fs.existsSync(tsconfigPath)) {
+			onProgress?.('tsc', 'running');
 			logger.log('Bearings: running tsc --noEmit...');
 			const tscResult = await execFn('npx tsc --noEmit', workspaceRoot);
 			if (tscResult.exitCode !== 0) {
 				issues.push(`TypeScript errors: ${tscResult.output.slice(0, 500)}`);
 			}
+			onProgress?.('tsc', 'done');
 		} else {
+			onProgress?.('tsc', 'skipped');
 			logger.log('Bearings: skipping tsc (no tsconfig.json)');
 		}
 	}
@@ -184,12 +190,15 @@ export async function runBearings(
 			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.ts'))
 			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.js'));
 		if (hasVitest) {
+			onProgress?.('vitest', 'running');
 			logger.log('Bearings: running vitest...');
 			const testResult = await execFn('npx vitest run', workspaceRoot);
 			if (testResult.exitCode !== 0) {
 				issues.push(`Test failures: ${testResult.output.slice(0, 500)}`);
 			}
+			onProgress?.('vitest', 'done');
 		} else {
+			onProgress?.('vitest', 'skipped');
 			logger.log('Bearings: skipping tests (no vitest config)');
 		}
 	}
@@ -764,9 +773,16 @@ export class LoopOrchestrator {
 							const cacheHit = verificationCache.isValid(this.config.workspaceRoot, branch, treeHash, checkpointLevel, fileHashes);
 							if (cacheHit) {
 								this.logger.log('Bearings (checkpoint): cache hit — skipping verification');
+								yield { kind: LoopEventKind.BearingsSkipped, reason: 'checkpoint cache hit' };
 								yield { kind: LoopEventKind.BearingsChecked, healthy: true, issues: [] };
 							} else {
-								const cbResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, checkpointLevel);
+								yield { kind: LoopEventKind.BearingsStarted, level: checkpointLevel };
+								const cpStart = Date.now();
+								const cbResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, checkpointLevel, (stage, status) => {
+									this.onEvent({ kind: LoopEventKind.BearingsProgress, stage, status });
+								});
+								const cpDuration = Date.now() - cpStart;
+								yield { kind: LoopEventKind.BearingsCompleted, healthy: cbResult.healthy, durationMs: cpDuration, issues: cbResult.issues };
 								yield { kind: LoopEventKind.BearingsChecked, healthy: cbResult.healthy, issues: cbResult.issues };
 								if (cbResult.healthy) {
 									verificationCache.save(this.config.workspaceRoot, {
@@ -826,9 +842,16 @@ export class LoopOrchestrator {
 						const cacheHit = verificationCache.isValid(this.config.workspaceRoot, branch, treeHash, bearingsLevel, fileHashes);
 						if (cacheHit) {
 							this.logger.log('Bearings: cache hit — skipping verification (no relevant changes)');
+							yield { kind: LoopEventKind.BearingsSkipped, reason: 'cache hit — no relevant changes' };
 							yield { kind: LoopEventKind.BearingsChecked, healthy: true, issues: [] };
 						} else {
-							const bearingsResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, bearingsLevel);
+							yield { kind: LoopEventKind.BearingsStarted, level: bearingsLevel };
+							const bearingsStart = Date.now();
+							const bearingsResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, bearingsLevel, (stage, status) => {
+								this.onEvent({ kind: LoopEventKind.BearingsProgress, stage, status });
+							});
+							const bearingsDuration = Date.now() - bearingsStart;
+							yield { kind: LoopEventKind.BearingsCompleted, healthy: bearingsResult.healthy, durationMs: bearingsDuration, issues: bearingsResult.issues };
 							yield { kind: LoopEventKind.BearingsChecked, healthy: bearingsResult.healthy, issues: bearingsResult.issues };
 							if (bearingsResult.healthy) {
 								verificationCache.save(this.config.workspaceRoot, {
@@ -860,12 +883,16 @@ export class LoopOrchestrator {
 							}
 						}
 						bearingsFixAttempted = false;
+					} else {
+						yield { kind: LoopEventKind.BearingsSkipped, reason: `level is 'none' for ${!startupBearingsDone ? 'startup' : 'per-task'}` };
 					}
 					if (!startupBearingsDone) {
 						startupBearingsDone = true;
 					}
 				} else if (skipBearingsOnce) {
 					skipBearingsOnce = false;
+				} else if (!bearingsConfig.enabled) {
+					yield { kind: LoopEventKind.BearingsSkipped, reason: 'bearings disabled' };
 				}
 
 				iteration++;

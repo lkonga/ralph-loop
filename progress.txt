@@ -741,3 +741,4 @@ CHECKPOINT: Cache / Dirty-Skip Verification. Added 2 checkpoint tests in test/or
 
 ### Task 127 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
 [2026-03-20T05:52:46.605Z] [f78aca3c-14f6-434e-b58a-4bf184945dc3] Committed: 4d1667cc54bfe5b087f7a8163777eaa8291ac190
+[2026-03-20T05:53:03.013Z] [79095331-4db5-451b-b40c-6b1ce560ef31] [Task-129] Task started: **Task 115 — Startup UX Transparency**: Add explicit bearings lifecycle events/status (`BearingsStarted`, `BearingsProgress`, `BearingsCompleted`, `BearingsSkipped`) and surface them immediately in logs/UI so startup is visible, understandable, and cancellable rather than silently stalling. → Spec: `research/16-phase16-refined-tasks.md` L144-L166
