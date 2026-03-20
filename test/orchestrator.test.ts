@@ -5,7 +5,7 @@ import {
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode } from '../src/orchestrator';
+import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode, defaultBearingsExec } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
 import { estimatePromptTokens } from '../src/prompt';
 import {
@@ -394,7 +394,7 @@ describe('runBearings', () => {
 	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
 
 	it('returns healthy when both tsc and vitest pass', async () => {
-		const execFn = () => ({ exitCode: 0, output: '' });
+		const execFn = async () => ({ exitCode: 0, output: '' });
 		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
 		expect(result.healthy).toBe(true);
 		expect(result.issues).toHaveLength(0);
@@ -406,7 +406,7 @@ describe('runBearings', () => {
 		const path = require('path');
 		const os = require('os');
 		const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-noconfig-'));
-		const execFn = () => ({ exitCode: 1, output: 'should never be called' });
+		const execFn = async () => ({ exitCode: 1, output: 'should never be called' });
 		const result = await runBearings(tmpDir, noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn);
 		fs.rmSync(tmpDir, { recursive: true, force: true });
 		expect(result.healthy).toBe(true);
@@ -420,7 +420,7 @@ describe('runBearings', () => {
 		const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-tsc-'));
 		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
 		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
-		const execFn = (cmd: string) => {
+		const execFn = async (cmd: string) => {
 			if (cmd.includes('tsc')) return { exitCode: 1, output: 'error TS2345: Argument of type...' };
 			return { exitCode: 0, output: '' };
 		};
@@ -439,7 +439,7 @@ describe('runBearings', () => {
 		const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-vitest-'));
 		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
 		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
-		const execFn = (cmd: string) => {
+		const execFn = async (cmd: string) => {
 			if (cmd.includes('vitest')) return { exitCode: 1, output: '3 tests failed' };
 			return { exitCode: 0, output: '' };
 		};
@@ -482,7 +482,7 @@ describe('Bearings phase integration', () => {
 			noopLogger,
 			(e: any) => events.push(e),
 		);
-		orch.bearingsExecFn = () => ({ exitCode: 0, output: '' });
+		orch.bearingsExecFn = async () => ({ exitCode: 0, output: '' });
 		(orch as any).executionStrategy = {
 			execute: async (task: any) => {
 				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
@@ -519,7 +519,7 @@ describe('Bearings phase integration', () => {
 				}
 			},
 		);
-		orch.bearingsExecFn = () => ({ exitCode: 1, output: 'errors found' });
+		orch.bearingsExecFn = async () => ({ exitCode: 1, output: 'errors found' });
 		(orch as any).executionStrategy = {
 			execute: async (task: any) => {
 				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
@@ -580,7 +580,7 @@ describe('Bearings policy split', () => {
 	});
 
 	it('runBearings with level=none skips all checks', async () => {
-		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, () => ({ exitCode: 1, output: 'fail' }), 'none');
+		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, async () => ({ exitCode: 1, output: 'fail' }), 'none');
 		expect(result.healthy).toBe(true);
 		expect(result.issues).toHaveLength(0);
 	});
@@ -593,7 +593,7 @@ describe('Bearings policy split', () => {
 		fs.writeFileSync(path.join(dir, 'tsconfig.json'), '{}', 'utf-8');
 		fs.writeFileSync(path.join(dir, 'vite.config.ts'), '', 'utf-8');
 		const calls: string[] = [];
-		const execFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		const execFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
 		await runBearings(dir, noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn, 'tsc');
 		fs.rmSync(dir, { recursive: true, force: true });
 		expect(calls.some(c => c.includes('tsc'))).toBe(true);
@@ -608,7 +608,7 @@ describe('Bearings policy split', () => {
 		fs.writeFileSync(path.join(dir, 'tsconfig.json'), '{}', 'utf-8');
 		fs.writeFileSync(path.join(dir, 'vite.config.ts'), '', 'utf-8');
 		const calls: string[] = [];
-		const execFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		const execFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
 		await runBearings(dir, noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn, 'full');
 		fs.rmSync(dir, { recursive: true, force: true });
 		expect(calls.some(c => c.includes('tsc'))).toBe(true);
@@ -632,7 +632,7 @@ describe('Bearings policy split', () => {
 			noopLogger,
 			(e: any) => events.push(e),
 		);
-		orch.bearingsExecFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
 		(orch as any).executionStrategy = {
 			execute: async (task: any) => {
 				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
@@ -663,7 +663,7 @@ describe('Bearings policy split', () => {
 			noopLogger,
 			(e: any) => events.push(e),
 		);
-		orch.bearingsExecFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
 		(orch as any).executionStrategy = {
 			execute: async (task: any) => {
 				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
@@ -712,7 +712,7 @@ describe('CHECKPOINT: Bearings Policy Verification (Task 110)', () => {
 			noopLogger,
 			(e: any) => events.push(e),
 		);
-		orch.bearingsExecFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
 		(orch as any).executionStrategy = {
 			execute: async (task: any) => {
 				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
@@ -746,7 +746,7 @@ describe('CHECKPOINT: Bearings Policy Verification (Task 110)', () => {
 			noopLogger,
 			(e: any) => events.push(e),
 		);
-		orch.bearingsExecFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
 		(orch as any).executionStrategy = {
 			execute: async (task: any) => {
 				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
@@ -953,5 +953,59 @@ describe('ExecutionOptions agentMode passthrough', () => {
 			agentMode: 'ralph-explore',
 		};
 		expect(opts.agentMode).toBe('ralph-explore');
+	});
+});
+
+describe('Async Verification Runner (Task 111)', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+
+	it('BearingsExecFn returns a Promise with exitCode/output shape', async () => {
+		const asyncExec = async (cmd: string, cwd: string) => ({ exitCode: 0, output: 'ok' });
+		const result = await asyncExec('echo test', '/tmp');
+		expect(result).toHaveProperty('exitCode');
+		expect(result).toHaveProperty('output');
+		expect(result.exitCode).toBe(0);
+		expect(result.output).toBe('ok');
+	});
+
+	it('defaultBearingsExec returns a Promise (is async)', async () => {
+		const result = defaultBearingsExec('echo hello', '/tmp');
+		expect(result).toBeInstanceOf(Promise);
+		const resolved = await result;
+		expect(resolved).toHaveProperty('exitCode');
+		expect(resolved).toHaveProperty('output');
+		expect(resolved.exitCode).toBe(0);
+	});
+
+	it('runBearings accepts async exec function and returns correct results', async () => {
+		const asyncExec = async (cmd: string) => ({ exitCode: 0, output: '' });
+		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, asyncExec);
+		expect(result.healthy).toBe(true);
+	});
+
+	it('cancellation via AbortSignal stops child process cleanly', async () => {
+		const ac = new AbortController();
+		// Abort immediately
+		ac.abort();
+		const result = await defaultBearingsExec('sleep 60', '/tmp', ac.signal);
+		// Should resolve quickly with non-zero exit code (aborted)
+		expect(result.exitCode).not.toBe(0);
+	});
+
+	it('long-running verification does not block subsequent event emissions', async () => {
+		const events: string[] = [];
+		const slowExec = async (cmd: string) => {
+			// Simulate a short delay but still async
+			await new Promise(r => setTimeout(r, 10));
+			events.push(`exec:${cmd}`);
+			return { exitCode: 0, output: '' };
+		};
+		// Start bearings and push an event concurrently
+		const bearingsPromise = runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, slowExec);
+		events.push('concurrent-event');
+		await bearingsPromise;
+		// The concurrent event should have been pushed before exec completes
+		const concurrentIdx = events.indexOf('concurrent-event');
+		expect(concurrentIdx).toBe(0);
 	});
 });

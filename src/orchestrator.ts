@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { spawn } from 'child_process';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -70,7 +70,7 @@ export function resolveAgentMode(
 	return modeId;
 }
 
-export type BearingsExecFn = (cmd: string, cwd: string) => { exitCode: number; output: string };
+export type BearingsExecFn = (cmd: string, cwd: string, signal?: AbortSignal) => Promise<{ exitCode: number; output: string }>;
 
 export class LinkedCancellationSource {
 	private readonly controller = new AbortController();
@@ -104,13 +104,48 @@ export class LinkedCancellationSource {
 	}
 }
 
-function defaultBearingsExec(cmd: string, cwd: string): { exitCode: number; output: string } {
-	try {
-		const output = execSync(cmd, { cwd, encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
-		return { exitCode: 0, output };
-	} catch (err: any) {
-		return { exitCode: err.status ?? 1, output: (err.stdout ?? '') + (err.stderr ?? '') };
-	}
+export function defaultBearingsExec(cmd: string, cwd: string, signal?: AbortSignal): Promise<{ exitCode: number; output: string }> {
+	return new Promise((resolve) => {
+		if (signal?.aborted) {
+			return resolve({ exitCode: 1, output: 'Aborted before start' });
+		}
+
+		const child = spawn(cmd, { cwd, shell: true, stdio: ['pipe', 'pipe', 'pipe'] });
+		let stdout = '';
+		let stderr = '';
+		let settled = false;
+
+		const onAbort = () => {
+			if (!settled) {
+				settled = true;
+				child.kill('SIGTERM');
+				resolve({ exitCode: 1, output: stdout + stderr + '\nAborted' });
+			}
+		};
+
+		if (signal) {
+			signal.addEventListener('abort', onAbort, { once: true });
+		}
+
+		child.stdout.on('data', (data: Buffer) => { stdout += data.toString(); });
+		child.stderr.on('data', (data: Buffer) => { stderr += data.toString(); });
+
+		child.on('error', (err: Error) => {
+			if (!settled) {
+				settled = true;
+				if (signal) { signal.removeEventListener('abort', onAbort); }
+				resolve({ exitCode: 1, output: err.message });
+			}
+		});
+
+		child.on('close', (code: number | null) => {
+			if (!settled) {
+				settled = true;
+				if (signal) { signal.removeEventListener('abort', onAbort); }
+				resolve({ exitCode: code ?? 1, output: stdout + stderr });
+			}
+		});
+	});
 }
 
 export async function runBearings(
@@ -133,7 +168,7 @@ export async function runBearings(
 	if (shouldRunTsc) {
 		const tsconfigPath = path.join(workspaceRoot, 'tsconfig.json');
 		if (fs.existsSync(tsconfigPath)) {
-			const tscResult = execFn('npx tsc --noEmit', workspaceRoot);
+			const tscResult = await execFn('npx tsc --noEmit', workspaceRoot);
 			if (tscResult.exitCode !== 0) {
 				issues.push(`TypeScript errors: ${tscResult.output.slice(0, 500)}`);
 			}
@@ -147,7 +182,7 @@ export async function runBearings(
 			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.ts'))
 			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.js'));
 		if (hasVitest) {
-			const testResult = execFn('npx vitest run', workspaceRoot);
+			const testResult = await execFn('npx vitest run', workspaceRoot);
 			if (testResult.exitCode !== 0) {
 				issues.push(`Test failures: ${testResult.output.slice(0, 500)}`);
 			}
