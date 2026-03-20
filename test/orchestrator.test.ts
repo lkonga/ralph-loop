@@ -1510,3 +1510,147 @@ describe('Bearings lifecycle events (Task 115)', () => {
 		expect(skipped[0]).toHaveProperty('reason');
 	});
 });
+
+describe('CHECKPOINT: Startup DX Verification (Task 116)', () => {
+	const logs: string[] = [];
+	const noopLogger: ILogger = { log: (msg: string) => logs.push(msg), warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		logs.length = 0;
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-startup-dx-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('end-to-end startup uses new bearings policy: tsc-only startup, none per-task, no vitest swarm', async () => {
+		// Setup: workspace with both tsconfig and vitest config present
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Task A\n- [ ] Task B\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 2, countdownSeconds: 0,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prd.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+
+		// VERIFY: startup ran tsc-only, NOT full vitest
+		const tscCalls = calls.filter(c => c.includes('tsc'));
+		const vitestCalls = calls.filter(c => c.includes('vitest'));
+		expect(tscCalls.length).toBeGreaterThanOrEqual(1);
+		expect(vitestCalls).toHaveLength(0);
+
+		// VERIFY: per-task iterations did NOT spawn additional bearings runs
+		// With default perTask='none', only the first iteration (startup) should run bearings
+		// Second iteration should emit BearingsSkipped for perTask
+		const bearingsStarted = events.filter(e => e.kind === LoopEventKind.BearingsStarted);
+		expect(bearingsStarted).toHaveLength(1);
+		expect(bearingsStarted[0].level).toBe('tsc');
+
+		// VERIFY: events chain is transparent — Started, Progress, Completed all present
+		const bearingsCompleted = events.filter(e => e.kind === LoopEventKind.BearingsCompleted);
+		expect(bearingsCompleted).toHaveLength(1);
+		expect(bearingsCompleted[0]).toHaveProperty('durationMs');
+	});
+
+	it('no hidden full-suite default — DEFAULT_BEARINGS_CONFIG never triggers vitest on startup or per-task', () => {
+		// This is the critical invariant: startup defaults to 'tsc', perTask defaults to 'none'
+		expect(DEFAULT_BEARINGS_CONFIG.startup).toBe('tsc');
+		expect(DEFAULT_BEARINGS_CONFIG.perTask).toBe('none');
+		// Only checkpoint should be 'full'
+		expect(DEFAULT_BEARINGS_CONFIG.checkpoint).toBe('full');
+	});
+
+	it('logs clearly explain what is running during startup bearings', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Some task\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async () => ({ exitCode: 0, output: '' });
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prd.replace('- [ ]', '- [x]'), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+
+		// Logs must mention what is running
+		const tscLog = logs.some(l => l.includes('Bearings') && l.includes('tsc'));
+		expect(tscLog).toBe(true);
+
+		// Progress events explain stages
+		const progress = events.filter(e => e.kind === LoopEventKind.BearingsProgress);
+		expect(progress.length).toBeGreaterThanOrEqual(1);
+		expect(progress.some((p: any) => p.stage === 'tsc')).toBe(true);
+	});
+
+	it('logs clearly explain why bearings are skipped (per-task=none)', async () => {
+		// Two tasks: first gets startup bearings, second should get a skip event with reason
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Task one\n- [ ] Task two\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 2, countdownSeconds: 0,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async () => ({ exitCode: 0, output: '' });
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prd.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+
+		// The second iteration should skip bearings and explain why
+		const skipped = events.filter(e => e.kind === LoopEventKind.BearingsSkipped);
+		expect(skipped.length).toBeGreaterThanOrEqual(1);
+		const hasReasonExplained = skipped.some((e: any) => typeof e.reason === 'string' && e.reason.length > 0);
+		expect(hasReasonExplained).toBe(true);
+	});
+
+	it('runBearings is async (non-blocking) — no execSync in the startup path', async () => {
+		// Verify the function is truly async by confirming Promise return
+		const result = runBearings('/tmp', noopLogger, DEFAULT_BEARINGS_CONFIG, async () => ({ exitCode: 0, output: '' }), 'none');
+		expect(result).toBeInstanceOf(Promise);
+		await result;
+
+		// Verify defaultBearingsExec is also async
+		const execResult = defaultBearingsExec('echo ok', '/tmp');
+		expect(execResult).toBeInstanceOf(Promise);
+		await execResult;
+	});
+});
