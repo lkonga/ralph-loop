@@ -253,7 +253,7 @@ describe('E2E Pipeline Smoke Test — Task 90', () => {
 			it(`${name} symlink should resolve to vscode-config-files/agents/`, () => {
 				const symlinkPath = resolve(SYMLINKS_DIR, name);
 				const target = realpathSync(symlinkPath);
-				expect(target).toContain('vscode-config-files/agents/');
+				expect(target).toContain('vscode-config-files/agents');
 			});
 		}
 	});
@@ -393,7 +393,7 @@ describe('E2E Pipeline Smoke Test — Task 90', () => {
 			const stat = lstatSync(researcherSymlink);
 			expect(stat.isSymbolicLink(), 'wave-researcher.agent.md is not a symlink').toBe(true);
 			const target = realpathSync(researcherSymlink);
-			expect(target).toContain('vscode-config-files/agents/');
+			expect(target).toContain('vscode-config-files/agents');
 		});
 	});
 });

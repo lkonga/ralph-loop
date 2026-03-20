@@ -18,6 +18,7 @@ import { StruggleDetector } from './struggleDetector';
 import {
 	BearingsConfig,
 	BearingsResult,
+	BearingsLevel,
 	DEFAULT_AUTO_DECOMPOSE,
 	DEFAULT_BEARINGS_CONFIG,
 	DEFAULT_CONFIG,
@@ -117,10 +118,19 @@ export async function runBearings(
 	logger: ILogger,
 	config: BearingsConfig = DEFAULT_BEARINGS_CONFIG,
 	execFn: BearingsExecFn = defaultBearingsExec,
+	level?: BearingsLevel,
 ): Promise<BearingsResult> {
+	const effectiveLevel = level ?? 'full';
+	if (effectiveLevel === 'none') {
+		return { healthy: true, issues: [] };
+	}
+
 	const issues: string[] = [];
 
-	if (config.runTsc) {
+	const shouldRunTsc = config.runTsc && (effectiveLevel === 'tsc' || effectiveLevel === 'full');
+	const shouldRunTests = config.runTests && effectiveLevel === 'full';
+
+	if (shouldRunTsc) {
 		const tsconfigPath = path.join(workspaceRoot, 'tsconfig.json');
 		if (fs.existsSync(tsconfigPath)) {
 			const tscResult = execFn('npx tsc --noEmit', workspaceRoot);
@@ -132,7 +142,7 @@ export async function runBearings(
 		}
 	}
 
-	if (config.runTests) {
+	if (shouldRunTests) {
 		const hasVitest = fs.existsSync(path.join(workspaceRoot, 'vite.config.ts'))
 			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.ts'))
 			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.js'));
@@ -489,6 +499,7 @@ export class LoopOrchestrator {
 			const bearingsConfig = this.config.bearings ?? DEFAULT_BEARINGS_CONFIG;
 			let bearingsFixAttempted = false;
 			let skipBearingsOnce = false;
+			let startupBearingsDone = false;
 
 			// Knowledge manager
 			const knowledgeConfig = this.config.knowledge ?? DEFAULT_KNOWLEDGE_CONFIG;
@@ -728,28 +739,36 @@ export class LoopOrchestrator {
 					continue;
 				}
 
-				// Bearings phase: pre-flight health check
+				// Bearings phase: stage-aware pre-flight health check
 				if (bearingsConfig.enabled && !skipBearingsOnce) {
-					const bearingsResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn);
-					yield { kind: LoopEventKind.BearingsChecked, healthy: bearingsResult.healthy, issues: bearingsResult.issues };
-					if (!bearingsResult.healthy) {
-						if (bearingsFixAttempted) {
-							bearingsFixAttempted = false;
-							yield { kind: LoopEventKind.BearingsFailed, issues: bearingsResult.issues };
-							this.pauseRequested = true;
+					const bearingsLevel = !startupBearingsDone
+						? (bearingsConfig.startup ?? 'tsc')
+						: (bearingsConfig.perTask ?? 'none');
+					if (bearingsLevel !== 'none') {
+						const bearingsResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, bearingsLevel);
+						yield { kind: LoopEventKind.BearingsChecked, healthy: bearingsResult.healthy, issues: bearingsResult.issues };
+						if (!bearingsResult.healthy) {
+							if (bearingsFixAttempted) {
+								bearingsFixAttempted = false;
+								yield { kind: LoopEventKind.BearingsFailed, issues: bearingsResult.issues };
+								this.pauseRequested = true;
+								continue;
+							}
+							bearingsFixAttempted = true;
+							skipBearingsOnce = true;
+							const fixLine = '- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing';
+							const fixLineChecked = '- [x] Fix baseline: resolve TypeScript errors and failing tests before continuing';
+							const currentPrd = fs.readFileSync(prdPath, 'utf-8');
+							if (!currentPrd.includes(fixLine) && !currentPrd.includes(fixLineChecked)) {
+								fs.writeFileSync(prdPath, fixLine + '\n' + currentPrd, 'utf-8');
+							}
 							continue;
 						}
-						bearingsFixAttempted = true;
-						skipBearingsOnce = true;
-						const fixLine = '- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing';
-						const fixLineChecked = '- [x] Fix baseline: resolve TypeScript errors and failing tests before continuing';
-						const currentPrd = fs.readFileSync(prdPath, 'utf-8');
-						if (!currentPrd.includes(fixLine) && !currentPrd.includes(fixLineChecked)) {
-							fs.writeFileSync(prdPath, fixLine + '\n' + currentPrd, 'utf-8');
-						}
-						continue;
+						bearingsFixAttempted = false;
 					}
-					bearingsFixAttempted = false;
+					if (!startupBearingsDone) {
+						startupBearingsDone = true;
+					}
 				} else if (skipBearingsOnce) {
 					skipBearingsOnce = false;
 				}
@@ -1360,6 +1379,7 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		autoDecompose: vsConfig.get('autoDecompose', DEFAULT_CONFIG.autoDecompose),
 		knowledge: vsConfig.get('knowledge', DEFAULT_CONFIG.knowledge),
 		contextTrimming: vsConfig.get('contextTrimming', DEFAULT_CONFIG.contextTrimming),
+		bearings: vsConfig.get('bearings', DEFAULT_CONFIG.bearings),
 		cooldownShowDialog: vsConfig.get<boolean>('cooldownShowDialog', DEFAULT_CONFIG.cooldownShowDialog ?? true),
 		agentMode: vsConfig.get<string>('agentMode', DEFAULT_CONFIG.agentMode ?? 'ralph-executor'),
 	};

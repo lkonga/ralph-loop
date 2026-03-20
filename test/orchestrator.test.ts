@@ -11,6 +11,7 @@ import { estimatePromptTokens } from '../src/prompt';
 import {
 	DEFAULT_CONFIG,
 	DEFAULT_INACTIVITY_CONFIG,
+	DEFAULT_BEARINGS_CONFIG,
 } from '../src/types';
 import type {
 	IRalphHookService,
@@ -553,6 +554,128 @@ describe('Bearings phase integration', () => {
 		expect(bearingsChecked).toHaveLength(0);
 		const bearingsFailed = events.filter(e => e.kind === LoopEventKind.BearingsFailed);
 		expect(bearingsFailed).toHaveLength(0);
+	});
+});
+
+describe('Bearings policy split', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		const os = require('os');
+		const fs = require('fs');
+		const path = require('path');
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-policy-'));
+	});
+
+	afterEach(() => {
+		const fs = require('fs');
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('DEFAULT_BEARINGS_CONFIG resolves to startup=tsc, perTask=none, checkpoint=full', () => {
+		expect(DEFAULT_BEARINGS_CONFIG.startup).toBe('tsc');
+		expect(DEFAULT_BEARINGS_CONFIG.perTask).toBe('none');
+		expect(DEFAULT_BEARINGS_CONFIG.checkpoint).toBe('full');
+	});
+
+	it('runBearings with level=none skips all checks', async () => {
+		const result = await runBearings('/tmp', noopLogger, { enabled: true, runTsc: true, runTests: true }, () => ({ exitCode: 1, output: 'fail' }), 'none');
+		expect(result.healthy).toBe(true);
+		expect(result.issues).toHaveLength(0);
+	});
+
+	it('runBearings with level=tsc runs only tsc, not vitest', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const os = require('os');
+		const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bp-tsc-'));
+		fs.writeFileSync(path.join(dir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(dir, 'vite.config.ts'), '', 'utf-8');
+		const calls: string[] = [];
+		const execFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		await runBearings(dir, noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn, 'tsc');
+		fs.rmSync(dir, { recursive: true, force: true });
+		expect(calls.some(c => c.includes('tsc'))).toBe(true);
+		expect(calls.some(c => c.includes('vitest'))).toBe(false);
+	});
+
+	it('runBearings with level=full runs both tsc and vitest', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const os = require('os');
+		const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bp-full-'));
+		fs.writeFileSync(path.join(dir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(dir, 'vite.config.ts'), '', 'utf-8');
+		const calls: string[] = [];
+		const execFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		await runBearings(dir, noopLogger, { enabled: true, runTsc: true, runTests: true }, execFn, 'full');
+		fs.rmSync(dir, { recursive: true, force: true });
+		expect(calls.some(c => c.includes('tsc'))).toBe(true);
+		expect(calls.some(c => c.includes('vitest'))).toBe(true);
+	});
+
+	it('task start no longer implies full vitest by default (perTask=none)', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: true, startup: 'tsc', perTask: 'none', checkpoint: 'full' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+		// After startup tsc, per-task should NOT run vitest
+		const vitestCalls = calls.filter(c => c.includes('vitest'));
+		expect(vitestCalls).toHaveLength(0);
+	});
+
+	it('existing behavior preserved when full is explicitly chosen for all stages', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Test task\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: true, startup: 'full', perTask: 'full', checkpoint: 'full' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+		const tscCalls = calls.filter(c => c.includes('tsc'));
+		const vitestCalls = calls.filter(c => c.includes('vitest'));
+		expect(tscCalls.length).toBeGreaterThanOrEqual(1);
+		expect(vitestCalls.length).toBeGreaterThanOrEqual(1);
 	});
 });
 

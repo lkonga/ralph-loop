@@ -302,16 +302,24 @@ export interface StruggleDetectionConfig {
 }
 
 // --- Bearings (pre-flight health check) ---
+export type BearingsLevel = 'none' | 'tsc' | 'targeted-tests' | 'full';
+
 export interface BearingsConfig {
 	enabled: boolean;
 	runTsc: boolean;
 	runTests: boolean;
+	startup?: BearingsLevel;
+	perTask?: BearingsLevel;
+	checkpoint?: BearingsLevel;
 }
 
 export const DEFAULT_BEARINGS_CONFIG: BearingsConfig = {
 	enabled: true,
 	runTsc: true,
 	runTests: true,
+	startup: 'tsc',
+	perTask: 'none',
+	checkpoint: 'full',
 };
 
 export interface BearingsResult {

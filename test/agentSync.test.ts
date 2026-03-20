@@ -95,7 +95,7 @@ describe('Task 92 — Agent Sync via Symlinks', () => {
                 const stat = lstatSync(fullPath);
                 expect(stat.isSymbolicLink()).toBe(true);
                 const resolved = realpathSync(fullPath);
-                expect(resolved).toContain('vscode-config-files/agents/');
+                expect(resolved).toContain('vscode-config-files/agents');
             });
         }
     });

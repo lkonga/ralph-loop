@@ -499,3 +499,35 @@
 - [x] **Task 107 — Verify [CHECKPOINT] in description does not flag checkpoint**: This task mentions [CHECKPOINT] in its title on purpose. If the parser incorrectly sets `checkpoint: true` on it, Task 104 failed. Write a test in `test/prd.test.ts` that parses a PRD line like `- [ ] **Task N — Verify [CHECKPOINT] in description**:` and asserts it is parsed with `checkpoint` being `undefined` or falsy — not `true`. Run `npx vitest run` — all must pass.
 
 - [x] **Task 108 — Verify both [DECOMPOSED] and [CHECKPOINT] coexist in description safely**: A task referencing both tags in description text. Neither should trigger annotation behavior. Write a test in `test/prd.test.ts` that parses `- [ ] **Task N — mentions [DECOMPOSED] and [CHECKPOINT] in text**:` and asserts it appears as a normal pending task with `checkpoint` not set. Run `npx vitest run` — all must pass.
+
+---
+
+## Phase 16 — Startup Latency & Preflight Transparency
+
+> Specs: `research/16-phase16-refined-tasks.md` | Research: `research/15-phase16-deep-research.md`
+> **TDD is MANDATORY** — every implementation task must have tests written before or alongside the implementation. No task may be marked complete without passing tests.
+> **Problem**: Ralph currently runs heavyweight synchronous validation (`npx tsc --noEmit` + `npx vitest run`) in the VS Code extension host before ordinary task start, causing multi-minute silent startup stalls, `node (vitest …)` worker swarms, and poor system stability.
+
+### 16a — Bearings Cost Control
+
+- [ ] **Task 109 — Bearings Policy Split**: Replace the current boolean bearings behavior with stage-aware policy so Ralph no longer runs full `tsc` + full `vitest` as an opaque default before every task. Default to `startup: tsc`, `perTask: none`, `checkpoint: full` while keeping stronger validation available where it matters. → Spec: `research/16-phase16-refined-tasks.md` L30-L52
+
+- [ ] **Task 110 — CHECKPOINT: Bearings Policy Verification**: Verify startup no longer triggers full-suite validation by default and that checkpoints still run the configured stronger validation path. → Spec: `research/16-phase16-refined-tasks.md` L54-L69
+
+### 16b — Non-Blocking Verification
+
+- [ ] **Task 111 — Async Verification Runner**: Replace synchronous `execSync()` bearings execution with async process spawning/streaming so the VS Code extension host stays responsive while preflight validation runs. → Spec: `research/16-phase16-refined-tasks.md` L71-L89
+
+- [ ] **Task 112 — CHECKPOINT: Non-Blocking Verification Verification**: Prove the extension host remains responsive during startup verification and that users see progress before verification completes. → Spec: `research/16-phase16-refined-tasks.md` L91-L106
+
+### 16c — Cache & Dirty-Aware Skip
+
+- [ ] **Task 113 — Verification Cache & Dirty-Aware Skip**: Add cached last-green verification metadata and dirty-aware invalidation so expensive validation is skipped when no relevant files/config changed. → Spec: `research/16-phase16-refined-tasks.md` L108-L125
+
+- [ ] **Task 114 — CHECKPOINT: Cache / Dirty-Skip Verification**: Verify repeated task starts stay cheap on an unchanged workspace and that dirty conditions correctly invalidate the cache. → Spec: `research/16-phase16-refined-tasks.md` L127-L142
+
+### 16d — Startup UX Transparency
+
+- [ ] **Task 115 — Startup UX Transparency**: Add explicit bearings lifecycle events/status (`BearingsStarted`, `BearingsProgress`, `BearingsCompleted`, `BearingsSkipped`) and surface them immediately in logs/UI so startup is visible, understandable, and cancellable rather than silently stalling. → Spec: `research/16-phase16-refined-tasks.md` L144-L166
+
+- [ ] **Task 116 — CHECKPOINT: Startup DX Verification**: Final gate proving Ralph startup is transparent, bounded, and stable: no silent 1–2 minute wait, no default full `vitest` worker swarm on ordinary task start, and clear logs explaining what is running or why it was skipped. → Spec: `research/16-phase16-refined-tasks.md` L168-L184

@@ -3,6 +3,7 @@ import { HookBridgeDisposable, registerHookBridge, startChatSendWatcher } from '
 import { LoopOrchestrator, loadConfig } from './orchestrator';
 import { SessionPersistence } from './sessionPersistence';
 import { ShellHookProvider } from './shellHookProvider';
+import { disposeStatusBar, updateStatusBar } from './statusBar';
 import { fireStateChangeNotification } from './stateNotification';
 import { ChatSendRequest, IRalphHookService, LoopEventKind, LoopState, createOutputLogger } from './types';
 
@@ -124,8 +125,8 @@ export function activate(context: vscode.ExtensionContext): void {
 				switch (event.kind) {
 					case LoopEventKind.TaskStarted:
 						logger.log(`▶ [iter ${event.iteration}] Starting: ${event.task.description}`);
-						vscode.window.setStatusBarMessage(`$(sync~spin) Ralph: ${event.task.description}`, 5000);
 						fireStateChangeNotification(LoopState.Running, event.task.taskId);
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.CopilotTriggered:
 						logger.log(`⚡ Copilot triggered via ${event.method}`);
@@ -136,6 +137,7 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.TaskCompleted:
 						logger.log(`✔ Completed in ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
 						fireStateChangeNotification(LoopState.Running, event.task.taskId);
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.TaskTimedOut:
 						logger.warn(`⏰ Timed out after ${Math.round(event.durationMs / 1000)}s: ${event.task.description}`);
@@ -149,16 +151,19 @@ export function activate(context: vscode.ExtensionContext): void {
 						break;
 					case LoopEventKind.Countdown:
 						vscode.window.setStatusBarMessage(`$(clock) Ralph: Next task in ${event.secondsLeft}s`, 1100);
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.AllDone:
 						logger.log(`🏁 All ${event.total} tasks completed`);
 						vscode.window.showInformationMessage(`Ralph Loop: All ${event.total} tasks completed!`);
 						fireStateChangeNotification(LoopState.Idle, '');
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.MaxIterations:
 						logger.warn(`🛑 Hit max iterations: ${event.limit}`);
 						vscode.window.showWarningMessage(`Ralph Loop: Reached ${event.limit} iteration limit`);
 						fireStateChangeNotification(LoopState.Idle, '');
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.IterationLimitExpanded:
 						logger.log(`📈 Iteration limit expanded: ${event.oldLimit} → ${event.newLimit}`);
@@ -170,11 +175,13 @@ export function activate(context: vscode.ExtensionContext): void {
 						logger.log('⏸ Loop yielded gracefully');
 						vscode.window.showInformationMessage('Ralph Loop: Yielded gracefully after task completion');
 						fireStateChangeNotification(LoopState.Idle, '');
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.SessionChanged:
 						logger.warn(`🔀 Chat session changed: ${event.oldSessionId} → ${event.newSessionId}`);
 						vscode.window.showWarningMessage('Ralph Loop: Chat session changed — loop paused');
 						fireStateChangeNotification(LoopState.Paused, '');
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.CircuitBreakerTripped:
 						logger.warn(`⚠ Circuit breaker tripped: ${event.reason} (action: ${event.action})`);
@@ -267,6 +274,7 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.Stopped:
 						logger.log('⏹ Loop stopped');
 						fireStateChangeNotification(LoopState.Idle, '');
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.PrdValidationFailed: {
 						const msgs = event.errors.map(e => `  ${e.level}: ${e.message}`).join('\n');
@@ -415,6 +423,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
 export function deactivate(): void {
 	orchestrator?.stop();
+	disposeStatusBar();
 	hookBridgeDisposable?.dispose();
 	hookBridgeDisposable = undefined;
 	sessionTrackingDisposable?.dispose();

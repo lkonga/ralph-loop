@@ -20,6 +20,8 @@
 | 12 | [detailed-source-analysis](12-detailed-source-analysis.md) | research | — | Per-repository implementation specifics |
 | 13 | [phase9-deep-research](13-phase9-deep-research.md) | research | ✓ | Phase 9 research: context management, knowledge harvest, thrashing detection, plan regeneration |
 | 14 | [phase9-refined-tasks](14-phase9-refined-tasks.md) | spec | ✓ | Phase 9 task specifications (Tasks 57-68): interfaces, config schemas, test expectations |
+| 15 | [phase16-deep-research](15-phase16-deep-research.md) | research | ✓ | Phase 16 research: startup latency, synchronous bearings bottleneck, async verification, cache/dirty-skip, and startup UX transparency |
+| 16 | [phase16-refined-tasks](16-phase16-refined-tasks.md) | spec | ✓ | Phase 16 task specifications (Tasks 109-116): bearings policy split, async verification runner, verification cache, and startup DX progress events |
 
 ## Internal Files (Not Part of PD Chain)
 
