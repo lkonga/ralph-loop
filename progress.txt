@@ -697,3 +697,4 @@ Bearings Policy Split: Replaced boolean bearings with stage-aware policy. Added 
 [2026-03-20T05:32:00.060Z] [c8573b6b-d0d4-4218-b374-734ae6182fc9] [Task-123] Task completed: **Task 109 — Bearings Policy Split**: Replace the current boolean bearings behavior with stage-aware policy so Ralph no longer runs full `tsc` + full `vitest` as an opaque default before every task. Default to `startup: tsc`, `perTask: none`, `checkpoint: full` while keeping stronger validation available where it matters. → Spec: `research/16-phase16-refined-tasks.md` L30-L52 (234s)
 
 ### Task 122 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
+[2026-03-20T05:32:00.199Z] [c8573b6b-d0d4-4218-b374-734ae6182fc9] Committed: 08c6ce1e516bd7474a2c4a6cf53f55748a143af8
