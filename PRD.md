@@ -510,7 +510,7 @@
 
 ### 16a — Bearings Cost Control
 
-- [ ] **Task 109 — Bearings Policy Split**: Replace the current boolean bearings behavior with stage-aware policy so Ralph no longer runs full `tsc` + full `vitest` as an opaque default before every task. Default to `startup: tsc`, `perTask: none`, `checkpoint: full` while keeping stronger validation available where it matters. → Spec: `research/16-phase16-refined-tasks.md` L30-L52
+- [x] **Task 109 — Bearings Policy Split**: Replace the current boolean bearings behavior with stage-aware policy so Ralph no longer runs full `tsc` + full `vitest` as an opaque default before every task. Default to `startup: tsc`, `perTask: none`, `checkpoint: full` while keeping stronger validation available where it matters. → Spec: `research/16-phase16-refined-tasks.md` L30-L52
 
 - [ ] **Task 110 — CHECKPOINT: Bearings Policy Verification**: Verify startup no longer triggers full-suite validation by default and that checkpoints still run the configured stronger validation path. → Spec: `research/16-phase16-refined-tasks.md` L54-L69
 
