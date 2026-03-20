@@ -715,3 +715,10 @@ Async Verification Runner: Replaced synchronous execSync()-based defaultBearings
 ### Task 124 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
 [2026-03-20T05:39:58.443Z] [869098f9-d53f-43b2-accb-293489754039] Committed: da80101e92c6d915fb94de57c62849b9ded8ebf3
 [2026-03-20T05:40:14.325Z] [ad4c8a17-f198-481a-972e-4a296730faaa] [Task-126] Task started: **Task 112 — CHECKPOINT: Non-Blocking Verification Verification**: Prove the extension host remains responsive during startup verification and that users see progress before verification completes. → Spec: `research/16-phase16-refined-tasks.md` L91-L106
+
+### Task 126 (Task 112) | Files: [src/orchestrator.ts, test/orchestrator.test.ts] | Lines: +97/-2 | Status: pass
+CHECKPOINT: Non-Blocking Verification Verification. Added progress logging to runBearings — logger.log messages emitted before each tsc/vitest exec call so users see progress before verification completes. Wrote 5 new tests in test/orchestrator.test.ts: (1) logger receives progress messages before runBearings resolves, (2) no execSync in orchestrator.ts source, (3) BearingsExecFn returns Promise, (4) event loop remains unblocked during bearings execution (setInterval ticks during async exec), (5) progress log emitted before tsc exec in timeline ordering. Verified: no execSync anywhere in orchestrator.ts. tsc clean, all 886 tests pass.
+[2026-03-20T05:42:00.000Z] [ad4c8a17-f198-481a-972e-4a296730faaa] [Task-126] Task completed: **Task 112 — CHECKPOINT: Non-Blocking Verification Verification** (108s)
+[2026-03-20T05:42:23.448Z] [ad4c8a17-f198-481a-972e-4a296730faaa] [Task-126] Task completed: **Task 112 — CHECKPOINT: Non-Blocking Verification Verification**: Prove the extension host remains responsive during startup verification and that users see progress before verification completes. → Spec: `research/16-phase16-refined-tasks.md` L91-L106 (129s)
+
+### Task 125 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
