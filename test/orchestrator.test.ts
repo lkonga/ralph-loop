@@ -679,6 +679,96 @@ describe('Bearings policy split', () => {
 	});
 });
 
+describe('CHECKPOINT: Bearings Policy Verification (Task 110)', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		const os = require('os');
+		const fs = require('fs');
+		const path = require('path');
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-bearings-checkpoint-'));
+	});
+
+	afterEach(() => {
+		const fs = require('fs');
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('startup path emits no full-suite trigger under default policy (only tsc, no vitest)', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] First task\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		await orch.start();
+		// Startup default is 'tsc' — vitest must NOT be called
+		const vitestCalls = calls.filter(c => c.includes('vitest'));
+		const tscCalls = calls.filter(c => c.includes('tsc'));
+		expect(vitestCalls).toHaveLength(0);
+		expect(tscCalls.length).toBeGreaterThanOrEqual(1);
+	});
+
+	it('checkpoint path still triggers configured validation (bearings at checkpoint level)', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		// PRD with a [CHECKPOINT] task followed by a normal task
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] [CHECKPOINT] Verify things\n- [ ] Normal task\n', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'vite.config.ts'), '', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 2, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: true, startup: 'tsc', perTask: 'none', checkpoint: 'full' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		// Auto-resume checkpoint after pause
+		const origDelay = (orch as any).delay.bind(orch);
+		(orch as any).delay = async (ms: number) => {
+			(orch as any).pauseRequested = false;
+		};
+		await orch.start();
+		// Checkpoint task should have triggered bearings at 'full' level — vitest must appear
+		const vitestCalls = calls.filter(c => c.includes('vitest'));
+		expect(vitestCalls.length).toBeGreaterThanOrEqual(1);
+		// BearingsChecked event should have been emitted for checkpoint
+		const bearingsChecked = events.filter((e: any) => e.kind === LoopEventKind.BearingsChecked);
+		expect(bearingsChecked.length).toBeGreaterThanOrEqual(1);
+	});
+});
+
 describe('LinkedCancellationSource', () => {
 	it('aborts when any source signal aborts', () => {
 		const ac1 = new AbortController();

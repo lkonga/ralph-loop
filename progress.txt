@@ -698,3 +698,4 @@ Bearings Policy Split: Replaced boolean bearings with stage-aware policy. Added 
 
 ### Task 122 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
 [2026-03-20T05:32:00.199Z] [c8573b6b-d0d4-4218-b374-734ae6182fc9] Committed: 08c6ce1e516bd7474a2c4a6cf53f55748a143af8
+[2026-03-20T05:32:16.354Z] [c06e099f-9220-4de2-9fda-8688f3d25461] [Task-124] Task started: **Task 110 — CHECKPOINT: Bearings Policy Verification**: Verify startup no longer triggers full-suite validation by default and that checkpoints still run the configured stronger validation path. → Spec: `research/16-phase16-refined-tasks.md` L54-L69

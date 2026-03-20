@@ -712,9 +712,25 @@ export class LoopOrchestrator {
 					continue;
 				}
 
-				// DSL checkpoint gate: pause immediately for human review, no agent execution
+				// DSL checkpoint gate: run checkpoint-level bearings then pause for human review
 				if (task.checkpoint) {
 					const checkpointInvocationId = crypto.randomUUID();
+					// Run bearings at checkpoint level before pausing
+					if (bearingsConfig.enabled) {
+						const checkpointLevel = bearingsConfig.checkpoint ?? 'full';
+						if (checkpointLevel !== 'none') {
+							const cbResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, checkpointLevel);
+							yield { kind: LoopEventKind.BearingsChecked, healthy: cbResult.healthy, issues: cbResult.issues };
+							if (!cbResult.healthy) {
+								yield { kind: LoopEventKind.BearingsFailed, issues: cbResult.issues };
+								this.pauseRequested = true;
+								continue;
+							}
+						}
+						if (!startupBearingsDone) {
+							startupBearingsDone = true;
+						}
+					}
 					yield {
 						kind: LoopEventKind.HumanCheckpointRequested,
 						task,
