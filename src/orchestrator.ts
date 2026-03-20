@@ -15,6 +15,7 @@ import { SessionPersistence } from './sessionPersistence';
 import { AutoDecomposer, StagnationDetector } from './stagnationDetector';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
 import { StruggleDetector } from './struggleDetector';
+import { VerificationCache } from './verificationCache';
 import {
 	BearingsConfig,
 	BearingsResult,
@@ -537,6 +538,7 @@ export class LoopOrchestrator {
 			let bearingsFixAttempted = false;
 			let skipBearingsOnce = false;
 			let startupBearingsDone = false;
+			const verificationCache = new VerificationCache();
 
 			// Knowledge manager
 			const knowledgeConfig = this.config.knowledge ?? DEFAULT_KNOWLEDGE_CONFIG;
@@ -756,12 +758,32 @@ export class LoopOrchestrator {
 					if (bearingsConfig.enabled) {
 						const checkpointLevel = bearingsConfig.checkpoint ?? 'full';
 						if (checkpointLevel !== 'none') {
-							const cbResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, checkpointLevel);
-							yield { kind: LoopEventKind.BearingsChecked, healthy: cbResult.healthy, issues: cbResult.issues };
-							if (!cbResult.healthy) {
-								yield { kind: LoopEventKind.BearingsFailed, issues: cbResult.issues };
-								this.pauseRequested = true;
-								continue;
+							const branch = VerificationCache.getGitBranch(this.config.workspaceRoot);
+							const treeHash = VerificationCache.getGitTreeHash(this.config.workspaceRoot);
+							const fileHashes = VerificationCache.computeFileHashes(this.config.workspaceRoot);
+							const cacheHit = verificationCache.isValid(this.config.workspaceRoot, branch, treeHash, checkpointLevel, fileHashes);
+							if (cacheHit) {
+								this.logger.log('Bearings (checkpoint): cache hit — skipping verification');
+								yield { kind: LoopEventKind.BearingsChecked, healthy: true, issues: [] };
+							} else {
+								const cbResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, checkpointLevel);
+								yield { kind: LoopEventKind.BearingsChecked, healthy: cbResult.healthy, issues: cbResult.issues };
+								if (cbResult.healthy) {
+									verificationCache.save(this.config.workspaceRoot, {
+										timestamp: Date.now(),
+										branch,
+										treeHash,
+										level: checkpointLevel,
+										healthy: true,
+										fileHashes,
+									});
+								}
+								if (!cbResult.healthy) {
+									verificationCache.clear(this.config.workspaceRoot);
+									yield { kind: LoopEventKind.BearingsFailed, issues: cbResult.issues };
+									this.pauseRequested = true;
+									continue;
+								}
 							}
 						}
 						if (!startupBearingsDone) {
@@ -798,24 +820,44 @@ export class LoopOrchestrator {
 						? (bearingsConfig.startup ?? 'tsc')
 						: (bearingsConfig.perTask ?? 'none');
 					if (bearingsLevel !== 'none') {
-						const bearingsResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, bearingsLevel);
-						yield { kind: LoopEventKind.BearingsChecked, healthy: bearingsResult.healthy, issues: bearingsResult.issues };
-						if (!bearingsResult.healthy) {
-							if (bearingsFixAttempted) {
-								bearingsFixAttempted = false;
-								yield { kind: LoopEventKind.BearingsFailed, issues: bearingsResult.issues };
-								this.pauseRequested = true;
+						const branch = VerificationCache.getGitBranch(this.config.workspaceRoot);
+						const treeHash = VerificationCache.getGitTreeHash(this.config.workspaceRoot);
+						const fileHashes = VerificationCache.computeFileHashes(this.config.workspaceRoot);
+						const cacheHit = verificationCache.isValid(this.config.workspaceRoot, branch, treeHash, bearingsLevel, fileHashes);
+						if (cacheHit) {
+							this.logger.log('Bearings: cache hit — skipping verification (no relevant changes)');
+							yield { kind: LoopEventKind.BearingsChecked, healthy: true, issues: [] };
+						} else {
+							const bearingsResult = await runBearings(this.config.workspaceRoot, this.logger, bearingsConfig, this.bearingsExecFn, bearingsLevel);
+							yield { kind: LoopEventKind.BearingsChecked, healthy: bearingsResult.healthy, issues: bearingsResult.issues };
+							if (bearingsResult.healthy) {
+								verificationCache.save(this.config.workspaceRoot, {
+									timestamp: Date.now(),
+									branch,
+									treeHash,
+									level: bearingsLevel,
+									healthy: true,
+									fileHashes,
+								});
+							}
+							if (!bearingsResult.healthy) {
+								verificationCache.clear(this.config.workspaceRoot);
+								if (bearingsFixAttempted) {
+									bearingsFixAttempted = false;
+									yield { kind: LoopEventKind.BearingsFailed, issues: bearingsResult.issues };
+									this.pauseRequested = true;
+									continue;
+								}
+								bearingsFixAttempted = true;
+								skipBearingsOnce = true;
+								const fixLine = '- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing';
+								const fixLineChecked = '- [x] Fix baseline: resolve TypeScript errors and failing tests before continuing';
+								const currentPrd = fs.readFileSync(prdPath, 'utf-8');
+								if (!currentPrd.includes(fixLine) && !currentPrd.includes(fixLineChecked)) {
+									fs.writeFileSync(prdPath, fixLine + '\n' + currentPrd, 'utf-8');
+								}
 								continue;
 							}
-							bearingsFixAttempted = true;
-							skipBearingsOnce = true;
-							const fixLine = '- [ ] Fix baseline: resolve TypeScript errors and failing tests before continuing';
-							const fixLineChecked = '- [x] Fix baseline: resolve TypeScript errors and failing tests before continuing';
-							const currentPrd = fs.readFileSync(prdPath, 'utf-8');
-							if (!currentPrd.includes(fixLine) && !currentPrd.includes(fixLineChecked)) {
-								fs.writeFileSync(prdPath, fixLine + '\n' + currentPrd, 'utf-8');
-							}
-							continue;
 						}
 						bearingsFixAttempted = false;
 					}

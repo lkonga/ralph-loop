@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import {
 	shouldContinueLoop,
 	shouldNudge,
@@ -8,6 +11,7 @@ import {
 import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode, defaultBearingsExec } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
 import { estimatePromptTokens } from '../src/prompt';
+import { VerificationCache } from '../src/verificationCache';
 import {
 	DEFAULT_CONFIG,
 	DEFAULT_INACTIVITY_CONFIG,
@@ -1111,5 +1115,145 @@ describe('CHECKPOINT: Non-Blocking Verification (Task 112)', () => {
 		const execIdx = timeline.findIndex(e => e.startsWith('exec:'));
 		expect(logIdx).toBeGreaterThanOrEqual(0);
 		expect(logIdx).toBeLessThan(execIdx);
+	});
+});
+
+describe('Verification Cache & Dirty-Aware Skip (Task 113)', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		const os = require('os');
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-vcache-orch-'));
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'package.json'), '{"name":"test"}', 'utf-8');
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('cache hit skips rerun when inputs unchanged', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Task A\n', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 2, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: false, startup: 'tsc', perTask: 'tsc', checkpoint: 'full' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+
+		// Pre-seed the cache with a healthy result matching current workspace state
+		const cache = new VerificationCache();
+		const branch = VerificationCache.getGitBranch(tmpDir);
+		const treeHash = VerificationCache.getGitTreeHash(tmpDir);
+		const fileHashes = VerificationCache.computeFileHashes(tmpDir);
+		cache.save(tmpDir, {
+			timestamp: Date.now(),
+			branch,
+			treeHash,
+			level: 'tsc',
+			healthy: true,
+			fileHashes,
+		});
+
+		await orch.start();
+		// Startup bearings should be skipped (cache hit) — no tsc calls at startup
+		const bearingsChecked = events.filter((e: any) => e.kind === LoopEventKind.BearingsChecked);
+		expect(bearingsChecked.length).toBeGreaterThanOrEqual(1);
+		expect(bearingsChecked[0].healthy).toBe(true);
+		// With cache hit, tsc should NOT have been called for the first iteration
+		expect(calls.filter(c => c.includes('tsc')).length).toBe(0);
+	});
+
+	it('cache miss reruns when relevant files/config change', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Task B\n', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: false, startup: 'tsc', perTask: 'none', checkpoint: 'full' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+
+		// Pre-seed cache with STALE file hashes (simulating a file change)
+		const cache = new VerificationCache();
+		const branch = VerificationCache.getGitBranch(tmpDir);
+		const treeHash = VerificationCache.getGitTreeHash(tmpDir);
+		cache.save(tmpDir, {
+			timestamp: Date.now(),
+			branch,
+			treeHash,
+			level: 'tsc',
+			healthy: true,
+			fileHashes: { 'package.json': 'stale-hash' },
+		});
+
+		await orch.start();
+		// Should have actually run tsc since cache was invalid
+		expect(calls.some(c => c.includes('tsc'))).toBe(true);
+	});
+
+	it('cache invalidates on branch/tree change', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Task C\n', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: false, startup: 'tsc', perTask: 'none', checkpoint: 'full' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+
+		// Pre-seed cache with a different branch
+		const cache = new VerificationCache();
+		const fileHashes = VerificationCache.computeFileHashes(tmpDir);
+		cache.save(tmpDir, {
+			timestamp: Date.now(),
+			branch: 'totally-different-branch',
+			treeHash: 'abc123',
+			level: 'tsc',
+			healthy: true,
+			fileHashes,
+		});
+
+		await orch.start();
+		// Should have actually run tsc since branch doesn't match
+		expect(calls.some(c => c.includes('tsc'))).toBe(true);
 	});
 });
