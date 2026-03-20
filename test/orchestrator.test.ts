@@ -1009,3 +1009,107 @@ describe('Async Verification Runner (Task 111)', () => {
 		expect(concurrentIdx).toBe(0);
 	});
 });
+
+describe('CHECKPOINT: Non-Blocking Verification (Task 112)', () => {
+	const logMessages: string[] = [];
+	const capturingLogger = {
+		log: (msg: string) => { logMessages.push(msg); },
+		warn: (msg: string) => { logMessages.push(`WARN:${msg}`); },
+		error: (msg: string) => { logMessages.push(`ERROR:${msg}`); },
+	};
+
+	beforeEach(() => { logMessages.length = 0; });
+
+	it('logger receives progress messages BEFORE runBearings resolves', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const os = require('os');
+		const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-nb-'));
+		fs.writeFileSync(path.join(dir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(dir, 'vite.config.ts'), '', 'utf-8');
+
+		let execCallCount = 0;
+		const slowExec = async (cmd: string) => {
+			execCallCount++;
+			await new Promise(r => setTimeout(r, 5));
+			return { exitCode: 0, output: '' };
+		};
+
+		const logsBefore = logMessages.length;
+		await runBearings(dir, capturingLogger, { enabled: true, runTsc: true, runTests: true }, slowExec, 'full');
+		fs.rmSync(dir, { recursive: true, force: true });
+
+		// Progress logs must have been emitted during the run
+		const progressLogs = logMessages.filter(m => m.includes('Bearings'));
+		expect(progressLogs.length).toBeGreaterThanOrEqual(2); // at least tsc-start + tests-start
+	});
+
+	it('no execSync import or usage in orchestrator.ts startup path', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const orchestratorSource = fs.readFileSync(
+			path.join(__dirname, '..', 'src', 'orchestrator.ts'), 'utf-8'
+		);
+		// Must not contain execSync anywhere
+		expect(orchestratorSource).not.toContain('execSync');
+	});
+
+	it('BearingsExecFn signature requires Promise return (async)', () => {
+		// Verify the type at runtime: a sync function returning plain object
+		// should still work via async wrapper, but the actual defaultBearingsExec
+		// must return a Promise
+		const result = defaultBearingsExec('echo ok', '/tmp');
+		expect(result).toBeInstanceOf(Promise);
+	});
+
+	it('event loop remains unblocked during bearings execution', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const os = require('os');
+		const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-nb3-'));
+		fs.writeFileSync(path.join(dir, 'tsconfig.json'), '{}', 'utf-8');
+
+		let tickCount = 0;
+		const tickInterval = setInterval(() => { tickCount++; }, 5);
+
+		const slowExec = async (cmd: string) => {
+			await new Promise(r => setTimeout(r, 30));
+			return { exitCode: 0, output: '' };
+		};
+
+		await runBearings(dir, capturingLogger, { enabled: true, runTsc: true, runTests: true }, slowExec, 'tsc');
+		clearInterval(tickInterval);
+		fs.rmSync(dir, { recursive: true, force: true });
+
+		// If the event loop were blocked, tickCount would be 0
+		expect(tickCount).toBeGreaterThan(0);
+	});
+
+	it('progress log emitted before tsc exec completes', async () => {
+		const fs = require('fs');
+		const path = require('path');
+		const os = require('os');
+		const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-nb2-'));
+		fs.writeFileSync(path.join(dir, 'tsconfig.json'), '{}', 'utf-8');
+
+		const timeline: string[] = [];
+		const timelineLogger = {
+			log: (msg: string) => { timeline.push(`log:${msg}`); },
+			warn: () => {},
+			error: () => {},
+		};
+		const execFn = async (cmd: string) => {
+			timeline.push(`exec:${cmd}`);
+			return { exitCode: 0, output: '' };
+		};
+
+		await runBearings(dir, timelineLogger, { enabled: true, runTsc: true, runTests: false }, execFn, 'tsc');
+		fs.rmSync(dir, { recursive: true, force: true });
+
+		// A log entry about tsc should appear before the exec call
+		const logIdx = timeline.findIndex(e => e.startsWith('log:') && e.includes('tsc'));
+		const execIdx = timeline.findIndex(e => e.startsWith('exec:'));
+		expect(logIdx).toBeGreaterThanOrEqual(0);
+		expect(logIdx).toBeLessThan(execIdx);
+	});
+});

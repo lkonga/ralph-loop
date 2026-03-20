@@ -714,3 +714,4 @@ Async Verification Runner: Replaced synchronous execSync()-based defaultBearings
 
 ### Task 124 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
 [2026-03-20T05:39:58.443Z] [869098f9-d53f-43b2-accb-293489754039] Committed: da80101e92c6d915fb94de57c62849b9ded8ebf3
+[2026-03-20T05:40:14.325Z] [ad4c8a17-f198-481a-972e-4a296730faaa] [Task-126] Task started: **Task 112 — CHECKPOINT: Non-Blocking Verification Verification**: Prove the extension host remains responsive during startup verification and that users see progress before verification completes. → Spec: `research/16-phase16-refined-tasks.md` L91-L106

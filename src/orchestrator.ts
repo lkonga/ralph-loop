@@ -168,6 +168,7 @@ export async function runBearings(
 	if (shouldRunTsc) {
 		const tsconfigPath = path.join(workspaceRoot, 'tsconfig.json');
 		if (fs.existsSync(tsconfigPath)) {
+			logger.log('Bearings: running tsc --noEmit...');
 			const tscResult = await execFn('npx tsc --noEmit', workspaceRoot);
 			if (tscResult.exitCode !== 0) {
 				issues.push(`TypeScript errors: ${tscResult.output.slice(0, 500)}`);
@@ -182,6 +183,7 @@ export async function runBearings(
 			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.ts'))
 			|| fs.existsSync(path.join(workspaceRoot, 'vitest.config.js'));
 		if (hasVitest) {
+			logger.log('Bearings: running vitest...');
 			const testResult = await execFn('npx vitest run', workspaceRoot);
 			if (testResult.exitCode !== 0) {
 				issues.push(`Test failures: ${testResult.output.slice(0, 500)}`);
