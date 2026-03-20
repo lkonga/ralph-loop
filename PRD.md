@@ -524,7 +524,7 @@
 
 - [x] **Task 113 — Verification Cache & Dirty-Aware Skip**: Add cached last-green verification metadata and dirty-aware invalidation so expensive validation is skipped when no relevant files/config changed. → Spec: `research/16-phase16-refined-tasks.md` L108-L125
 
-- [ ] **Task 114 — CHECKPOINT: Cache / Dirty-Skip Verification**: Verify repeated task starts stay cheap on an unchanged workspace and that dirty conditions correctly invalidate the cache. → Spec: `research/16-phase16-refined-tasks.md` L127-L142
+- [x] **Task 114 — CHECKPOINT: Cache / Dirty-Skip Verification**: Verify repeated task starts stay cheap on an unchanged workspace and that dirty conditions correctly invalidate the cache. → Spec: `research/16-phase16-refined-tasks.md` L127-L142
 
 ### 16d — Startup UX Transparency
 

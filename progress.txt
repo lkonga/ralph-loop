@@ -733,3 +733,10 @@ Verification Cache & Dirty-Aware Skip. Created src/verificationCache.ts with Ver
 ### Task 126 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
 [2026-03-20T05:47:38.530Z] [7b37e2e9-78ed-4cb5-a054-df890307ca01] Committed: 2359174ec30eb17c4baf60906ebb93aba1ea8d56
 [2026-03-20T05:47:55.463Z] [f78aca3c-14f6-434e-b58a-4bf184945dc3] [Task-128] Task started: **Task 114 — CHECKPOINT: Cache / Dirty-Skip Verification**: Verify repeated task starts stay cheap on an unchanged workspace and that dirty conditions correctly invalidate the cache. → Spec: `research/16-phase16-refined-tasks.md` L127-L142
+
+### Task 128 (Task 114) | Files: [test/orchestrator.test.ts] | Lines: +104/-0 | Status: pass
+CHECKPOINT: Cache / Dirty-Skip Verification. Added 2 checkpoint tests in test/orchestrator.test.ts under 'CHECKPOINT: Cache / Dirty-Skip Verification (Task 114)' describe block: (1) 'repeated start reuses cached green state' — runs orchestrator twice on unchanged workspace, verifies first run calls tsc (cold cache) and second run has zero tsc calls (warm cache hit); (2) 'dirty change to tracked file invalidates cache and triggers full verification' — pre-seeds cache with current file hashes, mutates package.json, runs orchestrator, verifies tsc is called (cache miss due to stale hash). Both tests verify the VerificationCache integration in the orchestrator's startup bearings path. tsc clean, all 904 tests pass.
+[2026-03-20T11:22:00.000Z] [Task-128] Task completed: **Task 114 — CHECKPOINT: Cache / Dirty-Skip Verification**
+[2026-03-20T05:52:46.471Z] [f78aca3c-14f6-434e-b58a-4bf184945dc3] [Task-128] Task completed: **Task 114 — CHECKPOINT: Cache / Dirty-Skip Verification**: Verify repeated task starts stay cheap on an unchanged workspace and that dirty conditions correctly invalidate the cache. → Spec: `research/16-phase16-refined-tasks.md` L127-L142 (291s)
+
+### Task 127 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
