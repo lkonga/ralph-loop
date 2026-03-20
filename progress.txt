@@ -732,3 +732,4 @@ Verification Cache & Dirty-Aware Skip. Created src/verificationCache.ts with Ver
 
 ### Task 126 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
 [2026-03-20T05:47:38.530Z] [7b37e2e9-78ed-4cb5-a054-df890307ca01] Committed: 2359174ec30eb17c4baf60906ebb93aba1ea8d56
+[2026-03-20T05:47:55.463Z] [f78aca3c-14f6-434e-b58a-4bf184945dc3] [Task-128] Task started: **Task 114 — CHECKPOINT: Cache / Dirty-Skip Verification**: Verify repeated task starts stay cheap on an unchanged workspace and that dirty conditions correctly invalidate the cache. → Spec: `research/16-phase16-refined-tasks.md` L127-L142

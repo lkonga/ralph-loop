@@ -1257,3 +1257,107 @@ describe('Verification Cache & Dirty-Aware Skip (Task 113)', () => {
 		expect(calls.some(c => c.includes('tsc'))).toBe(true);
 	});
 });
+
+describe('CHECKPOINT: Cache / Dirty-Skip Verification (Task 114)', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-checkpoint114-'));
+		fs.writeFileSync(path.join(tmpDir, 'tsconfig.json'), '{}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'package.json'), '{"name":"test"}', 'utf-8');
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('repeated start reuses cached green state — zero tsc calls on second run', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Task Alpha\n- [ ] Task Beta\n', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+
+		const makeOrch = () => {
+			const orch = new LoopOrchestrator(
+				{
+					...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+					bearings: { enabled: true, runTsc: true, runTests: false, startup: 'tsc', perTask: 'tsc', checkpoint: 'full' },
+					diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+				},
+				noopLogger,
+				(e: any) => events.push(e),
+			);
+			orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+			(orch as any).executionStrategy = {
+				execute: async (task: any) => {
+					const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+					fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prd.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+					return { completed: true, method: 'chat' as const, hadFileChanges: true };
+				},
+			};
+			return orch;
+		};
+
+		// First run: tsc should be called (cold cache)
+		const orch1 = makeOrch();
+		await orch1.start();
+		const firstRunTscCalls = calls.filter(c => c.includes('tsc')).length;
+		expect(firstRunTscCalls).toBeGreaterThan(0);
+
+		// Second run: cache is warm and workspace unchanged → zero tsc calls
+		const callsBefore = calls.length;
+		const orch2 = makeOrch();
+		await orch2.start();
+		const secondRunTscCalls = calls.slice(callsBefore).filter(c => c.includes('tsc')).length;
+		expect(secondRunTscCalls).toBe(0);
+	});
+
+	it('dirty change to tracked file invalidates cache and triggers full verification', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Task Gamma\n', 'utf-8');
+		const calls: string[] = [];
+		const events: any[] = [];
+
+		// Pre-seed cache with CURRENT hashes
+		const cache = new VerificationCache();
+		const branch = VerificationCache.getGitBranch(tmpDir);
+		const treeHash = VerificationCache.getGitTreeHash(tmpDir);
+		const oldHashes = VerificationCache.computeFileHashes(tmpDir);
+		cache.save(tmpDir, {
+			timestamp: Date.now(),
+			branch,
+			treeHash,
+			level: 'tsc',
+			healthy: true,
+			fileHashes: oldHashes,
+		});
+
+		// Mutate a tracked file AFTER cache was saved (dirty condition)
+		fs.writeFileSync(path.join(tmpDir, 'package.json'), '{"name":"changed-dep"}', 'utf-8');
+
+		// Verify hashes actually differ
+		const newHashes = VerificationCache.computeFileHashes(tmpDir);
+		expect(newHashes['package.json']).not.toBe(oldHashes['package.json']);
+
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG, workspaceRoot: tmpDir, maxIterations: 1, countdownSeconds: 0,
+				bearings: { enabled: true, runTsc: true, runTests: false, startup: 'tsc', perTask: 'none', checkpoint: 'full' },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async (cmd: string) => { calls.push(cmd); return { exitCode: 0, output: '' }; };
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prd = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(path.join(tmpDir, 'PRD.md'), prd.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`), 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+
+		await orch.start();
+		// Cache was stale due to dirty file → tsc must have been called
+		expect(calls.some(c => c.includes('tsc'))).toBe(true);
+	});
+});
