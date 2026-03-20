@@ -740,3 +740,4 @@ CHECKPOINT: Cache / Dirty-Skip Verification. Added 2 checkpoint tests in test/or
 [2026-03-20T05:52:46.471Z] [f78aca3c-14f6-434e-b58a-4bf184945dc3] [Task-128] Task completed: **Task 114 — CHECKPOINT: Cache / Dirty-Skip Verification**: Verify repeated task starts stay cheap on an unchanged workspace and that dirty conditions correctly invalidate the cache. → Spec: `research/16-phase16-refined-tasks.md` L127-L142 (291s)
 
 ### Task 127 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +14/-1 | Status: pass
+[2026-03-20T05:52:46.605Z] [f78aca3c-14f6-434e-b58a-4bf184945dc3] Committed: 4d1667cc54bfe5b087f7a8163777eaa8291ac190
