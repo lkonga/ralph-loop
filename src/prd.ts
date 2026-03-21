@@ -64,7 +64,7 @@ function parseDependsOn(description: string): string[] | undefined {
 }
 
 export function parsePrd(content: string): PrdSnapshot {
-	const lines = content.split('\n');
+	const lines = content.replace(/\r\n?/g, '\n').split('\n');
 	const tasks: Task[] = [];
 	let id = 0;
 	let currentPhaseAgent: string | undefined;
@@ -271,10 +271,24 @@ export function markTaskComplete(prdPath: string, task: Task): void {
 	const content = fs.readFileSync(prdPath, 'utf-8');
 	const lines = content.split('\n');
 	const lineIdx = task.lineNumber - 1;
+	const needle = task.description.slice(0, 50);
 
-	if (lineIdx >= 0 && lineIdx < lines.length) {
+	// Fast path: use stored line number if it still points to the right task
+	if (lineIdx >= 0 && lineIdx < lines.length &&
+		CHECKBOX_UNCHECKED.test(lines[lineIdx]) &&
+		lines[lineIdx].includes(needle)) {
 		lines[lineIdx] = lines[lineIdx].replace(/\[\s*\]/, '[x]');
 		fs.writeFileSync(prdPath, lines.join('\n'), 'utf-8');
+		return;
+	}
+
+	// Fallback: search by description content (handles shifted line numbers after PRD self-edits)
+	for (let i = 0; i < lines.length; i++) {
+		if (CHECKBOX_UNCHECKED.test(lines[i]) && lines[i].includes(needle)) {
+			lines[i] = lines[i].replace(/\[\s*\]/, '[x]');
+			fs.writeFileSync(prdPath, lines.join('\n'), 'utf-8');
+			return;
+		}
 	}
 }
 

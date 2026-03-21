@@ -722,6 +722,11 @@ export class LoopOrchestrator {
 					if (readyTasks.length === 0) {
 						const fallbackTask = pickNextTask(snapshot);
 						if (!fallbackTask || this.completedTasks.has(fallbackTask.id)) {
+							if (snapshot.total === 0) {
+								this.logger.warn('PRD re-read returned 0 tasks — possible file corruption, retrying');
+								await this.delay(500);
+								continue;
+							}
 							yield { kind: LoopEventKind.AllDone, total: snapshot.total };
 							return;
 						}
@@ -805,6 +810,11 @@ export class LoopOrchestrator {
 				const task = pickNextTask(snapshot);
 
 				if (!task) {
+					if (snapshot.total === 0) {
+						this.logger.warn('PRD re-read returned 0 tasks — possible file corruption, retrying');
+						await this.delay(500);
+						continue;
+					}
 					yield { kind: LoopEventKind.AllDone, total: snapshot.total };
 					return;
 				}
