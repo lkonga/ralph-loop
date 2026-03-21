@@ -1099,8 +1099,8 @@ describe('CHECKPOINT: Non-Blocking Verification (Task 112)', () => {
 		const timeline: string[] = [];
 		const timelineLogger = {
 			log: (msg: string) => { timeline.push(`log:${msg}`); },
-			warn: () => {},
-			error: () => {},
+			warn: () => { },
+			error: () => { },
 		};
 		const execFn = async (cmd: string) => {
 			timeline.push(`exec:${cmd}`);
