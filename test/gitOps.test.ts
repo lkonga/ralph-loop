@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import { atomicCommit, inferCommitType, buildCommitMessage, getCurrentBranch, createAndCheckoutBranch, branchExists, getShortHash } from '../src/gitOps';
+import { atomicCommit, inferCommitType, buildCommitMessage, getCurrentBranch, createAndCheckoutBranch, checkoutBranch, branchExists, getShortHash } from '../src/gitOps';
 import type { Task } from '../src/types';
 import { TaskStatus } from '../src/types';
 
@@ -297,6 +297,26 @@ describe('gitOps', () => {
 			});
 			const exists = await branchExists('/workspace', 'nonexistent');
 			expect(exists).toBe(false);
+		});
+	});
+
+	describe('checkoutBranch', () => {
+		it('checks out an existing branch successfully', async () => {
+			mockGitCommands({
+				'checkout': { stdout: "Switched to branch 'feature'\n" },
+			});
+			const result = await checkoutBranch('/workspace', 'feature');
+			expect(result.success).toBe(true);
+			expect(result.error).toBeUndefined();
+		});
+
+		it('returns error when branch does not exist', async () => {
+			mockGitCommands({
+				'checkout': { err: new Error("error: pathspec 'nonexistent' did not match any file(s) known to git") },
+			});
+			const result = await checkoutBranch('/workspace', 'nonexistent');
+			expect(result.success).toBe(false);
+			expect(result.error).toBeDefined();
 		});
 	});
 
