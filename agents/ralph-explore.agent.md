@@ -1,1 +1,0 @@
-../../vscode-config-files/agents/ralph-explore.agent.md

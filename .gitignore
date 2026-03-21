@@ -4,4 +4,4 @@ out/
 .vscode-test/
 .vscode/skills
 AGENTS.md
-prompts
+.github/agents

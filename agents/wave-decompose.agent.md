@@ -1,1 +1,0 @@
-../../vscode-config-files/agents/wave-decompose.agent.md

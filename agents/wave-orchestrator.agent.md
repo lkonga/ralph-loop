@@ -1,1 +1,0 @@
-../../vscode-config-files/agents/wave-orchestrator.agent.md

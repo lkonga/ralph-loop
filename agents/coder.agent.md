@@ -1,1 +1,0 @@
-../../vscode-config-files/agents/coder.agent.md
