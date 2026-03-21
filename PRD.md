@@ -621,7 +621,7 @@
 
 ### 19.1 — Make Idle Authoritative
 
-- [ ] **Task 138 — Add a shared final idle refresh path in `src/extension.ts`**: Guarantee one authoritative Ralph idle refresh after every `await orchestrator.start()` settlement, including crashes and auto-resume. → Spec: `research/17-phase19-deep-research.md` L33-L51
+- [x] **Task 138 — Add a shared final idle refresh path in `src/extension.ts`**: Guarantee one authoritative Ralph idle refresh after every `await orchestrator.start()` settlement, including crashes and auto-resume. → Spec: `research/17-phase19-deep-research.md` L33-L51
 
 - [ ] **Task 139 — Enforce fork-side precedence so Ralph idle beats lifecycle processing**: Prevent a later `RequestLifecycleModel` `Processing` update from overwriting a correct Ralph idle push in the Copilot fork status bar. → Spec: `research/17-phase19-deep-research.md` L53-L72
 
