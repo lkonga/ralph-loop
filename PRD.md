@@ -584,7 +584,7 @@
 
 - [x] **Task 127 — Add `checkoutBranch` Helper**: In `src/gitOps.ts`, add `checkoutBranch(workspaceRoot: string, branchName: string): Promise<{ success: boolean; error?: string }>` — runs `git checkout {branchName}` (without `-b`). If it doesn't already exist, add it. Write tests FIRST. Run `npx tsc --noEmit` and `npx vitest run`.
 
-- [ ] **Task 128 — Add `hasDirtyWorkingTree` Helper**: In `src/gitOps.ts`, add `hasDirtyWorkingTree(workspaceRoot: string): Promise<boolean>` — runs `git status --porcelain`, returns `true` if output is non-empty (tracked changes or untracked files). Write tests FIRST in `test/gitOps.test.ts`. Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 128 — Add `hasDirtyWorkingTree` Helper**: In `src/gitOps.ts`, add `hasDirtyWorkingTree(workspaceRoot: string): Promise<boolean>` — runs `git status --porcelain`, returns `true` if output is non-empty (tracked changes or untracked files). Write tests FIRST in `test/gitOps.test.ts`. Run `npx tsc --noEmit` and `npx vitest run`.
 
 - [ ] **Task 129 — Update `deriveBranchName` to Accept Hash Suffix**: In `src/prd.ts`, change `deriveBranchName(title: string, shortHash?: string): string` — when `shortHash` is provided, append `-{shortHash}` after the slug (before truncation limit). Adjust the slug max length from 50 to 44 chars to leave room for `-` + 7-char hash. Existing tests must still pass (hash is optional). Add new tests: hash is appended, total length stays within limit, different hashes produce different branch names. Run `npx tsc --noEmit` and `npx vitest run`.
 
