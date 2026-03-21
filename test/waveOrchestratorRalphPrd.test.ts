@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
-const AGENT_PATH = resolve(__dirname, '../../vscode-config-files/agents/wave-orchestrator.agent.md');
+const AGENT_PATH = resolve(__dirname, '../../vscode-config-files/agents.source/wave-orchestrator.agent.md');
 
 describe('Wave Orchestrator --ralph-prd Mode', () => {
 	let content: string;

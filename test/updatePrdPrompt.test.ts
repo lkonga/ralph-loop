@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
-const PROMPT_PATH = resolve(__dirname, '../../vscode-config-files/prompts/updatePRD.prompt.md');
+const PROMPT_PATH = resolve(__dirname, '../../vscode-config-files/prompts.source/updatePRD.prompt.md');
 
 describe('updatePRD prompt handoff entry (Task 29)', () => {
 	let content: string;

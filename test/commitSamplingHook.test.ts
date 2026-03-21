@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
-const AGENT_PATH = resolve(__dirname, '../../vscode-config-files/agents/wave-context-grounder.agent.md');
+const AGENT_PATH = resolve(__dirname, '../../vscode-config-files/agents.source/wave-context-grounder.agent.md');
 
 describe('Commit-Sampling Hook (Task 32)', () => {
 	let content: string;

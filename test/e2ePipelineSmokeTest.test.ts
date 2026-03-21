@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { readFileSync, existsSync, lstatSync, realpathSync } from 'fs';
+import { readFileSync, existsSync, lstatSync } from 'fs';
 import { resolve } from 'path';
 
 /**
@@ -11,9 +11,8 @@ import { resolve } from 'path';
  * consistent, and cross-references between phases resolve.
  */
 
-const AGENTS_DIR = resolve(__dirname, '../../vscode-config-files/agents');
-const PROMPTS_DIR = resolve(__dirname, '../../vscode-config-files/prompts');
-const SYMLINKS_DIR = resolve(__dirname, '../agents');
+const AGENTS_DIR = resolve(__dirname, '../../vscode-config-files/agents.source');
+const PROMPTS_DIR = resolve(__dirname, '../../vscode-config-files/prompts.source');
 const DOCS_DIR = resolve(__dirname, '../docs/patterns');
 
 const PIPELINE_AGENTS = {
@@ -234,26 +233,20 @@ describe('E2E Pipeline Smoke Test — Task 90', () => {
 		});
 	});
 
-	describe('Pipeline Wiring — symlinks from ralph-loop resolve', () => {
-		const requiredSymlinks = [
+	describe('Pipeline Wiring — wave agents exist as canonical files', () => {
+		const requiredAgents = [
 			'wave-context-grounder.agent.md',
 			'wave-orchestrator.agent.md',
 			'wave-spec-generator.agent.md',
 			'wave-prd-generator.agent.md',
 		];
 
-		for (const name of requiredSymlinks) {
-			it(`ralph-loop/agents/${name} should be a symlink`, () => {
-				const symlinkPath = resolve(SYMLINKS_DIR, name);
-				expect(existsSync(symlinkPath), `Missing symlink: ${symlinkPath}`).toBe(true);
-				const stat = lstatSync(symlinkPath);
-				expect(stat.isSymbolicLink(), `${name} is not a symlink`).toBe(true);
-			});
-
-			it(`${name} symlink should resolve to vscode-config-files/agents/`, () => {
-				const symlinkPath = resolve(SYMLINKS_DIR, name);
-				const target = realpathSync(symlinkPath);
-				expect(target).toContain('vscode-config-files/agents');
+		for (const name of requiredAgents) {
+			it(`${name} exists in vscode-config-files/agents.source/`, () => {
+				const filePath = resolve(AGENTS_DIR, name);
+				expect(existsSync(filePath), `Missing agent: ${filePath}`).toBe(true);
+				const stat = lstatSync(filePath);
+				expect(stat.isFile()).toBe(true);
 			});
 		}
 	});
@@ -369,7 +362,6 @@ describe('E2E Pipeline Smoke Test — Task 90', () => {
 
 	describe('Task 102 — wave-researcher github_repo tool', () => {
 		const researcherPath = resolve(AGENTS_DIR, 'wave-researcher.agent.md');
-		const researcherSymlink = resolve(SYMLINKS_DIR, 'wave-researcher.agent.md');
 		let researcherContent: string;
 
 		beforeAll(() => {
@@ -388,12 +380,10 @@ describe('E2E Pipeline Smoke Test — Task 90', () => {
 			expect(body).toContain('github_repo');
 		});
 
-		it('symlink in ralph-loop/agents/ should resolve correctly', () => {
-			expect(existsSync(researcherSymlink), `Missing symlink: ${researcherSymlink}`).toBe(true);
-			const stat = lstatSync(researcherSymlink);
-			expect(stat.isSymbolicLink(), 'wave-researcher.agent.md is not a symlink').toBe(true);
-			const target = realpathSync(researcherSymlink);
-			expect(target).toContain('vscode-config-files/agents');
+		it('wave-researcher.agent.md exists as canonical file in vscode-config-files', () => {
+			expect(existsSync(researcherPath), `Missing agent: ${researcherPath}`).toBe(true);
+			const stat = lstatSync(researcherPath);
+			expect(stat.isFile()).toBe(true);
 		});
 	});
 });

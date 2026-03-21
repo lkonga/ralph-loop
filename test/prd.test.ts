@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, parseLineAnnotations } from '../src/prd';
+import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, parseLineAnnotations, parsePrdTitle, deriveBranchName } from '../src/prd';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -758,5 +758,67 @@ describe('Task 108 — [DECOMPOSED] and [CHECKPOINT] coexist in description safe
 		const gate = snapshot.tasks.find(t => t.description.includes('checkpoint gate'));
 		expect(gate).toBeDefined();
 		expect(gate!.checkpoint).toBe(true);
+	});
+});
+
+describe('parsePrdTitle', () => {
+	it('extracts H1 heading text', () => {
+		const content = '# My Awesome PRD\n\n- [ ] Task one\n';
+		expect(parsePrdTitle(content)).toBe('My Awesome PRD');
+	});
+
+	it('returns first H1 only', () => {
+		const content = '# First Title\n\n# Second Title\n';
+		expect(parsePrdTitle(content)).toBe('First Title');
+	});
+
+	it('returns undefined when no H1', () => {
+		const content = '## Not an H1\n\n- [ ] Task one\n';
+		expect(parsePrdTitle(content)).toBeUndefined();
+	});
+
+	it('handles H1 with special characters', () => {
+		const content = '# Build & Deploy: v2.0 (beta)\n';
+		expect(parsePrdTitle(content)).toBe('Build & Deploy: v2.0 (beta)');
+	});
+
+	it('ignores lines that are not at start of line', () => {
+		const content = '  # Indented heading\n- [ ] Task\n';
+		expect(parsePrdTitle(content)).toBeUndefined();
+	});
+});
+
+describe('deriveBranchName', () => {
+	it('slugifies a simple title with ralph/ prefix', () => {
+		expect(deriveBranchName('My Awesome PRD')).toBe('ralph/my-awesome-prd');
+	});
+
+	it('handles special characters', () => {
+		expect(deriveBranchName('Build & Deploy: v2.0 (beta)')).toBe('ralph/build-deploy-v2-0-beta');
+	});
+
+	it('collapses consecutive hyphens', () => {
+		expect(deriveBranchName('hello---world')).toBe('ralph/hello-world');
+	});
+
+	it('trims hyphens from ends', () => {
+		expect(deriveBranchName('--leading and trailing--')).toBe('ralph/leading-and-trailing');
+	});
+
+	it('truncates to 50 chars total (including ralph/ prefix)', () => {
+		const longTitle = 'a'.repeat(100);
+		const result = deriveBranchName(longTitle);
+		expect(result.length).toBeLessThanOrEqual(50);
+		expect(result.startsWith('ralph/')).toBe(true);
+	});
+
+	it('always has ralph/ prefix', () => {
+		expect(deriveBranchName('test')).toBe('ralph/test');
+		expect(deriveBranchName('X')).toBe('ralph/x');
+	});
+
+	it('handles empty slug after stripping', () => {
+		const result = deriveBranchName('!!!');
+		expect(result.startsWith('ralph/')).toBe(true);
 	});
 });

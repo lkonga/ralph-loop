@@ -152,7 +152,7 @@ describe('Context Source Chain (Task 34)', () => {
 		it('should load agent markdown', async () => {
 			const { readFileSync, existsSync } = await import('fs');
 			const { resolve } = await import('path');
-			const agentPath = resolve(__dirname, '../../vscode-config-files/agents/wave-context-grounder.agent.md');
+			const agentPath = resolve(__dirname, '../../vscode-config-files/agents.source/wave-context-grounder.agent.md');
 			expect(existsSync(agentPath)).toBe(true);
 			agentContent = readFileSync(agentPath, 'utf-8');
 		});

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
-const PROMPT_PATH = resolve(__dirname, '../../vscode-config-files/prompts/researchPhase.prompt.md');
+const PROMPT_PATH = resolve(__dirname, '../../vscode-config-files/prompts.source/researchPhase.prompt.md');
 const README_PATH = resolve(__dirname, '../README.md');
 
 describe('researchPhase prompt refactor (Task 28)', () => {

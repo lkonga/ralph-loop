@@ -7,6 +7,29 @@ const CHECKBOX_CHECKED = /^(\s*)-\s*\[x\]\s+(.+)$/i;
 const DEPENDS_ANNOTATION = /depends:\s*([\w,\s-]+)/i;
 const MISSING_DEP_PATTERN = /MISSING_DEP:\s*(\S+)/i;
 const AGENT_ANNOTATION = /\[AGENT:(\w+)\]/g;
+const H1_PATTERN = /^# (.+)$/;
+
+export function parsePrdTitle(prdContent: string): string | undefined {
+	for (const line of prdContent.split('\n')) {
+		const match = H1_PATTERN.exec(line);
+		if (match) { return match[1].trim(); }
+	}
+	return undefined;
+}
+
+export function deriveBranchName(title: string): string {
+	const PREFIX = 'ralph/';
+	const MAX_LENGTH = 50;
+	let slug = title
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/-{2,}/g, '-')
+		.replace(/^-|-$/g, '');
+	if (!slug) { slug = 'prd'; }
+	const maxSlug = MAX_LENGTH - PREFIX.length;
+	slug = slug.slice(0, maxSlug).replace(/-$/g, '');
+	return PREFIX + slug;
+}
 
 export function parseLineAnnotations(line: string): { decomposed: boolean; checkpoint: boolean } {
 	const decomposed = /^-\s*\[[ x]\]\s*\[DECOMPOSED\]/i.test(line);

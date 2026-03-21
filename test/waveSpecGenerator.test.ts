@@ -1,12 +1,11 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { readFileSync, existsSync, lstatSync, realpathSync } from 'fs';
+import { readFileSync, existsSync, lstatSync } from 'fs';
 import { resolve } from 'path';
 
-const CANONICAL_PATH = resolve(__dirname, '../../vscode-config-files/agents/wave-spec-generator.agent.md');
-const SYMLINK_PATH = resolve(__dirname, '../agents/wave-spec-generator.agent.md');
+const CANONICAL_PATH = resolve(__dirname, '../../vscode-config-files/agents.source/wave-spec-generator.agent.md');
 
 describe('Wave Spec Generator Agent — Task 26', () => {
-	it('should exist at vscode-config-files/agents/wave-spec-generator.agent.md', () => {
+	it('should exist at vscode-config-files/agents.source/wave-spec-generator.agent.md', () => {
 		expect(existsSync(CANONICAL_PATH)).toBe(true);
 	});
 
@@ -81,19 +80,15 @@ describe('Wave Spec Generator Agent — Task 26', () => {
 		});
 	});
 
-	describe('symlink integration', () => {
-		it('should have a symlink at ralph-loop/agents/wave-spec-generator.agent.md', () => {
-			expect(existsSync(SYMLINK_PATH)).toBe(true);
+	describe('canonical file ownership', () => {
+		it('canonical file exists in vscode-config-files/agents.source/', () => {
+			expect(existsSync(CANONICAL_PATH)).toBe(true);
 		});
 
-		it('symlink should be a symbolic link, not a regular file', () => {
-			const stat = lstatSync(SYMLINK_PATH);
-			expect(stat.isSymbolicLink()).toBe(true);
-		});
-
-		it('symlink should resolve to the canonical file', () => {
-			const resolved = realpathSync(SYMLINK_PATH);
-			expect(resolved).toBe(realpathSync(CANONICAL_PATH));
+		it('canonical file is a regular file (not a symlink)', () => {
+			const stat = lstatSync(CANONICAL_PATH);
+			expect(stat.isSymbolicLink()).toBe(false);
+			expect(stat.isFile()).toBe(true);
 		});
 	});
 });
