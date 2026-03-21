@@ -862,3 +862,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 [2026-03-21T11:58:00.292Z] [edc2d3dc-70a3-44be-98c3-50f139002c3c] [Task-146] Task completed: **Task 132 — Remove `atomicCommit` Branch Guard**: In `src/gitOps.ts`, remove the protected-branch check at the top of `atomicCommit()`. Remove the `protectedBranches` parameter. The linear branch gate makes this guard redundant — work always happens on a ralph/ branch. Remove corresponding tests in `test/gitOps.test.ts` (commit blocked on main, warning logged). Update all `atomicCommit` call sites. Run `npx tsc --noEmit` and `npx vitest run`. (271s)
 
 ### Task 145 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
+[2026-03-21T11:58:00.420Z] [edc2d3dc-70a3-44be-98c3-50f139002c3c] Committed: 57aa9c18a4826995ac25098c026f8851d7652e82
