@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import { atomicCommit, inferCommitType, buildCommitMessage, getCurrentBranch, createAndCheckoutBranch, checkoutBranch, branchExists, getShortHash } from '../src/gitOps';
+import { atomicCommit, inferCommitType, buildCommitMessage, getCurrentBranch, createAndCheckoutBranch, checkoutBranch, branchExists, getShortHash, hasDirtyWorkingTree } from '../src/gitOps';
 import type { Task } from '../src/types';
 import { TaskStatus } from '../src/types';
 
@@ -336,6 +336,32 @@ describe('gitOps', () => {
 			});
 			const hash = await getShortHash('/workspace');
 			expect(hash).toBe('ff00bb1');
+		});
+	});
+
+	describe('hasDirtyWorkingTree', () => {
+		it('returns true when there are tracked changes', async () => {
+			mockGitCommands({
+				'status --porcelain': { stdout: ' M src/foo.ts\n' },
+			});
+			const dirty = await hasDirtyWorkingTree('/workspace');
+			expect(dirty).toBe(true);
+		});
+
+		it('returns true when there are untracked files', async () => {
+			mockGitCommands({
+				'status --porcelain': { stdout: '?? newfile.ts\n' },
+			});
+			const dirty = await hasDirtyWorkingTree('/workspace');
+			expect(dirty).toBe(true);
+		});
+
+		it('returns false when working tree is clean', async () => {
+			mockGitCommands({
+				'status --porcelain': { stdout: '' },
+			});
+			const dirty = await hasDirtyWorkingTree('/workspace');
+			expect(dirty).toBe(false);
 		});
 	});
 });

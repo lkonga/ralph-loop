@@ -138,3 +138,8 @@ export async function getShortHash(workspaceRoot: string): Promise<string> {
 	const result = await runGit(workspaceRoot, ['rev-parse', '--short', 'HEAD']);
 	return result.stdout.trim();
 }
+
+export async function hasDirtyWorkingTree(workspaceRoot: string): Promise<boolean> {
+	const result = await runGit(workspaceRoot, ['status', '--porcelain']);
+	return result.stdout.trim().length > 0;
+}
