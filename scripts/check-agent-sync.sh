@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Validates that all agent files in ralph-loop/agents/ are symlinks
-# pointing to vscode-config-files/agents/ and none are broken.
+# Validates that all agent files in ralph-loop/agents.source/ are symlinks
+# pointing to vscode-config-files/agents.source/ and none are broken.
 
-AGENTS_DIR="$(cd "$(dirname "$0")/../agents" && pwd)"
-CONFIG_AGENTS_DIR="$(cd "$(dirname "$0")/../../vscode-config-files/agents" 2>/dev/null && pwd)" || true
+AGENTS_DIR="$(cd "$(dirname "$0")/../agents.source" && pwd)"
+CONFIG_AGENTS_DIR="$(cd "$(dirname "$0")/../../vscode-config-files/agents.source" 2>/dev/null && pwd)" || true
 
 errors=0
 
 if [ ! -d "$AGENTS_DIR" ]; then
-	echo "FAIL: agents/ directory not found at $AGENTS_DIR"
+	echo "FAIL: agents.source/ directory not found at $AGENTS_DIR"
 	exit 1
 fi
 
@@ -33,7 +33,7 @@ for f in "$AGENTS_DIR"/*.agent.md; do
 
 	target="$(readlink -f "$f")"
 	if [ -n "$CONFIG_AGENTS_DIR" ] && [[ "$target" != "$CONFIG_AGENTS_DIR"/* ]]; then
-		echo "WARN: $name resolves outside vscode-config-files/agents/ -> $target"
+		echo "WARN: $name resolves outside vscode-config-files/agents.source/ -> $target"
 	fi
 
 	echo "  OK: $name -> $(readlink "$f")"
