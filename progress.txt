@@ -820,3 +820,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 [2026-03-21T09:48:51.717Z] [c361b681-62e4-4c1d-80d5-f2fb58b67a76] [Task-139] Task completed: **Task 125 — CHECKPOINT: Feature Branch Enforcement E2E**: Full end-to-end verification. (1) Start ralph-loop on `main` → creates `ralph/<prd-slug>` branch, all commits land there, `main` untouched. (2) Stop and resume → session correctly restores branch context. (3) Complete all tasks → branch contains full commit history, user can `git log ralph/<slug>` to review, then `git merge` or discard. (4) `featureBranch.enabled: false` → commits go to current branch as before (backward compatible). (5) No regressions in existing tests. Clean compile, full vitest green. (216s)
 
 ### Task 138 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
+[2026-03-21T09:48:51.834Z] [c361b681-62e4-4c1d-80d5-f2fb58b67a76] Committed: 5f8be3b43ea610f135af478abd69dde84a1b3b28
