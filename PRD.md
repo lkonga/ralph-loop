@@ -580,7 +580,7 @@
 
 ### 18a — New Branch Primitives
 
-- [ ] **Task 126 — Add `getShortHash` Helper**: In `src/gitOps.ts`, add `getShortHash(workspaceRoot: string): Promise<string>` — runs `git rev-parse --short HEAD`, returns 7-char hex hash. Write tests FIRST in `test/gitOps.test.ts`: returns a hex string of expected length. Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 126 — Add `getShortHash` Helper**: In `src/gitOps.ts`, add `getShortHash(workspaceRoot: string): Promise<string>` — runs `git rev-parse --short HEAD`, returns 7-char hex hash. Write tests FIRST in `test/gitOps.test.ts`: returns a hex string of expected length. Run `npx tsc --noEmit` and `npx vitest run`.
 
 - [ ] **Task 127 — Add `checkoutBranch` Helper**: In `src/gitOps.ts`, add `checkoutBranch(workspaceRoot: string, branchName: string): Promise<{ success: boolean; error?: string }>` — runs `git checkout {branchName}` (without `-b`). If it doesn't already exist, add it. Write tests FIRST. Run `npx tsc --noEmit` and `npx vitest run`.
 
