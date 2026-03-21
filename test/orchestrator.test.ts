@@ -1879,4 +1879,84 @@ describe('Startup branch gate (linear flow)', () => {
 		expect(snapshot.branch).toBe('ralph/my-feature-project-abc1234');
 		expect(snapshot.originalBranch).toBe('main');
 	});
+
+	it('switches back to originalBranch on AllDone and yields BranchSwitchedBack', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc1234');
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'checkoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		expect(gitOps.checkoutBranch).toHaveBeenCalledWith(tmpDir, 'main');
+		const switchBack = events.find(e => e.kind === LoopEventKind.BranchSwitchedBack);
+		expect(switchBack).toBeDefined();
+		expect(switchBack.from).toBe('ralph/my-feature-project-abc1234');
+		expect(switchBack.to).toBe('main');
+	});
+
+	it('logs warning but does not crash when switch-back fails', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('develop');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc1234');
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'checkoutBranch').mockResolvedValue({ success: false, error: 'conflict' });
+
+		const warnLogs: string[] = [];
+		const testLogger = { log: () => { }, warn: (msg: string) => warnLogs.push(msg), error: () => { } };
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true },
+			},
+			testLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		expect(gitOps.checkoutBranch).toHaveBeenCalledWith(tmpDir, 'develop');
+		expect(events.find(e => e.kind === LoopEventKind.BranchSwitchedBack)).toBeUndefined();
+		expect(warnLogs.some(m => m.includes('develop'))).toBe(true);
+	});
+
+	it('does not switch back when featureBranch is disabled', async () => {
+		const gitOps = await import('../src/gitOps');
+		const checkoutSpy = vi.spyOn(gitOps, 'checkoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		expect(checkoutSpy).not.toHaveBeenCalled();
+		expect(events.find(e => e.kind === LoopEventKind.BranchSwitchedBack)).toBeUndefined();
+	});
 });

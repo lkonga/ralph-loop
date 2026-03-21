@@ -309,6 +309,10 @@ export function activate(context: vscode.ExtensionContext): void {
 						logger.error(`🌿 Branch enforcement failed: ${event.reason}`);
 						vscode.window.showErrorMessage(`Ralph Loop: Branch enforcement failed — ${event.reason}`);
 						break;
+					case LoopEventKind.BranchSwitchedBack:
+						logger.log(`🌿 Switched back to '${event.to}' from '${event.from}'`);
+						vscode.window.showInformationMessage(`Ralph finished — switched back to ${event.to}. Review changes on ${event.from}.`);
+						break;
 					case LoopEventKind.Error:
 						logger.error(`❌ ${event.message}`);
 						vscode.window.showErrorMessage(`Ralph Loop: ${event.message}`);

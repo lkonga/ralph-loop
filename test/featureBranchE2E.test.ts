@@ -87,8 +87,13 @@ describe('Feature Branch Enforcement E2E', () => {
             );
             await orch.start();
 
+            // After loop completes, orchestrator switches back to original branch
             const branch = await getCurrentBranch(tmpDir);
-            expect(branch).toBe(expectedBranch);
+            expect(branch).toBe('main');
+
+            // Ralph branch should still exist
+            const ralphBranchExists = await branchExists(tmpDir, expectedBranch);
+            expect(ralphBranchExists).toBe(true);
 
             // Main should be untouched (still exists)
             const mainExists = await branchExists(tmpDir, 'main');
@@ -181,8 +186,13 @@ describe('Feature Branch Enforcement E2E', () => {
             );
             await orch.start();
 
+            // After loop completes, orchestrator switches back to main
             const branch = await getCurrentBranch(tmpDir);
-            expect(branch).toBe(expectedBranch);
+            expect(branch).toBe('main');
+
+            // New ralph branch was created (and still exists)
+            const newBranchExists = await branchExists(tmpDir, expectedBranch);
+            expect(newBranchExists).toBe(true);
 
             const created = events.find(e => e.kind === LoopEventKind.BranchCreated);
             expect(created).toBeDefined();
@@ -366,6 +376,66 @@ describe('Feature Branch Enforcement E2E', () => {
         it('DEFAULT_CONFIG has feature branch disabled by default', () => {
             expect(DEFAULT_CONFIG.featureBranch).toBeDefined();
             expect(DEFAULT_CONFIG.featureBranch!.enabled).toBe(false);
+        });
+    });
+
+    // --- (6) Switch back to original branch on loop completion ---
+
+    describe('(6) Switch back to original branch on completion', () => {
+        it('switches back to main after loop completes (AllDone)', async () => {
+            fs.writeFileSync(
+                path.join(tmpDir, 'PRD.md'),
+                '# Switch Back Test\n\n- [x] **Task 1 — Done**: done\n',
+            );
+            fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
+
+            const events: any[] = [];
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    maxIterations: 1,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: { enabled: true },
+                },
+                noopLogger,
+                (e: any) => events.push(e),
+            );
+            await orch.start();
+
+            const branch = await getCurrentBranch(tmpDir);
+            expect(branch).toBe('main');
+
+            const switchBack = events.find(e => e.kind === LoopEventKind.BranchSwitchedBack);
+            expect(switchBack).toBeDefined();
+            expect(switchBack.to).toBe('main');
+        });
+
+        it('ralph branch still exists after switch-back', async () => {
+            fs.writeFileSync(
+                path.join(tmpDir, 'PRD.md'),
+                '# Branch Exists Test\n\n- [x] **Task 1 — Done**: done\n',
+            );
+            fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
+
+            const shortHash = await getShortHash(tmpDir);
+            const expectedBranch = deriveBranchName('Branch Exists Test', shortHash);
+
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    maxIterations: 1,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: { enabled: true },
+                },
+                noopLogger,
+                () => { },
+            );
+            await orch.start();
+
+            const exists = await branchExists(tmpDir, expectedBranch);
+            expect(exists).toBe(true);
         });
     });
 });

@@ -103,6 +103,7 @@ export const enum LoopEventKind {
 	BranchCreated = 'branch_created',
 	BranchValidated = 'branch_validated',
 	BranchEnforcementFailed = 'branch_enforcement_failed',
+	BranchSwitchedBack = 'branch_switched_back',
 	StateNotified = 'state_notified',
 	Stopped = 'stopped',
 	Error = 'error',
@@ -149,6 +150,7 @@ export type LoopEvent =
 	| { kind: LoopEventKind.BranchCreated; branchName: string }
 	| { kind: LoopEventKind.BranchValidated; branchName: string }
 	| { kind: LoopEventKind.BranchEnforcementFailed; reason: string }
+	| { kind: LoopEventKind.BranchSwitchedBack; from: string; to: string }
 	| { kind: LoopEventKind.StateNotified; state: string; taskId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };

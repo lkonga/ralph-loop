@@ -432,6 +432,21 @@ export class LoopOrchestrator {
 					break;
 				}
 			}
+
+			// Switch back to original branch after loop completion
+			if (this.originalBranch && this.activeBranch) {
+				try {
+					const result = await checkoutBranch(this.config.workspaceRoot, this.originalBranch);
+					if (result.success) {
+						this.onEvent({ kind: LoopEventKind.BranchSwitchedBack, from: this.activeBranch, to: this.originalBranch });
+					} else {
+						this.logger.warn(`Failed to switch back to '${this.originalBranch}': ${result.error ?? 'unknown error'}. Work remains on '${this.activeBranch}'.`);
+					}
+				} catch (err: unknown) {
+					const msg = err instanceof Error ? err.message : String(err);
+					this.logger.warn(`Failed to switch back to '${this.originalBranch}': ${msg}. Work remains on '${this.activeBranch}'.`);
+				}
+			}
 		} finally {
 			this.cleanup();
 			this.state = LoopState.Idle;
