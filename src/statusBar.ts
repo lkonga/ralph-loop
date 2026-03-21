@@ -37,6 +37,9 @@ function buildTooltip(snapshot: StateSnapshot): vscode.MarkdownString {
     if (snapshot.taskDescription) {
         lines.push(`**Description:** ${snapshot.taskDescription}`);
     }
+    if (snapshot.branch) {
+        lines.push(`**Branch:** ${snapshot.branch}`);
+    }
     const iter = snapshot.iterationCount;
     const nudge = snapshot.nudgeCount;
     if (iter > 0 || nudge > 0) {

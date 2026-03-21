@@ -95,4 +95,29 @@ describe('State Snapshot Command', () => {
 			expect(defaultSnapshot.taskId).toBe('');
 		});
 	});
+
+	describe('StateSnapshot branch field', () => {
+		it('accepts optional branch field', () => {
+			const snapshot: StateSnapshot = {
+				state: LoopState.Running,
+				taskId: 'Task-1',
+				taskDescription: 'desc',
+				iterationCount: 1,
+				nudgeCount: 0,
+				branch: 'ralph/my-feature',
+			};
+			expect(snapshot.branch).toBe('ralph/my-feature');
+		});
+
+		it('branch is undefined when not set', () => {
+			const snapshot: StateSnapshot = {
+				state: 'idle',
+				taskId: '',
+				taskDescription: '',
+				iterationCount: 0,
+				nudgeCount: 0,
+			};
+			expect(snapshot.branch).toBeUndefined();
+		});
+	});
 });

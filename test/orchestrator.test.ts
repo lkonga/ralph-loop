@@ -1863,4 +1863,102 @@ describe('Startup branch gate', () => {
 		expect(checkoutSpy).not.toHaveBeenCalled();
 		expect(events.find(e => e.kind === LoopEventKind.BranchEnforcementFailed)).toBeUndefined();
 	});
+
+	it('yields BranchCreated event when creating a new branch', async () => {
+		fs.writeFileSync(
+			path.join(tmpDir, 'PRD.md'),
+			'# My Feature Project\n\n- [ ] **Task 1 — Do something**: description\n',
+		);
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'branchExists').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const branchCreated = events.find(e => e.kind === LoopEventKind.BranchCreated);
+		expect(branchCreated).toBeDefined();
+		expect(branchCreated.branchName).toBe('ralph/my-feature-project');
+	});
+
+	it('yields BranchValidated event when already on expected branch', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('ralph/my-feature-project');
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const branchValidated = events.find(e => e.kind === LoopEventKind.BranchValidated);
+		expect(branchValidated).toBeDefined();
+		expect(branchValidated.branchName).toBe('ralph/my-feature-project');
+	});
+
+	it('yields BranchCreated when checking out existing branch from protected', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'branchExists').mockResolvedValue(true);
+		vi.spyOn(gitOps, 'checkoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const branchCreated = events.find(e => e.kind === LoopEventKind.BranchCreated);
+		expect(branchCreated).toBeDefined();
+		expect(branchCreated.branchName).toBe('ralph/my-feature-project');
+	});
+
+	it('getStateSnapshot includes branch after branch gate', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('ralph/my-feature-project');
+
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			() => {},
+		);
+		await orch.start();
+
+		const snapshot = orch.getStateSnapshot();
+		expect(snapshot.branch).toBe('ralph/my-feature-project');
+	});
 });

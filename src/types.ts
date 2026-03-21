@@ -36,6 +36,7 @@ export interface StateSnapshot {
 	readonly taskDescription: string;
 	readonly iterationCount: number;
 	readonly nudgeCount: number;
+	readonly branch?: string;
 }
 
 export interface PrdSnapshot {
@@ -98,6 +99,8 @@ export const enum LoopEventKind {
 	ConfidenceScored = 'confidence_scored',
 	ContextHandoff = 'context_handoff',
 	PrdValidationFailed = 'prd_validation_failed',
+	BranchCreated = 'branch_created',
+	BranchValidated = 'branch_validated',
 	BranchEnforcementFailed = 'branch_enforcement_failed',
 	StateNotified = 'state_notified',
 	Stopped = 'stopped',
@@ -142,6 +145,8 @@ export type LoopEvent =
 	| { kind: LoopEventKind.ConfidenceScored; score: number; threshold: number; breakdown: Record<string, number>; taskId: string }
 	| { kind: LoopEventKind.ContextHandoff; estimatedTokens: number; maxTokens: number; pct: number }
 	| { kind: LoopEventKind.PrdValidationFailed; errors: readonly PrdValidationError[] }
+	| { kind: LoopEventKind.BranchCreated; branchName: string }
+	| { kind: LoopEventKind.BranchValidated; branchName: string }
 	| { kind: LoopEventKind.BranchEnforcementFailed; reason: string }
 	| { kind: LoopEventKind.StateNotified; state: string; taskId: string }
 	| { kind: LoopEventKind.Stopped }

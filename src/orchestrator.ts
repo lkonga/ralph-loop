@@ -380,6 +380,7 @@ export class LoopOrchestrator {
 			taskDescription: this._currentTaskDescription,
 			iterationCount: this._currentIteration,
 			nudgeCount: this._currentNudgeCount,
+			branch: this.activeBranch,
 		};
 	}
 
@@ -609,6 +610,7 @@ export class LoopOrchestrator {
 				if (currentBranch === expectedBranch) {
 					this.logger.log(`Branch gate: already on expected branch '${expectedBranch}'`);
 					this.activeBranch = expectedBranch;
+					yield { kind: LoopEventKind.BranchValidated, branchName: expectedBranch };
 				} else if (protectedBranches.includes(currentBranch)) {
 					const exists = await branchExists(this.config.workspaceRoot, expectedBranch);
 					if (exists) {
@@ -627,6 +629,7 @@ export class LoopOrchestrator {
 						this.logger.log(`Branch gate: created and checked out branch '${expectedBranch}'`);
 					}
 					this.activeBranch = expectedBranch;
+					yield { kind: LoopEventKind.BranchCreated, branchName: expectedBranch };
 				} else {
 					this.logger.log(`Branch gate: on non-protected branch '${currentBranch}', proceeding`);
 					this.activeBranch = currentBranch;

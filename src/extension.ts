@@ -298,6 +298,17 @@ export function activate(context: vscode.ExtensionContext): void {
 						vscode.window.showErrorMessage(`Ralph Loop: PRD validation failed — ${event.errors.length} error(s). Check output for details.`);
 						break;
 					}
+					case LoopEventKind.BranchCreated:
+						logger.log(`🌿 Branch created/checked out: ${event.branchName}`);
+						vscode.window.showInformationMessage(`Ralph Loop: Switched to branch '${event.branchName}'`);
+						break;
+					case LoopEventKind.BranchValidated:
+						logger.log(`🌿 Branch validated: ${event.branchName}`);
+						break;
+					case LoopEventKind.BranchEnforcementFailed:
+						logger.error(`🌿 Branch enforcement failed: ${event.reason}`);
+						vscode.window.showErrorMessage(`Ralph Loop: Branch enforcement failed — ${event.reason}`);
+						break;
 					case LoopEventKind.Error:
 						logger.error(`❌ ${event.message}`);
 						vscode.window.showErrorMessage(`Ralph Loop: ${event.message}`);
