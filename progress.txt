@@ -838,3 +838,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 [2026-03-21T11:42:06.422Z] [b922f5e9-cf21-444b-91e5-2bc56bed6e01] [Task-142] Task completed: **Task 128 — Add `hasDirtyWorkingTree` Helper**: In `src/gitOps.ts`, add `hasDirtyWorkingTree(workspaceRoot: string): Promise<boolean>` — runs `git status --porcelain`, returns `true` if output is non-empty (tracked changes or untracked files). Write tests FIRST in `test/gitOps.test.ts`. Run `npx tsc --noEmit` and `npx vitest run`. (67s)
 
 ### Task 141 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
+[2026-03-21T11:42:06.544Z] [b922f5e9-cf21-444b-91e5-2bc56bed6e01] Committed: 19c0641ae065410517ba736020c04f25ff6dd610
