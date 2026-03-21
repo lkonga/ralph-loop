@@ -821,4 +821,24 @@ describe('deriveBranchName', () => {
 		const result = deriveBranchName('!!!');
 		expect(result.startsWith('ralph/')).toBe(true);
 	});
+
+	it('appends shortHash when provided', () => {
+		expect(deriveBranchName('My PRD', 'abc1234')).toBe('ralph/my-prd-abc1234');
+	});
+
+	it('total length stays within 50 with hash', () => {
+		const longTitle = 'a'.repeat(100);
+		const result = deriveBranchName(longTitle, 'abc1234');
+		expect(result.length).toBeLessThanOrEqual(50);
+		expect(result).toContain('-abc1234');
+		expect(result.startsWith('ralph/')).toBe(true);
+	});
+
+	it('different hashes produce different branch names', () => {
+		const a = deriveBranchName('Same Title', 'aaaa111');
+		const b = deriveBranchName('Same Title', 'bbbb222');
+		expect(a).not.toBe(b);
+		expect(a).toBe('ralph/same-title-aaaa111');
+		expect(b).toBe('ralph/same-title-bbbb222');
+	});
 });

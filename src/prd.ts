@@ -17,18 +17,19 @@ export function parsePrdTitle(prdContent: string): string | undefined {
 	return undefined;
 }
 
-export function deriveBranchName(title: string): string {
+export function deriveBranchName(title: string, shortHash?: string): string {
 	const PREFIX = 'ralph/';
 	const MAX_LENGTH = 50;
+	const suffix = shortHash ? `-${shortHash}` : '';
 	let slug = title
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/-{2,}/g, '-')
 		.replace(/^-|-$/g, '');
 	if (!slug) { slug = 'prd'; }
-	const maxSlug = MAX_LENGTH - PREFIX.length;
+	const maxSlug = MAX_LENGTH - PREFIX.length - suffix.length;
 	slug = slug.slice(0, maxSlug).replace(/-$/g, '');
-	return PREFIX + slug;
+	return PREFIX + slug + suffix;
 }
 
 export function parseLineAnnotations(line: string): { decomposed: boolean; checkpoint: boolean } {
