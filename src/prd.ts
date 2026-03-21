@@ -345,8 +345,12 @@ function stripDependsAnnotation(line: string): string {
 	return line.replace(DEPENDS_SUFFIX, '');
 }
 
+function stripTrailingParenthetical(line: string): string {
+	return line.replace(/\s*\(archived\b[^)]*\)\s*$/, '');
+}
+
 function normalizeForComparison(line: string): string {
-	return stripDependsAnnotation(stripDecomposedPrefix(stripCheckboxState(line)));
+	return stripTrailingParenthetical(stripDependsAnnotation(stripDecomposedPrefix(stripCheckboxState(line))));
 }
 
 export function validatePrdEdit(before: string, after: string): { allowed: boolean; reason?: string } {
