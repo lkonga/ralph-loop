@@ -1813,4 +1813,54 @@ describe('Startup branch gate', () => {
 		expect(createSpy).not.toHaveBeenCalled();
 		expect(events.find(e => e.kind === LoopEventKind.BranchEnforcementFailed)).toBeUndefined();
 	});
+
+	it('custom protected branches list is respected', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('develop');
+		vi.spyOn(gitOps, 'branchExists').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'develop'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		expect(gitOps.createAndCheckoutBranch).toHaveBeenCalledWith(tmpDir, 'ralph/my-feature-project');
+	});
+
+	it('non-protected non-expected branch proceeds without branch ops', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('feature/other-work');
+		const branchExistsSpy = vi.spyOn(gitOps, 'branchExists').mockResolvedValue(false);
+		const createSpy = vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		const checkoutSpy = vi.spyOn(gitOps, 'checkoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		expect(branchExistsSpy).not.toHaveBeenCalled();
+		expect(createSpy).not.toHaveBeenCalled();
+		expect(checkoutSpy).not.toHaveBeenCalled();
+		expect(events.find(e => e.kind === LoopEventKind.BranchEnforcementFailed)).toBeUndefined();
+	});
 });
