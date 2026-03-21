@@ -776,3 +776,4 @@ Added parsePrdTitle(prdContent) — extracts first H1 heading text via /^# (.+)$
 
 ### Task 131 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +13/-1 | Status: pass
 [2026-03-21T09:22:59.634Z] [27204146-feb9-4a5e-9e05-c2b8274894e9] Committed: 07f57b9b1b47813e6142ab51272f6ca8ffd1fd97
+[2026-03-21T09:23:15.935Z] [4bdafa92-9be3-4d8f-8467-25fd4f8c79f1] [Task-133] Task started: **Task 119 — Feature Branch Config Option**: In `src/types.ts`, add `featureBranch?: { enabled: boolean; protectedBranches?: string[] }` to `RalphConfig`. Default: `{ enabled: true, protectedBranches: ['main', 'master'] }`. In `DEFAULT_CONFIG`, set `featureBranch: { enabled: true, protectedBranches: ['main', 'master'] }`. In `package.json`, add `ralph-loop.featureBranch.enabled` (boolean, default true) and `ralph-loop.featureBranch.protectedBranches` (array of strings, default `['main', 'master']`) to the VS Code settings contributions. Run `npx tsc --noEmit` and `npx vitest run`.

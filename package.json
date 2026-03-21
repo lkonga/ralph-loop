@@ -87,6 +87,19 @@
 					],
 					"default": "general",
 					"description": "Workflow preset that applies smart defaults for common scenarios. Presets set config values that can still be overridden individually."
+				},
+				"ralph-loop.featureBranch.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable automatic feature branch creation and enforcement."
+				},
+				"ralph-loop.featureBranch.protectedBranches": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": ["main", "master"],
+					"description": "Branches that ralph-loop should never commit to directly. A feature branch will be created instead."
 				}
 			}
 		}

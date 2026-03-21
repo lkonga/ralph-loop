@@ -1653,4 +1653,20 @@ describe('CHECKPOINT: Startup DX Verification (Task 116)', () => {
 		expect(execResult).toBeInstanceOf(Promise);
 		await execResult;
 	});
+
+	it('DEFAULT_CONFIG includes featureBranch with correct defaults', () => {
+		expect(DEFAULT_CONFIG.featureBranch).toBeDefined();
+		expect(DEFAULT_CONFIG.featureBranch).toEqual({
+			enabled: true,
+			protectedBranches: ['main', 'master'],
+		});
+	});
+
+	it('featureBranch.enabled defaults to true', () => {
+		expect(DEFAULT_CONFIG.featureBranch!.enabled).toBe(true);
+	});
+
+	it('featureBranch.protectedBranches defaults to main and master', () => {
+		expect(DEFAULT_CONFIG.featureBranch!.protectedBranches).toEqual(['main', 'master']);
+	});
 });
