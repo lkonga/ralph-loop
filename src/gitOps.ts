@@ -106,6 +106,14 @@ export async function createAndCheckoutBranch(workspaceRoot: string, branchName:
 	return { success: true };
 }
 
+export async function checkoutBranch(workspaceRoot: string, branchName: string): Promise<{ success: boolean; error?: string }> {
+	const result = await runGit(workspaceRoot, ['checkout', branchName]);
+	if (result.err) {
+		return { success: false, error: result.err.message };
+	}
+	return { success: true };
+}
+
 export async function branchExists(workspaceRoot: string, branchName: string): Promise<boolean> {
 	const result = await runGit(workspaceRoot, ['rev-parse', '--verify', `refs/heads/${branchName}`]);
 	return !result.err;

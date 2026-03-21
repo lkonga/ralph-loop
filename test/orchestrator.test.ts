@@ -1670,3 +1670,147 @@ describe('CHECKPOINT: Startup DX Verification (Task 116)', () => {
 		expect(DEFAULT_CONFIG.featureBranch!.protectedBranches).toEqual(['main', 'master']);
 	});
 });
+
+describe('Startup branch gate', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'branch-gate-'));
+		fs.writeFileSync(
+			path.join(tmpDir, 'PRD.md'),
+			'# My Feature Project\n\n- [x] **Task 1 — Done**: already done\n',
+		);
+		fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('creates branch from protected branch (main)', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'branchExists').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		expect(gitOps.createAndCheckoutBranch).toHaveBeenCalledWith(tmpDir, 'ralph/my-feature-project');
+	});
+
+	it('reuses existing branch instead of creating', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'branchExists').mockResolvedValue(true);
+		vi.spyOn(gitOps, 'checkoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		expect(gitOps.checkoutBranch).toHaveBeenCalledWith(tmpDir, 'ralph/my-feature-project');
+		expect(gitOps.createAndCheckoutBranch).not.toHaveBeenCalled();
+	});
+
+	it('proceeds normally when already on expected branch', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('ralph/my-feature-project');
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		expect(events.find(e => e.kind === LoopEventKind.BranchEnforcementFailed)).toBeUndefined();
+	});
+
+	it('stops on branch creation failure', async () => {
+		// Need a pending task so the loop doesn't just AllDone before reaching branch gate side effects
+		fs.writeFileSync(
+			path.join(tmpDir, 'PRD.md'),
+			'# My Feature Project\n\n- [ ] **Task 1 — Do something**: description\n',
+		);
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'branchExists').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: false, error: 'branch creation failed' });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const failEvent = events.find(e => e.kind === LoopEventKind.BranchEnforcementFailed);
+		expect(failEvent).toBeDefined();
+		expect(failEvent.reason).toContain('branch creation failed');
+	});
+
+	it('skipped when featureBranch.enabled is false', async () => {
+		const gitOps = await import('../src/gitOps');
+		const getCurrentBranchSpy = vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		const branchExistsSpy = vi.spyOn(gitOps, 'branchExists').mockResolvedValue(false);
+		const createSpy = vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: false, protectedBranches: ['main', 'master'] },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		// Branch operations should not be called
+		expect(branchExistsSpy).not.toHaveBeenCalled();
+		expect(createSpy).not.toHaveBeenCalled();
+		expect(events.find(e => e.kind === LoopEventKind.BranchEnforcementFailed)).toBeUndefined();
+	});
+});

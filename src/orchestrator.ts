@@ -8,9 +8,9 @@ import { showCooldownDialog, type CooldownDialogResult } from './cooldownDialog'
 import { buildFinalNudgePrompt, buildPrompt, parseReviewVerdict, PromptCapabilities, sendReviewPrompt } from './copilot';
 import { MAX_RETRIES_PER_TASK, shouldRetryError } from './decisions';
 import { DiffValidator } from './diffValidator';
-import { atomicCommit } from './gitOps';
+import { atomicCommit, getCurrentBranch, branchExists, createAndCheckoutBranch, checkoutBranch } from './gitOps';
 import { KnowledgeManager } from './knowledge';
-import { addDependsAnnotation, analyzeMissingDependency, appendProgress, markTaskComplete, pickNextTask, pickReadyTasks, readPrdFile, readPrdSnapshot, resolvePrdPath, resolveProgressPath, validatePrd, validatePrdEdit } from './prd';
+import { addDependsAnnotation, analyzeMissingDependency, appendProgress, deriveBranchName, markTaskComplete, parsePrdTitle, pickNextTask, pickReadyTasks, readPrdFile, readPrdSnapshot, resolvePrdPath, resolveProgressPath, validatePrd, validatePrdEdit } from './prd';
 import { SessionPersistence } from './sessionPersistence';
 import { AutoDecomposer, StagnationDetector } from './stagnationDetector';
 import { CopilotCommandStrategy, DirectApiStrategy } from './strategies';
@@ -327,6 +327,7 @@ export class LoopOrchestrator {
 	private pendingContext?: string;
 	private linkedSignal?: LinkedCancellationSource;
 	private readonly sessionPersistence?: SessionPersistence;
+	private activeBranch?: string;
 	private _currentTaskId = '';
 	private _currentTaskDescription = '';
 	private _currentIteration = 0;
@@ -422,7 +423,8 @@ export class LoopOrchestrator {
 				if (event.kind === LoopEventKind.Stopped ||
 					event.kind === LoopEventKind.AllDone ||
 					event.kind === LoopEventKind.MaxIterations ||
-					event.kind === LoopEventKind.YieldRequested) {
+					event.kind === LoopEventKind.YieldRequested ||
+					event.kind === LoopEventKind.BranchEnforcementFailed) {
 					this.sessionPersistence?.clear(this.config.workspaceRoot);
 					break;
 				}
@@ -592,6 +594,42 @@ export class LoopOrchestrator {
 					for (const w of validation.errors) {
 						this.logger.warn(`PRD warning: ${w.message}`);
 					}
+				}
+			}
+
+			// Branch enforcement gate (fires once per loop run)
+			const featureBranchConfig = this.config.featureBranch;
+			if (featureBranchConfig?.enabled) {
+				const prdContent = readPrdFile(prdPath);
+				const prdTitle = parsePrdTitle(prdContent);
+				const expectedBranch = deriveBranchName(prdTitle ?? '');
+				const currentBranch = await getCurrentBranch(this.config.workspaceRoot);
+				const protectedBranches = featureBranchConfig.protectedBranches ?? ['main', 'master'];
+
+				if (currentBranch === expectedBranch) {
+					this.logger.log(`Branch gate: already on expected branch '${expectedBranch}'`);
+					this.activeBranch = expectedBranch;
+				} else if (protectedBranches.includes(currentBranch)) {
+					const exists = await branchExists(this.config.workspaceRoot, expectedBranch);
+					if (exists) {
+						const result = await checkoutBranch(this.config.workspaceRoot, expectedBranch);
+						if (!result.success) {
+							yield { kind: LoopEventKind.BranchEnforcementFailed, reason: result.error ?? 'checkout failed' };
+							return;
+						}
+						this.logger.log(`Branch gate: checked out existing branch '${expectedBranch}'`);
+					} else {
+						const result = await createAndCheckoutBranch(this.config.workspaceRoot, expectedBranch);
+						if (!result.success) {
+							yield { kind: LoopEventKind.BranchEnforcementFailed, reason: result.error ?? 'branch creation failed' };
+							return;
+						}
+						this.logger.log(`Branch gate: created and checked out branch '${expectedBranch}'`);
+					}
+					this.activeBranch = expectedBranch;
+				} else {
+					this.logger.log(`Branch gate: on non-protected branch '${currentBranch}', proceeding`);
+					this.activeBranch = currentBranch;
 				}
 			}
 
