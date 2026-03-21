@@ -117,7 +117,6 @@ describe('Feature Branch Enforcement E2E', () => {
                 tmpDir,
                 { id: 1, taskId: 'Task 1', title: 'Task 1', description: 'test commit', status: 'pending' as any },
                 'inv-1',
-                { protectedBranches: ['main', 'master'] },
             );
             expect(result.success).toBe(true);
 
@@ -130,18 +129,6 @@ describe('Feature Branch Enforcement E2E', () => {
             expect(mainLog).not.toContain('test commit');
         });
 
-        it('atomicCommit refuses to commit on protected branch (main)', async () => {
-            // Stay on main
-            fs.writeFileSync(path.join(tmpDir, 'newfile.txt'), 'content');
-            const result = await atomicCommit(
-                tmpDir,
-                { id: 1, taskId: 'Task 1', title: 'Task 1', description: 'bad commit', status: 'pending' as any },
-                'inv-1',
-                { protectedBranches: ['main', 'master'] },
-            );
-            expect(result.success).toBe(false);
-            expect(result.error).toContain('protected branch');
-        });
     });
 
     // --- (2) Stop and resume → session correctly restores branch context ---
@@ -254,7 +241,6 @@ describe('Feature Branch Enforcement E2E', () => {
                     tmpDir,
                     { id: i, taskId: `Task ${i}`, title: `Task ${i}`, description: `implement task ${i}`, status: 'pending' as any },
                     `inv-${i}`,
-                    { protectedBranches: ['main', 'master'] },
                 );
                 expect(result.success).toBe(true);
             }
@@ -279,7 +265,6 @@ describe('Feature Branch Enforcement E2E', () => {
                 tmpDir,
                 { id: 1, taskId: 'Task 1', title: 'Task 1', description: 'add feature', status: 'pending' as any },
                 'inv-1',
-                { protectedBranches: ['main', 'master'] },
             );
 
             // Switch to main and merge
@@ -303,7 +288,6 @@ describe('Feature Branch Enforcement E2E', () => {
                 tmpDir,
                 { id: 1, taskId: 'Task 1', title: 'Task 1', description: 'discard me', status: 'pending' as any },
                 'inv-1',
-                { protectedBranches: ['main', 'master'] },
             );
 
             // Switch back to main
@@ -365,7 +349,6 @@ describe('Feature Branch Enforcement E2E', () => {
                 tmpDir,
                 { id: 1, taskId: 'Task 1', title: 'Task 1', description: 'direct commit', status: 'pending' as any },
                 'inv-1',
-                // No protectedBranches — backward compatible mode
             );
             expect(result.success).toBe(true);
 
