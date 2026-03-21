@@ -602,7 +602,7 @@
 
 - [x] **Task 134 — Switch Back to Original Branch on Loop Completion**: In `src/orchestrator.ts`, after the loop completes (all tasks done or user stops), `git checkout originalBranch` to return to where the user started. Yield a new `LoopEventKind.BranchSwitchedBack` event (`{ from: string, to: string }`). In `src/extension.ts`, handle the event: show info notification "Ralph finished — switched back to {originalBranch}. Review changes on {ralphBranch}." If switch-back fails (branch deleted, conflicts), log a warning but don't crash — the ralph/ branch still has all the work. Write tests FIRST. Run `npx tsc --noEmit` and `npx vitest run`.
 
-- [ ] **Task 135 — Remove `branchMismatch` UI Handling**: In `src/extension.ts`, remove the `branchMismatch` dialog (Resume/Continue/Discard). When resuming a session, the orchestrator simply checks out the stored ralph/ branch — no user prompt needed, since the ralph/ branch is self-contained. Simplify the resume flow. Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 135 — Remove `branchMismatch` UI Handling**: In `src/extension.ts`, remove the `branchMismatch` dialog (Resume/Continue/Discard). When resuming a session, the orchestrator simply checks out the stored ralph/ branch — no user prompt needed, since the ralph/ branch is self-contained. Simplify the resume flow. Run `npx tsc --noEmit` and `npx vitest run`.
 
 ### 18d — Cleanup & Verification
 
