@@ -606,6 +606,6 @@
 
 ### 18d — Cleanup & Verification
 
-- [ ] **Task 136 — Remove `BranchValidated` Event**: In `src/types.ts`, remove `LoopEventKind.BranchValidated` — no longer needed since we always create a new branch (never validate an existing one). Remove handling in `src/extension.ts`. Update tests. Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 136 — Remove `BranchValidated` Event**: In `src/types.ts`, remove `LoopEventKind.BranchValidated` — no longer needed since we always create a new branch (never validate an existing one). Remove handling in `src/extension.ts`. Update tests. Run `npx tsc --noEmit` and `npx vitest run`.
 
 - [ ] **Task 137 — CHECKPOINT: Linear Branch Model E2E**: Full end-to-end verification. (1) Start on `main` → creates `ralph/<slug>-<hash>`, all commits land there, `main` untouched. (2) Start on `bisect/v0.39-lean` → creates `ralph/<slug>-<hash>` from that HEAD, `bisect/v0.39-lean` untouched. (3) Start on any arbitrary branch → same behavior. (4) Dirty working tree → committed on ralph/ branch as WIP, original branch clean. (5) Loop completes → switches back to original branch. (6) Resume after stop → checks out stored ralph/ branch, continues. (7) `featureBranch.enabled: false` → commits go to current branch (backward compatible). (8) No `protectedBranches` config needed. (9) No regressions in existing tests. Clean compile, full vitest green.
