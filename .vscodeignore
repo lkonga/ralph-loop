@@ -1,3 +1,4 @@
+# Source & dev files (VSIX only needs out/)
 .git/**
 .vscode/**
 .opencode/**
@@ -7,17 +8,25 @@ test/**
 cli/**
 docs/**
 research/**
-agents/**
+scripts/**
 __mocks__/**
 node_modules/**
+
+# Agent/config wiring (dev-time only, discovered via settings.json)
+agents.source/**
+.github/agents/**
+AGENTS.md
+
+# Build artifacts & config
 *.vsix
 *.ts
 !out/**
 vite.config.ts
 tsconfig.json
+
+# Docs not needed in VSIX
 PRD.md
 ISSUES.md
 CHANGELOG.md
 progress.txt
 knowledge.md
-prompts

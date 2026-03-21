@@ -2,7 +2,7 @@
 	"name": "ralph-loop",
 	"displayName": "Ralph Loop — Autonomous PRD Loop",
 	"description": "Drives Copilot Agent Mode in a deterministic loop from PRD tasks.",
-	"version": "0.5.8",
+	"version": "0.5.9",
 	"publisher": "ralph-loop",
 	"license": "MIT",
 	"engines": {
@@ -98,7 +98,10 @@
 					"items": {
 						"type": "string"
 					},
-					"default": ["main", "master"],
+					"default": [
+						"main",
+						"master"
+					],
 					"description": "Branches that ralph-loop should never commit to directly. A feature branch will be created instead."
 				}
 			}
