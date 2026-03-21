@@ -3,7 +3,7 @@ import { HookBridgeDisposable, registerHookBridge, startChatSendWatcher } from '
 import { LoopOrchestrator, loadConfig } from './orchestrator';
 import { SessionPersistence } from './sessionPersistence';
 import { ShellHookProvider } from './shellHookProvider';
-import { disposeStatusBar, updateStatusBar } from './statusBar';
+import { disposeStatusBar, showStatusBarIdle, updateStatusBar } from './statusBar';
 import { fireStateChangeNotification } from './stateNotification';
 import { ChatSendRequest, IRalphHookService, RalphConfig, LoopEventKind, LoopState, createOutputLogger } from './types';
 
@@ -11,6 +11,26 @@ let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.LogOutputChannel;
 let hookBridgeDisposable: HookBridgeDisposable | undefined;
 let sessionTrackingDisposable: vscode.Disposable | undefined;
+
+/**
+ * Shared finalizer: runs orchestrator.start() and guarantees idle cleanup
+ * on all exit paths (normal completion, crash, auto-resume).
+ */
+export async function runOrchestratorWithIdleCleanup(
+	orch: LoopOrchestrator,
+	logger: ReturnType<typeof createOutputLogger>,
+): Promise<void> {
+	try {
+		await orch.start();
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err);
+		logger.error(`Loop crashed: ${message}`);
+		vscode.window.showErrorMessage(`Ralph Loop crashed: ${message}`);
+	} finally {
+		showStatusBarIdle();
+		fireStateChangeNotification(LoopState.Idle, '');
+	}
+}
 
 /**
  * Auto-resume an incomplete session without prompting the user.
@@ -350,14 +370,8 @@ export function activate(context: vscode.ExtensionContext): void {
 				} catch { /* proposed API unavailable */ }
 			}
 
-			try {
-				outputChannel.show(true);
-				await orchestrator.start();
-			} catch (err) {
-				const message = err instanceof Error ? err.message : String(err);
-				logger.error(`Loop crashed: ${message}`);
-				vscode.window.showErrorMessage(`Ralph Loop crashed: ${message}`);
-			}
+			outputChannel.show(true);
+			await runOrchestratorWithIdleCleanup(orchestrator, logger);
 		}),
 
 		vscode.commands.registerCommand('ralph-loop.stop', () => {
@@ -451,8 +465,12 @@ export function activate(context: vscode.ExtensionContext): void {
 		resumeIncompleteSession(wsRoot, logger, config => {
 			orchestrator = new LoopOrchestrator(config, logger, event => {
 				logger.log(`[resumed] ${event.kind}`);
+				if (event.kind === LoopEventKind.TaskStarted) {
+					fireStateChangeNotification(LoopState.Running, event.task.taskId);
+					updateStatusBar(orchestrator!.getStateSnapshot());
+				}
 			});
-			orchestrator.start();
+			runOrchestratorWithIdleCleanup(orchestrator, logger);
 		});
 	}
 }

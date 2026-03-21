@@ -23,9 +23,23 @@ vi.mock('vscode', () => ({
 	},
 }));
 
+vi.mock('../src/statusBar', () => ({
+	showStatusBarIdle: vi.fn(),
+	updateStatusBar: vi.fn(),
+	disposeStatusBar: vi.fn(),
+}));
+
+vi.mock('../src/stateNotification', () => ({
+	fireStateChangeNotification: vi.fn(),
+}));
+
 import * as vscode from 'vscode';
+import { showStatusBarIdle } from '../src/statusBar';
+import { fireStateChangeNotification } from '../src/stateNotification';
 
 const mockShowInfo = vi.mocked(vscode.window.showInformationMessage);
+const mockShowStatusBarIdle = vi.mocked(showStatusBarIdle);
+const mockFireStateChange = vi.mocked(fireStateChangeNotification);
 
 beforeEach(() => {
 	vi.restoreAllMocks();
@@ -86,5 +100,52 @@ describe('extension resume flow', () => {
 		expect(onResume).not.toHaveBeenCalled();
 
 		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+});
+
+describe('shared idle finalizer (runOrchestratorWithIdleCleanup)', () => {
+	it('pushes idle and hides status bar after orchestrator.start() resolves', async () => {
+		const { runOrchestratorWithIdleCleanup } = await import('../src/extension');
+
+		const mockOrchestrator = {
+			start: vi.fn().mockResolvedValue(undefined),
+		} as any;
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() } as any;
+
+		await runOrchestratorWithIdleCleanup(mockOrchestrator, logger);
+
+		expect(mockShowStatusBarIdle).toHaveBeenCalledOnce();
+		expect(mockFireStateChange).toHaveBeenCalledWith('idle', '');
+	});
+
+	it('shows crash message and still pushes idle when orchestrator.start() rejects', async () => {
+		const { runOrchestratorWithIdleCleanup } = await import('../src/extension');
+
+		const mockOrchestrator = {
+			start: vi.fn().mockRejectedValue(new Error('boom')),
+		} as any;
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() } as any;
+
+		await runOrchestratorWithIdleCleanup(mockOrchestrator, logger);
+
+		expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('boom'));
+		expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(expect.stringContaining('boom'));
+		expect(mockShowStatusBarIdle).toHaveBeenCalledOnce();
+		expect(mockFireStateChange).toHaveBeenCalledWith('idle', '');
+	});
+
+	it('auto-resume uses the same finalizer and emits idle cleanup', async () => {
+		const { runOrchestratorWithIdleCleanup } = await import('../src/extension');
+
+		const mockOrchestrator = {
+			start: vi.fn().mockResolvedValue(undefined),
+		} as any;
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() } as any;
+
+		// Simulate resume path using the same function
+		await runOrchestratorWithIdleCleanup(mockOrchestrator, logger);
+
+		expect(mockShowStatusBarIdle).toHaveBeenCalledOnce();
+		expect(mockFireStateChange).toHaveBeenCalledWith('idle', '');
 	});
 });

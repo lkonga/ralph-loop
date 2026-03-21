@@ -609,3 +609,28 @@
 - [x] **Task 136 — Remove `BranchValidated` Event**: In `src/types.ts`, remove `LoopEventKind.BranchValidated` — no longer needed since we always create a new branch (never validate an existing one). Remove handling in `src/extension.ts`. Update tests. Run `npx tsc --noEmit` and `npx vitest run`.
 
 - [x] **Task 137 — CHECKPOINT: Linear Branch Model E2E**: Full end-to-end verification. (1) Start on `main` → creates `ralph/<slug>-<hash>`, all commits land there, `main` untouched. (2) Start on `bisect/v0.39-lean` → creates `ralph/<slug>-<hash>` from that HEAD, `bisect/v0.39-lean` untouched. (3) Start on any arbitrary branch → same behavior. (4) Dirty working tree → committed on ralph/ branch as WIP, original branch clean. (5) Loop completes → switches back to original branch. (6) Resume after stop → checks out stored ralph/ branch, continues. (7) `featureBranch.enabled: false` → commits go to current branch (backward compatible). (8) No `protectedBranches` config needed. (9) No regressions in existing tests. Clean compile, full vitest green.
+
+---
+
+## Phase 19 — Status Bar Idle/Processing Consistency
+
+> Spec: `research/17-phase19-deep-research.md`
+> **Problem**: Split-brain status bug where the visible bar can remain on `processing` while `ralph-loop.status` already reports `idle`.
+> **Solution**: Pair a Ralph-side guaranteed idle refresh with a fork-side precedence model, then harden terminal sequencing, abnormal exits, stop responsiveness, and regressions so the bar converges to idle across normal, failed, resumed, and consecutive runs.
+> **TDD is MANDATORY**. Run `npx tsc --noEmit` and `npx vitest run` — ALL tests must pass before marking ANY checkbox.
+
+### 19.1 — Make Idle Authoritative
+
+- [ ] **Task 138 — Add a shared final idle refresh path in `src/extension.ts`**: Guarantee one authoritative Ralph idle refresh after every `await orchestrator.start()` settlement, including crashes and auto-resume. → Spec: `research/17-phase19-deep-research.md` L33-L51
+
+- [ ] **Task 139 — Enforce fork-side precedence so Ralph idle beats lifecycle processing**: Prevent a later `RequestLifecycleModel` `Processing` update from overwriting a correct Ralph idle push in the Copilot fork status bar. → Spec: `research/17-phase19-deep-research.md` L53-L72
+
+- [ ] **Task 140 — Make terminal snapshots truthful in `src/orchestrator.ts`**: Ensure terminal event handlers stop reading stale `running` snapshots after the loop has already logically ended. → Spec: `research/17-phase19-deep-research.md` L74-L92
+
+### 19.2 — Backfill Edge Cases and Lock Regressions
+
+- [ ] **Task 141 — Backfill abnormal exits and resumed cleanup through the shared idle path**: Ensure non-happy exits also converge the UI to idle instead of relying on happy-path terminal events. → Spec: `research/17-phase19-deep-research.md` L96-L115
+
+- [ ] **Task 142 — Make `delay()` abort-aware so stop requests collapse stale UI windows**: Reduce stop-path lag by making orchestrator waits terminate promptly when the loop is stopping. → Spec: `research/17-phase19-deep-research.md` L117-L134
+
+- [ ] **Task 143 — Add regression coverage for normal, failure, stop, resume, and consecutive-run scenarios**: Lock in the status-bar convergence contract so the bar, snapshots, and status command stay aligned across all reported exit paths. → Spec: `research/17-phase19-deep-research.md` L136-L157
