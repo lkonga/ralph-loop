@@ -821,3 +821,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 
 ### Task 138 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
 [2026-03-21T09:48:51.834Z] [c361b681-62e4-4c1d-80d5-f2fb58b67a76] Committed: 5f8be3b43ea610f135af478abd69dde84a1b3b28
+[2026-03-21T11:37:43.121Z] [fe06f4f4-4f80-482c-90b4-e697b2fee969] [Task-140] Task started: **Task 126 — Add `getShortHash` Helper**: In `src/gitOps.ts`, add `getShortHash(workspaceRoot: string): Promise<string>` — runs `git rev-parse --short HEAD`, returns 7-char hex hash. Write tests FIRST in `test/gitOps.test.ts`: returns a hex string of expected length. Run `npx tsc --noEmit` and `npx vitest run`.

@@ -133,3 +133,8 @@ export async function branchExists(workspaceRoot: string, branchName: string): P
 	const result = await runGit(workspaceRoot, ['rev-parse', '--verify', `refs/heads/${branchName}`]);
 	return !result.err;
 }
+
+export async function getShortHash(workspaceRoot: string): Promise<string> {
+	const result = await runGit(workspaceRoot, ['rev-parse', '--short', 'HEAD']);
+	return result.stdout.trim();
+}

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import { atomicCommit, inferCommitType, buildCommitMessage, getCurrentBranch, createAndCheckoutBranch, branchExists } from '../src/gitOps';
+import { atomicCommit, inferCommitType, buildCommitMessage, getCurrentBranch, createAndCheckoutBranch, branchExists, getShortHash } from '../src/gitOps';
 import type { Task } from '../src/types';
 import { TaskStatus } from '../src/types';
 
@@ -297,6 +297,25 @@ describe('gitOps', () => {
 			});
 			const exists = await branchExists('/workspace', 'nonexistent');
 			expect(exists).toBe(false);
+		});
+	});
+
+	describe('getShortHash', () => {
+		it('returns a 7-char hex string', async () => {
+			mockGitCommands({
+				'rev-parse --short HEAD': { stdout: 'a1b2c3d\n' },
+			});
+			const hash = await getShortHash('/workspace');
+			expect(hash).toBe('a1b2c3d');
+			expect(hash).toMatch(/^[0-9a-f]{7}$/);
+		});
+
+		it('returns trimmed output', async () => {
+			mockGitCommands({
+				'rev-parse --short HEAD': { stdout: '  ff00bb1  \n' },
+			});
+			const hash = await getShortHash('/workspace');
+			expect(hash).toBe('ff00bb1');
 		});
 	});
 });
