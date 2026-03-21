@@ -594,7 +594,7 @@
 
 - [x] **Task 131 — Remove `protectedBranches` Config**: In `src/types.ts`, remove `protectedBranches?: string[]` from `featureBranch` config. Simplify to `featureBranch?: { enabled: boolean }`. Update `DEFAULT_CONFIG` accordingly. In `package.json`, remove the `ralph-loop.featureBranch.protectedBranches` VS Code setting contribution. Update all references. Run `npx tsc --noEmit` and `npx vitest run`.
 
-- [ ] **Task 132 — Remove `atomicCommit` Branch Guard**: In `src/gitOps.ts`, remove the protected-branch check at the top of `atomicCommit()`. Remove the `protectedBranches` parameter. The linear branch gate makes this guard redundant — work always happens on a ralph/ branch. Remove corresponding tests in `test/gitOps.test.ts` (commit blocked on main, warning logged). Update all `atomicCommit` call sites. Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 132 — Remove `atomicCommit` Branch Guard**: In `src/gitOps.ts`, remove the protected-branch check at the top of `atomicCommit()`. Remove the `protectedBranches` parameter. The linear branch gate makes this guard redundant — work always happens on a ralph/ branch. Remove corresponding tests in `test/gitOps.test.ts` (commit blocked on main, warning logged). Update all `atomicCommit` call sites. Run `npx tsc --noEmit` and `npx vitest run`.
 
 ### 18c — Session Persistence & Switch-Back
 
