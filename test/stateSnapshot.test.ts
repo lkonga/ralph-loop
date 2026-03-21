@@ -1,6 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { LoopState } from '../src/types';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { LoopState, LoopEventKind, DEFAULT_CONFIG, DEFAULT_BEARINGS_CONFIG } from '../src/types';
 import type { StateSnapshot } from '../src/types';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 
 describe('State Snapshot Command', () => {
 	describe('StateSnapshot interface', () => {
@@ -119,5 +122,127 @@ describe('State Snapshot Command', () => {
 			};
 			expect(snapshot.branch).toBeUndefined();
 		});
+	});
+});
+
+describe('Terminal snapshot truthfulness', () => {
+	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-snapshot-'));
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [x] Done task\n', 'utf-8');
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('AllDone StateNotified carries idle state and empty taskId', async () => {
+		const { LoopOrchestrator } = await import('../src/orchestrator');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const allDoneIdx = events.findIndex(e => e.kind === LoopEventKind.AllDone);
+		expect(allDoneIdx).toBeGreaterThanOrEqual(0);
+
+		const stateNotifiedAfter = events.find(
+			(e, i) => i > allDoneIdx && e.kind === LoopEventKind.StateNotified,
+		);
+		expect(stateNotifiedAfter).toBeDefined();
+		expect(stateNotifiedAfter.state).toBe(LoopState.Idle);
+		expect(stateNotifiedAfter.taskId).toBe('');
+	});
+
+	it('on stop/yield/max-iterations, terminal StateNotified sees idle not stale running', async () => {
+		const { LoopOrchestrator } = await import('../src/orchestrator');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const terminalKinds = new Set([
+			LoopEventKind.AllDone,
+			LoopEventKind.Stopped,
+			LoopEventKind.MaxIterations,
+			LoopEventKind.YieldRequested,
+		]);
+
+		for (let i = 0; i < events.length; i++) {
+			if (terminalKinds.has(events[i].kind)) {
+				const nextNotified = events.find(
+					(e, j) => j > i && e.kind === LoopEventKind.StateNotified,
+				);
+				if (nextNotified) {
+					expect(nextNotified.state).toBe(LoopState.Idle);
+					expect(nextNotified.taskId).toBe('');
+				}
+			}
+		}
+	});
+
+	it('getStateSnapshot returns idle after start() resolves', async () => {
+		const { LoopOrchestrator } = await import('../src/orchestrator');
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			() => {},
+		);
+		await orch.start();
+
+		const snap = orch.getStateSnapshot();
+		expect(snap.state).toBe(LoopState.Idle);
+		expect(snap.taskId).toBe('');
+	});
+
+	it('terminal sequencing does not regress branch switch-back', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc1234');
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'checkoutBranch').mockResolvedValue({ success: true });
+
+		const { LoopOrchestrator } = await import('../src/orchestrator');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const switchBack = events.find(e => e.kind === LoopEventKind.BranchSwitchedBack);
+		expect(switchBack).toBeDefined();
+		expect(switchBack.to).toBe('main');
 	});
 });
