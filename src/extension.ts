@@ -5,12 +5,34 @@ import { SessionPersistence } from './sessionPersistence';
 import { ShellHookProvider } from './shellHookProvider';
 import { disposeStatusBar, updateStatusBar } from './statusBar';
 import { fireStateChangeNotification } from './stateNotification';
-import { ChatSendRequest, IRalphHookService, LoopEventKind, LoopState, createOutputLogger } from './types';
+import { ChatSendRequest, IRalphHookService, RalphConfig, LoopEventKind, LoopState, createOutputLogger } from './types';
 
 let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.LogOutputChannel;
 let hookBridgeDisposable: HookBridgeDisposable | undefined;
 let sessionTrackingDisposable: vscode.Disposable | undefined;
+
+/**
+ * Auto-resume an incomplete session without prompting the user.
+ * The ralph/ branch is self-contained, so we just load it and go.
+ */
+export function resumeIncompleteSession(
+	wsRoot: string,
+	logger: ReturnType<typeof createOutputLogger>,
+	onResume: (config: RalphConfig) => void,
+): void {
+	const persistence = new SessionPersistence();
+	if (!persistence.hasIncompleteSession(wsRoot)) {
+		return;
+	}
+	const state = persistence.load(wsRoot);
+	if (!state) {
+		return;
+	}
+	logger.log(`Auto-resuming incomplete session (branch: ${state.branchName ?? 'unknown'})`);
+	const config = loadConfig(wsRoot);
+	onResume(config);
+}
 
 async function resolveWorkspaceRoot(): Promise<string | undefined> {
 	const folders = vscode.workspace.workspaceFolders;
@@ -425,31 +447,16 @@ export function activate(context: vscode.ExtensionContext): void {
 
 	logger.log('Ralph Loop extension activated');
 
-	// Check for incomplete session on activation
+	// Auto-resume incomplete session on activation (no user prompt needed)
 	const folders = vscode.workspace.workspaceFolders;
 	if (folders?.length) {
 		const wsRoot = folders[0].uri.fsPath;
-		const persistence = new SessionPersistence();
-		if (persistence.hasIncompleteSession(wsRoot)) {
-			(async () => {
-				const state = persistence.load(wsRoot);
-				if (state) {
-					const choice = await vscode.window.showInformationMessage(
-						'Ralph Loop has an incomplete session. Resume?',
-						'Resume', 'Discard',
-					);
-					if (choice === 'Resume') {
-						const config = loadConfig(wsRoot);
-						orchestrator = new LoopOrchestrator(config, logger, event => {
-							logger.log(`[resumed] ${event.kind}`);
-						});
-						orchestrator.start();
-					} else if (choice === 'Discard') {
-						persistence.clear(wsRoot);
-					}
-				}
-			})();
-		}
+		resumeIncompleteSession(wsRoot, logger, config => {
+			orchestrator = new LoopOrchestrator(config, logger, event => {
+				logger.log(`[resumed] ${event.kind}`);
+			});
+			orchestrator.start();
+		});
 	}
 }
 
