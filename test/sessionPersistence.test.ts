@@ -236,4 +236,73 @@ describe('SessionPersistence', () => {
         expect(loaded).not.toBeNull();
         expect(loaded!.currentTaskIndex).toBe(1);
     });
+
+    // === Task 124 — Persist Branch in Session State ===
+
+    it('save persists branchName when provided', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            branchName: 'ralph/my-feature',
+        };
+        persistence.save(tmpDir, state);
+        const filePath = path.join(tmpDir, '.ralph', 'session.json');
+        const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        expect(content.branchName).toBe('ralph/my-feature');
+    });
+
+    it('load returns stored branchName', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            branchName: 'ralph/my-feature',
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).not.toBeNull();
+        expect(loaded!.branchName).toBe('ralph/my-feature');
+    });
+
+    it('load sets branchMismatch when current branch differs from stored', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            branchName: 'ralph/my-feature',
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir, 'main');
+        expect(loaded).not.toBeNull();
+        expect(loaded!.branchMismatch).toBe(true);
+        expect(loaded!.branchName).toBe('ralph/my-feature');
+    });
+
+    it('load does not set branchMismatch when branches match', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            branchName: 'ralph/my-feature',
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir, 'ralph/my-feature');
+        expect(loaded).not.toBeNull();
+        expect(loaded!.branchMismatch).toBeUndefined();
+    });
+
+    it('load handles missing branchName gracefully (legacy session)', () => {
+        // State without branchName should load normally, no mismatch flag
+        persistence.save(tmpDir, sampleState);
+        const loaded = persistence.load(tmpDir, 'main');
+        expect(loaded).not.toBeNull();
+        expect(loaded!.branchName).toBeUndefined();
+        expect(loaded!.branchMismatch).toBeUndefined();
+    });
+
+    it('load handles missing currentBranch param gracefully (no validation)', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            branchName: 'ralph/my-feature',
+        };
+        persistence.save(tmpDir, state);
+        // No currentBranch passed — no validation
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).not.toBeNull();
+        expect(loaded!.branchName).toBe('ralph/my-feature');
+        expect(loaded!.branchMismatch).toBeUndefined();
+    });
 });

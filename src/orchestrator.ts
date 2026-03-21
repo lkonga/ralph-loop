@@ -1475,6 +1475,7 @@ export class LoopOrchestrator {
 				}
 
 				// Save session state after each iteration
+				const currentBranch = await getCurrentBranch(this.config.workspaceRoot);
 				this.sessionPersistence?.save(this.config.workspaceRoot, {
 					currentTaskIndex: task.id,
 					iterationCount: iteration,
@@ -1483,6 +1484,7 @@ export class LoopOrchestrator {
 					circuitBreakerState: 'active',
 					timestamp: Date.now(),
 					version: 1,
+					branchName: currentBranch,
 				});
 			}
 		} finally {

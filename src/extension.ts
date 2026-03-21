@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { HookBridgeDisposable, registerHookBridge, startChatSendWatcher } from './hookBridge';
 import { LoopOrchestrator, loadConfig } from './orchestrator';
 import { SessionPersistence } from './sessionPersistence';
+import { getCurrentBranch, checkoutBranch } from './gitOps';
 import { ShellHookProvider } from './shellHookProvider';
 import { disposeStatusBar, updateStatusBar } from './statusBar';
 import { fireStateChangeNotification } from './stateNotification';
@@ -427,23 +428,48 @@ export function activate(context: vscode.ExtensionContext): void {
 		const wsRoot = folders[0].uri.fsPath;
 		const persistence = new SessionPersistence();
 		if (persistence.hasIncompleteSession(wsRoot)) {
-			vscode.window.showInformationMessage(
-				'Ralph Loop has an incomplete session. Resume?',
-				'Resume', 'Discard',
-			).then(choice => {
-				if (choice === 'Resume') {
-					const state = persistence.load(wsRoot);
-					if (state) {
+			(async () => {
+				const currentBranch = await getCurrentBranch(wsRoot);
+				const state = persistence.load(wsRoot, currentBranch);
+				if (state?.branchMismatch) {
+					const choice = await vscode.window.showWarningMessage(
+						`Session was on branch '${state.branchName}' but current branch is '${currentBranch}'. Switch back?`,
+						'Resume', 'Continue', 'Discard',
+					);
+					if (choice === 'Resume') {
+						await checkoutBranch(wsRoot, state.branchName!);
 						const config = loadConfig(wsRoot);
 						orchestrator = new LoopOrchestrator(config, logger, event => {
 							logger.log(`[resumed] ${event.kind}`);
 						});
 						orchestrator.start();
+					} else if (choice === 'Continue') {
+						const config = loadConfig(wsRoot);
+						orchestrator = new LoopOrchestrator(config, logger, event => {
+							logger.log(`[resumed] ${event.kind}`);
+						});
+						orchestrator.start();
+					} else if (choice === 'Discard') {
+						persistence.clear(wsRoot);
 					}
-				} else if (choice === 'Discard') {
-					persistence.clear(wsRoot);
+				} else {
+					const choice = await vscode.window.showInformationMessage(
+						'Ralph Loop has an incomplete session. Resume?',
+						'Resume', 'Discard',
+					);
+					if (choice === 'Resume') {
+						if (state) {
+							const config = loadConfig(wsRoot);
+							orchestrator = new LoopOrchestrator(config, logger, event => {
+								logger.log(`[resumed] ${event.kind}`);
+							});
+							orchestrator.start();
+						}
+					} else if (choice === 'Discard') {
+						persistence.clear(wsRoot);
+					}
 				}
-			});
+			})();
 		}
 	}
 }
