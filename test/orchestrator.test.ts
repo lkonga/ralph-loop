@@ -1664,6 +1664,16 @@ describe('CHECKPOINT: Startup DX Verification (Task 116)', () => {
 	it('featureBranch.enabled defaults to false', () => {
 		expect(DEFAULT_CONFIG.featureBranch!.enabled).toBe(false);
 	});
+
+	it('featureBranch config has no protectedBranches property', () => {
+		expect(DEFAULT_CONFIG.featureBranch).not.toHaveProperty('protectedBranches');
+	});
+
+	it('package.json has no featureBranch.protectedBranches setting', () => {
+		const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
+		const settings = pkg.contributes?.configuration?.properties ?? {};
+		expect(settings).not.toHaveProperty('ralph-loop.featureBranch.protectedBranches');
+	});
 });
 
 describe('Startup branch gate (linear flow)', () => {

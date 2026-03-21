@@ -92,17 +92,6 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Enable automatic feature branch creation and enforcement."
-				},
-				"ralph-loop.featureBranch.protectedBranches": {
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"default": [
-						"main",
-						"master"
-					],
-					"description": "Branches that ralph-loop should never commit to directly. A feature branch will be created instead."
 				}
 			}
 		}
