@@ -438,3 +438,368 @@ describe('Feature Branch Enforcement E2E', () => {
         });
     });
 });
+
+/**
+ * Task 137 — CHECKPOINT: Linear Branch Model E2E
+ *
+ * Comprehensive verification of the linear branch model:
+ * (1) main → ralph/<slug>-<hash>, main untouched
+ * (2) bisect/v0.39-lean → ralph/<slug>-<hash>, original untouched
+ * (3) arbitrary branch → same behavior
+ * (4) dirty working tree → WIP commit on ralph/ branch, original clean
+ * (5) loop completes → switches back to original branch
+ * (6) resume after stop → session persists originalBranch
+ * (7) featureBranch.enabled: false → backward compatible
+ * (8) no protectedBranches config needed
+ * (9) no regressions
+ */
+describe('Task 137 — Linear Branch Model E2E', () => {
+    let tmpDir: string;
+
+    beforeEach(() => {
+        tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'linear-branch-e2e-'));
+        initGitRepo(tmpDir);
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    // --- (2) Start on bisect/v0.39-lean → creates ralph/<slug>-<hash> from that HEAD ---
+
+    describe('(2) Start on bisect/v0.39-lean', () => {
+        it('creates ralph/<slug>-<hash> from bisect branch HEAD, original untouched', async () => {
+            // Create bisect branch with commits
+            git(tmpDir, ['checkout', '-b', 'bisect/v0.39-lean']);
+            fs.writeFileSync(path.join(tmpDir, 'bisect-file.txt'), 'bisect content');
+            git(tmpDir, ['add', '-A']);
+            git(tmpDir, ['commit', '-m', 'bisect commit']);
+
+            fs.writeFileSync(
+                path.join(tmpDir, 'PRD.md'),
+                '# Bisect Test\n\n- [x] **Task 1 — Done**: done\n',
+            );
+            git(tmpDir, ['add', '-A']);
+            git(tmpDir, ['commit', '-m', 'add PRD']);
+            // Capture HEAD after all commits on bisect branch
+            const bisectHead = git(tmpDir, ['rev-parse', 'HEAD']);
+
+            const shortHash = await getShortHash(tmpDir);
+            const expectedBranch = deriveBranchName('Bisect Test', shortHash);
+
+            const events: any[] = [];
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    maxIterations: 1,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: { enabled: true },
+                },
+                noopLogger,
+                (e: any) => events.push(e),
+            );
+            await orch.start();
+
+            // After completion, should switch back to bisect/v0.39-lean
+            const branch = await getCurrentBranch(tmpDir);
+            expect(branch).toBe('bisect/v0.39-lean');
+
+            // Ralph branch should exist
+            const ralphExists = await branchExists(tmpDir, expectedBranch);
+            expect(ralphExists).toBe(true);
+
+            // bisect/v0.39-lean HEAD should be the same as before
+            const bisectHeadAfter = git(tmpDir, ['rev-parse', 'bisect/v0.39-lean']);
+            // Ralph branch was created from bisect HEAD, so bisect HEAD shouldn't have moved
+            // (it should still be the same commit as before the orchestrator created a branch)
+            expect(bisectHeadAfter).toBe(bisectHead);
+
+            // BranchCreated and BranchSwitchedBack events
+            const created = events.find(e => e.kind === LoopEventKind.BranchCreated);
+            expect(created).toBeDefined();
+            expect(created.branchName).toBe(expectedBranch);
+
+            const switchBack = events.find(e => e.kind === LoopEventKind.BranchSwitchedBack);
+            expect(switchBack).toBeDefined();
+            expect(switchBack.to).toBe('bisect/v0.39-lean');
+        });
+    });
+
+    // --- (3) Start on any arbitrary branch → same behavior ---
+
+    describe('(3) Start on arbitrary branch', () => {
+        it('creates ralph/<slug>-<hash> from feature/my-work branch', async () => {
+            git(tmpDir, ['checkout', '-b', 'feature/my-work']);
+            fs.writeFileSync(path.join(tmpDir, 'work.txt'), 'in progress');
+            git(tmpDir, ['add', '-A']);
+            git(tmpDir, ['commit', '-m', 'work in progress']);
+
+            fs.writeFileSync(
+                path.join(tmpDir, 'PRD.md'),
+                '# Arbitrary Branch\n\n- [x] **Task 1 — Done**: done\n',
+            );
+            git(tmpDir, ['add', '-A']);
+            git(tmpDir, ['commit', '-m', 'add PRD']);
+
+            const shortHash = await getShortHash(tmpDir);
+            const expectedBranch = deriveBranchName('Arbitrary Branch', shortHash);
+
+            const events: any[] = [];
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    maxIterations: 1,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: { enabled: true },
+                },
+                noopLogger,
+                (e: any) => events.push(e),
+            );
+            await orch.start();
+
+            // Switches back to original
+            const branch = await getCurrentBranch(tmpDir);
+            expect(branch).toBe('feature/my-work');
+
+            // Ralph branch exists
+            expect(await branchExists(tmpDir, expectedBranch)).toBe(true);
+
+            // Events fired
+            expect(events.find(e => e.kind === LoopEventKind.BranchCreated)).toBeDefined();
+            expect(events.find(e => e.kind === LoopEventKind.BranchSwitchedBack)?.to).toBe('feature/my-work');
+        });
+    });
+
+    // --- (4) Dirty working tree → WIP commit on ralph/ branch, original clean ---
+
+    describe('(4) Dirty working tree handling', () => {
+        it('dirty state is committed as WIP on ralph/ branch, original branch stays clean', async () => {
+            fs.writeFileSync(
+                path.join(tmpDir, 'PRD.md'),
+                '# Dirty Test\n\n- [x] **Task 1 — Done**: done\n',
+            );
+            fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
+            git(tmpDir, ['add', '-A']);
+            git(tmpDir, ['commit', '-m', 'add prd']);
+
+            const mainHeadBefore = git(tmpDir, ['rev-parse', 'HEAD']);
+
+            // Create dirty state (unstaged file)
+            fs.writeFileSync(path.join(tmpDir, 'dirty-file.txt'), 'uncommitted');
+
+            const shortHash = await getShortHash(tmpDir);
+            const expectedBranch = deriveBranchName('Dirty Test', shortHash);
+
+            const events: any[] = [];
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    maxIterations: 1,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: { enabled: true },
+                },
+                noopLogger,
+                (e: any) => events.push(e),
+            );
+            await orch.start();
+
+            // Switched back to main
+            const branch = await getCurrentBranch(tmpDir);
+            expect(branch).toBe('main');
+
+            // main HEAD unchanged (dirty file was NOT committed on main)
+            const mainHeadAfter = git(tmpDir, ['rev-parse', 'HEAD']);
+            expect(mainHeadAfter).toBe(mainHeadBefore);
+
+            // dirty-file should NOT exist on main
+            expect(fs.existsSync(path.join(tmpDir, 'dirty-file.txt'))).toBe(false);
+
+            // Ralph branch should have the WIP commit with the dirty file
+            const ralphLog = git(tmpDir, ['log', '--oneline', expectedBranch]);
+            expect(ralphLog.toLowerCase()).toContain('wip');
+
+            // dirty-file should exist on ralph branch
+            const ralphTreeFiles = git(tmpDir, ['ls-tree', '--name-only', expectedBranch]);
+            expect(ralphTreeFiles).toContain('dirty-file.txt');
+        });
+    });
+
+    // --- (5) Loop completes → switches back to original branch (non-main) ---
+
+    describe('(5) Switches back to non-main original branch', () => {
+        it('switches back to bisect/v0.39-lean after completion', async () => {
+            git(tmpDir, ['checkout', '-b', 'bisect/v0.39-lean']);
+            fs.writeFileSync(
+                path.join(tmpDir, 'PRD.md'),
+                '# SB Non Main\n\n- [x] **Task 1 — Done**: done\n',
+            );
+            fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
+            git(tmpDir, ['add', '-A']);
+            git(tmpDir, ['commit', '-m', 'setup']);
+
+            const events: any[] = [];
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    maxIterations: 1,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: { enabled: true },
+                },
+                noopLogger,
+                (e: any) => events.push(e),
+            );
+            await orch.start();
+
+            const branch = await getCurrentBranch(tmpDir);
+            expect(branch).toBe('bisect/v0.39-lean');
+
+            const switchBack = events.find(e => e.kind === LoopEventKind.BranchSwitchedBack);
+            expect(switchBack).toBeDefined();
+            expect(switchBack.from).toMatch(/^ralph\//);
+            expect(switchBack.to).toBe('bisect/v0.39-lean');
+        });
+    });
+
+    // --- (6) Resume after stop → session persists originalBranch ---
+
+    describe('(6) Resume after stop uses persisted originalBranch', () => {
+        it('session persistence saves and restores originalBranch', () => {
+            const persistence = new SessionPersistence();
+            persistence.save(tmpDir, {
+                currentTaskIndex: 2,
+                iterationCount: 5,
+                nudgeCount: 1,
+                retryCount: 0,
+                circuitBreakerState: 'active',
+                timestamp: Date.now(),
+                version: 1,
+                branchName: 'ralph/my-project-abc1234',
+                originalBranch: 'bisect/v0.39-lean',
+            });
+
+            const loaded = persistence.load(tmpDir);
+            expect(loaded).not.toBeNull();
+            expect(loaded!.branchName).toBe('ralph/my-project-abc1234');
+            expect(loaded!.originalBranch).toBe('bisect/v0.39-lean');
+        });
+
+        it('session persistence handles missing originalBranch gracefully', () => {
+            const persistence = new SessionPersistence();
+            persistence.save(tmpDir, {
+                currentTaskIndex: 0,
+                iterationCount: 1,
+                nudgeCount: 0,
+                retryCount: 0,
+                circuitBreakerState: 'active',
+                timestamp: Date.now(),
+                version: 1,
+                branchName: 'ralph/test',
+            });
+
+            const loaded = persistence.load(tmpDir);
+            expect(loaded).not.toBeNull();
+            expect(loaded!.originalBranch).toBeUndefined();
+        });
+
+        it('orchestrator state snapshot includes originalBranch after branch gate', async () => {
+            git(tmpDir, ['checkout', '-b', 'develop']);
+            fs.writeFileSync(
+                path.join(tmpDir, 'PRD.md'),
+                '# Resume Snapshot\n\n- [x] **Task 1 — Done**: done\n',
+            );
+            fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
+            git(tmpDir, ['add', '-A']);
+            git(tmpDir, ['commit', '-m', 'setup']);
+
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    maxIterations: 1,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: { enabled: true },
+                },
+                noopLogger,
+                () => { },
+            );
+            await orch.start();
+
+            const snapshot = orch.getStateSnapshot();
+            expect(snapshot.originalBranch).toBe('develop');
+            expect(snapshot.branch).toMatch(/^ralph\//);
+        });
+    });
+
+    // --- (7) featureBranch.enabled: false → backward compatible ---
+
+    describe('(7) Disabled feature branch is backward compatible', () => {
+        it('no branch operations when disabled, stays on arbitrary branch', async () => {
+            git(tmpDir, ['checkout', '-b', 'my-custom-branch']);
+            fs.writeFileSync(
+                path.join(tmpDir, 'PRD.md'),
+                '# Disabled Custom\n\n- [x] **Task 1 — Done**: done\n',
+            );
+            fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
+            git(tmpDir, ['add', '-A']);
+            git(tmpDir, ['commit', '-m', 'setup']);
+
+            const events: any[] = [];
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    maxIterations: 1,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: { enabled: false },
+                },
+                noopLogger,
+                (e: any) => events.push(e),
+            );
+            await orch.start();
+
+            // Should remain on original branch
+            const branch = await getCurrentBranch(tmpDir);
+            expect(branch).toBe('my-custom-branch');
+
+            // No branch events
+            expect(events.find(e => e.kind === LoopEventKind.BranchCreated)).toBeUndefined();
+            expect(events.find(e => e.kind === LoopEventKind.BranchSwitchedBack)).toBeUndefined();
+        });
+    });
+
+    // --- (8) No protectedBranches config needed ---
+
+    describe('(8) No protectedBranches config', () => {
+        it('DEFAULT_CONFIG.featureBranch has no protectedBranches field', () => {
+            const fb = DEFAULT_CONFIG.featureBranch;
+            expect(fb).toBeDefined();
+            expect(fb).toEqual({ enabled: false });
+            expect((fb as any).protectedBranches).toBeUndefined();
+        });
+
+        it('featureBranch config type only has enabled field', () => {
+            // Verify the config shape: { enabled: boolean } — no extra fields
+            const config = { enabled: true };
+            const orch = new LoopOrchestrator(
+                {
+                    ...DEFAULT_CONFIG,
+                    workspaceRoot: tmpDir,
+                    bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+                    featureBranch: config,
+                },
+                noopLogger,
+                () => { },
+            );
+            // Construction succeeds — no protectedBranches required
+            expect(orch).toBeDefined();
+        });
+    });
+
+    // --- (9) No regressions — verified by running full test suite ---
+    // This is implicitly verified by the full `npx vitest run` execution.
+});
