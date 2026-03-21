@@ -623,7 +623,7 @@
 
 - [x] **Task 138 — Add a shared final idle refresh path in `src/extension.ts`**: Guarantee one authoritative Ralph idle refresh after every `await orchestrator.start()` settlement, including crashes and auto-resume. → Spec: `research/17-phase19-deep-research.md` L33-L51
 
-- [ ] **Task 139 — Enforce fork-side precedence so Ralph idle beats lifecycle processing**: Prevent a later `RequestLifecycleModel` `Processing` update from overwriting a correct Ralph idle push in the Copilot fork status bar. → Spec: `research/17-phase19-deep-research.md` L53-L72
+- [x] **Task 139 — Enforce fork-side precedence so Ralph idle beats lifecycle processing**: Prevent a later `RequestLifecycleModel` `Processing` update from overwriting a correct Ralph idle push in the Copilot fork status bar. → Spec: `research/17-phase19-deep-research.md` L53-L72
 
 - [ ] **Task 140 — Make terminal snapshots truthful in `src/orchestrator.ts`**: Ensure terminal event handlers stop reading stale `running` snapshots after the loop has already logically ended. → Spec: `research/17-phase19-deep-research.md` L74-L92
 

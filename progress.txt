@@ -899,3 +899,7 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 
 ### Task 151 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
 [2026-03-21T19:38:21.606Z] [62b72ee3-4986-4c88-a352-c96c28132872] Committed: e441efd7edfa95637fd4f1cf30f8d00006b59fb2
+[2026-03-21T19:38:33.624Z] [6cea999f-f70b-4ff8-b2eb-893cf420fe18] [Task-153] Task started: **Task 139 — Enforce fork-side precedence so Ralph idle beats lifecycle processing**: Prevent a later `RequestLifecycleModel` `Processing` update from overwriting a correct Ralph idle push in the Copilot fork status bar. → Spec: `research/17-phase19-deep-research.md` L53-L72
+[2026-03-21T19:44:43.427Z] [6cea999f-f70b-4ff8-b2eb-893cf420fe18] [Task-153] Task completed: **Task 139 — Enforce fork-side precedence so Ralph idle beats lifecycle processing**: Prevent a later `RequestLifecycleModel` `Processing` update from overwriting a correct Ralph idle push in the Copilot fork status bar. → Spec: `research/17-phase19-deep-research.md` L53-L72 (370s)
+
+### Task 152 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
