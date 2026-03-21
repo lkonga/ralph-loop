@@ -13,7 +13,7 @@ export interface SerializedLoopState {
     pid?: number;
     workspacePath?: string;
     branchName?: string;
-    branchMismatch?: boolean;
+    originalBranch?: string;
 }
 
 const SESSION_DIR = '.ralph';
@@ -52,7 +52,7 @@ export class SessionPersistence {
         fs.renameSync(tmp, target);
     }
 
-    load(workspaceRoot: string, currentBranch?: string): SerializedLoopState | null {
+    load(workspaceRoot: string): SerializedLoopState | null {
         const filePath = path.join(workspaceRoot, SESSION_DIR, SESSION_FILE);
         if (!fs.existsSync(filePath)) {
             return null;
@@ -68,10 +68,6 @@ export class SessionPersistence {
             }
             if (data.pid && isPidAlive(data.pid)) {
                 return null;
-            }
-            // Branch mismatch detection
-            if (currentBranch && data.branchName && currentBranch !== data.branchName) {
-                data.branchMismatch = true;
             }
             return data;
         } catch {

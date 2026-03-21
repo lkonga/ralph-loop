@@ -261,48 +261,54 @@ describe('SessionPersistence', () => {
         expect(loaded!.branchName).toBe('ralph/my-feature');
     });
 
-    it('load sets branchMismatch when current branch differs from stored', () => {
+    // === Task 133 — Persist originalBranch in Session State ===
+
+    it('save persists originalBranch alongside branchName', () => {
         const state: SerializedLoopState = {
             ...sampleState,
-            branchName: 'ralph/my-feature',
+            branchName: 'ralph/my-feature-abc123',
+            originalBranch: 'main',
         };
         persistence.save(tmpDir, state);
-        const loaded = persistence.load(tmpDir, 'main');
-        expect(loaded).not.toBeNull();
-        expect(loaded!.branchMismatch).toBe(true);
-        expect(loaded!.branchName).toBe('ralph/my-feature');
+        const filePath = path.join(tmpDir, '.ralph', 'session.json');
+        const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        expect(content.originalBranch).toBe('main');
+        expect(content.branchName).toBe('ralph/my-feature-abc123');
     });
 
-    it('load does not set branchMismatch when branches match', () => {
+    it('load returns stored originalBranch', () => {
         const state: SerializedLoopState = {
             ...sampleState,
-            branchName: 'ralph/my-feature',
+            branchName: 'ralph/my-feature-abc123',
+            originalBranch: 'develop',
         };
         persistence.save(tmpDir, state);
-        const loaded = persistence.load(tmpDir, 'ralph/my-feature');
-        expect(loaded).not.toBeNull();
-        expect(loaded!.branchMismatch).toBeUndefined();
-    });
-
-    it('load handles missing branchName gracefully (legacy session)', () => {
-        // State without branchName should load normally, no mismatch flag
-        persistence.save(tmpDir, sampleState);
-        const loaded = persistence.load(tmpDir, 'main');
-        expect(loaded).not.toBeNull();
-        expect(loaded!.branchName).toBeUndefined();
-        expect(loaded!.branchMismatch).toBeUndefined();
-    });
-
-    it('load handles missing currentBranch param gracefully (no validation)', () => {
-        const state: SerializedLoopState = {
-            ...sampleState,
-            branchName: 'ralph/my-feature',
-        };
-        persistence.save(tmpDir, state);
-        // No currentBranch passed — no validation
         const loaded = persistence.load(tmpDir);
         expect(loaded).not.toBeNull();
-        expect(loaded!.branchName).toBe('ralph/my-feature');
-        expect(loaded!.branchMismatch).toBeUndefined();
+        expect(loaded!.originalBranch).toBe('develop');
+        expect(loaded!.branchName).toBe('ralph/my-feature-abc123');
+    });
+
+    it('load handles missing originalBranch gracefully (legacy session)', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            branchName: 'ralph/my-feature',
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).not.toBeNull();
+        expect(loaded!.originalBranch).toBeUndefined();
+    });
+
+    it('load does not set branchMismatch (flag removed)', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            branchName: 'ralph/my-feature',
+            originalBranch: 'main',
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).not.toBeNull();
+        expect('branchMismatch' in loaded!).toBe(false);
     });
 });

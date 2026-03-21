@@ -152,43 +152,6 @@ describe('Feature Branch Enforcement E2E', () => {
             expect(loaded!.branchName).toBe('ralph/my-test-project');
         });
 
-        it('session detects branch mismatch when current differs from stored', () => {
-            const persistence = new SessionPersistence();
-            persistence.save(tmpDir, {
-                currentTaskIndex: 0,
-                iterationCount: 1,
-                nudgeCount: 0,
-                retryCount: 0,
-                circuitBreakerState: 'active',
-                timestamp: Date.now(),
-                version: 1,
-                branchName: 'ralph/my-test-project',
-            });
-
-            // Load with different current branch
-            const loaded = persistence.load(tmpDir, 'main');
-            expect(loaded).not.toBeNull();
-            expect(loaded!.branchMismatch).toBe(true);
-        });
-
-        it('session does not flag mismatch when branches match', () => {
-            const persistence = new SessionPersistence();
-            persistence.save(tmpDir, {
-                currentTaskIndex: 0,
-                iterationCount: 1,
-                nudgeCount: 0,
-                retryCount: 0,
-                circuitBreakerState: 'active',
-                timestamp: Date.now(),
-                version: 1,
-                branchName: 'ralph/my-test-project',
-            });
-
-            const loaded = persistence.load(tmpDir, 'ralph/my-test-project');
-            expect(loaded).not.toBeNull();
-            expect(loaded!.branchMismatch).toBeUndefined();
-        });
-
         it('orchestrator creates new branch from main even when old branch exists', async () => {
             fs.writeFileSync(
                 path.join(tmpDir, 'PRD.md'),

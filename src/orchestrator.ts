@@ -1483,6 +1483,7 @@ export class LoopOrchestrator {
 					timestamp: Date.now(),
 					version: 1,
 					branchName: currentBranch,
+					originalBranch: this.originalBranch,
 				});
 			}
 		} finally {
