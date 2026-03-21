@@ -826,3 +826,5 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 [2026-03-21T11:39:16.815Z] [fe06f4f4-4f80-482c-90b4-e697b2fee969] [Task-140] Task completed: **Task 126 — Add `getShortHash` Helper**: In `src/gitOps.ts`, add `getShortHash(workspaceRoot: string): Promise<string>` — runs `git rev-parse --short HEAD`, returns 7-char hex hash. Write tests FIRST in `test/gitOps.test.ts`: returns a hex string of expected length. Run `npx tsc --noEmit` and `npx vitest run`. (94s)
 
 ### Task 139 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
+[2026-03-21T11:39:16.983Z] [fe06f4f4-4f80-482c-90b4-e697b2fee969] Committed: 45a70d6612377409421664ed87bf905b03512ebc
+[2026-03-21T11:39:29.000Z] [651f0599-3901-4865-8ef5-095a6dd0e0d2] [Task-141] Task started: **Task 127 — Add `checkoutBranch` Helper**: In `src/gitOps.ts`, add `checkoutBranch(workspaceRoot: string, branchName: string): Promise<{ success: boolean; error?: string }>` — runs `git checkout {branchName}` (without `-b`). If it doesn't already exist, add it. Write tests FIRST. Run `npx tsc --noEmit` and `npx vitest run`.
