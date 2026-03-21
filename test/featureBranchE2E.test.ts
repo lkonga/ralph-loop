@@ -5,7 +5,7 @@ import * as path from 'path';
 import { execFileSync } from 'child_process';
 import { LoopOrchestrator } from '../src/orchestrator';
 import { parsePrdTitle, deriveBranchName } from '../src/prd';
-import { getCurrentBranch, atomicCommit, branchExists } from '../src/gitOps';
+import { getCurrentBranch, atomicCommit, branchExists, getShortHash } from '../src/gitOps';
 import { SessionPersistence } from '../src/sessionPersistence';
 import {
     DEFAULT_CONFIG,
@@ -63,12 +63,15 @@ describe('Feature Branch Enforcement E2E', () => {
     // --- (1) Start on main → creates ralph/<slug>, commits land there, main untouched ---
 
     describe('(1) Start on main creates feature branch and commits land there', () => {
-        it('orchestrator creates ralph/<slug> branch from PRD title when starting on main', async () => {
+        it('orchestrator creates ralph/<slug>-<hash> branch from PRD title when starting on main', async () => {
             fs.writeFileSync(
                 path.join(tmpDir, 'PRD.md'),
                 '# My Test Project\n\n- [x] **Task 1 — Done**: completed\n',
             );
             fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
+
+            const shortHash = await getShortHash(tmpDir);
+            const expectedBranch = deriveBranchName('My Test Project', shortHash);
 
             const events: any[] = [];
             const orch = new LoopOrchestrator(
@@ -77,16 +80,15 @@ describe('Feature Branch Enforcement E2E', () => {
                     workspaceRoot: tmpDir,
                     maxIterations: 1,
                     bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
-                    featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+                    featureBranch: { enabled: true },
                 },
                 noopLogger,
                 (e: any) => events.push(e),
             );
             await orch.start();
 
-            // Should have switched to ralph/my-test-project
             const branch = await getCurrentBranch(tmpDir);
-            expect(branch).toBe('ralph/my-test-project');
+            expect(branch).toBe(expectedBranch);
 
             // Main should be untouched (still exists)
             const mainExists = await branchExists(tmpDir, 'main');
@@ -95,7 +97,7 @@ describe('Feature Branch Enforcement E2E', () => {
             // BranchCreated event should have fired
             const created = events.find(e => e.kind === LoopEventKind.BranchCreated);
             expect(created).toBeDefined();
-            expect(created.branchName).toBe('ralph/my-test-project');
+            expect(created.branchName).toBe(expectedBranch);
         });
 
         it('atomicCommit places commits on feature branch, not main', async () => {
@@ -200,19 +202,21 @@ describe('Feature Branch Enforcement E2E', () => {
             expect(loaded!.branchMismatch).toBeUndefined();
         });
 
-        it('orchestrator resumes on correct feature branch after restart', async () => {
+        it('orchestrator creates new branch from main even when old branch exists', async () => {
             fs.writeFileSync(
                 path.join(tmpDir, 'PRD.md'),
                 '# Resume Test\n\n- [x] **Task 1 — Done**: done\n',
             );
             fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
 
-            const expectedBranch = 'ralph/resume-test';
-            // Create feature branch and then switch back to main (simulating restart on main)
-            git(tmpDir, ['checkout', '-b', expectedBranch]);
+            // Create an old feature branch and switch back to main
+            git(tmpDir, ['checkout', '-b', 'ralph/resume-test']);
             git(tmpDir, ['checkout', 'main']);
 
-            // Start orchestrator — should checkout existing feature branch
+            const shortHash = await getShortHash(tmpDir);
+            const expectedBranch = deriveBranchName('Resume Test', shortHash);
+
+            // Start orchestrator — new linear flow always creates new branch
             const events: any[] = [];
             const orch = new LoopOrchestrator(
                 {
@@ -220,7 +224,7 @@ describe('Feature Branch Enforcement E2E', () => {
                     workspaceRoot: tmpDir,
                     maxIterations: 1,
                     bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
-                    featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+                    featureBranch: { enabled: true },
                 },
                 noopLogger,
                 (e: any) => events.push(e),
@@ -393,13 +397,16 @@ describe('Feature Branch Enforcement E2E', () => {
             );
             fs.writeFileSync(path.join(tmpDir, 'progress.txt'), '');
 
+            const shortHash = await getShortHash(tmpDir);
+            const expectedBranch = deriveBranchName('Snapshot Test', shortHash);
+
             const orch = new LoopOrchestrator(
                 {
                     ...DEFAULT_CONFIG,
                     workspaceRoot: tmpDir,
                     maxIterations: 1,
                     bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
-                    featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+                    featureBranch: { enabled: true },
                 },
                 noopLogger,
                 () => { },
@@ -407,13 +414,12 @@ describe('Feature Branch Enforcement E2E', () => {
             await orch.start();
 
             const snapshot = orch.getStateSnapshot();
-            expect(snapshot.branch).toBe('ralph/snapshot-test');
+            expect(snapshot.branch).toBe(expectedBranch);
         });
 
-        it('DEFAULT_CONFIG has feature branch enabled by default', () => {
+        it('DEFAULT_CONFIG has feature branch disabled by default', () => {
             expect(DEFAULT_CONFIG.featureBranch).toBeDefined();
-            expect(DEFAULT_CONFIG.featureBranch!.enabled).toBe(true);
-            expect(DEFAULT_CONFIG.featureBranch!.protectedBranches).toEqual(['main', 'master']);
+            expect(DEFAULT_CONFIG.featureBranch!.enabled).toBe(false);
         });
     });
 });

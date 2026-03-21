@@ -37,6 +37,7 @@ export interface StateSnapshot {
 	readonly iterationCount: number;
 	readonly nudgeCount: number;
 	readonly branch?: string;
+	readonly originalBranch?: string;
 }
 
 export interface PrdSnapshot {
@@ -535,7 +536,7 @@ export interface RalphConfig {
 	inactivity?: InactivityConfig;
 	cooldownShowDialog?: boolean;
 	agentMode?: string;
-	featureBranch?: { enabled: boolean; protectedBranches?: string[] };
+	featureBranch?: { enabled: boolean };
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -575,7 +576,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	inactivity: { ...DEFAULT_INACTIVITY_CONFIG },
 	cooldownShowDialog: true,
 	agentMode: 'ralph-executor',
-	featureBranch: { enabled: true, protectedBranches: ['main', 'master'] },
+	featureBranch: { enabled: false },
 };
 
 // --- Verification ---

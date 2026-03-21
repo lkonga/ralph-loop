@@ -143,3 +143,15 @@ export async function hasDirtyWorkingTree(workspaceRoot: string): Promise<boolea
 	const result = await runGit(workspaceRoot, ['status', '--porcelain']);
 	return result.stdout.trim().length > 0;
 }
+
+export async function wipCommit(workspaceRoot: string): Promise<{ success: boolean; error?: string }> {
+	const addResult = await runGit(workspaceRoot, ['add', '-A']);
+	if (addResult.err) {
+		return { success: false, error: `git add failed: ${addResult.err.message}` };
+	}
+	const commitResult = await runGit(workspaceRoot, ['commit', '-m', 'wip: snapshot before ralph run']);
+	if (commitResult.err) {
+		return { success: false, error: `git commit failed: ${commitResult.err.message}` };
+	}
+	return { success: true };
+}

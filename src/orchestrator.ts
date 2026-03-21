@@ -8,7 +8,7 @@ import { showCooldownDialog, type CooldownDialogResult } from './cooldownDialog'
 import { buildFinalNudgePrompt, buildPrompt, parseReviewVerdict, PromptCapabilities, sendReviewPrompt } from './copilot';
 import { MAX_RETRIES_PER_TASK, shouldRetryError } from './decisions';
 import { DiffValidator } from './diffValidator';
-import { atomicCommit, getCurrentBranch, branchExists, createAndCheckoutBranch, checkoutBranch } from './gitOps';
+import { atomicCommit, getCurrentBranch, branchExists, createAndCheckoutBranch, checkoutBranch, getShortHash, hasDirtyWorkingTree, wipCommit } from './gitOps';
 import { KnowledgeManager } from './knowledge';
 import { addDependsAnnotation, analyzeMissingDependency, appendProgress, deriveBranchName, markTaskComplete, parsePrdTitle, pickNextTask, pickReadyTasks, readPrdFile, readPrdSnapshot, resolvePrdPath, resolveProgressPath, validatePrd, validatePrdEdit } from './prd';
 import { SessionPersistence } from './sessionPersistence';
@@ -328,6 +328,7 @@ export class LoopOrchestrator {
 	private linkedSignal?: LinkedCancellationSource;
 	private readonly sessionPersistence?: SessionPersistence;
 	private activeBranch?: string;
+	private originalBranch?: string;
 	private _currentTaskId = '';
 	private _currentTaskDescription = '';
 	private _currentIteration = 0;
@@ -381,6 +382,7 @@ export class LoopOrchestrator {
 			iterationCount: this._currentIteration,
 			nudgeCount: this._currentNudgeCount,
 			branch: this.activeBranch,
+			originalBranch: this.originalBranch,
 		};
 	}
 
@@ -598,41 +600,37 @@ export class LoopOrchestrator {
 				}
 			}
 
-			// Branch enforcement gate (fires once per loop run)
+			// Branch enforcement gate (linear flow — always create new branch)
 			const featureBranchConfig = this.config.featureBranch;
 			if (featureBranchConfig?.enabled) {
-				const prdContent = readPrdFile(prdPath);
-				const prdTitle = parsePrdTitle(prdContent);
-				const expectedBranch = deriveBranchName(prdTitle ?? '');
-				const currentBranch = await getCurrentBranch(this.config.workspaceRoot);
-				const protectedBranches = featureBranchConfig.protectedBranches ?? ['main', 'master'];
+				try {
+					const currentBranch = await getCurrentBranch(this.config.workspaceRoot);
+					this.originalBranch = currentBranch;
 
-				if (currentBranch === expectedBranch) {
-					this.logger.log(`Branch gate: already on expected branch '${expectedBranch}'`);
-					this.activeBranch = expectedBranch;
-					yield { kind: LoopEventKind.BranchValidated, branchName: expectedBranch };
-				} else if (protectedBranches.includes(currentBranch)) {
-					const exists = await branchExists(this.config.workspaceRoot, expectedBranch);
-					if (exists) {
-						const result = await checkoutBranch(this.config.workspaceRoot, expectedBranch);
-						if (!result.success) {
-							yield { kind: LoopEventKind.BranchEnforcementFailed, reason: result.error ?? 'checkout failed' };
-							return;
-						}
-						this.logger.log(`Branch gate: checked out existing branch '${expectedBranch}'`);
-					} else {
-						const result = await createAndCheckoutBranch(this.config.workspaceRoot, expectedBranch);
-						if (!result.success) {
-							yield { kind: LoopEventKind.BranchEnforcementFailed, reason: result.error ?? 'branch creation failed' };
-							return;
-						}
-						this.logger.log(`Branch gate: created and checked out branch '${expectedBranch}'`);
+					const prdContent = readPrdFile(prdPath);
+					const prdTitle = parsePrdTitle(prdContent);
+					const shortHash = await getShortHash(this.config.workspaceRoot);
+					const derivedName = deriveBranchName(prdTitle ?? '', shortHash);
+
+					const createResult = await createAndCheckoutBranch(this.config.workspaceRoot, derivedName);
+					if (!createResult.success) {
+						yield { kind: LoopEventKind.BranchEnforcementFailed, reason: createResult.error ?? 'branch creation failed' };
+						return;
 					}
-					this.activeBranch = expectedBranch;
-					yield { kind: LoopEventKind.BranchCreated, branchName: expectedBranch };
-				} else {
-					this.logger.log(`Branch gate: on non-protected branch '${currentBranch}', proceeding`);
-					this.activeBranch = currentBranch;
+
+					if (await hasDirtyWorkingTree(this.config.workspaceRoot)) {
+						await wipCommit(this.config.workspaceRoot);
+						this.logger.log('Branch gate: committed dirty working tree as WIP');
+					}
+
+					this.activeBranch = derivedName;
+					this.logger.log(`Branch gate: created branch '${derivedName}' from '${currentBranch}'`);
+					yield { kind: LoopEventKind.BranchCreated, branchName: derivedName };
+				} catch (err) {
+					const msg = err instanceof Error ? err.message : String(err);
+					this.logger.warn(`Branch gate: git operations failed — ${msg}`);
+					yield { kind: LoopEventKind.BranchEnforcementFailed, reason: msg };
+					return;
 				}
 			}
 
