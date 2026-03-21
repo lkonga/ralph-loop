@@ -2,7 +2,7 @@
 	"name": "ralph-loop",
 	"displayName": "Ralph Loop — Autonomous PRD Loop",
 	"description": "Drives Copilot Agent Mode in a deterministic loop from PRD tasks.",
-	"version": "0.5.11",
+	"version": "0.5.12",
 	"publisher": "ralph-loop",
 	"license": "MIT",
 	"engines": {
