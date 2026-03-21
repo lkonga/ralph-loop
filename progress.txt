@@ -856,3 +856,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 [2026-03-21T11:53:17.517Z] [bd27cd33-4a93-4140-b3a4-d328220dce79] [Task-145] Task completed: **Task 131 — Remove `protectedBranches` Config**: In `src/types.ts`, remove `protectedBranches?: string[]` from `featureBranch` config. Simplify to `featureBranch?: { enabled: boolean }`. Update `DEFAULT_CONFIG` accordingly. In `package.json`, remove the `ralph-loop.featureBranch.protectedBranches` VS Code setting contribution. Update all references. Run `npx tsc --noEmit` and `npx vitest run`. (130s)
 
 ### Task 144 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
+[2026-03-21T11:53:17.679Z] [bd27cd33-4a93-4140-b3a4-d328220dce79] Committed: 3f7bbdb23cd7f418e9818eeea86e9ab15ac86028
