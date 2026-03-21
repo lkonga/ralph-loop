@@ -881,3 +881,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 
 ### Task 148 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
 [2026-03-21T12:07:52.118Z] [408849dc-a820-4b63-a3b1-d7725638c6f6] Committed: 30323db229983775e14e3d7baf4759709449b34e
+[2026-03-21T12:08:04.133Z] [cc71d392-5ea8-4f9c-a1cd-a2dc23ccc08e] [Task-150] Task started: **Task 136 — Remove `BranchValidated` Event**: In `src/types.ts`, remove `LoopEventKind.BranchValidated` — no longer needed since we always create a new branch (never validate an existing one). Remove handling in `src/extension.ts`. Update tests. Run `npx tsc --noEmit` and `npx vitest run`.

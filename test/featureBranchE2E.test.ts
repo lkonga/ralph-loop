@@ -311,7 +311,6 @@ describe('Feature Branch Enforcement E2E', () => {
 
             // No branch events
             expect(events.find(e => e.kind === LoopEventKind.BranchCreated)).toBeUndefined();
-            expect(events.find(e => e.kind === LoopEventKind.BranchValidated)).toBeUndefined();
             expect(events.find(e => e.kind === LoopEventKind.BranchEnforcementFailed)).toBeUndefined();
         });
 

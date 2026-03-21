@@ -101,7 +101,6 @@ export const enum LoopEventKind {
 	ContextHandoff = 'context_handoff',
 	PrdValidationFailed = 'prd_validation_failed',
 	BranchCreated = 'branch_created',
-	BranchValidated = 'branch_validated',
 	BranchEnforcementFailed = 'branch_enforcement_failed',
 	BranchSwitchedBack = 'branch_switched_back',
 	StateNotified = 'state_notified',
@@ -148,7 +147,6 @@ export type LoopEvent =
 	| { kind: LoopEventKind.ContextHandoff; estimatedTokens: number; maxTokens: number; pct: number }
 	| { kind: LoopEventKind.PrdValidationFailed; errors: readonly PrdValidationError[] }
 	| { kind: LoopEventKind.BranchCreated; branchName: string }
-	| { kind: LoopEventKind.BranchValidated; branchName: string }
 	| { kind: LoopEventKind.BranchEnforcementFailed; reason: string }
 	| { kind: LoopEventKind.BranchSwitchedBack; from: string; to: string }
 	| { kind: LoopEventKind.StateNotified; state: string; taskId: string }
