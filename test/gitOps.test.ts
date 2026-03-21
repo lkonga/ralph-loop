@@ -197,6 +197,51 @@ describe('gitOps', () => {
 			expect(addCallIndex).toBeLessThan(diffCallIndex);
 			expect(diffCallIndex).toBeLessThan(commitCallIndex);
 		});
+
+		it('blocks commit on protected branch (main)', async () => {
+			vi.mocked(fs.existsSync).mockReturnValue(false);
+			mockGitCommands({
+				'rev-parse --abbrev-ref HEAD': { stdout: 'main\n' },
+			});
+			const task = makeTask(1, 'Add feature');
+			const result = await atomicCommit('/workspace', task, 'inv-1', {
+				protectedBranches: ['main', 'master'],
+			});
+			expect(result.success).toBe(false);
+			expect(result.error).toContain('Refusing to commit on protected branch');
+		});
+
+		it('allows commit on feature branch', async () => {
+			vi.mocked(fs.existsSync).mockReturnValue(false);
+			mockGitCommands({
+				'rev-parse --abbrev-ref HEAD': { stdout: 'ralph/my-feature\n' },
+				'add -A': { stdout: '' },
+				'diff --cached --name-only': { stdout: 'src/foo.ts\n' },
+				'commit -m': { stdout: '' },
+				'rev-parse HEAD': { stdout: 'abc123\n' },
+			});
+			const task = makeTask(1, 'Add feature');
+			const result = await atomicCommit('/workspace', task, 'inv-1', {
+				protectedBranches: ['main', 'master'],
+			});
+			expect(result.success).toBe(true);
+		});
+
+		it('logs warning when commit blocked on protected branch', async () => {
+			vi.mocked(fs.existsSync).mockReturnValue(false);
+			mockGitCommands({
+				'rev-parse --abbrev-ref HEAD': { stdout: 'master\n' },
+			});
+			const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() };
+			const task = makeTask(1, 'Add feature');
+			await atomicCommit('/workspace', task, 'inv-1', {
+				protectedBranches: ['main', 'master'],
+				logger,
+			});
+			expect(logger.warn).toHaveBeenCalledWith(
+				expect.stringContaining('protected branch')
+			);
+		});
 	});
 
 	describe('getCurrentBranch', () => {

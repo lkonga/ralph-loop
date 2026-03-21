@@ -1,12 +1,17 @@
 import { execFile } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Task } from './types';
+import type { Task, ILogger } from './types';
 
 export interface CommitResult {
 	success: boolean;
 	commitHash?: string;
 	error?: string;
+}
+
+export interface AtomicCommitOptions {
+	protectedBranches?: string[];
+	logger?: ILogger;
 }
 
 function runGit(workspaceRoot: string, args: string[]): Promise<{ stdout: string; stderr: string; err?: Error }> {
@@ -52,7 +57,17 @@ export function buildCommitMessage(task: Task, taskInvocationId: string, changed
 	return subject + '\n' + bodyParts.join('\n');
 }
 
-export async function atomicCommit(workspaceRoot: string, task: Task, taskInvocationId: string): Promise<CommitResult> {
+export async function atomicCommit(workspaceRoot: string, task: Task, taskInvocationId: string, options?: AtomicCommitOptions): Promise<CommitResult> {
+	// (0) Branch guard — refuse to commit on protected branches
+	if (options?.protectedBranches?.length) {
+		const currentBranch = await getCurrentBranch(workspaceRoot);
+		if (options.protectedBranches.includes(currentBranch)) {
+			const msg = `Refusing to commit on protected branch '${currentBranch}'`;
+			options.logger?.warn(msg);
+			return { success: false, error: msg };
+		}
+	}
+
 	// (1) Verify committable state
 	const gitDir = path.join(workspaceRoot, '.git');
 	if (fs.existsSync(path.join(gitDir, 'rebase-merge')) || fs.existsSync(path.join(gitDir, 'rebase-apply'))) {
