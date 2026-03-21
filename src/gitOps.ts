@@ -92,3 +92,21 @@ export async function atomicCommit(workspaceRoot: string, task: Task, taskInvoca
 
 	return { success: true, commitHash };
 }
+
+export async function getCurrentBranch(workspaceRoot: string): Promise<string> {
+	const result = await runGit(workspaceRoot, ['rev-parse', '--abbrev-ref', 'HEAD']);
+	return result.stdout.trim() || 'HEAD';
+}
+
+export async function createAndCheckoutBranch(workspaceRoot: string, branchName: string): Promise<{ success: boolean; error?: string }> {
+	const result = await runGit(workspaceRoot, ['checkout', '-b', branchName]);
+	if (result.err) {
+		return { success: false, error: result.err.message };
+	}
+	return { success: true };
+}
+
+export async function branchExists(workspaceRoot: string, branchName: string): Promise<boolean> {
+	const result = await runGit(workspaceRoot, ['rev-parse', '--verify', `refs/heads/${branchName}`]);
+	return !result.err;
+}

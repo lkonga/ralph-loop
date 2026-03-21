@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import { atomicCommit, inferCommitType, buildCommitMessage } from '../src/gitOps';
+import { atomicCommit, inferCommitType, buildCommitMessage, getCurrentBranch, createAndCheckoutBranch, branchExists } from '../src/gitOps';
 import type { Task } from '../src/types';
 import { TaskStatus } from '../src/types';
 
@@ -196,6 +196,62 @@ describe('gitOps', () => {
 			const commitCallIndex = calls.findIndex(c => (c[1] as string[]).join(' ').includes('commit'));
 			expect(addCallIndex).toBeLessThan(diffCallIndex);
 			expect(diffCallIndex).toBeLessThan(commitCallIndex);
+		});
+	});
+
+	describe('getCurrentBranch', () => {
+		it('returns branch name', async () => {
+			mockGitCommands({
+				'rev-parse --abbrev-ref HEAD': { stdout: 'feature/my-branch\n' },
+			});
+			const branch = await getCurrentBranch('/workspace');
+			expect(branch).toBe('feature/my-branch');
+		});
+
+		it('returns HEAD for detached state', async () => {
+			mockGitCommands({
+				'rev-parse --abbrev-ref HEAD': { stdout: 'HEAD\n' },
+			});
+			const branch = await getCurrentBranch('/workspace');
+			expect(branch).toBe('HEAD');
+		});
+	});
+
+	describe('createAndCheckoutBranch', () => {
+		it('succeeds when branch creation works', async () => {
+			mockGitCommands({
+				'checkout -b': { stdout: "Switched to a new branch 'my-branch'\n" },
+			});
+			const result = await createAndCheckoutBranch('/workspace', 'my-branch');
+			expect(result.success).toBe(true);
+			expect(result.error).toBeUndefined();
+		});
+
+		it('returns error when branch already exists', async () => {
+			mockGitCommands({
+				'checkout -b': { err: new Error("fatal: a branch named 'my-branch' already exists") },
+			});
+			const result = await createAndCheckoutBranch('/workspace', 'my-branch');
+			expect(result.success).toBe(false);
+			expect(result.error).toBeDefined();
+		});
+	});
+
+	describe('branchExists', () => {
+		it('returns true for existing branch', async () => {
+			mockGitCommands({
+				'rev-parse --verify': { stdout: 'abc123\n' },
+			});
+			const exists = await branchExists('/workspace', 'main');
+			expect(exists).toBe(true);
+		});
+
+		it('returns false for missing branch', async () => {
+			mockGitCommands({
+				'rev-parse --verify': { err: new Error('fatal: not a valid ref') },
+			});
+			const exists = await branchExists('/workspace', 'nonexistent');
+			expect(exists).toBe(false);
 		});
 	});
 });
