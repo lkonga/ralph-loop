@@ -108,6 +108,23 @@ describe('buildPrompt', () => {
 		expect(prompt).toContain('YOUR TASK TO IMPLEMENT');
 		expect(prompt).not.toContain('YOUR TASK TO IMPLEMENT —');
 	});
+
+	it('includes WORKSPACE header when lane is provided', () => {
+		const lane = { repoId: 'my-app', workspaceFolder: '/home/user/my-app', prdPath: '/home/user/my-app/PRD.md', progressPath: '/home/user/my-app/progress.txt', enabled: true };
+		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '', 20, undefined, undefined, undefined, 1, undefined, undefined, 'Task-1', undefined, undefined, lane);
+		expect(prompt).toContain('WORKSPACE: my-app (/home/user/my-app)');
+	});
+
+	it('omits WORKSPACE header when lane is not provided', () => {
+		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '');
+		expect(prompt).not.toContain('WORKSPACE:');
+	});
+
+	it('uses lane workspaceFolder as workspaceRoot for spec context when lane provided', () => {
+		const lane = { repoId: 'repo-x', workspaceFolder: '/tmp/repo-x', prdPath: '/tmp/repo-x/PRD.md', progressPath: '/tmp/repo-x/progress.txt', enabled: true };
+		const prompt = buildPrompt('Fix bug', '- [ ] Fix bug', '', 20, undefined, undefined, undefined, 1, undefined, undefined, 'Task-1', undefined, '/should/not/use/this', lane);
+		expect(prompt).toContain('WORKSPACE: repo-x (/tmp/repo-x)');
+	});
 });
 
 describe('generateStopHookScript', () => {

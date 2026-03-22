@@ -52,7 +52,7 @@ export function annotateBudget(prompt: string, config: ContextBudgetConfig): str
 	return `[Context budget: ~${Math.round(pct)}% utilized — be concise, avoid verbose output]\n${prompt}`;
 }
 
-import { DEFAULT_CONTEXT_TRIMMING, type ContextTrimmingConfig, type ContextBudgetConfig, type ResearchFrontmatter, type SpecFrontmatter } from './types';
+import { DEFAULT_CONTEXT_TRIMMING, type ContextTrimmingConfig, type ContextBudgetConfig, type ResearchFrontmatter, type SpecFrontmatter, type RepoLane } from './types';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -294,7 +294,7 @@ export function buildFinalNudgePrompt(task: string, nudgeCount: number, maxNudge
 	return `Your remaining time is almost up. Produce your final result NOW: commit any partial work, update progress.txt, and mark the checkbox. If tests fail, document the failure and mark done anyway.`;
 }
 
-export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string, taskId?: string, promptTemplate?: string, workspaceRoot?: string): string {
+export function buildPrompt(taskDescription: string, prdContent: string, progressContent: string, maxProgressLines: number = 20, promptBlocks?: string[], capabilities?: PromptCapabilities, learnings?: string[], iterationNumber: number = 1, contextTrimming?: ContextTrimmingConfig, operatorContext?: string, taskId?: string, promptTemplate?: string, workspaceRoot?: string, lane?: RepoLane): string {
 	const sanitized = sanitizeTaskDescription(taskDescription.trim());
 	const ct = contextTrimming ?? DEFAULT_CONTEXT_TRIMMING;
 
@@ -319,11 +319,15 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 	}
 	// else: Full tier — no changes
 
+	// When lane is provided, override workspaceRoot with lane's folder
+	const effectiveWorkspaceRoot = lane ? lane.workspaceFolder : workspaceRoot;
+
 	const parts: string[] = [
 		'===================================================================',
 		`                       YOUR TASK TO IMPLEMENT${taskId ? ` \u2014 ${taskId}` : ''}`,
 		'===================================================================',
 		'',
+		...(lane ? [`WORKSPACE: ${lane.repoId} (${lane.workspaceFolder})`, ''] : []),
 		sanitized,
 		'',
 		'===================================================================',
@@ -355,8 +359,8 @@ export function buildPrompt(taskDescription: string, prdContent: string, progres
 	];
 
 	// Inject spec context from frontmatter if available
-	if (workspaceRoot) {
-		const specContext = buildSpecContextLine(workspaceRoot, taskDescription);
+	if (effectiveWorkspaceRoot) {
+		const specContext = buildSpecContextLine(effectiveWorkspaceRoot, taskDescription);
 		if (specContext) {
 			parts.push(specContext, '');
 		}
