@@ -978,3 +978,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 [2026-03-22T14:25:38.132Z] [6cdfc9af-f2d5-42f4-8a97-7c482adfd38f] [Task-164] Task completed: **Task 162 — Multi-Lane Status Bar Display**: Extend `src/statusBar.ts` to show the active lane in the status bar: `ralph • {repoId} • {state} • Task {N}/{total}`. The tooltip shows all lanes with their individual progress: `repo-a: 3/5 done | repo-b: 7/12 done | repo-c: idle`. When a lane completes all tasks, show `✓` next to it. The status bar click menu allows selecting a specific lane to focus on (filters the view to that lane). Run `npx tsc --noEmit` and `npx vitest run`. (160s)
 
 ### Task 163 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +12/-1 | Status: pass
+[2026-03-22T14:25:38.265Z] [6cdfc9af-f2d5-42f4-8a97-7c482adfd38f] Committed: d0c8b3223e791cf06ba6fa4d111d8e09364a97a7
