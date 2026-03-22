@@ -938,3 +938,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 
 ### Task 157 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
 [2026-03-22T13:37:39.269Z] [0f4c6449-ddbc-4e97-91c2-941e73684cd3] Committed: 3a873898d80455b81f5780571d6280a34e4aaa22
+[2026-03-22T13:37:51.295Z] [aa8cbc31-663f-4b5b-be0e-c99942e7087c] [Task-159] Task started: **Task 157 — Discover PRD Files from Multi-Root Workspace Folders**: In `src/extension.ts`, when ralph-loop activates in a multi-root workspace, scan all `vscode.workspace.workspaceFolders` for `PRD.md` files. Auto-populate `repos` config from discovered folders: `repoId` = folder name, `workspaceFolder` = folder path, `prdPath` = `{folder}/PRD.md`, `progressPath` = `{folder}/progress.txt`, `enabled` = `true`. Show a quick-pick allowing the user to select which repos to include. Store selections in workspace-scoped settings. Run `npx tsc --noEmit` and `npx vitest run`.

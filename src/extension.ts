@@ -1,3 +1,5 @@
+import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
 import {
 	type HookBridgeDisposable,
@@ -20,6 +22,7 @@ import {
 	LoopEventKind,
 	LoopState,
 	type RalphConfig,
+	type RepoLane,
 } from "./types";
 
 let orchestrator: LoopOrchestrator | undefined;
@@ -117,6 +120,80 @@ async function resolveWorkspaceRoot(): Promise<string | undefined> {
 		"Ralph Loop: Could not determine workspace root for PRD.md",
 	);
 	return undefined;
+}
+
+/**
+ * Scan workspace folders for PRD.md files and build RepoLane entries.
+ * Accepts an optional `fileExists` predicate for testability (defaults to fs.existsSync).
+ */
+export function discoverPrdRepos(
+	folders: readonly vscode.WorkspaceFolder[],
+	fileExists: (p: string) => boolean = fs.existsSync,
+): RepoLane[] {
+	if (!folders?.length) {
+		return [];
+	}
+	const lanes: RepoLane[] = [];
+	for (const folder of folders) {
+		const prdPath = path.join(folder.uri.fsPath, "PRD.md");
+		if (fileExists(prdPath)) {
+			lanes.push({
+				repoId: folder.name,
+				workspaceFolder: folder.uri.fsPath,
+				prdPath,
+				progressPath: path.join(folder.uri.fsPath, "progress.txt"),
+				enabled: true,
+			});
+		}
+	}
+	return lanes;
+}
+
+interface RepoQuickPickItem extends vscode.QuickPickItem {
+	repoLane: RepoLane;
+}
+
+/**
+ * Show a quick-pick allowing the user to select which repos to include.
+ * Returns selected RepoLane[] or undefined if cancelled.
+ */
+export async function showRepoQuickPick(
+	repos: RepoLane[],
+): Promise<RepoLane[] | undefined> {
+	const items: RepoQuickPickItem[] = repos.map((lane) => ({
+		label: lane.repoId,
+		description: lane.workspaceFolder,
+		picked: lane.enabled,
+		repoLane: lane,
+	}));
+
+	const selected = await vscode.window.showQuickPick(items, {
+		canPickMany: true,
+		placeHolder: "Select repos to include in Ralph Loop",
+	});
+
+	if (selected === undefined) {
+		return undefined;
+	}
+
+	return (selected as RepoQuickPickItem[]).map((item) => item.repoLane);
+}
+
+/**
+ * Store repo selections in workspace-scoped settings.
+ * Non-selected repos get enabled=false.
+ */
+export async function applyRepoSelections(
+	allRepos: RepoLane[],
+	selectedRepos: RepoLane[],
+): Promise<void> {
+	const selectedIds = new Set(selectedRepos.map((r) => r.repoId));
+	const stored = allRepos.map((r) => ({
+		...r,
+		enabled: selectedIds.has(r.repoId),
+	}));
+	const config = vscode.workspace.getConfiguration("ralph-loop");
+	await config.update("repos", stored, vscode.ConfigurationTarget.Workspace);
 }
 
 export function activate(context: vscode.ExtensionContext): void {
