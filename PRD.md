@@ -658,7 +658,7 @@
 
 - [x] **Task 160 — Lane-Isolated Branch Management**: Extend the Phase 18 linear branch model to operate per-lane. Each lane gets its own `ralph/<slug>-<hash>` branch derived from the lane's repo HEAD, not from the workspace root. `originalBranch` is tracked per lane in `SessionPersistence`. On loop completion, each lane switches back to its own original branch independently. A failure in one lane's branch management must not affect other lanes. Run `npx tsc --noEmit` and `npx vitest run`.
 
-- [ ] **Task 161 — Lane-Isolated Prompt Building**: Extend `buildPrompt()` to accept a `RepoLane` parameter. The prompt uses the lane's PRD content, the lane's progress.txt, and the lane's workspace folder for file references. When firing the prompt to Copilot, set the working directory context to the lane's folder. The agent must be told which repo it's working in: add `"WORKSPACE: {repoId} ({workspaceFolder})"` to the prompt header. Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 161 — Lane-Isolated Prompt Building**: Extend `buildPrompt()` to accept a `RepoLane` parameter. The prompt uses the lane's PRD content, the lane's progress.txt, and the lane's workspace folder for file references. When firing the prompt to Copilot, set the working directory context to the lane's folder. The agent must be told which repo it's working in: add `"WORKSPACE: {repoId} ({workspaceFolder})"` to the prompt header. Run `npx tsc --noEmit` and `npx vitest run`.
 
 ### 21c — Status and Progress Tracking
 
