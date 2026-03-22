@@ -192,7 +192,7 @@ export async function runBearings(
 		if (hasVitest) {
 			onProgress?.('vitest', 'running');
 			logger.log('Bearings: running vitest...');
-			const testResult = await execFn('npx vitest run --pool=forks --poolOptions.forks.maxForks=12', workspaceRoot);
+			const testResult = await execFn('npx vitest run', workspaceRoot);
 			if (testResult.exitCode !== 0) {
 				issues.push(`Test failures: ${testResult.output.slice(0, 500)}`);
 			}
@@ -770,6 +770,7 @@ export class LoopOrchestrator {
 										if (!pEditValidation.allowed) {
 											this.logger.warn(`PRD write protection (parallel): ${pEditValidation.reason}`);
 											fs.writeFileSync(prdPath, prdContentBeforeParallel, 'utf-8');
+											markTaskComplete(prdPath, task);
 											this.onEvent({ kind: LoopEventKind.Error, message: `PRD write protection: ${pEditValidation.reason}` });
 										}
 
@@ -1328,6 +1329,8 @@ export class LoopOrchestrator {
 						if (!prdEditValidation.allowed) {
 							this.logger.warn(`PRD write protection: ${prdEditValidation.reason}`);
 							fs.writeFileSync(prdPath, prdContentBeforeTask, 'utf-8');
+							// Re-apply the current task's checkbox toggle (reverted by the full restore)
+							markTaskComplete(prdPath, task);
 							additionalContext = `PRD write protection rejected your edit: ${prdEditValidation.reason}. Only checkbox toggles, DECOMPOSED prefixes, and depends annotations are allowed.`;
 							yield { kind: LoopEventKind.Error, message: `PRD write protection: ${prdEditValidation.reason}` };
 						}

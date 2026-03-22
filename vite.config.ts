@@ -3,10 +3,10 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
 	test: {
 		include: ['test/**/*.test.ts'],
-		pool: 'forks',
+		pool: 'threads',
 		poolOptions: {
-			forks: {
-				maxForks: 6,
+			threads: {
+				maxThreads: 4,
 			},
 		},
 	},

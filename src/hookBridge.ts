@@ -125,7 +125,7 @@ async function main() {
   }
 
   // Check 4: Test failures
-  const vitest = runCommand('npx vitest run --pool=forks --poolOptions.forks.maxForks=12');
+  const vitest = runCommand('npx vitest run');
   if (!vitest.ok) {
     failures.push('Test failures: ' + (vitest.stdout || vitest.stderr || 'see vitest output'));
   }

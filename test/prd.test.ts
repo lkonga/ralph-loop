@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, parseLineAnnotations, parsePrdTitle, deriveBranchName } from '../src/prd';
+import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, parseLineAnnotations, parsePrdTitle, deriveBranchName, markTaskComplete } from '../src/prd';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -651,6 +651,31 @@ describe('validatePrdEdit', () => {
 		const result = validatePrdEdit(before, after);
 		expect(result.allowed).toBe(false);
 		expect(result.reason).toBeDefined();
+	});
+
+	it('after restore + markTaskComplete, current task checkbox is checked and next task can be picked', () => {
+		const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'prd-wp-'));
+		const prdPath = path.join(tmpDir, 'PRD.md');
+		const before = '- [ ] **Task 84 — GL6**: Handle rate limits\n- [ ] **Task 113 — CHECKPOINT**: Audit verification\n';
+		// Agent checked Task 84 but also deleted Task 113
+		const after = '- [x] **Task 84 — GL6**: Handle rate limits\n';
+		const result = validatePrdEdit(before, after);
+		expect(result.allowed).toBe(false);
+
+		// Simulate orchestrator: restore PRD then re-check current task
+		fs.writeFileSync(prdPath, before, 'utf-8');
+		markTaskComplete(prdPath, { id: 1, lineNumber: 1, description: '**Task 84 — GL6**: Handle rate limits', status: 'pending' as any, taskId: 'Task-084' });
+		const restored = fs.readFileSync(prdPath, 'utf-8');
+		expect(restored).toContain('- [x] **Task 84');
+		expect(restored).toContain('- [ ] **Task 113');
+
+		// Next task should be Task 113, not Task 84 again
+		const snapshot = parsePrd(restored);
+		const next = pickNextTask(snapshot);
+		expect(next).toBeDefined();
+		expect(next!.description).toContain('Task 113');
+
+		fs.rmSync(tmpDir, { recursive: true });
 	});
 });
 

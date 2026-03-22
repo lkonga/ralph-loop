@@ -78,7 +78,7 @@ export function createBuiltinRegistry(): VerifierRegistry {
 
 	registry.register('vitest', async (task, workspaceRoot) => {
 		try {
-			execSync('npx vitest run --pool=forks --poolOptions.forks.maxForks=12', { cwd: workspaceRoot, stdio: 'pipe' });
+			execSync('npx vitest run', { cwd: workspaceRoot, stdio: 'pipe' });
 			return { name: 'vitest', result: VerifyResult.Pass, detail: 'Tests pass' };
 		} catch (err) {
 			return { name: 'vitest', result: VerifyResult.Fail, detail: extractExecDetail(err) };
