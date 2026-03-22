@@ -1,4 +1,5 @@
 {
+    "typescript.tsserver.enable": false,
     "workbench.colorCustomizations": {
         "editorCursor.foreground": "#e9dbb7"
     },

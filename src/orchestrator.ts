@@ -192,7 +192,7 @@ export async function runBearings(
 		if (hasVitest) {
 			onProgress?.('vitest', 'running');
 			logger.log('Bearings: running vitest...');
-			const testResult = await execFn('npx vitest run', workspaceRoot);
+			const testResult = await execFn('npx vitest run --pool=forks --poolOptions.forks.maxForks=12', workspaceRoot);
 			if (testResult.exitCode !== 0) {
 				issues.push(`Test failures: ${testResult.output.slice(0, 500)}`);
 			}

@@ -126,7 +126,7 @@ describe('State Snapshot Command', () => {
 });
 
 describe('Terminal snapshot truthfulness', () => {
-	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
 	let tmpDir: string;
 
 	beforeEach(() => {
@@ -209,7 +209,7 @@ describe('Terminal snapshot truthfulness', () => {
 				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
 			},
 			noopLogger,
-			() => {},
+			() => { },
 		);
 		await orch.start();
 
