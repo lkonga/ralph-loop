@@ -662,7 +662,7 @@
 
 ### 21c — Status and Progress Tracking
 
-- [ ] **Task 162 — Multi-Lane Status Bar Display**: Extend `src/statusBar.ts` to show the active lane in the status bar: `ralph • {repoId} • {state} • Task {N}/{total}`. The tooltip shows all lanes with their individual progress: `repo-a: 3/5 done | repo-b: 7/12 done | repo-c: idle`. When a lane completes all tasks, show `✓` next to it. The status bar click menu allows selecting a specific lane to focus on (filters the view to that lane). Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 162 — Multi-Lane Status Bar Display**: Extend `src/statusBar.ts` to show the active lane in the status bar: `ralph • {repoId} • {state} • Task {N}/{total}`. The tooltip shows all lanes with their individual progress: `repo-a: 3/5 done | repo-b: 7/12 done | repo-c: idle`. When a lane completes all tasks, show `✓` next to it. The status bar click menu allows selecting a specific lane to focus on (filters the view to that lane). Run `npx tsc --noEmit` and `npx vitest run`.
 
 - [ ] **Task 163 — Per-Lane Progress Tracking**: Each lane writes to its own `progress.txt` in its own workspace folder. The orchestrator must ensure progress entries include the `repoId` prefix for correlation: `[{timestamp}] [{invocationId}] [{repoId}] [Task-{N}] ...`. The `ralph-loop.status` command output includes a per-lane summary table. Run `npx tsc --noEmit` and `npx vitest run`.
 
