@@ -924,3 +924,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 [2026-03-22T12:32:44.790Z] [e1f52edd-7c68-4487-98f3-2ab75eb841a2] [Task-156] Task completed: **Task 142 — Make `delay()` abort-aware so stop requests collapse stale UI windows**: Reduce stop-path lag by making orchestrator waits terminate promptly when the loop is stopping. → Spec: `research/17-phase19-deep-research.md` L117-L134 (267s)
 
 ### Task 155 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +11/-1 | Status: pass
+[2026-03-22T12:32:44.911Z] [e1f52edd-7c68-4487-98f3-2ab75eb841a2] Committed: 92ac8b3a24caa01c600b8ee9eb894a34b8a5fe02
