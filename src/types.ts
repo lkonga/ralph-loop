@@ -38,6 +38,7 @@ export interface StateSnapshot {
 	readonly nudgeCount: number;
 	readonly branch?: string;
 	readonly originalBranch?: string;
+	readonly activeRepoId?: string;
 }
 
 export interface PrdSnapshot {
@@ -486,6 +487,15 @@ export interface RalphPreset {
 	overrides: Partial<RalphConfig>;
 }
 
+// --- Multi-PRD lane ---
+export interface RepoLane {
+	repoId: string;
+	workspaceFolder: string;
+	prdPath: string;
+	progressPath: string;
+	enabled: boolean;
+}
+
 // --- Config ---
 export interface CircuitBreakerConfig {
 	name: string;
@@ -537,6 +547,7 @@ export interface RalphConfig {
 	cooldownShowDialog?: boolean;
 	agentMode?: string;
 	featureBranch?: { enabled: boolean };
+	repos?: RepoLane[];
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {

@@ -634,3 +634,40 @@
 - [x] **Task 142 — Make `delay()` abort-aware so stop requests collapse stale UI windows**: Reduce stop-path lag by making orchestrator waits terminate promptly when the loop is stopping. → Spec: `research/17-phase19-deep-research.md` L117-L134
 
 - [x] **Task 143 — Add regression coverage for normal, failure, stop, resume, and consecutive-run scenarios**: Lock in the status-bar convergence contract so the bar, snapshots, and status command stay aligned across all reported exit paths. → Spec: `research/17-phase19-deep-research.md` L136-L157
+
+---
+
+## Phase 21 — Cross-Repo Parallel PRD Execution
+
+> **Problem**: ralph-loop only executes tasks from a single `PRD.md` in the workspace root. In multi-root VS Code workspaces (e.g., `ralph-loop` + `vscode-copilot-chat` + `opencode-patches`), each repo has its own `PRD.md` with independent task queues. Currently there is no way to orchestrate tasks across repos — the user must manually switch context and run ralph separately in each workspace folder.
+> **Goal**: Enable ralph-loop to discover, track, and execute PRD tasks from multiple independent repos in a single session, treating each repo's PRD as an isolated execution lane — no shared state, no cross-repo dependencies, independent branch management per repo.
+> **Constraint**: This is NOT subagent parallelism or wave-style parallel research. Each repo is a fully independent execution context with its own PRD.md, branch, working directory, and progress.txt.
+> **TDD is MANDATORY**. Run `npx tsc --noEmit` and `npx vitest run` — ALL tests must pass before marking ANY checkbox.
+
+### 21a — Multi-PRD Discovery and Data Model
+
+- [ ] **Task 156 — Define `RepoLane` Type and Multi-PRD Config**: In `src/types.ts`, add `RepoLane` interface: `{ repoId: string, workspaceFolder: string, prdPath: string, progressPath: string, enabled: boolean }`. Add `repos?: RepoLane[]` to `RalphLoopConfig`. When `repos` is undefined or empty, behavior is identical to current single-PRD mode (backward compatible). When populated, each entry is an independent execution lane. Add `activeRepoId: string` to orchestrator runtime state to track which lane is currently executing. Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 157 — Discover PRD Files from Multi-Root Workspace Folders**: In `src/extension.ts`, when ralph-loop activates in a multi-root workspace, scan all `vscode.workspace.workspaceFolders` for `PRD.md` files. Auto-populate `repos` config from discovered folders: `repoId` = folder name, `workspaceFolder` = folder path, `prdPath` = `{folder}/PRD.md`, `progressPath` = `{folder}/progress.txt`, `enabled` = `true`. Show a quick-pick allowing the user to select which repos to include. Store selections in workspace-scoped settings. Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 158 — Extend PRD Parser for Multi-Lane Snapshots**: In `src/prd.ts`, add `parseMultiPrd(lanes: RepoLane[]): Map<string, PrdSnapshot>` that reads each lane's PRD file and returns a map keyed by `repoId`. Each snapshot is independent — task IDs are scoped to their repo (`repoId:taskId`). Add `repoId` to `Task` interface as an optional field (undefined = legacy single-PRD mode). Run `npx tsc --noEmit` and `npx vitest run`.
+
+### 21b — Lane-Isolated Orchestration
+
+- [ ] **Task 159 — Implement Round-Robin Lane Scheduler**: In `src/orchestrator.ts`, add a lane scheduler that rotates between enabled repos. When multi-PRD mode is active: (1) parse all lane PRDs, (2) build a merged task queue with lane-scoped task IDs, (3) execute one task per lane in round-robin order, (4) each task execution uses the lane's `workspaceFolder` as CWD for all git ops and file watchers, (5) switching lanes resets the file watcher root. The scheduler must handle lanes completing at different rates — skip lanes with no remaining tasks. Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 160 — Lane-Isolated Branch Management**: Extend the Phase 18 linear branch model to operate per-lane. Each lane gets its own `ralph/<slug>-<hash>` branch derived from the lane's repo HEAD, not from the workspace root. `originalBranch` is tracked per lane in `SessionPersistence`. On loop completion, each lane switches back to its own original branch independently. A failure in one lane's branch management must not affect other lanes. Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 161 — Lane-Isolated Prompt Building**: Extend `buildPrompt()` to accept a `RepoLane` parameter. The prompt uses the lane's PRD content, the lane's progress.txt, and the lane's workspace folder for file references. When firing the prompt to Copilot, set the working directory context to the lane's folder. The agent must be told which repo it's working in: add `"WORKSPACE: {repoId} ({workspaceFolder})"` to the prompt header. Run `npx tsc --noEmit` and `npx vitest run`.
+
+### 21c — Status and Progress Tracking
+
+- [ ] **Task 162 — Multi-Lane Status Bar Display**: Extend `src/statusBar.ts` to show the active lane in the status bar: `ralph • {repoId} • {state} • Task {N}/{total}`. The tooltip shows all lanes with their individual progress: `repo-a: 3/5 done | repo-b: 7/12 done | repo-c: idle`. When a lane completes all tasks, show `✓` next to it. The status bar click menu allows selecting a specific lane to focus on (filters the view to that lane). Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 163 — Per-Lane Progress Tracking**: Each lane writes to its own `progress.txt` in its own workspace folder. The orchestrator must ensure progress entries include the `repoId` prefix for correlation: `[{timestamp}] [{invocationId}] [{repoId}] [Task-{N}] ...`. The `ralph-loop.status` command output includes a per-lane summary table. Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 164 — Per-Lane Session Persistence**: Extend `src/sessionPersistence.ts` to save/restore per-lane state: task progress, branch info, nudge/retry counts, and invocation IDs for each `RepoLane`. On resume, each lane picks up where it left off independently. A corrupted lane state must not prevent other lanes from resuming. Run `npx tsc --noEmit` and `npx vitest run`.
+
+### 21d — Verification
+
+- [ ] **Task 165 — CHECKPOINT: Cross-Repo Parallel PRD Execution**: Clean compile, full vitest green. End-to-end verification proves: (1) multi-root workspace with 2+ PRD.md files discovers and lists all repos, (2) user can select which repos to include, (3) tasks execute in round-robin across repos, (4) each repo gets its own branch, (5) each repo's progress.txt is independent, (6) failing a task in repo-a does not block repo-b, (7) status bar shows active lane and per-repo progress, (8) session persistence and resume work per-lane, (9) single-PRD mode (no `repos` config) is backward compatible with zero behavior change, (10) `ralph-loop.status` command shows multi-repo task summary.

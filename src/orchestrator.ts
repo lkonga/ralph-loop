@@ -426,6 +426,7 @@ export class LoopOrchestrator {
 	private _currentTaskDescription = "";
 	private _currentIteration = 0;
 	private _currentNudgeCount = 0;
+	private _activeRepoId = '';
 	bearingsExecFn?: BearingsExecFn;
 	showCooldownDialogFn: (
 		nextTask: string,
@@ -485,6 +486,7 @@ export class LoopOrchestrator {
 			nudgeCount: this._currentNudgeCount,
 			branch: this.activeBranch,
 			originalBranch: this.originalBranch,
+			activeRepoId: this._activeRepoId,
 		};
 	}
 

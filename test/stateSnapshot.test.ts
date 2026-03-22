@@ -50,6 +50,7 @@ describe("State Snapshot Command", () => {
 				taskDescription: "",
 				iterationCount: 0,
 				nudgeCount: 0,
+				activeRepoId: "",
 			});
 		});
 
@@ -557,8 +558,7 @@ describe("Status-bar convergence contract — regression suite", () => {
 		);
 		if (stoppedIdx >= 0) {
 			const stateAfter = events.find(
-				(e, i) =>
-					i > stoppedIdx && e.kind === LoopEventKind.StateNotified,
+				(e, i) => i > stoppedIdx && e.kind === LoopEventKind.StateNotified,
 			);
 			if (stateAfter) {
 				expect(stateAfter.state).toBe(LoopState.Idle);
