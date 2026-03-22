@@ -629,7 +629,7 @@
 
 ### 19.2 — Backfill Edge Cases and Lock Regressions
 
-- [ ] **Task 141 — Backfill abnormal exits and resumed cleanup through the shared idle path**: Ensure non-happy exits also converge the UI to idle instead of relying on happy-path terminal events. → Spec: `research/17-phase19-deep-research.md` L96-L115
+- [x] **Task 141 — Backfill abnormal exits and resumed cleanup through the shared idle path**: Ensure non-happy exits also converge the UI to idle instead of relying on happy-path terminal events. → Spec: `research/17-phase19-deep-research.md` L96-L115
 
 - [ ] **Task 142 — Make `delay()` abort-aware so stop requests collapse stale UI windows**: Reduce stop-path lag by making orchestrator waits terminate promptly when the loop is stopping. → Spec: `research/17-phase19-deep-research.md` L117-L134
 
