@@ -633,4 +633,4 @@
 
 - [x] **Task 142 — Make `delay()` abort-aware so stop requests collapse stale UI windows**: Reduce stop-path lag by making orchestrator waits terminate promptly when the loop is stopping. → Spec: `research/17-phase19-deep-research.md` L117-L134
 
-- [ ] **Task 143 — Add regression coverage for normal, failure, stop, resume, and consecutive-run scenarios**: Lock in the status-bar convergence contract so the bar, snapshots, and status command stay aligned across all reported exit paths. → Spec: `research/17-phase19-deep-research.md` L136-L157
+- [x] **Task 143 — Add regression coverage for normal, failure, stop, resume, and consecutive-run scenarios**: Lock in the status-bar convergence contract so the bar, snapshots, and status command stay aligned across all reported exit paths. → Spec: `research/17-phase19-deep-research.md` L136-L157
