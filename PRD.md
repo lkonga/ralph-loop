@@ -650,7 +650,7 @@
 
 - [x] **Task 157 — Discover PRD Files from Multi-Root Workspace Folders**: In `src/extension.ts`, when ralph-loop activates in a multi-root workspace, scan all `vscode.workspace.workspaceFolders` for `PRD.md` files. Auto-populate `repos` config from discovered folders: `repoId` = folder name, `workspaceFolder` = folder path, `prdPath` = `{folder}/PRD.md`, `progressPath` = `{folder}/progress.txt`, `enabled` = `true`. Show a quick-pick allowing the user to select which repos to include. Store selections in workspace-scoped settings. Run `npx tsc --noEmit` and `npx vitest run`.
 
-- [ ] **Task 158 — Extend PRD Parser for Multi-Lane Snapshots**: In `src/prd.ts`, add `parseMultiPrd(lanes: RepoLane[]): Map<string, PrdSnapshot>` that reads each lane's PRD file and returns a map keyed by `repoId`. Each snapshot is independent — task IDs are scoped to their repo (`repoId:taskId`). Add `repoId` to `Task` interface as an optional field (undefined = legacy single-PRD mode). Run `npx tsc --noEmit` and `npx vitest run`.
+- [x] **Task 158 — Extend PRD Parser for Multi-Lane Snapshots**: In `src/prd.ts`, add `parseMultiPrd(lanes: RepoLane[]): Map<string, PrdSnapshot>` that reads each lane's PRD file and returns a map keyed by `repoId`. Each snapshot is independent — task IDs are scoped to their repo (`repoId:taskId`). Add `repoId` to `Task` interface as an optional field (undefined = legacy single-PRD mode). Run `npx tsc --noEmit` and `npx vitest run`.
 
 ### 21b — Lane-Isolated Orchestration
 
