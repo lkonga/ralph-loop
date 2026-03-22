@@ -338,6 +338,8 @@ export function activate(context: vscode.ExtensionContext): void {
 						const msgs = event.errors.map(e => `  ${e.level}: ${e.message}`).join('\n');
 						logger.error(`PRD validation failed:\n${msgs}`);
 						vscode.window.showErrorMessage(`Ralph Loop: PRD validation failed — ${event.errors.length} error(s). Check output for details.`);
+						fireStateChangeNotification(LoopState.Idle, '');
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					}
 					case LoopEventKind.BranchCreated:
@@ -347,6 +349,8 @@ export function activate(context: vscode.ExtensionContext): void {
 					case LoopEventKind.BranchEnforcementFailed:
 						logger.error(`🌿 Branch enforcement failed: ${event.reason}`);
 						vscode.window.showErrorMessage(`Ralph Loop: Branch enforcement failed — ${event.reason}`);
+						fireStateChangeNotification(LoopState.Idle, '');
+						updateStatusBar(orchestrator!.getStateSnapshot());
 						break;
 					case LoopEventKind.BranchSwitchedBack:
 						logger.log(`🌿 Switched back to '${event.to}' from '${event.from}'`);

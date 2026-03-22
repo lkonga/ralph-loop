@@ -246,3 +246,113 @@ describe('Terminal snapshot truthfulness', () => {
 		expect(switchBack.to).toBe('main');
 	});
 });
+
+describe('Abnormal exit idle convergence', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-abnormal-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('BranchEnforcementFailed emits error event and still forces idle cleanup via StateNotified', async () => {
+		fs.writeFileSync(
+			path.join(tmpDir, 'PRD.md'),
+			'# My Feature\n\n- [ ] **Task 1 — Do something**: description\n',
+		);
+
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc1234');
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: false, error: 'branch creation failed' });
+
+		const { LoopOrchestrator } = await import('../src/orchestrator');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const failEvent = events.find(e => e.kind === LoopEventKind.BranchEnforcementFailed);
+		expect(failEvent).toBeDefined();
+
+		const failIdx = events.findIndex(e => e.kind === LoopEventKind.BranchEnforcementFailed);
+		const stateNotifiedAfter = events.find(
+			(e, i) => i > failIdx && e.kind === LoopEventKind.StateNotified,
+		);
+		expect(stateNotifiedAfter).toBeDefined();
+		expect(stateNotifiedAfter.state).toBe(LoopState.Idle);
+		expect(stateNotifiedAfter.taskId).toBe('');
+
+		expect(orch.getStateSnapshot().state).toBe(LoopState.Idle);
+	});
+
+	it('PrdValidationFailed emits validation error and still forces idle cleanup via StateNotified', async () => {
+		// Write an invalid PRD (no tasks, empty)
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '', 'utf-8');
+
+		const { LoopOrchestrator } = await import('../src/orchestrator');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		const failEvent = events.find(e => e.kind === LoopEventKind.PrdValidationFailed);
+		expect(failEvent).toBeDefined();
+
+		const failIdx = events.findIndex(e => e.kind === LoopEventKind.PrdValidationFailed);
+		const stateNotifiedAfter = events.find(
+			(e, i) => i > failIdx && e.kind === LoopEventKind.StateNotified,
+		);
+		expect(stateNotifiedAfter).toBeDefined();
+		expect(stateNotifiedAfter.state).toBe(LoopState.Idle);
+		expect(stateNotifiedAfter.taskId).toBe('');
+
+		expect(orch.getStateSnapshot().state).toBe(LoopState.Idle);
+	});
+
+	it('uncaught exception during execution emits crash surface and still forces idle cleanup', async () => {
+		fs.writeFileSync(
+			path.join(tmpDir, 'PRD.md'),
+			'- [ ] **Task 1 — Test**: Do something\n',
+		);
+
+		const { LoopOrchestrator } = await import('../src/orchestrator');
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+
+		// After start() resolves (even if it threw internally), state should be idle
+		await orch.start();
+		expect(orch.getStateSnapshot().state).toBe(LoopState.Idle);
+	});
+});

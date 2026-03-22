@@ -398,6 +398,8 @@ export class LoopOrchestrator {
 		LoopEventKind.MaxIterations,
 		LoopEventKind.YieldRequested,
 		LoopEventKind.SessionChanged,
+		LoopEventKind.BranchEnforcementFailed,
+		LoopEventKind.PrdValidationFailed,
 	]);
 
 	private static readonly TERMINAL_EVENTS = new Set<LoopEventKind>([
@@ -405,6 +407,8 @@ export class LoopOrchestrator {
 		LoopEventKind.AllDone,
 		LoopEventKind.MaxIterations,
 		LoopEventKind.YieldRequested,
+		LoopEventKind.BranchEnforcementFailed,
+		LoopEventKind.PrdValidationFailed,
 	]);
 
 	async start(): Promise<void> {
@@ -439,7 +443,8 @@ export class LoopOrchestrator {
 					event.kind === LoopEventKind.AllDone ||
 					event.kind === LoopEventKind.MaxIterations ||
 					event.kind === LoopEventKind.YieldRequested ||
-					event.kind === LoopEventKind.BranchEnforcementFailed) {
+					event.kind === LoopEventKind.BranchEnforcementFailed ||
+					event.kind === LoopEventKind.PrdValidationFailed) {
 					this.sessionPersistence?.clear(this.config.workspaceRoot);
 					break;
 				}

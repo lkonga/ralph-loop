@@ -148,4 +148,19 @@ describe('shared idle finalizer (runOrchestratorWithIdleCleanup)', () => {
 		expect(mockShowStatusBarIdle).toHaveBeenCalledOnce();
 		expect(mockFireStateChange).toHaveBeenCalledWith('idle', '');
 	});
+
+	it('auto-resume failure also ends in idle cleanup instead of leaving prior state', async () => {
+		const { runOrchestratorWithIdleCleanup } = await import('../src/extension');
+
+		const mockOrchestrator = {
+			start: vi.fn().mockRejectedValue(new Error('resume boom')),
+		} as any;
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() } as any;
+
+		await runOrchestratorWithIdleCleanup(mockOrchestrator, logger);
+
+		expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('resume boom'));
+		expect(mockShowStatusBarIdle).toHaveBeenCalledOnce();
+		expect(mockFireStateChange).toHaveBeenCalledWith('idle', '');
+	});
 });
