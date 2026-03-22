@@ -631,6 +631,6 @@
 
 - [x] **Task 141 — Backfill abnormal exits and resumed cleanup through the shared idle path**: Ensure non-happy exits also converge the UI to idle instead of relying on happy-path terminal events. → Spec: `research/17-phase19-deep-research.md` L96-L115
 
-- [ ] **Task 142 — Make `delay()` abort-aware so stop requests collapse stale UI windows**: Reduce stop-path lag by making orchestrator waits terminate promptly when the loop is stopping. → Spec: `research/17-phase19-deep-research.md` L117-L134
+- [x] **Task 142 — Make `delay()` abort-aware so stop requests collapse stale UI windows**: Reduce stop-path lag by making orchestrator waits terminate promptly when the loop is stopping. → Spec: `research/17-phase19-deep-research.md` L117-L134
 
 - [ ] **Task 143 — Add regression coverage for normal, failure, stop, resume, and consecutive-run scenarios**: Lock in the status-bar convergence contract so the bar, snapshots, and status command stay aligned across all reported exit paths. → Spec: `research/17-phase19-deep-research.md` L136-L157
