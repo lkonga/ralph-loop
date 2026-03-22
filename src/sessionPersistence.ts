@@ -1,6 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+export interface LaneBranchState {
+    originalBranch: string;
+    activeBranch: string;
+}
+
 export interface SerializedLoopState {
     currentTaskIndex: number;
     iterationCount: number;
@@ -14,6 +19,7 @@ export interface SerializedLoopState {
     workspacePath?: string;
     branchName?: string;
     originalBranch?: string;
+    laneBranches?: Record<string, LaneBranchState>;
 }
 
 const SESSION_DIR = '.ralph';

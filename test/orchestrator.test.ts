@@ -8,7 +8,7 @@ import {
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode, defaultBearingsExec, LaneScheduler } from '../src/orchestrator';
+import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode, defaultBearingsExec, LaneScheduler, LaneBranchManager } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
 import { estimatePromptTokens } from '../src/prompt';
 import { VerificationCache } from '../src/verificationCache';
@@ -2169,5 +2169,190 @@ describe('LaneScheduler', () => {
 		const scheduler = new LaneScheduler([]);
 		expect(scheduler.nextTask()).toBeUndefined();
 		expect(scheduler.allDone()).toBe(true);
+	});
+});
+
+describe('LaneBranchManager', () => {
+	let tmpDir: string;
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-lane-branch-'));
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	function makeLane(repoId: string, prdContent: string): RepoLane {
+		const dir = path.join(tmpDir, repoId);
+		fs.mkdirSync(dir, { recursive: true });
+		fs.writeFileSync(path.join(dir, 'PRD.md'), prdContent);
+		return { repoId, workspaceFolder: dir, prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: true };
+	}
+
+	it('creates branch per-lane from that lane repo HEAD', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc1234');
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+
+		const laneA = makeLane('repo-a', '# Project A\n- [ ] Task A1\n');
+		const laneB = makeLane('repo-b', '# Project B\n- [ ] Task B1\n');
+		const mgr = new LaneBranchManager(noopLogger);
+
+		const resultA = await mgr.createLaneBranch(laneA);
+		expect(resultA.success).toBe(true);
+		expect(gitOps.getCurrentBranch).toHaveBeenCalledWith(laneA.workspaceFolder);
+		expect(gitOps.createAndCheckoutBranch).toHaveBeenCalledWith(
+			laneA.workspaceFolder,
+			expect.stringContaining('ralph/'),
+		);
+
+		const resultB = await mgr.createLaneBranch(laneB);
+		expect(resultB.success).toBe(true);
+		expect(gitOps.getCurrentBranch).toHaveBeenCalledWith(laneB.workspaceFolder);
+		expect(gitOps.createAndCheckoutBranch).toHaveBeenCalledWith(
+			laneB.workspaceFolder,
+			expect.stringContaining('ralph/'),
+		);
+	});
+
+	it('derives branch name from lane PRD title and lane short hash', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('f00baa');
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+
+		const lane = makeLane('repo-a', '# My Cool Project\n- [ ] Task 1\n');
+		const mgr = new LaneBranchManager(noopLogger);
+		await mgr.createLaneBranch(lane);
+
+		expect(gitOps.getShortHash).toHaveBeenCalledWith(lane.workspaceFolder);
+		expect(gitOps.createAndCheckoutBranch).toHaveBeenCalledWith(
+			lane.workspaceFolder,
+			'ralph/my-cool-project-f00baa',
+		);
+	});
+
+	it('tracks originalBranch per lane', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch')
+			.mockResolvedValueOnce('main')
+			.mockResolvedValueOnce('develop');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc');
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+
+		const laneA = makeLane('repo-a', '# A\n');
+		const laneB = makeLane('repo-b', '# B\n');
+		const mgr = new LaneBranchManager(noopLogger);
+
+		await mgr.createLaneBranch(laneA);
+		await mgr.createLaneBranch(laneB);
+
+		const branches = mgr.getLaneBranches();
+		expect(branches.get('repo-a')!.originalBranch).toBe('main');
+		expect(branches.get('repo-b')!.originalBranch).toBe('develop');
+	});
+
+	it('switchBackAll switches each lane back independently', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch')
+			.mockResolvedValueOnce('main')
+			.mockResolvedValueOnce('feature/x');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc');
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'checkoutBranch').mockResolvedValue({ success: true });
+
+		const laneA = makeLane('repo-a', '# A\n');
+		const laneB = makeLane('repo-b', '# B\n');
+		const mgr = new LaneBranchManager(noopLogger);
+
+		await mgr.createLaneBranch(laneA);
+		await mgr.createLaneBranch(laneB);
+
+		const results = await mgr.switchBackAll();
+		expect(results).toHaveLength(2);
+		expect(results.every(r => r.success)).toBe(true);
+
+		expect(gitOps.checkoutBranch).toHaveBeenCalledWith(laneA.workspaceFolder, 'main');
+		expect(gitOps.checkoutBranch).toHaveBeenCalledWith(laneB.workspaceFolder, 'feature/x');
+	});
+
+	it('failure in one lane branch creation does not affect other lanes', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc');
+		vi.spyOn(gitOps, 'createAndCheckoutBranch')
+			.mockResolvedValueOnce({ success: false, error: 'branch exists' })
+			.mockResolvedValueOnce({ success: true });
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+
+		const laneA = makeLane('repo-a', '# A\n');
+		const laneB = makeLane('repo-b', '# B\n');
+		const mgr = new LaneBranchManager(noopLogger);
+
+		const resultA = await mgr.createLaneBranch(laneA);
+		expect(resultA.success).toBe(false);
+
+		const resultB = await mgr.createLaneBranch(laneB);
+		expect(resultB.success).toBe(true);
+	});
+
+	it('failure in one lane switchback does not affect other lanes', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc');
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(false);
+		vi.spyOn(gitOps, 'checkoutBranch')
+			.mockResolvedValueOnce({ success: false, error: 'conflict' })
+			.mockResolvedValueOnce({ success: true });
+
+		const laneA = makeLane('repo-a', '# A\n');
+		const laneB = makeLane('repo-b', '# B\n');
+		const mgr = new LaneBranchManager(noopLogger);
+
+		await mgr.createLaneBranch(laneA);
+		await mgr.createLaneBranch(laneB);
+
+		const results = await mgr.switchBackAll();
+		expect(results).toHaveLength(2);
+		expect(results[0].success).toBe(false);
+		expect(results[0].repoId).toBe('repo-a');
+		expect(results[1].success).toBe(true);
+		expect(results[1].repoId).toBe('repo-b');
+	});
+
+	it('handles dirty working tree with WIP commit per lane', async () => {
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'getCurrentBranch').mockResolvedValue('main');
+		vi.spyOn(gitOps, 'getShortHash').mockResolvedValue('abc');
+		vi.spyOn(gitOps, 'createAndCheckoutBranch').mockResolvedValue({ success: true });
+		vi.spyOn(gitOps, 'hasDirtyWorkingTree').mockResolvedValue(true);
+		vi.spyOn(gitOps, 'wipCommit').mockResolvedValue({ success: true });
+
+		const lane = makeLane('repo-a', '# A\n');
+		const mgr = new LaneBranchManager(noopLogger);
+
+		const result = await mgr.createLaneBranch(lane);
+		expect(result.success).toBe(true);
+		expect(gitOps.wipCommit).toHaveBeenCalledWith(lane.workspaceFolder);
+	});
+
+	it('getLaneBranches returns empty map when no lanes created', () => {
+		const mgr = new LaneBranchManager(noopLogger);
+		expect(mgr.getLaneBranches().size).toBe(0);
+	});
+
+	it('switchBackAll returns empty array when no lanes', async () => {
+		const mgr = new LaneBranchManager(noopLogger);
+		const results = await mgr.switchBackAll();
+		expect(results).toHaveLength(0);
 	});
 });

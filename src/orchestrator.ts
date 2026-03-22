@@ -2442,6 +2442,104 @@ export class LoopOrchestrator {
 	}
 }
 
+export interface LaneBranchInfo {
+	originalBranch: string;
+	activeBranch: string;
+}
+
+export interface LaneSwitchBackResult {
+	repoId: string;
+	success: boolean;
+	error?: string;
+}
+
+export class LaneBranchManager {
+	private readonly logger: ILogger;
+	private readonly branches: Map<string, LaneBranchInfo> = new Map();
+
+	constructor(logger: ILogger) {
+		this.logger = logger;
+	}
+
+	async createLaneBranch(lane: RepoLane): Promise<{ success: boolean; branchName?: string; error?: string }> {
+		try {
+			const currentBranch = await getCurrentBranch(lane.workspaceFolder);
+			const prdPath = path.join(lane.workspaceFolder, lane.prdPath);
+			const prdContent = readPrdFile(prdPath);
+			const prdTitle = parsePrdTitle(prdContent);
+			const shortHash = await getShortHash(lane.workspaceFolder);
+			const derivedName = deriveBranchName(prdTitle ?? "", shortHash);
+
+			const createResult = await createAndCheckoutBranch(lane.workspaceFolder, derivedName);
+			if (!createResult.success) {
+				this.logger.warn(`Lane ${lane.repoId}: branch creation failed — ${createResult.error ?? "unknown"}`);
+				return { success: false, error: createResult.error ?? "branch creation failed" };
+			}
+
+			if (await hasDirtyWorkingTree(lane.workspaceFolder)) {
+				await wipCommit(lane.workspaceFolder);
+				this.logger.log(`Lane ${lane.repoId}: committed dirty working tree as WIP`);
+			}
+
+			this.branches.set(lane.repoId, { originalBranch: currentBranch, activeBranch: derivedName });
+			this._laneWorkspaces.set(lane.repoId, lane.workspaceFolder);
+			this.logger.log(`Lane ${lane.repoId}: created branch '${derivedName}' from '${currentBranch}'`);
+			return { success: true, branchName: derivedName };
+		} catch (err: unknown) {
+			const msg = err instanceof Error ? err.message : String(err);
+			this.logger.warn(`Lane ${lane.repoId}: git operations failed — ${msg}`);
+			return { success: false, error: msg };
+		}
+	}
+
+	async switchBackAll(): Promise<LaneSwitchBackResult[]> {
+		const results: LaneSwitchBackResult[] = [];
+		for (const [repoId, info] of this.branches) {
+			try {
+				const lane = this.findLaneWorkspace(repoId);
+				if (!lane) {
+					results.push({ repoId, success: false, error: "lane workspace not found" });
+					continue;
+				}
+				const result = await checkoutBranch(lane, info.originalBranch);
+				if (result.success) {
+					results.push({ repoId, success: true });
+				} else {
+					this.logger.warn(`Lane ${repoId}: failed to switch back to '${info.originalBranch}': ${result.error ?? "unknown"}`);
+					results.push({ repoId, success: false, error: result.error });
+				}
+			} catch (err: unknown) {
+				const msg = err instanceof Error ? err.message : String(err);
+				this.logger.warn(`Lane ${repoId}: failed to switch back — ${msg}`);
+				results.push({ repoId, success: false, error: msg });
+			}
+		}
+		return results;
+	}
+
+	getLaneBranches(): Map<string, LaneBranchInfo> {
+		return new Map(this.branches);
+	}
+
+	toLaneRecord(): Record<string, { originalBranch: string; activeBranch: string }> {
+		const record: Record<string, { originalBranch: string; activeBranch: string }> = {};
+		for (const [repoId, info] of this.branches) {
+			record[repoId] = { originalBranch: info.originalBranch, activeBranch: info.activeBranch };
+		}
+		return record;
+	}
+
+	private _laneWorkspaces: Map<string, string> = new Map();
+
+	registerLaneWorkspace(repoId: string, workspaceFolder: string): void {
+		this._laneWorkspaces.set(repoId, workspaceFolder);
+	}
+
+	private findLaneWorkspace(repoId: string): string | undefined {
+		return this._laneWorkspaces.get(repoId);
+	}
+}
+
 export interface LaneTaskResult {
 	task: Task;
 	lane: RepoLane;

@@ -311,4 +311,44 @@ describe('SessionPersistence', () => {
         expect(loaded).not.toBeNull();
         expect('branchMismatch' in loaded!).toBe(false);
     });
+
+    // === Task 160 — Per-Lane originalBranch in Session State ===
+
+    it('save persists laneBranches alongside top-level fields', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            laneBranches: {
+                'repo-a': { originalBranch: 'main', activeBranch: 'ralph/a-abc' },
+                'repo-b': { originalBranch: 'develop', activeBranch: 'ralph/b-def' },
+            },
+        };
+        persistence.save(tmpDir, state);
+        const filePath = path.join(tmpDir, '.ralph', 'session.json');
+        const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        expect(content.laneBranches).toBeDefined();
+        expect(content.laneBranches['repo-a'].originalBranch).toBe('main');
+        expect(content.laneBranches['repo-b'].originalBranch).toBe('develop');
+    });
+
+    it('load returns stored laneBranches', () => {
+        const state: SerializedLoopState = {
+            ...sampleState,
+            laneBranches: {
+                'repo-a': { originalBranch: 'main', activeBranch: 'ralph/a-abc' },
+            },
+        };
+        persistence.save(tmpDir, state);
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).not.toBeNull();
+        expect(loaded!.laneBranches).toBeDefined();
+        expect(loaded!.laneBranches!['repo-a'].originalBranch).toBe('main');
+        expect(loaded!.laneBranches!['repo-a'].activeBranch).toBe('ralph/a-abc');
+    });
+
+    it('load handles missing laneBranches gracefully (legacy session)', () => {
+        persistence.save(tmpDir, sampleState);
+        const loaded = persistence.load(tmpDir);
+        expect(loaded).not.toBeNull();
+        expect(loaded!.laneBranches).toBeUndefined();
+    });
 });
