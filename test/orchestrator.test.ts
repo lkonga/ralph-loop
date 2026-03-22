@@ -8,7 +8,7 @@ import {
 	shouldRetryError,
 	MAX_RETRIES_PER_TASK,
 } from '../src/decisions';
-import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode, defaultBearingsExec } from '../src/orchestrator';
+import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode, defaultBearingsExec, LaneScheduler } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
 import { estimatePromptTokens } from '../src/prompt';
 import { VerificationCache } from '../src/verificationCache';
@@ -27,6 +27,7 @@ import type {
 	InactivityConfig,
 	ILogger,
 	ExecutionOptions,
+	RepoLane,
 } from '../src/types';
 import { VerifyResult, LoopEventKind } from '../src/types';
 
@@ -2016,5 +2017,157 @@ describe('abort-aware delay', () => {
 		await (orch as any).delay(5000);
 		// Calling stop again should not throw or cause issues
 		orch.stop();
+	});
+});
+
+describe('LaneScheduler', () => {
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-lane-sched-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	function makeLane(repoId: string, prdContent: string): RepoLane {
+		const dir = path.join(tmpDir, repoId);
+		fs.mkdirSync(dir, { recursive: true });
+		fs.writeFileSync(path.join(dir, 'PRD.md'), prdContent);
+		return { repoId, workspaceFolder: dir, prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: true };
+	}
+
+	it('round-robin rotates between lanes', () => {
+		const laneA = makeLane('repo-a', '- [ ] Task A1\n- [ ] Task A2\n');
+		const laneB = makeLane('repo-b', '- [ ] Task B1\n- [ ] Task B2\n');
+		const scheduler = new LaneScheduler([laneA, laneB]);
+
+		const first = scheduler.nextTask();
+		expect(first).toBeDefined();
+		expect(first!.lane.repoId).toBe('repo-a');
+
+		const second = scheduler.nextTask();
+		expect(second).toBeDefined();
+		expect(second!.lane.repoId).toBe('repo-b');
+
+		const third = scheduler.nextTask();
+		expect(third).toBeDefined();
+		expect(third!.lane.repoId).toBe('repo-a');
+	});
+
+	it('skips lanes with no remaining tasks', () => {
+		const laneA = makeLane('repo-a', '- [x] Task A1\n');
+		const laneB = makeLane('repo-b', '- [ ] Task B1\n- [ ] Task B2\n');
+		const scheduler = new LaneScheduler([laneA, laneB]);
+
+		const first = scheduler.nextTask();
+		expect(first).toBeDefined();
+		expect(first!.lane.repoId).toBe('repo-b');
+
+		const second = scheduler.nextTask();
+		expect(second).toBeDefined();
+		expect(second!.lane.repoId).toBe('repo-b');
+	});
+
+	it('returns undefined when all lanes are done', () => {
+		const laneA = makeLane('repo-a', '- [x] Task A1\n');
+		const laneB = makeLane('repo-b', '- [x] Task B1\n');
+		const scheduler = new LaneScheduler([laneA, laneB]);
+
+		expect(scheduler.nextTask()).toBeUndefined();
+		expect(scheduler.allDone()).toBe(true);
+	});
+
+	it('builds merged task queue with lane-scoped task IDs', () => {
+		const laneA = makeLane('repo-a', '- [ ] **Task 1 — Do A**: description\n');
+		const laneB = makeLane('repo-b', '- [ ] **Task 1 — Do B**: description\n');
+		const scheduler = new LaneScheduler([laneA, laneB]);
+
+		const first = scheduler.nextTask();
+		expect(first!.task.repoId).toBe('repo-a');
+
+		const second = scheduler.nextTask();
+		expect(second!.task.repoId).toBe('repo-b');
+	});
+
+	it('each task carries the lane workspaceFolder', () => {
+		const lane = makeLane('my-repo', '- [ ] Task 1\n');
+		const scheduler = new LaneScheduler([lane]);
+
+		const result = scheduler.nextTask();
+		expect(result).toBeDefined();
+		expect(result!.lane.workspaceFolder).toBe(path.join(tmpDir, 'my-repo'));
+	});
+
+	it('refresh re-reads PRDs and detects completed tasks', () => {
+		const lane = makeLane('repo-a', '- [ ] Task 1\n- [ ] Task 2\n');
+		const scheduler = new LaneScheduler([lane]);
+
+		// First task
+		const first = scheduler.nextTask();
+		expect(first).toBeDefined();
+
+		// Simulate task completion by modifying PRD file
+		fs.writeFileSync(path.join(tmpDir, 'repo-a', 'PRD.md'), '- [x] Task 1\n- [ ] Task 2\n');
+		scheduler.refresh();
+
+		const next = scheduler.nextTask();
+		expect(next).toBeDefined();
+		// After refresh, should still continue with remaining tasks
+	});
+
+	it('handles lanes completing at different rates', () => {
+		const laneA = makeLane('repo-a', '- [ ] Task A1\n');
+		const laneB = makeLane('repo-b', '- [ ] Task B1\n- [ ] Task B2\n- [ ] Task B3\n');
+		const scheduler = new LaneScheduler([laneA, laneB]);
+
+		// First round: A gets task, B gets task
+		const r1 = scheduler.nextTask();
+		expect(r1!.lane.repoId).toBe('repo-a');
+		const r2 = scheduler.nextTask();
+		expect(r2!.lane.repoId).toBe('repo-b');
+
+		// Mark A as done
+		fs.writeFileSync(path.join(tmpDir, 'repo-a', 'PRD.md'), '- [x] Task A1\n');
+		scheduler.refresh();
+
+		// Now only B has tasks — should keep returning B
+		const r3 = scheduler.nextTask();
+		expect(r3!.lane.repoId).toBe('repo-b');
+		const r4 = scheduler.nextTask();
+		expect(r4!.lane.repoId).toBe('repo-b');
+	});
+
+	it('activeLane returns the lane of the last picked task', () => {
+		const laneA = makeLane('repo-a', '- [ ] Task A1\n');
+		const laneB = makeLane('repo-b', '- [ ] Task B1\n');
+		const scheduler = new LaneScheduler([laneA, laneB]);
+
+		expect(scheduler.activeLane()).toBeUndefined();
+		scheduler.nextTask();
+		expect(scheduler.activeLane()!.repoId).toBe('repo-a');
+		scheduler.nextTask();
+		expect(scheduler.activeLane()!.repoId).toBe('repo-b');
+	});
+
+	it('skips disabled lanes', () => {
+		const laneA = makeLane('repo-a', '- [ ] Task A1\n');
+		const laneB: RepoLane = { repoId: 'repo-b', workspaceFolder: path.join(tmpDir, 'repo-b'), prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: false };
+		fs.mkdirSync(path.join(tmpDir, 'repo-b'), { recursive: true });
+		fs.writeFileSync(path.join(tmpDir, 'repo-b', 'PRD.md'), '- [ ] Task B1\n');
+		const scheduler = new LaneScheduler([laneA, laneB]);
+
+		const first = scheduler.nextTask();
+		expect(first!.lane.repoId).toBe('repo-a');
+
+		const second = scheduler.nextTask();
+		expect(second!.lane.repoId).toBe('repo-a');
+	});
+
+	it('empty lanes array returns undefined immediately', () => {
+		const scheduler = new LaneScheduler([]);
+		expect(scheduler.nextTask()).toBeUndefined();
+		expect(scheduler.allDone()).toBe(true);
 	});
 });

@@ -39,6 +39,7 @@ import {
 	appendProgress,
 	deriveBranchName,
 	markTaskComplete,
+	parseMultiPrd,
 	parsePrdTitle,
 	pickNextTask,
 	pickReadyTasks,
@@ -83,6 +84,8 @@ import {
 	type PreCompleteHookResult,
 	type PreCompleteInput,
 	type RalphConfig,
+	type RepoLane,
+	type Task,
 	type TaskState,
 	TaskStatus,
 	type VerifyCheck,
@@ -2436,6 +2439,71 @@ export class LoopOrchestrator {
 			};
 			signal.addEventListener("abort", onAbort, { once: true });
 		});
+	}
+}
+
+export interface LaneTaskResult {
+	task: Task;
+	lane: RepoLane;
+}
+
+export class LaneScheduler {
+	private readonly lanes: RepoLane[];
+	private laneSnapshots: Map<string, { tasks: readonly Task[]; pending: Task[] }>;
+	private currentLaneIndex: number;
+	private _activeLane: RepoLane | undefined;
+
+	constructor(lanes: RepoLane[]) {
+		this.lanes = lanes.filter(l => l.enabled);
+		this.currentLaneIndex = 0;
+		this._activeLane = undefined;
+		this.laneSnapshots = new Map();
+		this.buildSnapshots();
+	}
+
+	private buildSnapshots(): void {
+		this.laneSnapshots.clear();
+		const snapshots = parseMultiPrd(this.lanes);
+		for (const [repoId, snapshot] of snapshots) {
+			const pending = snapshot.tasks.filter(t => t.status === TaskStatus.Pending);
+			this.laneSnapshots.set(repoId, { tasks: snapshot.tasks, pending });
+		}
+	}
+
+	nextTask(): LaneTaskResult | undefined {
+		if (this.lanes.length === 0) { return undefined; }
+
+		let checked = 0;
+
+		while (checked < this.lanes.length) {
+			const lane = this.lanes[this.currentLaneIndex];
+			this.currentLaneIndex = (this.currentLaneIndex + 1) % this.lanes.length;
+			checked++;
+
+			const snap = this.laneSnapshots.get(lane.repoId);
+			if (!snap || snap.pending.length === 0) { continue; }
+
+			const task = snap.pending[0];
+			this._activeLane = lane;
+			return { task, lane };
+		}
+
+		return undefined;
+	}
+
+	refresh(): void {
+		this.buildSnapshots();
+	}
+
+	activeLane(): RepoLane | undefined {
+		return this._activeLane;
+	}
+
+	allDone(): boolean {
+		for (const [, snap] of this.laneSnapshots) {
+			if (snap.pending.length > 0) { return false; }
+		}
+		return true;
 	}
 }
 
