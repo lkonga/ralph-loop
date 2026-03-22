@@ -5,29 +5,29 @@ import * as path from "path";
 import * as vscode from "vscode";
 import {
 	type CircuitBreakerChain,
+	type CircuitBreakerState,
 	createDefaultChain,
 	ErrorHashTracker,
-	type CircuitBreakerState,
 } from "./circuitBreaker";
 import {
-	showCooldownDialog,
 	type CooldownDialogResult,
+	showCooldownDialog,
 } from "./cooldownDialog";
 import {
 	buildFinalNudgePrompt,
 	buildPrompt,
-	parseReviewVerdict,
 	type PromptCapabilities,
+	parseReviewVerdict,
 	sendReviewPrompt,
 } from "./copilot";
 import { MAX_RETRIES_PER_TASK, shouldRetryError } from "./decisions";
 import { DiffValidator } from "./diffValidator";
 import {
 	atomicCommit,
-	getCurrentBranch,
 	branchExists,
-	createAndCheckoutBranch,
 	checkoutBranch,
+	createAndCheckoutBranch,
+	getCurrentBranch,
 	getShortHash,
 	hasDirtyWorkingTree,
 	wipCommit,
@@ -2423,16 +2423,16 @@ export class LoopOrchestrator {
 	private delay(ms: number): Promise<void> {
 		const signal = this.stopController.signal;
 		if (signal.aborted) return Promise.resolve();
-		return new Promise<void>(resolve => {
+		return new Promise<void>((resolve) => {
 			const timer = setTimeout(() => {
-				signal.removeEventListener('abort', onAbort);
+				signal.removeEventListener("abort", onAbort);
 				resolve();
 			}, ms);
 			const onAbort = () => {
 				clearTimeout(timer);
 				resolve();
 			};
-			signal.addEventListener('abort', onAbort, { once: true });
+			signal.addEventListener("abort", onAbort, { once: true });
 		});
 	}
 }

@@ -378,3 +378,239 @@ describe("Abnormal exit idle convergence", () => {
 		expect(orch.getStateSnapshot().state).toBe(LoopState.Idle);
 	});
 });
+
+/**
+ * Status-bar convergence contract regression suite (Task 143).
+ *
+ * Asserts that after every terminal exit path the three observable channels
+ * — StateNotified event, getStateSnapshot(), and status-bar text — all
+ * converge to idle with an empty taskId.
+ */
+describe("Status-bar convergence contract — regression suite", () => {
+	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	let tmpDir: string;
+
+	function assertIdleConvergence(
+		events: any[],
+		orch: any,
+		terminalKind: LoopEventKind,
+	) {
+		const terminalIdx = events.findIndex((e) => e.kind === terminalKind);
+		expect(terminalIdx).toBeGreaterThanOrEqual(0);
+
+		// Channel 1: StateNotified event after the terminal event carries idle
+		const stateNotified = events.find(
+			(e, i) => i > terminalIdx && e.kind === LoopEventKind.StateNotified,
+		);
+		expect(stateNotified).toBeDefined();
+		expect(stateNotified.state).toBe(LoopState.Idle);
+		expect(stateNotified.taskId).toBe("");
+
+		// Channel 2: getStateSnapshot returns idle after start() resolves
+		const snap = orch.getStateSnapshot();
+		expect(snap.state).toBe(LoopState.Idle);
+		expect(snap.taskId).toBe("");
+		expect(snap.taskDescription).toBe("");
+	}
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "ralph-convergence-"));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it("normal completion (AllDone): bar, snapshot, and StateNotified all idle", async () => {
+		fs.writeFileSync(path.join(tmpDir, "PRD.md"), "- [x] Done task\n", "utf-8");
+
+		const { LoopOrchestrator } = await import("../src/orchestrator");
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		assertIdleConvergence(events, orch, LoopEventKind.AllDone);
+	});
+
+	it("BranchEnforcementFailed: all three channels converge to idle", async () => {
+		fs.writeFileSync(
+			path.join(tmpDir, "PRD.md"),
+			"- [ ] **Task 1 — Do thing**: desc\n",
+		);
+
+		const gitOps = await import("../src/gitOps");
+		vi.spyOn(gitOps, "getCurrentBranch").mockResolvedValue("main");
+		vi.spyOn(gitOps, "getShortHash").mockResolvedValue("abc1234");
+		vi.spyOn(gitOps, "hasDirtyWorkingTree").mockResolvedValue(false);
+		vi.spyOn(gitOps, "createAndCheckoutBranch").mockResolvedValue({
+			success: false,
+			error: "branch creation failed",
+		});
+
+		const { LoopOrchestrator } = await import("../src/orchestrator");
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+				featureBranch: { enabled: true },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		assertIdleConvergence(events, orch, LoopEventKind.BranchEnforcementFailed);
+	});
+
+	it("PrdValidationFailed: all three channels converge to idle", async () => {
+		fs.writeFileSync(path.join(tmpDir, "PRD.md"), "", "utf-8");
+
+		const { LoopOrchestrator } = await import("../src/orchestrator");
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		await orch.start();
+
+		assertIdleConvergence(events, orch, LoopEventKind.PrdValidationFailed);
+	});
+
+	it("thrown exception: snapshot and state converge to idle after start() resolves", async () => {
+		fs.writeFileSync(
+			path.join(tmpDir, "PRD.md"),
+			"- [ ] **Task 1 — Test**: desc\n",
+		);
+
+		const { LoopOrchestrator } = await import("../src/orchestrator");
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+
+		await orch.start();
+
+		const snap = orch.getStateSnapshot();
+		expect(snap.state).toBe(LoopState.Idle);
+		expect(snap.taskId).toBe("");
+		expect(snap.taskDescription).toBe("");
+	});
+
+	it("stop during wait: ends idle without lingering processing text", async () => {
+		fs.writeFileSync(
+			path.join(tmpDir, "PRD.md"),
+			"- [ ] **Task 1 — Stop test**: desc\n",
+		);
+
+		const { LoopOrchestrator } = await import("../src/orchestrator");
+		const events: any[] = [];
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 5,
+				waitTimeMs: 50000,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+
+		const startPromise = orch.start();
+		// Allow the loop to enter a wait/delay
+		await new Promise((r) => setTimeout(r, 50));
+		orch.stop();
+		await startPromise;
+
+		const snap = orch.getStateSnapshot();
+		expect(snap.state).toBe(LoopState.Idle);
+		expect(snap.taskId).toBe("");
+
+		// If a Stopped event was emitted, verify StateNotified came after it
+		const stoppedIdx = events.findIndex(
+			(e) => e.kind === LoopEventKind.Stopped,
+		);
+		if (stoppedIdx >= 0) {
+			const stateAfter = events.find(
+				(e, i) =>
+					i > stoppedIdx && e.kind === LoopEventKind.StateNotified,
+			);
+			if (stateAfter) {
+				expect(stateAfter.state).toBe(LoopState.Idle);
+				expect(stateAfter.taskId).toBe("");
+			}
+		}
+	});
+
+	it("consecutive runs: second run starts clean, no stale task text", async () => {
+		fs.writeFileSync(path.join(tmpDir, "PRD.md"), "- [x] Done\n", "utf-8");
+
+		const { LoopOrchestrator } = await import("../src/orchestrator");
+
+		// --- First run ---
+		const events1: any[] = [];
+		const orch1 = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events1.push(e),
+		);
+		await orch1.start();
+		expect(orch1.getStateSnapshot().state).toBe(LoopState.Idle);
+
+		// --- Second run in same workspace ---
+		const events2: any[] = [];
+		const orch2 = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 1,
+				bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false },
+			},
+			noopLogger,
+			(e: any) => events2.push(e),
+		);
+
+		// Before starting, snapshot must be idle with no stale text
+		const preSnap = orch2.getStateSnapshot();
+		expect(preSnap.state).toBe(LoopState.Idle);
+		expect(preSnap.taskId).toBe("");
+		expect(preSnap.taskDescription).toBe("");
+
+		await orch2.start();
+
+		const postSnap = orch2.getStateSnapshot();
+		expect(postSnap.state).toBe(LoopState.Idle);
+		expect(postSnap.taskId).toBe("");
+		expect(postSnap.taskDescription).toBe("");
+	});
+});

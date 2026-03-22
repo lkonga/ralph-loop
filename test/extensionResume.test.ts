@@ -175,3 +175,60 @@ describe("shared idle finalizer (runOrchestratorWithIdleCleanup)", () => {
 		expect(mockFireStateChange).toHaveBeenCalledWith("idle", "");
 	});
 });
+
+describe("Convergence contract regression — resume & consecutive runs", () => {
+	it("resume settles to idle on completion: both status bar and state notification fire", async () => {
+		const { runOrchestratorWithIdleCleanup } = await import("../src/extension");
+
+		const mockOrchestrator = {
+			start: vi.fn().mockResolvedValue(undefined),
+		} as any;
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() } as any;
+
+		await runOrchestratorWithIdleCleanup(mockOrchestrator, logger);
+
+		expect(mockShowStatusBarIdle).toHaveBeenCalledOnce();
+		expect(mockFireStateChange).toHaveBeenCalledWith("idle", "");
+		// No error logged on clean completion
+		expect(logger.error).not.toHaveBeenCalled();
+	});
+
+	it("resume settles to idle on failure: crash does not leave stale running state", async () => {
+		const { runOrchestratorWithIdleCleanup } = await import("../src/extension");
+
+		const mockOrchestrator = {
+			start: vi.fn().mockRejectedValue(new Error("resume crash")),
+		} as any;
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() } as any;
+
+		await runOrchestratorWithIdleCleanup(mockOrchestrator, logger);
+
+		// Both channels must converge to idle even after crash
+		expect(mockShowStatusBarIdle).toHaveBeenCalledOnce();
+		expect(mockFireStateChange).toHaveBeenCalledWith("idle", "");
+	});
+
+	it("consecutive runs via shared finalizer: second run inherits no stale state from first", async () => {
+		const { runOrchestratorWithIdleCleanup } = await import("../src/extension");
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() } as any;
+
+		// First run
+		const orch1 = { start: vi.fn().mockResolvedValue(undefined) } as any;
+		await runOrchestratorWithIdleCleanup(orch1, logger);
+
+		expect(mockShowStatusBarIdle).toHaveBeenCalledTimes(1);
+		expect(mockFireStateChange).toHaveBeenCalledTimes(1);
+
+		// Clear mocks to simulate fresh state tracking for second run
+		vi.mocked(showStatusBarIdle).mockClear();
+		vi.mocked(fireStateChangeNotification).mockClear();
+
+		// Second run
+		const orch2 = { start: vi.fn().mockResolvedValue(undefined) } as any;
+		await runOrchestratorWithIdleCleanup(orch2, logger);
+
+		// Second run also converges independently
+		expect(mockShowStatusBarIdle).toHaveBeenCalledOnce();
+		expect(mockFireStateChange).toHaveBeenCalledWith("idle", "");
+	});
+});
