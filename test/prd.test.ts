@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, parseLineAnnotations, parsePrdTitle, deriveBranchName, markTaskComplete } from '../src/prd';
+import { parsePrd, parseMultiPrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, parseLineAnnotations, parsePrdTitle, deriveBranchName, markTaskComplete } from '../src/prd';
+import type { RepoLane } from '../src/types';
 
 describe('parsePrd', () => {
 	it('parses unchecked tasks', () => {
@@ -865,5 +866,106 @@ describe('deriveBranchName', () => {
 		expect(a).not.toBe(b);
 		expect(a).toBe('ralph/same-title-aaaa111');
 		expect(b).toBe('ralph/same-title-bbbb222');
+	});
+});
+
+describe('parseMultiPrd', () => {
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-multi-prd-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('returns a map keyed by repoId with independent snapshots', () => {
+		const repoA = path.join(tmpDir, 'repo-a');
+		const repoB = path.join(tmpDir, 'repo-b');
+		fs.mkdirSync(repoA, { recursive: true });
+		fs.mkdirSync(repoB, { recursive: true });
+		fs.writeFileSync(path.join(repoA, 'PRD.md'), '- [ ] Task A1\n- [x] Task A2\n');
+		fs.writeFileSync(path.join(repoB, 'PRD.md'), '- [ ] Task B1\n- [ ] Task B2\n- [ ] Task B3\n');
+
+		const lanes: RepoLane[] = [
+			{ repoId: 'repo-a', workspaceFolder: repoA, prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: true },
+			{ repoId: 'repo-b', workspaceFolder: repoB, prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: true },
+		];
+
+		const result = parseMultiPrd(lanes);
+		expect(result).toBeInstanceOf(Map);
+		expect(result.size).toBe(2);
+
+		const snapA = result.get('repo-a');
+		expect(snapA).toBeDefined();
+		expect(snapA!.total).toBe(2);
+		expect(snapA!.completed).toBe(1);
+
+		const snapB = result.get('repo-b');
+		expect(snapB).toBeDefined();
+		expect(snapB!.total).toBe(3);
+		expect(snapB!.completed).toBe(0);
+	});
+
+	it('tasks have repoId set to the lane repoId', () => {
+		const repoDir = path.join(tmpDir, 'my-repo');
+		fs.mkdirSync(repoDir, { recursive: true });
+		fs.writeFileSync(path.join(repoDir, 'PRD.md'), '- [ ] Some task\n');
+
+		const lanes: RepoLane[] = [
+			{ repoId: 'my-repo', workspaceFolder: repoDir, prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: true },
+		];
+
+		const result = parseMultiPrd(lanes);
+		const snap = result.get('my-repo');
+		expect(snap!.tasks[0].repoId).toBe('my-repo');
+	});
+
+	it('skips disabled lanes', () => {
+		const repoDir = path.join(tmpDir, 'disabled-repo');
+		fs.mkdirSync(repoDir, { recursive: true });
+		fs.writeFileSync(path.join(repoDir, 'PRD.md'), '- [ ] Task\n');
+
+		const lanes: RepoLane[] = [
+			{ repoId: 'disabled-repo', workspaceFolder: repoDir, prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: false },
+		];
+
+		const result = parseMultiPrd(lanes);
+		expect(result.size).toBe(0);
+	});
+
+	it('returns empty map for empty lanes array', () => {
+		const result = parseMultiPrd([]);
+		expect(result.size).toBe(0);
+	});
+
+	it('legacy parsePrd tasks have repoId undefined by default', () => {
+		const content = '- [ ] Legacy task\n';
+		const snap = parsePrd(content);
+		expect(snap.tasks[0].repoId).toBeUndefined();
+	});
+
+	it('task IDs are scoped to their repo (repoId:taskId)', () => {
+		const repoA = path.join(tmpDir, 'scope-a');
+		const repoB = path.join(tmpDir, 'scope-b');
+		fs.mkdirSync(repoA, { recursive: true });
+		fs.mkdirSync(repoB, { recursive: true });
+		fs.writeFileSync(path.join(repoA, 'PRD.md'), '- [ ] First task\n');
+		fs.writeFileSync(path.join(repoB, 'PRD.md'), '- [ ] First task\n');
+
+		const lanes: RepoLane[] = [
+			{ repoId: 'scope-a', workspaceFolder: repoA, prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: true },
+			{ repoId: 'scope-b', workspaceFolder: repoB, prdPath: 'PRD.md', progressPath: 'progress.txt', enabled: true },
+		];
+
+		const result = parseMultiPrd(lanes);
+		const taskA = result.get('scope-a')!.tasks[0];
+		const taskB = result.get('scope-b')!.tasks[0];
+		// Both repos can have Task-001 independently — they are scoped by repoId
+		expect(taskA.taskId).toBe('Task-001');
+		expect(taskB.taskId).toBe('Task-001');
+		expect(taskA.repoId).toBe('scope-a');
+		expect(taskB.repoId).toBe('scope-b');
 	});
 });

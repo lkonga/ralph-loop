@@ -28,6 +28,7 @@ export interface Task {
 	readonly agent?: string;
 	readonly readOnly?: boolean;
 	readonly noDiff?: boolean;
+	readonly repoId?: string;
 }
 
 export interface StateSnapshot {

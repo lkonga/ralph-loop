@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Task, TaskStatus, PrdSnapshot, PrdValidationError, PrdValidationResult } from './types';
+import type { RepoLane } from './types';
 
 const CHECKBOX_UNCHECKED = /^(\s*)-\s*\[\s*\]\s+(.+)$/;
 const CHECKBOX_CHECKED = /^(\s*)-\s*\[x\]\s+(.+)$/i;
@@ -229,6 +230,24 @@ export function readPrdFile(prdPath: string): string {
 export function readPrdSnapshot(prdPath: string): PrdSnapshot {
 	const content = readPrdFile(prdPath);
 	return parsePrd(content);
+}
+
+export function parseMultiPrd(lanes: RepoLane[]): Map<string, PrdSnapshot> {
+	const result = new Map<string, PrdSnapshot>();
+	for (const lane of lanes) {
+		if (!lane.enabled) { continue; }
+		const fullPath = path.join(lane.workspaceFolder, lane.prdPath);
+		const content = fs.readFileSync(fullPath, 'utf-8');
+		const snapshot = parsePrd(content);
+		const taggedTasks = snapshot.tasks.map(t => ({ ...t, repoId: lane.repoId }));
+		result.set(lane.repoId, {
+			tasks: taggedTasks,
+			total: snapshot.total,
+			completed: snapshot.completed,
+			remaining: snapshot.remaining,
+		});
+	}
+	return result;
 }
 
 export function pickNextTask(snapshot: PrdSnapshot): Task | undefined {
