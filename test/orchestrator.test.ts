@@ -1960,3 +1960,61 @@ describe('Startup branch gate (linear flow)', () => {
 		expect(events.find(e => e.kind === LoopEventKind.BranchSwitchedBack)).toBeUndefined();
 	});
 });
+
+describe('abort-aware delay', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+
+	it('resolves immediately when stopController is already aborted', async () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp/test-abort', maxIterations: 1, bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false } },
+			noopLogger,
+			() => {},
+		);
+		// Abort the stop controller before calling delay
+		orch.stop();
+		const start = Date.now();
+		await (orch as any).delay(5000);
+		const elapsed = Date.now() - start;
+		expect(elapsed).toBeLessThan(500);
+	});
+
+	it('resolves promptly when stop fires mid-delay', async () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp/test-abort2', maxIterations: 1, bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false } },
+			noopLogger,
+			() => {},
+		);
+		const start = Date.now();
+		const p = (orch as any).delay(5000);
+		// Stop after a small tick
+		setTimeout(() => orch.stop(), 30);
+		await p;
+		const elapsed = Date.now() - start;
+		expect(elapsed).toBeLessThan(500);
+	});
+
+	it('cleans up listeners/timers after normal completion', async () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp/test-abort3', maxIterations: 1, bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false } },
+			noopLogger,
+			() => {},
+		);
+		// Normal completion — short delay
+		await (orch as any).delay(10);
+		// Subsequent stop should not throw or cause duplicate handling
+		orch.stop();
+		// No assertion — just verifying no throw/leak
+	});
+
+	it('cleans up listeners/timers after abort completion', async () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: '/tmp/test-abort4', maxIterations: 1, bearings: { ...DEFAULT_BEARINGS_CONFIG, enabled: false } },
+			noopLogger,
+			() => {},
+		);
+		orch.stop();
+		await (orch as any).delay(5000);
+		// Calling stop again should not throw or cause issues
+		orch.stop();
+	});
+});
