@@ -1,5 +1,5 @@
 ---
-model: GLM-4.7::default (oaicopilot)
+model: Proxy GLM 4.7 (GLM↔Qwen) (customoai)
 description: "Ralph explore agent — read-only codebase exploration and analysis"
 user-invocable: false
 target: vscode

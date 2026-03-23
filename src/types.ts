@@ -330,12 +330,12 @@ export interface BearingsConfig {
 }
 
 export const DEFAULT_BEARINGS_CONFIG: BearingsConfig = {
-	enabled: true,
-	runTsc: true,
-	runTests: true,
-	startup: 'tsc',
+	enabled: false,
+	runTsc: false,
+	runTests: false,
+	startup: 'none',
 	perTask: 'none',
-	checkpoint: 'full',
+	checkpoint: 'none',
 };
 
 export interface BearingsResult {

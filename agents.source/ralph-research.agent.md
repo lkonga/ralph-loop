@@ -1,5 +1,5 @@
 ---
-model: Claude Opus 4.6 (fast mode) (Preview) (copilot)
+model: GPT-5.4 (copilot)
 description: "Ralph research agent — read-only exploration with web search capabilities"
 user-invocable: false
 target: vscode
