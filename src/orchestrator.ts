@@ -36,11 +36,9 @@ import { KnowledgeManager } from "./knowledge";
 import {
 	addDependsAnnotation,
 	analyzeMissingDependency,
-	appendLaneProgress,
 	appendProgress,
 	deriveBranchName,
 	markTaskComplete,
-	parseMultiPrd,
 	parsePrdTitle,
 	pickNextTask,
 	pickReadyTasks,
@@ -50,7 +48,6 @@ import {
 	resolveProgressPath,
 	validatePrd,
 	validatePrdEdit,
-	validatePrdEditForTask,
 } from "./prd";
 import { SessionPersistence } from "./sessionPersistence";
 import { AutoDecomposer, StagnationDetector } from "./stagnationDetector";
@@ -86,8 +83,6 @@ import {
 	type PreCompleteHookResult,
 	type PreCompleteInput,
 	type RalphConfig,
-	type RepoLane,
-	type Task,
 	type TaskState,
 	TaskStatus,
 	type VerifyCheck,
@@ -431,7 +426,6 @@ export class LoopOrchestrator {
 	private _currentTaskDescription = "";
 	private _currentIteration = 0;
 	private _currentNudgeCount = 0;
-	private _activeRepoId = "";
 	bearingsExecFn?: BearingsExecFn;
 	showCooldownDialogFn: (
 		nextTask: string,
@@ -491,25 +485,7 @@ export class LoopOrchestrator {
 			nudgeCount: this._currentNudgeCount,
 			branch: this.activeBranch,
 			originalBranch: this.originalBranch,
-			activeRepoId: this._activeRepoId,
 		};
-	}
-
-	setActiveRepoId(repoId: string): void {
-		this._activeRepoId = repoId;
-	}
-
-	private writeProgress(
-		progressPath: string,
-		invocationId: string,
-		taskId: string,
-		message: string,
-	): void {
-		if (this._activeRepoId) {
-			appendLaneProgress(progressPath, invocationId, this._activeRepoId, taskId, message);
-		} else {
-			appendProgress(progressPath, `[${invocationId}] [${taskId}] ${message}`);
-		}
 	}
 
 	updateConfig(config: Partial<RalphConfig>): void {
@@ -925,13 +901,7 @@ export class LoopOrchestrator {
 						// Check if tasks remain before expanding
 						const peekSnapshot = readPrdSnapshot(prdPath);
 						const peekTask = pickNextTask(peekSnapshot);
-						if (peekTask && this.completedTasks.has(peekTask.id)) {
-							this.logger.warn(
-								`Pending task ${peekTask.taskId} reappeared with a stale completed latch during iteration-limit check; clearing latch.`,
-							);
-							this.completedTasks.delete(peekTask.id);
-						}
-						if (peekTask) {
+						if (peekTask && !this.completedTasks.has(peekTask.id)) {
 							const oldLimit = effectiveMaxIterations;
 							const expanded = Math.ceil(effectiveMaxIterations * 1.5);
 							effectiveMaxIterations = Math.min(
@@ -981,21 +951,9 @@ export class LoopOrchestrator {
 
 					if (readyTasks.length === 0) {
 						const fallbackTask = pickNextTask(snapshot);
-						if (!fallbackTask) {
-							if (snapshot.remaining === 0) {
-								yield { kind: LoopEventKind.AllDone, total: snapshot.total };
-								return;
-							}
-							const reason = `No ready task could be selected while ${snapshot.remaining} task(s) remain pending. Check dependencies or PRD parsing.`;
-							yield { kind: LoopEventKind.Error, message: reason };
-							yield { kind: LoopEventKind.Stopped };
+						if (!fallbackTask || this.completedTasks.has(fallbackTask.id)) {
+							yield { kind: LoopEventKind.AllDone, total: snapshot.total };
 							return;
-						}
-						if (this.completedTasks.has(fallbackTask.id)) {
-							this.logger.warn(
-								`Pending fallback task ${fallbackTask.taskId} reappeared with a stale completed latch; clearing latch.`,
-							);
-							this.completedTasks.delete(fallbackTask.id);
 						}
 						// Fall through to single-task execution below
 					} else if (readyTasks.length > 1) {
@@ -1064,10 +1022,9 @@ export class LoopOrchestrator {
 
 										// PRD write protection (parallel path)
 										const prdAfterParallel = readPrdFile(prdPath);
-										const pEditValidation = validatePrdEditForTask(
+										const pEditValidation = validatePrdEdit(
 											prdContentBeforeParallel,
 											prdAfterParallel,
-											task,
 										);
 										if (!pEditValidation.allowed) {
 											this.logger.warn(
@@ -1160,22 +1117,13 @@ export class LoopOrchestrator {
 				const task = pickNextTask(snapshot);
 
 				if (!task) {
-					if (snapshot.remaining === 0) {
-						yield { kind: LoopEventKind.AllDone, total: snapshot.total };
-						return;
-					}
-					const reason = `No ready task could be selected while ${snapshot.remaining} task(s) remain pending. Check dependencies or PRD parsing.`;
-					yield { kind: LoopEventKind.Error, message: reason };
-					yield { kind: LoopEventKind.Stopped };
+					yield { kind: LoopEventKind.AllDone, total: snapshot.total };
 					return;
 				}
 
 				// Skip tasks whose completion latch is already set
 				if (this.completedTasks.has(task.id)) {
-					this.logger.warn(
-						`Pending task ${task.taskId} reappeared with a stale completed latch; clearing latch and re-running the task.`,
-					);
-					this.completedTasks.delete(task.id);
+					continue;
 				}
 
 				// DSL checkpoint gate: run checkpoint-level bearings then pause for human review
@@ -2129,10 +2077,9 @@ export class LoopOrchestrator {
 
 						// PRD write protection: validate edits before commit
 						const prdContentAfterTask = readPrdFile(prdPath);
-						const prdEditValidation = validatePrdEditForTask(
+						const prdEditValidation = validatePrdEdit(
 							prdContentBeforeTask,
 							prdContentAfterTask,
-							task,
 						);
 						if (!prdEditValidation.allowed) {
 							this.logger.warn(
@@ -2487,212 +2434,6 @@ export class LoopOrchestrator {
 			};
 			signal.addEventListener("abort", onAbort, { once: true });
 		});
-	}
-}
-
-export interface LaneBranchInfo {
-	originalBranch: string;
-	activeBranch: string;
-}
-
-export interface LaneSwitchBackResult {
-	repoId: string;
-	success: boolean;
-	error?: string;
-}
-
-export class LaneBranchManager {
-	private readonly logger: ILogger;
-	private readonly branches: Map<string, LaneBranchInfo> = new Map();
-
-	constructor(logger: ILogger) {
-		this.logger = logger;
-	}
-
-	async createLaneBranch(
-		lane: RepoLane,
-	): Promise<{ success: boolean; branchName?: string; error?: string }> {
-		try {
-			const currentBranch = await getCurrentBranch(lane.workspaceFolder);
-			const prdPath = path.join(lane.workspaceFolder, lane.prdPath);
-			const prdContent = readPrdFile(prdPath);
-			const prdTitle = parsePrdTitle(prdContent);
-			const shortHash = await getShortHash(lane.workspaceFolder);
-			const derivedName = deriveBranchName(prdTitle ?? "", shortHash);
-
-			const createResult = await createAndCheckoutBranch(
-				lane.workspaceFolder,
-				derivedName,
-			);
-			if (!createResult.success) {
-				this.logger.warn(
-					`Lane ${lane.repoId}: branch creation failed — ${createResult.error ?? "unknown"}`,
-				);
-				return {
-					success: false,
-					error: createResult.error ?? "branch creation failed",
-				};
-			}
-
-			if (await hasDirtyWorkingTree(lane.workspaceFolder)) {
-				await wipCommit(lane.workspaceFolder);
-				this.logger.log(
-					`Lane ${lane.repoId}: committed dirty working tree as WIP`,
-				);
-			}
-
-			this.branches.set(lane.repoId, {
-				originalBranch: currentBranch,
-				activeBranch: derivedName,
-			});
-			this._laneWorkspaces.set(lane.repoId, lane.workspaceFolder);
-			this.logger.log(
-				`Lane ${lane.repoId}: created branch '${derivedName}' from '${currentBranch}'`,
-			);
-			return { success: true, branchName: derivedName };
-		} catch (err: unknown) {
-			const msg = err instanceof Error ? err.message : String(err);
-			this.logger.warn(`Lane ${lane.repoId}: git operations failed — ${msg}`);
-			return { success: false, error: msg };
-		}
-	}
-
-	async switchBackAll(): Promise<LaneSwitchBackResult[]> {
-		const results: LaneSwitchBackResult[] = [];
-		for (const [repoId, info] of this.branches) {
-			try {
-				const lane = this.findLaneWorkspace(repoId);
-				if (!lane) {
-					results.push({
-						repoId,
-						success: false,
-						error: "lane workspace not found",
-					});
-					continue;
-				}
-				const result = await checkoutBranch(lane, info.originalBranch);
-				if (result.success) {
-					results.push({ repoId, success: true });
-				} else {
-					this.logger.warn(
-						`Lane ${repoId}: failed to switch back to '${info.originalBranch}': ${result.error ?? "unknown"}`,
-					);
-					results.push({ repoId, success: false, error: result.error });
-				}
-			} catch (err: unknown) {
-				const msg = err instanceof Error ? err.message : String(err);
-				this.logger.warn(`Lane ${repoId}: failed to switch back — ${msg}`);
-				results.push({ repoId, success: false, error: msg });
-			}
-		}
-		return results;
-	}
-
-	getLaneBranches(): Map<string, LaneBranchInfo> {
-		return new Map(this.branches);
-	}
-
-	toLaneRecord(): Record<
-		string,
-		{ originalBranch: string; activeBranch: string }
-	> {
-		const record: Record<
-			string,
-			{ originalBranch: string; activeBranch: string }
-		> = {};
-		for (const [repoId, info] of this.branches) {
-			record[repoId] = {
-				originalBranch: info.originalBranch,
-				activeBranch: info.activeBranch,
-			};
-		}
-		return record;
-	}
-
-	private _laneWorkspaces: Map<string, string> = new Map();
-
-	registerLaneWorkspace(repoId: string, workspaceFolder: string): void {
-		this._laneWorkspaces.set(repoId, workspaceFolder);
-	}
-
-	private findLaneWorkspace(repoId: string): string | undefined {
-		return this._laneWorkspaces.get(repoId);
-	}
-}
-
-export interface LaneTaskResult {
-	task: Task;
-	lane: RepoLane;
-}
-
-export class LaneScheduler {
-	private readonly lanes: RepoLane[];
-	private laneSnapshots: Map<
-		string,
-		{ tasks: readonly Task[]; pending: Task[] }
-	>;
-	private currentLaneIndex: number;
-	private _activeLane: RepoLane | undefined;
-
-	constructor(lanes: RepoLane[]) {
-		this.lanes = lanes.filter((l) => l.enabled);
-		this.currentLaneIndex = 0;
-		this._activeLane = undefined;
-		this.laneSnapshots = new Map();
-		this.buildSnapshots();
-	}
-
-	private buildSnapshots(): void {
-		this.laneSnapshots.clear();
-		const snapshots = parseMultiPrd(this.lanes);
-		for (const [repoId, snapshot] of snapshots) {
-			const pending = snapshot.tasks.filter(
-				(t) => t.status === TaskStatus.Pending,
-			);
-			this.laneSnapshots.set(repoId, { tasks: snapshot.tasks, pending });
-		}
-	}
-
-	nextTask(): LaneTaskResult | undefined {
-		if (this.lanes.length === 0) {
-			return undefined;
-		}
-
-		let checked = 0;
-
-		while (checked < this.lanes.length) {
-			const lane = this.lanes[this.currentLaneIndex];
-			this.currentLaneIndex = (this.currentLaneIndex + 1) % this.lanes.length;
-			checked++;
-
-			const snap = this.laneSnapshots.get(lane.repoId);
-			if (!snap || snap.pending.length === 0) {
-				continue;
-			}
-
-			const task = snap.pending[0];
-			this._activeLane = lane;
-			return { task, lane };
-		}
-
-		return undefined;
-	}
-
-	refresh(): void {
-		this.buildSnapshots();
-	}
-
-	activeLane(): RepoLane | undefined {
-		return this._activeLane;
-	}
-
-	allDone(): boolean {
-		for (const [, snap] of this.laneSnapshots) {
-			if (snap.pending.length > 0) {
-				return false;
-			}
-		}
-		return true;
 	}
 }
 

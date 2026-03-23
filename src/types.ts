@@ -28,7 +28,6 @@ export interface Task {
 	readonly agent?: string;
 	readonly readOnly?: boolean;
 	readonly noDiff?: boolean;
-	readonly repoId?: string;
 }
 
 export interface StateSnapshot {
@@ -39,7 +38,6 @@ export interface StateSnapshot {
 	readonly nudgeCount: number;
 	readonly branch?: string;
 	readonly originalBranch?: string;
-	readonly activeRepoId?: string;
 }
 
 export interface PrdSnapshot {
@@ -105,7 +103,6 @@ export const enum LoopEventKind {
 	BranchCreated = 'branch_created',
 	BranchEnforcementFailed = 'branch_enforcement_failed',
 	BranchSwitchedBack = 'branch_switched_back',
-	LaneSwitched = 'lane_switched',
 	StateNotified = 'state_notified',
 	Stopped = 'stopped',
 	Error = 'error',
@@ -152,7 +149,6 @@ export type LoopEvent =
 	| { kind: LoopEventKind.BranchCreated; branchName: string }
 	| { kind: LoopEventKind.BranchEnforcementFailed; reason: string }
 	| { kind: LoopEventKind.BranchSwitchedBack; from: string; to: string }
-	| { kind: LoopEventKind.LaneSwitched; fromRepoId: string; toRepoId: string; workspaceFolder: string }
 	| { kind: LoopEventKind.StateNotified; state: string; taskId: string }
 	| { kind: LoopEventKind.Stopped }
 	| { kind: LoopEventKind.Error; message: string };
@@ -490,15 +486,6 @@ export interface RalphPreset {
 	overrides: Partial<RalphConfig>;
 }
 
-// --- Multi-PRD lane ---
-export interface RepoLane {
-	repoId: string;
-	workspaceFolder: string;
-	prdPath: string;
-	progressPath: string;
-	enabled: boolean;
-}
-
 // --- Config ---
 export interface CircuitBreakerConfig {
 	name: string;
@@ -550,7 +537,6 @@ export interface RalphConfig {
 	cooldownShowDialog?: boolean;
 	agentMode?: string;
 	featureBranch?: { enabled: boolean };
-	repos?: RepoLane[];
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {

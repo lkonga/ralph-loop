@@ -1,7 +1,5 @@
 {
-    "biome.enabled": false,
-    "biome.requireConfiguration": true,
-    "typescript.tsserver.enable": true,
+    "typescript.tsserver.enable": false,
     "workbench.colorCustomizations": {
         "editorCursor.foreground": "#e9dbb7"
     },
