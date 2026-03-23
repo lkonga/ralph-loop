@@ -979,3 +979,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 
 ### Task 163 State | Files: [PRD.md, knowledge.md, progress.txt] | Lines: +12/-1 | Status: pass
 [2026-03-22T14:25:38.265Z] [6cdfc9af-f2d5-42f4-8a97-7c482adfd38f] Committed: d0c8b3223e791cf06ba6fa4d111d8e09364a97a7
+[2026-03-22T14:25:50.282Z] [38b41437-4c81-4596-a216-ddc0bc0b2ff3] [Task-165] Task started: **Task 163 — Per-Lane Progress Tracking**: Each lane writes to its own `progress.txt` in its own workspace folder. The orchestrator must ensure progress entries include the `repoId` prefix for correlation: `[{timestamp}] [{invocationId}] [{repoId}] [Task-{N}] ...`. The `ralph-loop.status` command output includes a per-lane summary table. Run `npx tsc --noEmit` and `npx vitest run`.

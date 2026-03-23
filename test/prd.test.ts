@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { parsePrd, parseMultiPrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, parseLineAnnotations, parsePrdTitle, deriveBranchName, markTaskComplete } from '../src/prd';
+import { parsePrd, parseMultiPrd, pickNextTask, pickReadyTasks, isReadOnlyAgent, analyzeMissingDependency, addDependsAnnotation, validatePrd, validatePrdEdit, validatePrdEditForTask, parseLineAnnotations, parsePrdTitle, deriveBranchName, markTaskComplete, appendLaneProgress } from '../src/prd';
 import type { RepoLane } from '../src/types';
 
 describe('parsePrd', () => {
@@ -77,6 +77,18 @@ describe('parsePrd', () => {
 		const content = `- [ ] Only task\n`;
 		const snapshot = parsePrd(content);
 		expect(snapshot.tasks[0].taskId).toBe('Task-001');
+	});
+
+	it('uses the visible PRD task number for display taskId when present', () => {
+		const content = `- [ ] **Task 121 — Merge latest upstream into fork branch**: Do the thing\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks[0].taskId).toBe('Task-121');
+	});
+
+	it('uses the visible PRD task label for alphabetic task headings', () => {
+		const content = `- [ ] **Task A** First task\n- [ ] **Task B** Second task\n`;
+		const snapshot = parsePrd(content);
+		expect(snapshot.tasks.map(t => t.taskId)).toEqual(['Task-A', 'Task-B']);
 	});
 
 	it('DOES NOT skip task when [DECOMPOSED] is in description text (Task 106)', () => {
@@ -277,9 +289,9 @@ describe('analyzeMissingDependency', () => {
 		fs.writeFileSync(prdPath, prdContent, 'utf-8');
 		const snapshot = parsePrd(prdContent);
 		const task = snapshot.tasks[1]; // Task B
-		const failureContext = 'Some error output\nMISSING_DEP: Task-001\nMore output';
+		const failureContext = 'Some error output\nMISSING_DEP: Task-A\nMore output';
 		const result = await analyzeMissingDependency(task, failureContext, prdPath);
-		expect(result).toBe('Task-001');
+		expect(result).toBe('Task-A');
 	});
 
 	it('returns null when taskId does not exist in PRD', async () => {
@@ -680,6 +692,63 @@ describe('validatePrdEdit', () => {
 	});
 });
 
+describe('validatePrdEditForTask', () => {
+	it('allows checking the current task checkbox', () => {
+		const before = [
+			'- [x] **Task 127** Previous task',
+			'- [ ] **Task 128** Current task',
+			'- [ ] **Task 129** Next task',
+		].join('\n');
+		const after = [
+			'- [x] **Task 127** Previous task',
+			'- [x] **Task 128** Current task',
+			'- [ ] **Task 129** Next task',
+		].join('\n');
+		const result = validatePrdEditForTask(before, after, {
+			id: 1,
+			taskId: 'Task-128',
+			description: '**Task 128** Current task',
+			status: 'pending' as any,
+			lineNumber: 2,
+		});
+		expect(result.allowed).toBe(true);
+	});
+
+	it('rejects reverting a previously completed checkbox while checking the current task', () => {
+		const before = [
+			'- [x] **Task 128** Previous task',
+			'- [ ] **Task 129** Current task',
+		].join('\n');
+		const after = [
+			'- [ ] **Task 128** Previous task',
+			'- [x] **Task 129** Current task',
+		].join('\n');
+		const result = validatePrdEditForTask(before, after, {
+			id: 1,
+			taskId: 'Task-129',
+			description: '**Task 129** Current task',
+			status: 'pending' as any,
+			lineNumber: 2,
+		});
+		expect(result.allowed).toBe(false);
+		expect(result.reason).toContain('non-current task');
+	});
+
+	it('rejects unchecking the current task', () => {
+		const before = '- [x] **Task 129** Current task';
+		const after = '- [ ] **Task 129** Current task';
+		const result = validatePrdEditForTask(before, after, {
+			id: 0,
+			taskId: 'Task-129',
+			description: '**Task 129** Current task',
+			status: 'pending' as any,
+			lineNumber: 1,
+		});
+		expect(result.allowed).toBe(false);
+		expect(result.reason).toContain('unchecked to checked');
+	});
+});
+
 describe('parseLineAnnotations', () => {
 	it('detects [DECOMPOSED] at annotation position (unchecked)', () => {
 		const result = parseLineAnnotations('- [ ] [DECOMPOSED] Original task');
@@ -967,5 +1036,65 @@ describe('parseMultiPrd', () => {
 		expect(taskB.taskId).toBe('Task-001');
 		expect(taskA.repoId).toBe('scope-a');
 		expect(taskB.repoId).toBe('scope-b');
+	});
+});
+
+describe('appendLaneProgress', () => {
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lane-progress-'));
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it('writes progress entry with repoId prefix', () => {
+		const progressPath = path.join(tmpDir, 'progress.txt');
+		appendLaneProgress(progressPath, 'inv-123', 'repo-a', 'Task-5', 'Task started: do stuff');
+		const content = fs.readFileSync(progressPath, 'utf-8');
+		expect(content).toMatch(/\[.*\] \[inv-123\] \[repo-a\] \[Task-5\] Task started: do stuff/);
+	});
+
+	it('writes to the specified lane path (not a shared file)', () => {
+		const laneA = path.join(tmpDir, 'lane-a', 'progress.txt');
+		const laneB = path.join(tmpDir, 'lane-b', 'progress.txt');
+		fs.mkdirSync(path.join(tmpDir, 'lane-a'), { recursive: true });
+		fs.mkdirSync(path.join(tmpDir, 'lane-b'), { recursive: true });
+		appendLaneProgress(laneA, 'inv-1', 'repo-a', 'Task-1', 'msg A');
+		appendLaneProgress(laneB, 'inv-2', 'repo-b', 'Task-2', 'msg B');
+		const contentA = fs.readFileSync(laneA, 'utf-8');
+		const contentB = fs.readFileSync(laneB, 'utf-8');
+		expect(contentA).toContain('[repo-a]');
+		expect(contentA).not.toContain('[repo-b]');
+		expect(contentB).toContain('[repo-b]');
+		expect(contentB).not.toContain('[repo-a]');
+	});
+
+	it('appends multiple entries', () => {
+		const progressPath = path.join(tmpDir, 'progress.txt');
+		appendLaneProgress(progressPath, 'inv-1', 'repo-x', 'Task-1', 'first');
+		appendLaneProgress(progressPath, 'inv-2', 'repo-x', 'Task-2', 'second');
+		const content = fs.readFileSync(progressPath, 'utf-8');
+		const lines = content.trim().split('\n');
+		expect(lines).toHaveLength(2);
+		expect(lines[0]).toContain('[Task-1]');
+		expect(lines[1]).toContain('[Task-2]');
+	});
+
+	it('includes timestamp in ISO format', () => {
+		const progressPath = path.join(tmpDir, 'progress.txt');
+		appendLaneProgress(progressPath, 'inv-1', 'repo-a', 'Task-1', 'test');
+		const content = fs.readFileSync(progressPath, 'utf-8');
+		// ISO timestamp: [2026-03-22T...]
+		expect(content).toMatch(/^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+	});
+
+	it('creates file if it does not exist', () => {
+		const progressPath = path.join(tmpDir, 'new-progress.txt');
+		expect(fs.existsSync(progressPath)).toBe(false);
+		appendLaneProgress(progressPath, 'inv-1', 'repo-a', 'Task-1', 'msg');
+		expect(fs.existsSync(progressPath)).toBe(true);
 	});
 });

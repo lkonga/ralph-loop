@@ -66,6 +66,27 @@ export function buildLaneTooltipLines(lanes: LaneProgress[]): string[] {
     });
 }
 
+export function formatLaneSummaryTable(lanes: LaneProgress[]): string {
+    if (lanes.length === 0) { return ''; }
+    const header = 'Repo           | Progress | Status';
+    const separator = '---------------|----------|-------';
+    const rows = lanes.map(l => {
+        const status = l.allDone ? '✓' : l.total === 0 ? 'idle' : 'running';
+        const progress = l.total === 0 ? 'idle' : `${l.completed}/${l.total}`;
+        return `${l.repoId.padEnd(15)}| ${progress.padEnd(9)}| ${status}`;
+    });
+    return [header, separator, ...rows].join('\n');
+}
+
+export function buildStatusOutput(state: string, lanes: LaneProgress[]): string {
+    const parts = [`Ralph Loop: ${state}`];
+    const table = formatLaneSummaryTable(lanes);
+    if (table) {
+        parts.push('', table);
+    }
+    return parts.join('\n');
+}
+
 function buildTooltip(snapshot: StateSnapshot, lanes: LaneProgress[]): vscode.MarkdownString {
     const lines = [
         `**Ralph Loop**`,

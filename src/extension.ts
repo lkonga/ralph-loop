@@ -14,6 +14,9 @@ import {
 	disposeStatusBar,
 	showStatusBarIdle,
 	updateStatusBar,
+	formatLaneSummaryTable,
+	computeLaneProgress,
+	buildStatusOutput,
 } from "./statusBar";
 import {
 	type ChatSendRequest,

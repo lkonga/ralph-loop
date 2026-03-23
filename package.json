@@ -2,7 +2,7 @@
 	"name": "ralph-loop",
 	"displayName": "Ralph Loop — Autonomous PRD Loop",
 	"description": "Drives Copilot Agent Mode in a deterministic loop from PRD tasks.",
-	"version": "0.5.17",
+	"version": "0.5.18",
 	"publisher": "ralph-loop",
 	"license": "MIT",
 	"engines": {
@@ -102,6 +102,8 @@
 		"watch": "tsc -watch -p ./",
 		"test": "vitest run",
 		"test:watch": "vitest",
+		"lint": "biome check src/ cli/",
+		"lint:fix": "biome check --fix src/ cli/",
 		"package": "npm test && vsce package --no-dependencies --allow-missing-repository"
 	},
 	"devDependencies": {

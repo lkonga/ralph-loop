@@ -45,6 +45,15 @@ function parseTaskId(description: string): string {
 	return `task-${description.slice(0, 30).replace(/\s+/g, '-').toLowerCase()}`;
 }
 
+function deriveDisplayTaskId(description: string, ordinal: number): string {
+	const parsed = parseTaskId(description);
+	const numberedMatch = /^Task\s+([A-Za-z0-9_-]+)/i.exec(parsed);
+	if (numberedMatch) {
+		return `Task-${numberedMatch[1]}`;
+	}
+	return `Task-${String(ordinal + 1).padStart(3, '0')}`;
+}
+
 function parseAgentAnnotation(text: string): string | undefined {
 	const matches = [...text.matchAll(AGENT_ANNOTATION)];
 	if (matches.length > 1) {
@@ -123,7 +132,7 @@ export function parsePrd(content: string): PrdSnapshot {
 
 	for (let i = 0; i < taskEntries.length; i++) {
 		const entry = taskEntries[i];
-		(entry.task as { taskId: string }).taskId = `Task-${String(i + 1).padStart(3, '0')}`;
+		(entry.task as { taskId: string }).taskId = deriveDisplayTaskId(entry.rawDescription, i);
 		if (entry.task.dependsOn) { continue; } // explicit annotation takes priority
 		if (entry.indent > 0) {
 			// Find the nearest preceding task with less indentation
@@ -317,6 +326,18 @@ export function appendProgress(progressPath: string, message: string): void {
 	fs.appendFileSync(progressPath, entry, 'utf-8');
 }
 
+export function appendLaneProgress(
+	progressPath: string,
+	invocationId: string,
+	repoId: string,
+	taskId: string,
+	message: string,
+): void {
+	const timestamp = new Date().toISOString();
+	const entry = `[${timestamp}] [${invocationId}] [${repoId}] [${taskId}] ${message}\n`;
+	fs.appendFileSync(progressPath, entry, 'utf-8');
+}
+
 export function resolvePrdPath(workspaceRoot: string, prdRelative: string): string {
 	return path.resolve(workspaceRoot, prdRelative);
 }
@@ -401,6 +422,51 @@ export function validatePrdEdit(before: string, after: string): { allowed: boole
 				return { allowed: false, reason: `PRD structure change detected: lines were reordered` };
 			}
 			return { allowed: false, reason: `PRD line removed or altered: "${bLine.trim()}"` };
+		}
+	}
+
+	return { allowed: true };
+}
+
+function getCheckboxState(line: string): 'checked' | 'unchecked' | undefined {
+	if (CHECKBOX_CHECKED.test(line)) { return 'checked'; }
+	if (CHECKBOX_UNCHECKED.test(line)) { return 'unchecked'; }
+	return undefined;
+}
+
+export function validatePrdEditForTask(before: string, after: string, task: Task): { allowed: boolean; reason?: string } {
+	const base = validatePrdEdit(before, after);
+	if (!base.allowed) {
+		return base;
+	}
+
+	const beforeLines = before.split('\n');
+	const afterLines = after.split('\n');
+	const currentTaskLineIndex = task.lineNumber - 1;
+	const maxLines = Math.max(beforeLines.length, afterLines.length);
+
+	for (let i = 0; i < maxLines; i++) {
+		const beforeLine = beforeLines[i] ?? '';
+		const afterLine = afterLines[i] ?? '';
+		const beforeState = getCheckboxState(beforeLine);
+		const afterState = getCheckboxState(afterLine);
+
+		if (!beforeState || !afterState || beforeState === afterState) {
+			continue;
+		}
+
+		if (i !== currentTaskLineIndex) {
+			return {
+				allowed: false,
+				reason: `Checkbox state changed for a non-current task at line ${i + 1}`,
+			};
+		}
+
+		if (!(beforeState === 'unchecked' && afterState === 'checked')) {
+			return {
+				allowed: false,
+				reason: `Current task checkbox must only transition from unchecked to checked (line ${i + 1})`,
+			};
 		}
 	}
 

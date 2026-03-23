@@ -3199,3 +3199,83 @@ describe("LaneBranchManager", () => {
 		expect(results).toHaveLength(0);
 	});
 });
+
+describe("Per-Lane Progress Tracking", () => {
+	const noopLogger = { log: () => {}, warn: () => {}, error: () => {} };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "ralph-lane-progress-"));
+		fs.writeFileSync(path.join(tmpDir, "PRD.md"), "- [ ] **Task 1 — Test**: desc\n", "utf-8");
+	});
+
+	afterEach(() => {
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	it("setActiveRepoId sets the active repo for lane-aware progress", () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir },
+			noopLogger,
+			() => {},
+		);
+		orch.setActiveRepoId("repo-a");
+		const snap = orch.getStateSnapshot();
+		expect(snap.activeRepoId).toBe("repo-a");
+	});
+
+	it("writeProgress uses appendLaneProgress format when activeRepoId is set", () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir },
+			noopLogger,
+			() => {},
+		);
+		orch.setActiveRepoId("repo-alpha");
+		const progressPath = path.join(tmpDir, "progress.txt");
+		(orch as any).writeProgress(progressPath, "inv-42", "Task-7", "Task started: stuff");
+		const content = fs.readFileSync(progressPath, "utf-8");
+		expect(content).toMatch(/\[.*\] \[inv-42\] \[repo-alpha\] \[Task-7\] Task started: stuff/);
+	});
+
+	it("writeProgress falls back to appendProgress when no lane is active", () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir },
+			noopLogger,
+			() => {},
+		);
+		const progressPath = path.join(tmpDir, "progress.txt");
+		(orch as any).writeProgress(progressPath, "inv-99", "Task-3", "Task started: fallback");
+		const content = fs.readFileSync(progressPath, "utf-8");
+		// Should NOT have the lane format brackets
+		expect(content).toContain("[inv-99] [Task-3] Task started: fallback");
+		expect(content).not.toMatch(/\[inv-99\] \[.*\] \[Task-3\]/);
+	});
+
+	it("writeProgress writes to lane-specific path (not shared)", () => {
+		const laneDir = path.join(tmpDir, "lane-a");
+		fs.mkdirSync(laneDir, { recursive: true });
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir },
+			noopLogger,
+			() => {},
+		);
+		orch.setActiveRepoId("lane-a");
+		const lanePath = path.join(laneDir, "progress.txt");
+		(orch as any).writeProgress(lanePath, "inv-1", "Task-1", "lane msg");
+		expect(fs.existsSync(lanePath)).toBe(true);
+		const content = fs.readFileSync(lanePath, "utf-8");
+		expect(content).toContain("[lane-a]");
+	});
+
+	it("clearActiveRepoId resets to non-lane mode", () => {
+		const orch = new LoopOrchestrator(
+			{ ...DEFAULT_CONFIG, workspaceRoot: tmpDir },
+			noopLogger,
+			() => {},
+		);
+		orch.setActiveRepoId("repo-x");
+		expect(orch.getStateSnapshot().activeRepoId).toBe("repo-x");
+		orch.setActiveRepoId("");
+		expect(orch.getStateSnapshot().activeRepoId).toBe("");
+	});
+});

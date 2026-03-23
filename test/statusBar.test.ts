@@ -3,6 +3,8 @@ import type { StateSnapshot, PrdSnapshot } from '../src/types';
 import {
 	formatLaneText,
 	buildLaneTooltipLines,
+	formatLaneSummaryTable,
+	buildStatusOutput,
 	type LaneProgress,
 } from '../src/statusBar';
 
@@ -89,5 +91,74 @@ describe('computeLaneProgress', () => {
 		expect(result).toHaveLength(2);
 		expect(result[0]).toEqual({ repoId: 'repo-a', completed: 3, total: 5, allDone: false });
 		expect(result[1]).toEqual({ repoId: 'repo-b', completed: 12, total: 12, allDone: true });
+	});
+});
+
+describe('formatLaneSummaryTable', () => {
+	it('produces a table with headers and lane rows', () => {
+		const lanes: LaneProgress[] = [
+			{ repoId: 'repo-a', completed: 3, total: 5, allDone: false },
+			{ repoId: 'repo-b', completed: 7, total: 12, allDone: false },
+		];
+		const table = formatLaneSummaryTable(lanes);
+		expect(table).toContain('Repo');
+		expect(table).toContain('Progress');
+		expect(table).toContain('repo-a');
+		expect(table).toContain('3/5');
+		expect(table).toContain('repo-b');
+		expect(table).toContain('7/12');
+	});
+
+	it('shows checkmark for completed lanes', () => {
+		const lanes: LaneProgress[] = [
+			{ repoId: 'repo-a', completed: 5, total: 5, allDone: true },
+		];
+		const table = formatLaneSummaryTable(lanes);
+		expect(table).toContain('✓');
+	});
+
+	it('shows idle for zero-task lanes', () => {
+		const lanes: LaneProgress[] = [
+			{ repoId: 'repo-c', completed: 0, total: 0, allDone: false },
+		];
+		const table = formatLaneSummaryTable(lanes);
+		expect(table).toContain('idle');
+	});
+
+	it('returns empty string when no lanes', () => {
+		expect(formatLaneSummaryTable([])).toBe('');
+	});
+});
+
+describe('buildStatusOutput', () => {
+	it('includes state in output', () => {
+		const output = buildStatusOutput('running', []);
+		expect(output).toContain('running');
+	});
+
+	it('includes per-lane summary table when lanes are present', () => {
+		const lanes: LaneProgress[] = [
+			{ repoId: 'repo-a', completed: 3, total: 5, allDone: false },
+			{ repoId: 'repo-b', completed: 7, total: 12, allDone: false },
+		];
+		const output = buildStatusOutput('running', lanes);
+		expect(output).toContain('repo-a');
+		expect(output).toContain('3/5');
+		expect(output).toContain('repo-b');
+		expect(output).toContain('7/12');
+	});
+
+	it('omits lane table when no lanes', () => {
+		const output = buildStatusOutput('idle', []);
+		expect(output).toContain('idle');
+		expect(output).not.toContain('Repo');
+	});
+
+	it('shows checkmark for completed lanes', () => {
+		const lanes: LaneProgress[] = [
+			{ repoId: 'done-repo', completed: 5, total: 5, allDone: true },
+		];
+		const output = buildStatusOutput('running', lanes);
+		expect(output).toContain('✓');
 	});
 });

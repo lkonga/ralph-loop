@@ -36,6 +36,7 @@ import { KnowledgeManager } from "./knowledge";
 import {
 	addDependsAnnotation,
 	analyzeMissingDependency,
+	appendLaneProgress,
 	appendProgress,
 	deriveBranchName,
 	markTaskComplete,
@@ -49,6 +50,7 @@ import {
 	resolveProgressPath,
 	validatePrd,
 	validatePrdEdit,
+	validatePrdEditForTask,
 } from "./prd";
 import { SessionPersistence } from "./sessionPersistence";
 import { AutoDecomposer, StagnationDetector } from "./stagnationDetector";
@@ -493,6 +495,23 @@ export class LoopOrchestrator {
 		};
 	}
 
+	setActiveRepoId(repoId: string): void {
+		this._activeRepoId = repoId;
+	}
+
+	private writeProgress(
+		progressPath: string,
+		invocationId: string,
+		taskId: string,
+		message: string,
+	): void {
+		if (this._activeRepoId) {
+			appendLaneProgress(progressPath, invocationId, this._activeRepoId, taskId, message);
+		} else {
+			appendProgress(progressPath, `[${invocationId}] [${taskId}] ${message}`);
+		}
+	}
+
 	updateConfig(config: Partial<RalphConfig>): void {
 		this.config = { ...this.config, ...config };
 	}
@@ -906,7 +925,13 @@ export class LoopOrchestrator {
 						// Check if tasks remain before expanding
 						const peekSnapshot = readPrdSnapshot(prdPath);
 						const peekTask = pickNextTask(peekSnapshot);
-						if (peekTask && !this.completedTasks.has(peekTask.id)) {
+						if (peekTask && this.completedTasks.has(peekTask.id)) {
+							this.logger.warn(
+								`Pending task ${peekTask.taskId} reappeared with a stale completed latch during iteration-limit check; clearing latch.`,
+							);
+							this.completedTasks.delete(peekTask.id);
+						}
+						if (peekTask) {
 							const oldLimit = effectiveMaxIterations;
 							const expanded = Math.ceil(effectiveMaxIterations * 1.5);
 							effectiveMaxIterations = Math.min(
@@ -956,9 +981,21 @@ export class LoopOrchestrator {
 
 					if (readyTasks.length === 0) {
 						const fallbackTask = pickNextTask(snapshot);
-						if (!fallbackTask || this.completedTasks.has(fallbackTask.id)) {
-							yield { kind: LoopEventKind.AllDone, total: snapshot.total };
+						if (!fallbackTask) {
+							if (snapshot.remaining === 0) {
+								yield { kind: LoopEventKind.AllDone, total: snapshot.total };
+								return;
+							}
+							const reason = `No ready task could be selected while ${snapshot.remaining} task(s) remain pending. Check dependencies or PRD parsing.`;
+							yield { kind: LoopEventKind.Error, message: reason };
+							yield { kind: LoopEventKind.Stopped };
 							return;
+						}
+						if (this.completedTasks.has(fallbackTask.id)) {
+							this.logger.warn(
+								`Pending fallback task ${fallbackTask.taskId} reappeared with a stale completed latch; clearing latch.`,
+							);
+							this.completedTasks.delete(fallbackTask.id);
 						}
 						// Fall through to single-task execution below
 					} else if (readyTasks.length > 1) {
@@ -1027,9 +1064,10 @@ export class LoopOrchestrator {
 
 										// PRD write protection (parallel path)
 										const prdAfterParallel = readPrdFile(prdPath);
-										const pEditValidation = validatePrdEdit(
+										const pEditValidation = validatePrdEditForTask(
 											prdContentBeforeParallel,
 											prdAfterParallel,
+											task,
 										);
 										if (!pEditValidation.allowed) {
 											this.logger.warn(
@@ -1122,13 +1160,22 @@ export class LoopOrchestrator {
 				const task = pickNextTask(snapshot);
 
 				if (!task) {
-					yield { kind: LoopEventKind.AllDone, total: snapshot.total };
+					if (snapshot.remaining === 0) {
+						yield { kind: LoopEventKind.AllDone, total: snapshot.total };
+						return;
+					}
+					const reason = `No ready task could be selected while ${snapshot.remaining} task(s) remain pending. Check dependencies or PRD parsing.`;
+					yield { kind: LoopEventKind.Error, message: reason };
+					yield { kind: LoopEventKind.Stopped };
 					return;
 				}
 
 				// Skip tasks whose completion latch is already set
 				if (this.completedTasks.has(task.id)) {
-					continue;
+					this.logger.warn(
+						`Pending task ${task.taskId} reappeared with a stale completed latch; clearing latch and re-running the task.`,
+					);
+					this.completedTasks.delete(task.id);
 				}
 
 				// DSL checkpoint gate: run checkpoint-level bearings then pause for human review
@@ -2082,9 +2129,10 @@ export class LoopOrchestrator {
 
 						// PRD write protection: validate edits before commit
 						const prdContentAfterTask = readPrdFile(prdPath);
-						const prdEditValidation = validatePrdEdit(
+						const prdEditValidation = validatePrdEditForTask(
 							prdContentBeforeTask,
 							prdContentAfterTask,
+							task,
 						);
 						if (!prdEditValidation.allowed) {
 							this.logger.warn(
