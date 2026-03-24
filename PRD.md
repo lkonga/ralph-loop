@@ -634,3 +634,26 @@
 - [x] **Task 142 — Make `delay()` abort-aware so stop requests collapse stale UI windows**: Reduce stop-path lag by making orchestrator waits terminate promptly when the loop is stopping. → Spec: `research/17-phase19-deep-research.md` L117-L134
 
 - [x] **Task 143 — Add regression coverage for normal, failure, stop, resume, and consecutive-run scenarios**: Lock in the status-bar convergence contract so the bar, snapshots, and status command stay aligned across all reported exit paths. → Spec: `research/17-phase19-deep-research.md` L136-L157
+
+---
+
+## Phase 20 — Auto-Close Editors on Task Completion
+
+> **Problem**: During agentic execution, each task opens files in the editor (via read, edit, create tools). These tabs accumulate across tasks — by Task 10, the editor has 30-50 open tabs from previous tasks. This wastes memory, pollutes the editor workspace for the next task, and undermines Ralph's core "nuke context" philosophy where each task should start with a clean slate.
+> **Solution**: After a task is verified complete, committed, and all post-completion hooks have run, automatically close all editor tabs before the countdown to the next task begins. This ensures the next Copilot session starts with a clean editor — no stale files from previous tasks influencing context or consuming resources.
+> **Architecture**: Config-gated feature (`autoCloseEditors`), fires after `atomicCommit` and all post-task hooks, uses `workbench.action.closeAllEditors` VS Code command. Dirty file safety handled by the fact that `atomicCommit` already stages and commits all changes before this runs.
+> **TDD is MANDATORY**. Run `npx tsc --noEmit` and `npx vitest run` — ALL tests must pass before marking ANY checkbox.
+
+### 20a — Config & Core Logic
+
+- [x] **Task 144 — Add `autoCloseEditors` Config**: In `src/types.ts`, add `autoCloseEditors?: boolean` to `RalphConfig` (default `true`). In `DEFAULT_CONFIG`, set `autoCloseEditors: true`. In `package.json`, add `ralph-loop.autoCloseEditors` (boolean, default `true`) to the VS Code settings contributions with description `"Close all editor tabs after each task completes and is committed. Ensures the next task starts with a clean editor."`. Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 145 — Implement `closeAllEditors` Helper**: In `src/copilot.ts`, add `closeAllEditors(logger: ILogger): Promise<boolean>` that executes `vscode.commands.executeCommand('workbench.action.closeAllEditors')`. Return `true` on success, `false` on failure (catch and log, never throw — this is best-effort cleanup, not a gate). Write tests FIRST in `test/copilot.test.ts`: command executed on call, failure caught and returns false. Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 146 — Wire Auto-Close into Orchestrator Task Completion Path**: In `src/orchestrator.ts`, after the `atomicCommit` call succeeds (both in the single-task and parallel-task paths), call `closeAllEditors(logger)` when `config.autoCloseEditors` is `true`. This placement ensures: (1) all verification has passed, (2) changes are committed to git (no dirty files), (3) post-task hooks have run, (4) editors close before the countdown to the next task. Add `LoopEventKind.EditorsCleared = 'editors_cleared'` event. Yield it after successful close. In the parallel task path, close editors once after the entire batch completes (not per-task). Write tests FIRST in `test/orchestrator.test.ts`: editors closed after commit when enabled, not closed when disabled, failure does not stop the loop, event yielded on success. Run `npx tsc --noEmit` and `npx vitest run`.
+
+### 20b — Observability & Edge Cases
+
+- [ ] **Task 147 — Handle Extension Host Context (No-Op in CLI/Test)**: The `closeAllEditors` helper depends on `vscode.commands.executeCommand` which is only available in the VS Code extension host. In test/CLI contexts, the `vscode` module is mocked. Ensure the mock in `__mocks__/vscode.ts` includes `commands.executeCommand` returning a resolved promise. In `closeAllEditors`, guard with a try-catch so environments without the command degrade gracefully (log and return `false`). Write tests: function returns `false` when command is unavailable, does not throw. Run `npx tsc --noEmit` and `npx vitest run`.
+
+- [ ] **Task 148 — CHECKPOINT: Auto-Close Editors E2E Verification**: Full end-to-end verification. (1) Start ralph-loop with `autoCloseEditors: true` (default) — after each task completes and commits, all editor tabs are closed before the countdown. (2) Set `autoCloseEditors: false` — editors remain open as before (backward compatible). (3) If `atomicCommit` fails, editors are NOT closed (no cleanup without commit safety). (4) In parallel mode, editors close once after the batch, not per-task. (5) `EditorsCleared` event appears in progress.txt. (6) No regressions in existing tests. Clean compile, full vitest green.
