@@ -27,6 +27,7 @@ import type {
 	InactivityConfig,
 	ILogger,
 	ExecutionOptions,
+	RalphConfig,
 } from '../src/types';
 import { VerifyResult, LoopEventKind } from '../src/types';
 
@@ -2016,5 +2017,32 @@ describe('abort-aware delay', () => {
 		await (orch as any).delay(5000);
 		// Calling stop again should not throw or cause issues
 		orch.stop();
+	});
+});
+
+describe('autoCloseEditors config', () => {
+	it('RalphConfig accepts autoCloseEditors as optional boolean', () => {
+		const config: RalphConfig = { ...DEFAULT_CONFIG, workspaceRoot: '/tmp', autoCloseEditors: false };
+		expect(config.autoCloseEditors).toBe(false);
+	});
+
+	it('DEFAULT_CONFIG has autoCloseEditors set to true', () => {
+		expect(DEFAULT_CONFIG.autoCloseEditors).toBe(true);
+	});
+
+	it('autoCloseEditors defaults to true when not explicitly set', () => {
+		const config: RalphConfig = { ...DEFAULT_CONFIG, workspaceRoot: '/tmp' };
+		expect(config.autoCloseEditors).toBe(true);
+	});
+
+	it('package.json includes ralph-loop.autoCloseEditors setting', () => {
+		const pkgPath = path.resolve(__dirname, '..', 'package.json');
+		const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+		const settings = pkg.contributes?.configuration?.properties;
+		expect(settings).toHaveProperty('ralph-loop.autoCloseEditors');
+		const setting = settings['ralph-loop.autoCloseEditors'];
+		expect(setting.type).toBe('boolean');
+		expect(setting.default).toBe(true);
+		expect(setting.description).toBe('Close all editor tabs after each task completes and is committed. Ensures the next task starts with a clean editor.');
 	});
 });

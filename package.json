@@ -66,6 +66,11 @@
 					"default": true,
 					"description": "Show an auto-accepting dialog during inter-task countdown with Pause/Stop/Edit buttons."
 				},
+				"ralph-loop.autoCloseEditors": {
+					"type": "boolean",
+					"default": true,
+					"description": "Close all editor tabs after each task completes and is committed. Ensures the next task starts with a clean editor."
+				},
 				"ralph-loop.inactivityTimeoutMs": {
 					"type": "number",
 					"default": 300000,

@@ -537,6 +537,7 @@ export interface RalphConfig {
 	cooldownShowDialog?: boolean;
 	agentMode?: string;
 	featureBranch?: { enabled: boolean };
+	autoCloseEditors?: boolean;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -577,6 +578,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	cooldownShowDialog: true,
 	agentMode: 'ralph-executor',
 	featureBranch: { enabled: false },
+	autoCloseEditors: true,
 };
 
 // --- Verification ---
