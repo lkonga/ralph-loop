@@ -2121,7 +2121,8 @@ describe('auto-close editors wiring (Task 146)', () => {
 
 	it('closeAllEditors failure does not stop the loop', async () => {
 		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Fail close test\n', 'utf-8');
-		// Default mock throws — closeAllEditors returns false
+		// Mock executeCommand to throw — closeAllEditors returns false
+		vscode.commands.executeCommand = vi.fn().mockRejectedValue(new Error('not available'));
 		const events: any[] = [];
 		const orch = makeOrch({ autoCloseEditors: true }, events);
 		await orch.start();

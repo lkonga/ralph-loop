@@ -15,6 +15,6 @@ export const env = {
 	},
 };
 export const commands = {
-	executeCommand: async () => { throw new Error('not available'); },
+	executeCommand: async () => undefined,
 };
 export const ConfigurationTarget = { Workspace: 2 };

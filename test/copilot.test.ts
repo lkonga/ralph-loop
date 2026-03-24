@@ -731,4 +731,20 @@ describe('closeAllEditors', () => {
 		const result = await closeAllEditors(testLogger);
 		expect(result).toBe(false);
 	});
+
+	it('returns false when executeCommand is not a function (CLI/test env)', async () => {
+		const orig = vscode.commands.executeCommand;
+		(vscode.commands as any).executeCommand = undefined;
+		try {
+			const result = await closeAllEditors(testLogger);
+			expect(result).toBe(false);
+		} finally {
+			vscode.commands.executeCommand = orig;
+		}
+	});
+
+	it('does not throw when command is unavailable', async () => {
+		vi.spyOn(vscode.commands, 'executeCommand').mockImplementation(() => { throw new Error('not available'); });
+		await expect(closeAllEditors(testLogger)).resolves.toBe(false);
+	});
 });
