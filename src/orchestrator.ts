@@ -1099,6 +1099,7 @@ export class LoopOrchestrator {
 						if (this.config.autoCloseEditors) {
 							const closed = await closeAllEditors(this.logger);
 							if (closed) {
+								appendProgress(progressPath, `EditorsCleared (parallel batch)`);
 								yield { kind: LoopEventKind.EditorsCleared };
 							}
 						}
@@ -2126,6 +2127,7 @@ export class LoopOrchestrator {
 							if (this.config.autoCloseEditors) {
 								const closed = await closeAllEditors(this.logger);
 								if (closed) {
+									appendProgress(progressPath, `[${taskInvocationId}] EditorsCleared`);
 									yield { kind: LoopEventKind.EditorsCleared };
 								}
 							}
