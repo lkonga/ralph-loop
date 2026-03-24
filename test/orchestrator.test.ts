@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import {
 	shouldContinueLoop,
 	shouldNudge,
@@ -2044,5 +2045,106 @@ describe('autoCloseEditors config', () => {
 		expect(setting.type).toBe('boolean');
 		expect(setting.default).toBe(true);
 		expect(setting.description).toBe('Close all editor tabs after each task completes and is committed. Ensures the next task starts with a clean editor.');
+	});
+});
+
+describe('auto-close editors wiring (Task 146)', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+	let origExecCommand: typeof vscode.commands.executeCommand;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-autoclose-'));
+		const { execSync } = require('child_process');
+		execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
+		execSync('git config user.email "test@test.com"', { cwd: tmpDir, stdio: 'ignore' });
+		execSync('git config user.name "Test"', { cwd: tmpDir, stdio: 'ignore' });
+		fs.writeFileSync(path.join(tmpDir, 'README.md'), 'init\n', 'utf-8');
+		execSync('git add -A && git commit -m "init"', { cwd: tmpDir, stdio: 'ignore' });
+		origExecCommand = vscode.commands.executeCommand;
+	});
+
+	afterEach(() => {
+		vscode.commands.executeCommand = origExecCommand;
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	function makeOrch(config: Partial<RalphConfig>, events: any[]) {
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 2,
+				countdownSeconds: 0,
+				bearings: { enabled: false, runTsc: false, runTests: false },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+				...config,
+			} as RalphConfig,
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		orch.bearingsExecFn = async () => ({ exitCode: 0, output: '' });
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(
+					path.join(tmpDir, 'PRD.md'),
+					prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`),
+					'utf-8',
+				);
+				fs.writeFileSync(path.join(tmpDir, 'progress.txt'), 'done\n', 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		return orch;
+	}
+
+	it('editors closed after commit when autoCloseEditors is true', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Single close test\n', 'utf-8');
+		vscode.commands.executeCommand = vi.fn().mockResolvedValue(undefined);
+		const events: any[] = [];
+		const orch = makeOrch({ autoCloseEditors: true }, events);
+		await orch.start();
+		const cleared = events.filter((e: any) => e.kind === LoopEventKind.EditorsCleared);
+		expect(cleared.length).toBe(1);
+	});
+
+	it('editors not closed when autoCloseEditors is false', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] No close test\n', 'utf-8');
+		vscode.commands.executeCommand = vi.fn().mockResolvedValue(undefined);
+		const events: any[] = [];
+		const orch = makeOrch({ autoCloseEditors: false }, events);
+		await orch.start();
+		const cleared = events.filter((e: any) => e.kind === LoopEventKind.EditorsCleared);
+		expect(cleared.length).toBe(0);
+	});
+
+	it('closeAllEditors failure does not stop the loop', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Fail close test\n', 'utf-8');
+		// Default mock throws — closeAllEditors returns false
+		const events: any[] = [];
+		const orch = makeOrch({ autoCloseEditors: true }, events);
+		await orch.start();
+		// Loop should still complete (AllDone or at least TaskCommitted)
+		const committed = events.filter((e: any) => e.kind === LoopEventKind.TaskCommitted);
+		expect(committed.length).toBeGreaterThanOrEqual(1);
+		// No EditorsCleared since closeAllEditors failed
+		const cleared = events.filter((e: any) => e.kind === LoopEventKind.EditorsCleared);
+		expect(cleared.length).toBe(0);
+	});
+
+	it('EditorsCleared event yielded on success', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] Event yield test\n', 'utf-8');
+		vscode.commands.executeCommand = vi.fn().mockResolvedValue(undefined);
+		const events: any[] = [];
+		const orch = makeOrch({ autoCloseEditors: true }, events);
+		await orch.start();
+		const cleared = events.filter((e: any) => e.kind === LoopEventKind.EditorsCleared);
+		expect(cleared.length).toBe(1);
+		// EditorsCleared should appear after TaskCommitted
+		const committedIdx = events.findIndex((e: any) => e.kind === LoopEventKind.TaskCommitted);
+		const clearedIdx = events.findIndex((e: any) => e.kind === LoopEventKind.EditorsCleared);
+		expect(committedIdx).toBeGreaterThanOrEqual(0);
+		expect(clearedIdx).toBeGreaterThan(committedIdx);
 	});
 });

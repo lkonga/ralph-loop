@@ -16,6 +16,7 @@ import {
 import {
 	buildFinalNudgePrompt,
 	buildPrompt,
+	closeAllEditors,
 	type PromptCapabilities,
 	parseReviewVerdict,
 	sendReviewPrompt,
@@ -1094,6 +1095,14 @@ export class LoopOrchestrator {
 							}),
 						);
 
+						// Auto-close editors once after entire parallel batch
+						if (this.config.autoCloseEditors) {
+							const closed = await closeAllEditors(this.logger);
+							if (closed) {
+								yield { kind: LoopEventKind.EditorsCleared };
+							}
+						}
+
 						if (this.yieldRequested) {
 							this.logger.log("Yield honoured after parallel tasks");
 							yield { kind: LoopEventKind.YieldRequested };
@@ -2112,6 +2121,14 @@ export class LoopOrchestrator {
 								commitHash: commitResult.commitHash!,
 								taskInvocationId,
 							};
+
+							// Auto-close editors after successful commit
+							if (this.config.autoCloseEditors) {
+								const closed = await closeAllEditors(this.logger);
+								if (closed) {
+									yield { kind: LoopEventKind.EditorsCleared };
+								}
+							}
 						} else {
 							this.logger.warn(
 								`Atomic commit failed for task ${task.id}: ${commitResult.error}`,
