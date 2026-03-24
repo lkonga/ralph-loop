@@ -937,3 +937,4 @@ Added featureBranch config to RalphConfig interface: `featureBranch?: { enabled:
 
 ### Task 157 State | Files: [.ralph/verification.json, PRD.md, knowledge.md, progress.txt] | Lines: +35/-1 | Status: pass
 [2026-03-24T11:50:05.966Z] [94359240-5211-4b48-8997-8f34852f22d8] Committed: e6282b519196269fbf33929a757e0ab63dd62175
+[2026-03-24T11:50:17.981Z] [998f6002-ac67-4d0a-9240-2bb3307b3045] [Task-145] Task started: **Task 145 — Implement `closeAllEditors` Helper**: In `src/copilot.ts`, add `closeAllEditors(logger: ILogger): Promise<boolean>` that executes `vscode.commands.executeCommand('workbench.action.closeAllEditors')`. Return `true` on success, `false` on failure (catch and log, never throw — this is best-effort cleanup, not a gate). Write tests FIRST in `test/copilot.test.ts`: command executed on call, failure caught and returns false. Run `npx tsc --noEmit` and `npx vitest run`.

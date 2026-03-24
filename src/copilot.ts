@@ -130,3 +130,13 @@ export async function sendReviewPrompt(
 	return prompt;
 }
 
+export async function closeAllEditors(logger: ILogger): Promise<boolean> {
+	try {
+		await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+		return true;
+	} catch (err) {
+		logger.warn(`Failed to close editors: ${err}`);
+		return false;
+	}
+}
+

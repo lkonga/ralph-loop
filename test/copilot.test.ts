@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { buildPrompt, sanitizeTaskDescription, buildReviewPrompt, renderTemplate, DEFAULT_PROMPT_TEMPLATE, parseFrontmatter, extractSpecReference, buildSpecContextLine, estimatePromptTokens, annotateBudget, extractBlockquoteMetadata, normalizeResearchFile } from '../src/prompt';
 import type { PromptVariables } from '../src/prompt';
 import { generateStopHookScript } from '../src/hookBridge';
-import { sendReviewPrompt, parseReviewVerdict, openCopilotWithPrompt } from '../src/copilot';
+import { sendReviewPrompt, parseReviewVerdict, openCopilotWithPrompt, closeAllEditors } from '../src/copilot';
 import { DEFAULT_REVIEW_PROMPT_TEMPLATE } from '../src/types';
 import type { ILogger } from '../src/types';
 import * as vscode from 'vscode';
@@ -709,5 +709,26 @@ describe('agent mode switching in openCopilotWithPrompt', () => {
 
 		const toggleCall = executedCommands.find(c => c.command === 'workbench.action.chat.toggleAgentMode');
 		expect(toggleCall).toBeUndefined();
+	});
+});
+
+describe('closeAllEditors', () => {
+	const testLogger: ILogger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() };
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('executes workbench.action.closeAllEditors command and returns true', async () => {
+		const spy = vi.spyOn(vscode.commands, 'executeCommand').mockResolvedValue(undefined);
+		const result = await closeAllEditors(testLogger);
+		expect(result).toBe(true);
+		expect(spy).toHaveBeenCalledWith('workbench.action.closeAllEditors');
+	});
+
+	it('catches failure and returns false without throwing', async () => {
+		vi.spyOn(vscode.commands, 'executeCommand').mockRejectedValue(new Error('command failed'));
+		const result = await closeAllEditors(testLogger);
+		expect(result).toBe(false);
 	});
 });
