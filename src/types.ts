@@ -549,6 +549,8 @@ export interface RalphConfig {
 	agentMode?: string;
 	featureBranch?: { enabled: boolean };
 	autoCloseEditors?: boolean;
+	preFlightWizard?: 'always' | 'countdown' | 'never';
+	preFlightCountdownSeconds?: number;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -590,6 +592,8 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	agentMode: 'ralph-executor',
 	featureBranch: { enabled: false },
 	autoCloseEditors: true,
+	preFlightWizard: 'countdown',
+	preFlightCountdownSeconds: 15,
 };
 
 // --- Verification ---
