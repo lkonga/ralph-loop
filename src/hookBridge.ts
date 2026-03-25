@@ -118,6 +118,18 @@ async function main() {
     failures.push('progress.txt not found');
   }
 
+  // Check 3: TypeScript compilation
+  const tsc = runCommand('npx tsc --noEmit');
+  if (!tsc.ok) {
+    failures.push('TypeScript compilation errors: ' + (tsc.stdout || tsc.stderr || 'see tsc output'));
+  }
+
+  // Check 4: Test failures
+  const vitest = runCommand('npx vitest run');
+  if (!vitest.ok) {
+    failures.push('Test failures: ' + (vitest.stdout || vitest.stderr || 'see vitest output'));
+  }
+
   if (failures.length === 0) {
     process.stdout.write(JSON.stringify({ resultKind: 'success' }));
   } else {
