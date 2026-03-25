@@ -128,6 +128,74 @@ describe("State Snapshot Command", () => {
 			expect(snapshot.branch).toBeUndefined();
 		});
 	});
+
+	describe("StateSnapshot session progress fields (Task 149)", () => {
+		it("accepts all new optional session progress fields", () => {
+			const snapshot: StateSnapshot = {
+				state: LoopState.Running,
+				taskId: "Task-5",
+				taskDescription: "Do something",
+				iterationCount: 2,
+				nudgeCount: 1,
+				sessionTaskIndex: 3,
+				sessionTaskTotal: 20,
+				globalCompleted: 62,
+				globalTotal: 80,
+				taskStartedAt: 1711382400000,
+				agent: "ralph-executor",
+				maxIterations: 10,
+				maxNudges: 5,
+				agentDispatches: { "ralph-executor": 3, "ralph-explore": 1 },
+			};
+			expect(snapshot.sessionTaskIndex).toBe(3);
+			expect(snapshot.sessionTaskTotal).toBe(20);
+			expect(snapshot.globalCompleted).toBe(62);
+			expect(snapshot.globalTotal).toBe(80);
+			expect(snapshot.taskStartedAt).toBe(1711382400000);
+			expect(snapshot.agent).toBe("ralph-executor");
+			expect(snapshot.maxIterations).toBe(10);
+			expect(snapshot.maxNudges).toBe(5);
+			expect(snapshot.agentDispatches).toEqual({ "ralph-executor": 3, "ralph-explore": 1 });
+		});
+
+		it("all new fields are optional — existing literals remain valid", () => {
+			const snapshot: StateSnapshot = {
+				state: "idle",
+				taskId: "",
+				taskDescription: "",
+				iterationCount: 0,
+				nudgeCount: 0,
+			};
+			expect(snapshot.sessionTaskIndex).toBeUndefined();
+			expect(snapshot.sessionTaskTotal).toBeUndefined();
+			expect(snapshot.globalCompleted).toBeUndefined();
+			expect(snapshot.globalTotal).toBeUndefined();
+			expect(snapshot.taskStartedAt).toBeUndefined();
+			expect(snapshot.agent).toBeUndefined();
+			expect(snapshot.maxIterations).toBeUndefined();
+			expect(snapshot.maxNudges).toBeUndefined();
+			expect(snapshot.agentDispatches).toBeUndefined();
+		});
+
+		it("accepts partial new fields alongside existing fields", () => {
+			const snapshot: StateSnapshot = {
+				state: LoopState.Running,
+				taskId: "Task-10",
+				taskDescription: "Partial fields test",
+				iterationCount: 1,
+				nudgeCount: 0,
+				branch: "ralph/feature",
+				sessionTaskIndex: 1,
+				globalTotal: 50,
+				agent: "ralph-research",
+			};
+			expect(snapshot.sessionTaskIndex).toBe(1);
+			expect(snapshot.globalTotal).toBe(50);
+			expect(snapshot.agent).toBe("ralph-research");
+			expect(snapshot.sessionTaskTotal).toBeUndefined();
+			expect(snapshot.agentDispatches).toBeUndefined();
+		});
+	});
 });
 
 describe("Terminal snapshot truthfulness", () => {

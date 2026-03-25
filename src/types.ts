@@ -38,6 +38,15 @@ export interface StateSnapshot {
 	readonly nudgeCount: number;
 	readonly branch?: string;
 	readonly originalBranch?: string;
+	readonly sessionTaskIndex?: number;
+	readonly sessionTaskTotal?: number;
+	readonly globalCompleted?: number;
+	readonly globalTotal?: number;
+	readonly taskStartedAt?: number;
+	readonly agent?: string;
+	readonly maxIterations?: number;
+	readonly maxNudges?: number;
+	readonly agentDispatches?: Record<string, number>;
 }
 
 export interface PrdSnapshot {
