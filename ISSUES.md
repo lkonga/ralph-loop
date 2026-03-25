@@ -156,3 +156,21 @@ Create a hook catalog with standardized interfaces that can be plugged into the 
 - Benchmark context usage and response quality
 
 **Depends on**: Phase 5 Task 6
+
+---
+
+### ISS-011: Last Action / Last Tool Field in Status Bar
+
+**Priority**: P2
+**Source**: Phase 21 analysis — status bar DX improvements
+**Description**: Add a "Last Action" or "Last Tool" field to the status bar tooltip showing what the agent is currently doing (e.g., "Applying edits", "Running tests", "Waiting for Copilot"). This requires plumbing granular tool-level events from the execution strategy (`CopilotCommandStrategy`, `DirectApiStrategy`) through the orchestrator into the `StateSnapshot`. Currently the execution strategies fire a prompt and wait — they don't emit intermediate events.
+
+Implementation would require:
+- New event types or callback plumbing in `ITaskExecutionStrategy`
+- New state tracking in the orchestrator (`_lastAction: string`, `_lastActionAt: number`)
+- Updating the snapshot on every tool invocation
+- Surfacing in tooltip as `**Last Activity:** Running vitest... (2s ago)`
+
+**Complexity**: High — invasive change across strategy → orchestrator → snapshot → statusBar.
+**Deferred**: Requires event-driven execution strategy refactor. Not feasible as a surgical addition.
+**Depends on**: Phase 21 (status bar enrichment foundation)
