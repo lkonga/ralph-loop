@@ -159,7 +159,7 @@ Create a hook catalog with standardized interfaces that can be plugged into the 
 
 ---
 
-### ISS-011: Last Action / Last Tool Field in Status Bar
+### ISS-011: Last Action / Last Tool Field in Status Bar — [#20](https://github.com/lkonga/ralph-loop/issues/20)
 
 **Priority**: P2
 **Source**: Phase 21 analysis — status bar DX improvements
