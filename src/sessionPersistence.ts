@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import type { PendingHybridVerification } from './types';
 
 export interface SerializedLoopState {
     currentTaskIndex: number;
@@ -14,6 +15,7 @@ export interface SerializedLoopState {
     workspacePath?: string;
     branchName?: string;
     originalBranch?: string;
+    pendingHybridVerification?: PendingHybridVerification;
 }
 
 const SESSION_DIR = '.ralph';

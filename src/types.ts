@@ -89,6 +89,8 @@ export const enum LoopEventKind {
 	CircuitBreakerTripped = 'circuit_breaker_tripped',
 	DiffValidationFailed = 'diff_validation_failed',
 	HumanCheckpointRequested = 'human_checkpoint_requested',
+	HybridVerificationWaiting = 'hybrid_verification_waiting',
+	HybridVerificationCleared = 'hybrid_verification_cleared',
 	TaskReviewed = 'task_reviewed',
 	MonitorAlert = 'monitor_alert',
 	TaskCommitted = 'task_committed',
@@ -136,6 +138,8 @@ export type LoopEvent =
 	| { kind: LoopEventKind.CircuitBreakerTripped; breakerName: string; reason: string; action: string; taskInvocationId: string }
 	| { kind: LoopEventKind.DiffValidationFailed; task: Task; nudge: string; attempt: number; taskInvocationId: string }
 	| { kind: LoopEventKind.HumanCheckpointRequested; task: Task; reason: string; failCount: number; taskInvocationId: string }
+	| { kind: LoopEventKind.HybridVerificationWaiting; taskId: string; taskDescription: string; lockFilePath: string; taskInvocationId: string; commitHash?: string }
+	| { kind: LoopEventKind.HybridVerificationCleared; taskId: string; taskDescription: string; lockFilePath: string; taskInvocationId: string; commitHash?: string }
 	| { kind: LoopEventKind.TaskReviewed; task: Task; verdict: ReviewVerdict; taskInvocationId: string }
 	| { kind: LoopEventKind.MonitorAlert; alert: string; taskId: string }
 	| { kind: LoopEventKind.TaskCommitted; task: Task; commitHash: string; taskInvocationId: string }
@@ -278,6 +282,26 @@ export const DEFAULT_PARALLEL_MONITOR: ParallelMonitorConfig = {
 	intervalMs: 10000,
 	stuckThreshold: 3,
 };
+
+export interface HybridVerificationConfig {
+	enabled: boolean;
+	lockFilePath: string;
+	pollIntervalMs: number;
+}
+
+export const DEFAULT_HYBRID_VERIFICATION: HybridVerificationConfig = {
+	enabled: false,
+	lockFilePath: '.ralph/hybrid-verification.lock',
+	pollIntervalMs: 1000,
+};
+
+export interface PendingHybridVerification {
+	taskId: string;
+	taskDescription: string;
+	lockFilePath: string;
+	taskInvocationId: string;
+	commitHash?: string;
+}
 
 // --- Stagnation detection config ---
 export interface StagnationDetectionConfig {
@@ -532,6 +556,7 @@ export interface RalphConfig {
 	reviewAfterExecute?: ReviewAfterExecuteConfig;
 	maxConcurrencyPerStage: number;
 	parallelMonitor?: ParallelMonitorConfig;
+	hybridVerification?: HybridVerificationConfig;
 	preCompactBehavior?: PreCompactBehavior;
 	stagnationDetection?: StagnationDetectionConfig;
 	autoDecompose?: AutoDecomposeConfig;
@@ -578,6 +603,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	reviewAfterExecute: { ...DEFAULT_REVIEW_AFTER_EXECUTE },
 	maxConcurrencyPerStage: 1,
 	parallelMonitor: { ...DEFAULT_PARALLEL_MONITOR },
+	hybridVerification: { ...DEFAULT_HYBRID_VERIFICATION },
 	preCompactBehavior: { ...DEFAULT_PRE_COMPACT_BEHAVIOR },
 	stagnationDetection: { ...DEFAULT_STAGNATION_DETECTION },
 	autoDecompose: { ...DEFAULT_AUTO_DECOMPOSE },

@@ -108,6 +108,47 @@ describe("extension resume flow", () => {
 
 		fs.rmSync(tmpDir, { recursive: true, force: true });
 	});
+
+	it("auto-resumes when pending hybrid verification is persisted", async () => {
+		const { resumeIncompleteSession } = await import("../src/extension");
+
+		const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "ralph-resume-test-"));
+		const sessionDir = path.join(tmpDir, ".ralph");
+		fs.mkdirSync(sessionDir, { recursive: true });
+		fs.writeFileSync(
+			path.join(sessionDir, "session.json"),
+			JSON.stringify({
+				currentTaskIndex: 1,
+				iterationCount: 2,
+				nudgeCount: 0,
+				retryCount: 0,
+				circuitBreakerState: "closed",
+				timestamp: Date.now(),
+				version: 1,
+				branchName: "ralph/test-branch",
+				pendingHybridVerification: {
+					taskId: "Task-001",
+					taskDescription: "First task",
+					lockFilePath: ".ralph/hybrid-verification.lock",
+					taskInvocationId: "resume-invocation",
+					commitHash: "abc123",
+				},
+			}),
+		);
+
+		fs.writeFileSync(
+			path.join(tmpDir, "PRD.md"),
+			"- [x] **Task 1 — Done**: done\n- [ ] **Task 2 — Next**: next\n",
+		);
+
+		const onResume = vi.fn();
+		const logger = { log: vi.fn(), warn: vi.fn(), error: vi.fn() } as any;
+
+		resumeIncompleteSession(tmpDir, logger, onResume);
+
+		expect(onResume).toHaveBeenCalledOnce();
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
 });
 
 describe("shared idle finalizer (runOrchestratorWithIdleCleanup)", () => {

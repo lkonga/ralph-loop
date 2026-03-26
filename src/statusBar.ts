@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import type { LoopState, StateSnapshot } from './types';
+import type { StateSnapshot } from './types';
 
 let item: vscode.StatusBarItem | undefined;
 

@@ -12,6 +12,7 @@ import {
 import { runPreCompleteChain, LoopOrchestrator, runBearings, LinkedCancellationSource, resolveAgentMode, defaultBearingsExec } from '../src/orchestrator';
 import { parseReviewVerdict } from '../src/copilot';
 import { estimatePromptTokens } from '../src/prompt';
+import { SessionPersistence } from '../src/sessionPersistence';
 import { VerificationCache } from '../src/verificationCache';
 import {
 	DEFAULT_CONFIG,
@@ -2147,5 +2148,252 @@ describe('auto-close editors wiring (Task 146)', () => {
 		const clearedIdx = events.findIndex((e: any) => e.kind === LoopEventKind.EditorsCleared);
 		expect(committedIdx).toBeGreaterThanOrEqual(0);
 		expect(clearedIdx).toBeGreaterThan(committedIdx);
+	});
+});
+
+describe('hybrid verification hotfix', () => {
+	const noopLogger = { log: () => { }, warn: () => { }, error: () => { } };
+	let tmpDir: string;
+
+	beforeEach(() => {
+		tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-hybrid-verification-'));
+		const { execSync } = require('child_process');
+		execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
+		execSync('git config user.email "test@test.com"', { cwd: tmpDir, stdio: 'ignore' });
+		execSync('git config user.name "Test"', { cwd: tmpDir, stdio: 'ignore' });
+		fs.writeFileSync(path.join(tmpDir, 'README.md'), 'init\n', 'utf-8');
+		execSync('git add -A && git commit -m "init"', { cwd: tmpDir, stdio: 'ignore' });
+	});
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+		fs.rmSync(tmpDir, { recursive: true, force: true });
+	});
+
+	function makeOrch(events: any[], config: Partial<RalphConfig> = {}) {
+		const orch = new LoopOrchestrator(
+			{
+				...DEFAULT_CONFIG,
+				workspaceRoot: tmpDir,
+				maxIterations: 2,
+				countdownSeconds: 0,
+				cooldownShowDialog: false,
+				autoCloseEditors: false,
+				bearings: { enabled: false, runTsc: false, runTests: false },
+				diffValidation: { enabled: false, requireChanges: false, generateSummary: false },
+				hybridVerification: {
+					enabled: true,
+					lockFilePath: '.ralph/hybrid-verification.lock',
+					pollIntervalMs: 10,
+				},
+				...config,
+			} as RalphConfig,
+			noopLogger,
+			(e: any) => events.push(e),
+		);
+		(orch as any).executionStrategy = {
+			execute: async (task: any) => {
+				const prdContent = fs.readFileSync(path.join(tmpDir, 'PRD.md'), 'utf-8');
+				fs.writeFileSync(
+					path.join(tmpDir, 'PRD.md'),
+					prdContent.replace(`- [ ] ${task.description}`, `- [x] ${task.description}`),
+					'utf-8',
+				);
+				fs.writeFileSync(path.join(tmpDir, 'progress.txt'), `done ${task.taskId}\n`, 'utf-8');
+				return { completed: true, method: 'chat' as const, hadFileChanges: true };
+			},
+		};
+		return orch;
+	}
+
+	it('creates lock after successful commit and waits until it is removed', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] First task\n', 'utf-8');
+		const events: any[] = [];
+		const orch = makeOrch(events);
+		const lockPath = path.join(tmpDir, '.ralph', 'hybrid-verification.lock');
+
+		const startPromise = orch.start();
+		await vi.waitFor(() => expect(fs.existsSync(lockPath)).toBe(true));
+
+		const committedIdx = events.findIndex((e: any) => e.kind === LoopEventKind.TaskCommitted);
+		const waitingIdx = events.findIndex((e: any) => e.kind === LoopEventKind.HybridVerificationWaiting);
+		expect(committedIdx).toBeGreaterThanOrEqual(0);
+		expect(waitingIdx).toBeGreaterThan(committedIdx);
+
+		fs.unlinkSync(lockPath);
+		await startPromise;
+
+		expect(events.some((e: any) => e.kind === LoopEventKind.HybridVerificationCleared)).toBe(true);
+		expect(events.some((e: any) => e.kind === LoopEventKind.AllDone)).toBe(true);
+	});
+
+	it('continues once the lock file is removed externally', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] First task\n- [ ] Second task\n', 'utf-8');
+		const events: any[] = [];
+		const orch = makeOrch(events);
+		const lockPath = path.join(tmpDir, '.ralph', 'hybrid-verification.lock');
+
+		const startPromise = orch.start();
+		await vi.waitFor(() => expect(fs.existsSync(lockPath)).toBe(true));
+		fs.unlinkSync(lockPath);
+		await vi.waitFor(() => expect(events.some((e: any) => e.kind === LoopEventKind.TaskStarted && e.task.taskId === 'Task-002')).toBe(true));
+		await vi.waitFor(() => expect(fs.existsSync(lockPath)).toBe(true));
+		fs.unlinkSync(lockPath);
+		await startPromise;
+
+		expect(events.filter((e: any) => e.kind === LoopEventKind.HybridVerificationCleared).length).toBe(2);
+	});
+
+	it('does not create a lock file when commit fails', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] First task\n', 'utf-8');
+		const gitOps = await import('../src/gitOps');
+		vi.spyOn(gitOps, 'atomicCommit').mockResolvedValue({ success: false, error: 'commit failed' });
+		const events: any[] = [];
+		const orch = makeOrch(events);
+
+		await orch.start();
+
+		expect(fs.existsSync(path.join(tmpDir, '.ralph', 'hybrid-verification.lock'))).toBe(false);
+		expect(events.some((e: any) => e.kind === LoopEventKind.HybridVerificationWaiting)).toBe(false);
+	});
+
+	it('stop during wait exits cleanly', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] First task\n', 'utf-8');
+		const events: any[] = [];
+		const orch = makeOrch(events);
+		const lockPath = path.join(tmpDir, '.ralph', 'hybrid-verification.lock');
+
+		const startPromise = orch.start();
+		await vi.waitFor(() => expect(fs.existsSync(lockPath)).toBe(true));
+		orch.stop();
+		await startPromise;
+
+		expect(events.some((e: any) => e.kind === LoopEventKind.Stopped)).toBe(true);
+	});
+
+	it('resume re-enters wait when pending hybrid verification is persisted', async () => {
+		const session = new SessionPersistence();
+		const lockPath = path.join(tmpDir, '.ralph', 'hybrid-verification.lock');
+		fs.mkdirSync(path.dirname(lockPath), { recursive: true });
+		fs.writeFileSync(lockPath, '{"pending":true}', 'utf-8');
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [x] First task\n- [ ] Second task\n', 'utf-8');
+		session.save(tmpDir, {
+			currentTaskIndex: 1,
+			iterationCount: 1,
+			nudgeCount: 0,
+			retryCount: 0,
+			circuitBreakerState: 'active',
+			timestamp: Date.now(),
+			version: 1,
+			branchName: 'main',
+			pendingHybridVerification: {
+				taskId: 'Task-001',
+				taskDescription: 'First task',
+				lockFilePath: '.ralph/hybrid-verification.lock',
+				taskInvocationId: 'resume-invocation',
+				commitHash: 'abc123',
+			},
+		});
+
+		const events: any[] = [];
+		const orch = makeOrch(events, {
+			hybridVerification: {
+				enabled: false,
+				lockFilePath: '.ralph/hybrid-verification.lock',
+				pollIntervalMs: 10,
+			},
+		});
+		const startPromise = orch.start();
+
+		await vi.waitFor(() => expect(events.some((e: any) => e.kind === LoopEventKind.HybridVerificationWaiting)).toBe(true));
+		fs.unlinkSync(lockPath);
+		await startPromise;
+
+		expect(events.some((e: any) => e.kind === LoopEventKind.HybridVerificationCleared)).toBe(true);
+		expect(events.some((e: any) => e.kind === LoopEventKind.TaskStarted && e.task.taskId === 'Task-002')).toBe(true);
+	});
+
+	it('resume clears immediately when persisted lock is already gone', async () => {
+		const session = new SessionPersistence();
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [x] First task\n- [ ] Second task\n', 'utf-8');
+		session.save(tmpDir, {
+			currentTaskIndex: 1,
+			iterationCount: 1,
+			nudgeCount: 0,
+			retryCount: 0,
+			circuitBreakerState: 'active',
+			timestamp: Date.now(),
+			version: 1,
+			branchName: 'main',
+			pendingHybridVerification: {
+				taskId: 'Task-001',
+				taskDescription: 'First task',
+				lockFilePath: '.ralph/hybrid-verification.lock',
+				taskInvocationId: 'resume-invocation',
+				commitHash: 'abc123',
+			},
+		});
+
+		const events: any[] = [];
+		const orch = makeOrch(events, {
+			hybridVerification: {
+				enabled: false,
+				lockFilePath: '.ralph/hybrid-verification.lock',
+				pollIntervalMs: 10,
+			},
+		});
+		await orch.start();
+
+		expect(events.some((e: any) => e.kind === LoopEventKind.HybridVerificationCleared)).toBe(true);
+		expect(events.some((e: any) => e.kind === LoopEventKind.TaskStarted && e.task.taskId === 'Task-002')).toBe(true);
+	});
+
+	it('re-enters wait from on-disk lock file even without persisted pending state', async () => {
+		const lockPath = path.join(tmpDir, '.ralph', 'hybrid-verification.lock');
+		fs.mkdirSync(path.dirname(lockPath), { recursive: true });
+		fs.writeFileSync(
+			lockPath,
+			JSON.stringify({
+				taskId: 'Task-001',
+				taskDescription: 'First task',
+				taskInvocationId: 'orphaned-lock',
+				commitHash: 'abc123',
+			}),
+			'utf-8',
+		);
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [x] First task\n- [ ] Second task\n', 'utf-8');
+
+		const events: any[] = [];
+		const orch = makeOrch(events);
+		const startPromise = orch.start();
+
+		await vi.waitFor(() => expect(events.some((e: any) => e.kind === LoopEventKind.HybridVerificationWaiting)).toBe(true));
+		fs.unlinkSync(lockPath);
+		await vi.waitFor(() => expect(fs.existsSync(lockPath)).toBe(true));
+		fs.unlinkSync(lockPath);
+		await startPromise;
+
+		expect(events.some((e: any) => e.kind === LoopEventKind.HybridVerificationCleared)).toBe(true);
+		expect(events.some((e: any) => e.kind === LoopEventKind.TaskStarted && e.task.taskId === 'Task-002')).toBe(true);
+	});
+
+	it('disables parallel batching conservatively when hybrid verification is enabled', async () => {
+		fs.writeFileSync(path.join(tmpDir, 'PRD.md'), '- [ ] First task\n- [ ] Second task\n', 'utf-8');
+		const events: any[] = [];
+		const orch = makeOrch(events, {
+			features: { ...DEFAULT_CONFIG.features, useParallelTasks: true },
+			maxParallelTasks: 2,
+		});
+		const lockPath = path.join(tmpDir, '.ralph', 'hybrid-verification.lock');
+
+		const startPromise = orch.start();
+		await vi.waitFor(() => expect(fs.existsSync(lockPath)).toBe(true));
+		fs.unlinkSync(lockPath);
+		await vi.waitFor(() => expect(fs.existsSync(lockPath)).toBe(true));
+		fs.unlinkSync(lockPath);
+		await startPromise;
+
+		expect(events.some((e: any) => e.kind === LoopEventKind.TasksParallelized)).toBe(false);
+		expect(events.filter((e: any) => e.kind === LoopEventKind.TaskCommitted).length).toBe(2);
 	});
 });

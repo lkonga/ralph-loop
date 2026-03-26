@@ -119,6 +119,22 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Show structured questions at checkpoints, stagnation recovery, and session end via askQuestions. When false, uses simple notifications."
+				},
+				"ralph-loop.hybridVerification.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "After each successful task commit, create a lock file and wait for an external verifier or human to remove it before continuing."
+				},
+				"ralph-loop.hybridVerification.lockFilePath": {
+					"type": "string",
+					"default": ".ralph/hybrid-verification.lock",
+					"description": "Workspace-relative path for the external hybrid verification lock file."
+				},
+				"ralph-loop.hybridVerification.pollIntervalMs": {
+					"type": "number",
+					"default": 1000,
+					"minimum": 1,
+					"description": "How often Ralph checks whether the external hybrid verification lock file has been removed."
 				}
 			}
 		}

@@ -344,6 +344,16 @@ export function activate(context: vscode.ExtensionContext): void {
 								}
 							})();
 							break;
+						case LoopEventKind.HybridVerificationWaiting:
+							logger.warn(
+								`🔒 Waiting for external verification on ${event.taskId} via ${event.lockFilePath}`,
+							);
+							break;
+						case LoopEventKind.HybridVerificationCleared:
+							logger.log(
+								`🔓 External verification cleared for ${event.taskId} via ${event.lockFilePath}`,
+							);
+							break;
 						case LoopEventKind.TaskReviewed:
 							logger.log(
 								`📝 Review verdict for ${event.task.taskId}: ${event.verdict.outcome} — ${event.verdict.summary}`,

@@ -25,7 +25,6 @@ import { MAX_RETRIES_PER_TASK, shouldRetryError } from "./decisions";
 import { DiffValidator } from "./diffValidator";
 import {
 	atomicCommit,
-	branchExists,
 	checkoutBranch,
 	createAndCheckoutBranch,
 	getCurrentBranch,
@@ -64,6 +63,7 @@ import {
 	DEFAULT_CONTEXT_TRIMMING,
 	DEFAULT_DIFF_VALIDATION,
 	DEFAULT_FEATURES,
+	DEFAULT_HYBRID_VERIFICATION,
 	DEFAULT_KNOWLEDGE_CONFIG,
 	DEFAULT_PARALLEL_MONITOR,
 	DEFAULT_PRE_COMPLETE_HOOKS,
@@ -79,6 +79,7 @@ import {
 	type LoopEvent,
 	LoopEventKind,
 	LoopState,
+	type PendingHybridVerification,
 	type ParallelMonitorConfig,
 	type PreCompleteHookConfig,
 	type PreCompleteHookResult,
@@ -612,6 +613,168 @@ export class LoopOrchestrator {
 		this.logger.log("Yield requested");
 	}
 
+	private getHybridVerificationConfig() {
+		return this.config.hybridVerification ?? DEFAULT_HYBRID_VERIFICATION;
+	}
+
+	private isHybridVerificationEnabled(): boolean {
+		return this.getHybridVerificationConfig().enabled;
+	}
+
+	private resolveHybridLockPath(lockFilePath: string): string {
+		if (path.isAbsolute(lockFilePath)) {
+			return lockFilePath;
+		}
+		return path.resolve(this.config.workspaceRoot, lockFilePath);
+	}
+
+	private readPendingHybridVerificationFromLockFile(
+		lockFilePath: string,
+	): PendingHybridVerification | undefined {
+		const resolvedLockPath = this.resolveHybridLockPath(lockFilePath);
+		if (!fs.existsSync(resolvedLockPath)) {
+			return undefined;
+		}
+		try {
+			const raw = fs.readFileSync(resolvedLockPath, "utf-8");
+			const payload = JSON.parse(raw) as Partial<PendingHybridVerification>;
+			if (
+				typeof payload.taskId !== "string" ||
+				typeof payload.taskDescription !== "string" ||
+				typeof payload.taskInvocationId !== "string"
+			) {
+				return undefined;
+			}
+			return {
+				taskId: payload.taskId,
+				taskDescription: payload.taskDescription,
+				lockFilePath,
+				taskInvocationId: payload.taskInvocationId,
+				commitHash:
+					typeof payload.commitHash === "string"
+						? payload.commitHash
+						: undefined,
+			};
+		} catch {
+			return undefined;
+		}
+	}
+
+	private async persistSessionState(
+		taskIndex: number,
+		iteration: number,
+		pendingHybridVerification?: PendingHybridVerification,
+	): Promise<void> {
+		const currentBranch = this.activeBranch ?? await getCurrentBranch(this.config.workspaceRoot);
+		this.sessionPersistence?.save(this.config.workspaceRoot, {
+			currentTaskIndex: taskIndex,
+			iterationCount: iteration,
+			nudgeCount: 0,
+			retryCount: 0,
+			circuitBreakerState: "active",
+			timestamp: Date.now(),
+			version: 1,
+			branchName: currentBranch,
+			originalBranch: this.originalBranch,
+			pendingHybridVerification,
+		});
+	}
+
+	private async createHybridVerificationLockFile(
+		pending: PendingHybridVerification,
+	): Promise<void> {
+		const lockPath = this.resolveHybridLockPath(pending.lockFilePath);
+		fs.mkdirSync(path.dirname(lockPath), { recursive: true });
+		const tmpPath = `${lockPath}.tmp`;
+		const payload = {
+			taskId: pending.taskId,
+			taskDescription: pending.taskDescription,
+			taskInvocationId: pending.taskInvocationId,
+			commitHash: pending.commitHash,
+			createdAt: new Date().toISOString(),
+		};
+		fs.writeFileSync(tmpPath, JSON.stringify(payload, null, 2), "utf-8");
+		fs.renameSync(tmpPath, lockPath);
+	}
+
+	private async *waitForHybridVerification(
+		pending: PendingHybridVerification,
+	): AsyncGenerator<LoopEvent, boolean> {
+		const pollIntervalMs = Math.max(1, this.getHybridVerificationConfig().pollIntervalMs);
+		const lockPath = this.resolveHybridLockPath(pending.lockFilePath);
+		const previousState = this.state;
+		const previousTaskId = this._currentTaskId;
+		const previousTaskDescription = this._currentTaskDescription;
+
+		this.state = LoopState.Paused;
+		this._currentTaskId = pending.taskId;
+		this._currentTaskDescription = pending.taskDescription;
+
+		try {
+			if (!fs.existsSync(lockPath)) {
+				yield {
+					kind: LoopEventKind.HybridVerificationCleared,
+					taskId: pending.taskId,
+					taskDescription: pending.taskDescription,
+					lockFilePath: pending.lockFilePath,
+					taskInvocationId: pending.taskInvocationId,
+					commitHash: pending.commitHash,
+				};
+				return true;
+			}
+
+			yield {
+				kind: LoopEventKind.HybridVerificationWaiting,
+				taskId: pending.taskId,
+				taskDescription: pending.taskDescription,
+				lockFilePath: pending.lockFilePath,
+				taskInvocationId: pending.taskInvocationId,
+				commitHash: pending.commitHash,
+			};
+
+			while (fs.existsSync(lockPath)) {
+				if (this.stopRequested || this.linkedSignal?.signal.aborted) {
+					yield { kind: LoopEventKind.Stopped };
+					return false;
+				}
+				await this.delay(pollIntervalMs);
+			}
+
+			yield {
+				kind: LoopEventKind.HybridVerificationCleared,
+				taskId: pending.taskId,
+				taskDescription: pending.taskDescription,
+				lockFilePath: pending.lockFilePath,
+				taskInvocationId: pending.taskInvocationId,
+				commitHash: pending.commitHash,
+			};
+			return true;
+		} finally {
+			this.state = previousState;
+			this._currentTaskId = previousTaskId;
+			this._currentTaskDescription = previousTaskDescription;
+		}
+	}
+
+	private async *enterHybridVerificationWait(
+		task: { id: number; taskId: string; description: string },
+		commitHash: string,
+		taskInvocationId: string,
+		iteration: number,
+	): AsyncGenerator<LoopEvent, boolean> {
+		const pending: PendingHybridVerification = {
+			taskId: task.taskId,
+			taskDescription: task.description,
+			lockFilePath: this.getHybridVerificationConfig().lockFilePath,
+			taskInvocationId,
+			commitHash,
+		};
+
+		await this.createHybridVerificationLockFile(pending);
+		await this.persistSessionState(task.id, iteration, pending);
+		return yield* this.waitForHybridVerification(pending);
+	}
+
 	injectContext(text: string): void {
 		this.pendingContext = text;
 		this.logger.log("Context injected for next iteration");
@@ -665,10 +828,6 @@ export class LoopOrchestrator {
 		};
 	}
 
-	private get executionOptions(): ExecutionOptions {
-		return this.executionOptionsForTask();
-	}
-
 	private executionOptionsForTask(task?: { agent?: string }): ExecutionOptions {
 		const agentMode = task
 			? resolveAgentMode(
@@ -705,6 +864,18 @@ export class LoopOrchestrator {
 		let iterationLimitExpanded = false;
 		let effectiveMaxIterations = this.config.maxIterations;
 		const loopStartTime = Date.now();
+		const resumedState = this.sessionPersistence?.load(this.config.workspaceRoot) ?? undefined;
+
+		if (typeof resumedState?.iterationCount === "number") {
+			iteration = resumedState.iterationCount;
+			this._currentIteration = resumedState.iterationCount;
+		}
+		if (resumedState?.branchName) {
+			this.activeBranch = resumedState.branchName;
+		}
+		if (resumedState?.originalBranch) {
+			this.originalBranch = resumedState.originalBranch;
+		}
 
 		// Linked cancellation: combines manual stop signal + timeout
 		const timeoutSignal = AbortSignal.timeout(
@@ -805,7 +976,7 @@ export class LoopOrchestrator {
 
 			// Branch enforcement gate (linear flow — always create new branch)
 			const featureBranchConfig = this.config.featureBranch;
-			if (featureBranchConfig?.enabled) {
+			if (featureBranchConfig?.enabled && !this.activeBranch) {
 				try {
 					const currentBranch = await getCurrentBranch(
 						this.config.workspaceRoot,
@@ -843,6 +1014,23 @@ export class LoopOrchestrator {
 					const msg = err instanceof Error ? err.message : String(err);
 					this.logger.warn(`Branch gate: git operations failed — ${msg}`);
 					yield { kind: LoopEventKind.BranchEnforcementFailed, reason: msg };
+					return;
+				}
+			}
+
+			const pendingHybridVerification =
+				resumedState?.pendingHybridVerification ??
+				(this.isHybridVerificationEnabled()
+					? this.readPendingHybridVerificationFromLockFile(
+							this.getHybridVerificationConfig().lockFilePath,
+						)
+					: undefined);
+
+			if (pendingHybridVerification) {
+				const shouldContinue = yield* this.waitForHybridVerification(
+					pendingHybridVerification,
+				);
+				if (!shouldContinue) {
 					return;
 				}
 			}
@@ -940,7 +1128,8 @@ export class LoopOrchestrator {
 				// Use DAG-aware parallel task selection when useParallelTasks is enabled and maxParallelTasks > 1
 				if (
 					this.config.features.useParallelTasks &&
-					this.config.maxParallelTasks > 1
+					this.config.maxParallelTasks > 1 &&
+					!this.isHybridVerificationEnabled()
 				) {
 					const concurrencyCap =
 						this.config.maxConcurrencyPerStage > 1
@@ -961,7 +1150,7 @@ export class LoopOrchestrator {
 						yield { kind: LoopEventKind.TasksParallelized, tasks: readyTasks };
 						iteration++;
 
-						const parallelResults = await Promise.all(
+						await Promise.all(
 							readyTasks.map(async (task) => {
 								const invId = crypto.randomUUID();
 								task.status = TaskStatus.InProgress;
@@ -2123,6 +2312,18 @@ export class LoopOrchestrator {
 								taskInvocationId,
 							};
 
+							if (this.isHybridVerificationEnabled()) {
+								const shouldContinue = yield* this.enterHybridVerificationWait(
+									task,
+									commitResult.commitHash!,
+									taskInvocationId,
+									iteration,
+								);
+								if (!shouldContinue) {
+									return;
+								}
+							}
+
 							// Auto-close editors after successful commit
 							if (this.config.autoCloseEditors) {
 								const closed = await closeAllEditors(this.logger);
@@ -2415,18 +2616,7 @@ export class LoopOrchestrator {
 				}
 
 				// Save session state after each iteration
-				const currentBranch = await getCurrentBranch(this.config.workspaceRoot);
-				this.sessionPersistence?.save(this.config.workspaceRoot, {
-					currentTaskIndex: task.id,
-					iterationCount: iteration,
-					nudgeCount: 0,
-					retryCount: 0,
-					circuitBreakerState: "active",
-					timestamp: Date.now(),
-					version: 1,
-					branchName: currentBranch,
-					originalBranch: this.originalBranch,
-				});
+				await this.persistSessionState(task.id, iteration);
 			}
 		} finally {
 			this._currentTaskId = "";
@@ -2571,6 +2761,10 @@ export function loadConfig(workspaceRoot: string): RalphConfig {
 		agentMode: vsConfig.get<string>(
 			"agentMode",
 			DEFAULT_CONFIG.agentMode ?? "ralph-executor",
+		),
+		hybridVerification: vsConfig.get(
+			"hybridVerification",
+			DEFAULT_CONFIG.hybridVerification,
 		),
 	};
 }
