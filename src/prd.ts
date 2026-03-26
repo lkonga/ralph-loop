@@ -299,6 +299,13 @@ export function appendProgress(progressPath: string, message: string): void {
 }
 
 export function resolvePrdPath(workspaceRoot: string, prdRelative: string): string {
+	// Prefer BRANCH-PRD.md if it exists — allows branch-scoped task isolation
+	if (prdRelative === 'PRD.md') {
+		const branchPrd = path.resolve(workspaceRoot, 'BRANCH-PRD.md');
+		if (fs.existsSync(branchPrd)) {
+			return branchPrd;
+		}
+	}
 	return path.resolve(workspaceRoot, prdRelative);
 }
 

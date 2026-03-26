@@ -78,14 +78,22 @@ async function resolveWorkspaceRoot(): Promise<string | undefined> {
 		return undefined;
 	}
 
-	const prdFiles = await vscode.workspace.findFiles(
-		"**/PRD.md",
+	// Prefer BRANCH-PRD.md (branch-scoped tasks) over PRD.md (master record)
+	let prdFiles = await vscode.workspace.findFiles(
+		"**/BRANCH-PRD.md",
 		"**/node_modules/**",
 		10,
 	);
+	if (prdFiles.length === 0) {
+		prdFiles = await vscode.workspace.findFiles(
+			"**/PRD.md",
+			"**/node_modules/**",
+			10,
+		);
+	}
 
 	if (prdFiles.length === 0) {
-		vscode.window.showErrorMessage("Ralph Loop: No PRD.md found in workspace");
+		vscode.window.showErrorMessage("Ralph Loop: No PRD.md or BRANCH-PRD.md found in workspace");
 		return undefined;
 	}
 
@@ -98,7 +106,7 @@ async function resolveWorkspaceRoot(): Promise<string | undefined> {
 				label: vscode.workspace.asRelativePath(uri),
 				uri,
 			})),
-			{ placeHolder: "Multiple PRD.md files found — pick one" },
+			{ placeHolder: "Multiple PRD files found — pick one" },
 		);
 		if (!picked) {
 			return undefined;
