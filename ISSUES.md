@@ -174,3 +174,65 @@ Implementation would require:
 **Complexity**: High — invasive change across strategy → orchestrator → snapshot → statusBar.
 **Deferred**: Requires event-driven execution strategy refactor. Not feasible as a surgical addition.
 **Depends on**: Phase 21 (status bar enrichment foundation)
+
+---
+
+### ISS-012: Built-In Multi-Lane Agent Orchestration Mode
+
+**Priority**: P1
+**Source**: Hybrid verification discussion after `feat/hybrid-checkpoint-lock`
+**Description**: Add a true built-in multi-lane orchestration mode to Ralph so the loop can coordinate distinct agent roles internally rather than relying on an external human/verifier removing a lock file. The target shape is a small-context implementation lane plus one or more higher-context review/checkpoint lanes that can independently approve continuation.
+
+Initial design questions:
+- How many lanes are first-class (`explore`, `planner`, `coder`, `reviewer`, `builder`, etc.)?
+- Which lane owns task execution vs. verification vs. packaging?
+- How should Ralph encode lane policy in config or PRD annotations?
+
+**Future outcome**: Ralph becomes capable of internal subagent-first execution rather than using only an external lock-file gate.
+
+---
+
+### ISS-013: Checkpoint / Verifier Lane Greenlight Contract
+
+**Priority**: P1
+**Source**: Hybrid verification discussion after `feat/hybrid-checkpoint-lock`
+**Description**: Replace the current coarse external lock-file mechanism with a structured verifier-lane contract. The verifier lane should explicitly emit a machine-readable result (approve / reject / retry / escalate) that Ralph can consume before moving to the next task.
+
+Questions to resolve:
+- What is the canonical verifier result schema?
+- Does approval require tests/builds, human signoff, model signoff, or all three?
+- How are verifier failures surfaced back into the next prompt iteration?
+
+**Related current workaround**: the lock-file gate in `feat/hybrid-checkpoint-lock`.
+
+---
+
+### ISS-014: Artifact Passing Between Ralph Lanes
+
+**Priority**: P2
+**Source**: Hybrid verification discussion after `feat/hybrid-checkpoint-lock`
+**Description**: Define how Ralph should pass artifacts between internal lanes or subagents. Examples include: code diffs, review summaries, verification outputs, build logs, lock-state metadata, and PRD/task state snapshots. The goal is to avoid relying on implicit context carry-over and instead make lane handoffs explicit and inspectable.
+
+Potential artifact classes:
+- task implementation summary
+- changed file list / git diff summary
+- verification findings
+- build/package results
+- checkpoint decision payloads
+
+**Depends on**: ISS-012, ISS-013
+
+---
+
+### ISS-015: Continuation Policy for Hybrid / Verifier Modes
+
+**Priority**: P2
+**Source**: Hybrid verification discussion after `feat/hybrid-checkpoint-lock`
+**Description**: Define continuation and failure policy for hybrid and future verifier modes. Today the lock-file gate is intentionally minimal. Future built-in modes need explicit policy for:
+- verifier timeouts
+- stale approvals
+- retry vs. stop vs. escalate decisions
+- interaction with pause/yield/parallel mode
+- whether approvals are per-task, per-batch, or per-phase
+
+This issue tracks the policy layer required before the minimal lock gate can evolve into a full internal checkpoint system.
