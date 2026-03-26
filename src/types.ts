@@ -551,6 +551,7 @@ export interface RalphConfig {
 	autoCloseEditors?: boolean;
 	preFlightWizard?: 'always' | 'countdown' | 'never';
 	preFlightCountdownSeconds?: number;
+	checkpointQuestions?: boolean;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -594,6 +595,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	autoCloseEditors: true,
 	preFlightWizard: 'countdown',
 	preFlightCountdownSeconds: 15,
+	checkpointQuestions: true,
 };
 
 // --- Verification ---
