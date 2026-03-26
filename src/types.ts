@@ -341,12 +341,12 @@ export interface BearingsConfig {
 }
 
 export const DEFAULT_BEARINGS_CONFIG: BearingsConfig = {
-	enabled: false,
-	runTsc: false,
-	runTests: false,
-	startup: 'none',
+	enabled: true,
+	runTsc: true,
+	runTests: true,
+	startup: 'tsc',
 	perTask: 'none',
-	checkpoint: 'none',
+	checkpoint: 'full',
 };
 
 export interface BearingsResult {
@@ -549,6 +549,9 @@ export interface RalphConfig {
 	agentMode?: string;
 	featureBranch?: { enabled: boolean };
 	autoCloseEditors?: boolean;
+	preFlightWizard?: 'always' | 'countdown' | 'never';
+	preFlightCountdownSeconds?: number;
+	checkpointQuestions?: boolean;
 }
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
@@ -590,6 +593,9 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	agentMode: 'ralph-executor',
 	featureBranch: { enabled: false },
 	autoCloseEditors: true,
+	preFlightWizard: 'countdown',
+	preFlightCountdownSeconds: 15,
+	checkpointQuestions: true,
 };
 
 // --- Verification ---

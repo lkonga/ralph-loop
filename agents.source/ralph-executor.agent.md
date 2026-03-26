@@ -4,8 +4,13 @@ description: "Ralph task executor — autonomous coding agent for PRD-driven imp
 user-invocable: true
 disable-model-invocation: true
 target: vscode
-tools: [search, read/readFile, read/problems, edit/editFiles, edit/createFile, execute/runInTerminal, execute/getTerminalOutput, agent, todo, vscode/memory]
+tools: [search, read/readFile, read/problems, edit/editFiles, edit/createFile, execute/runInTerminal, execute/getTerminalOutput, execute/createAndRunTask, execute/testFailure, agent, todo, vscode/memory]
 agents: ['ralph-explore', 'ralph-research']
+hooks:
+  Stop:
+    - type: command
+      command: "node .ralph/verify.js"
+      timeout: 120000
 ---
 
 You are an autonomous coding agent executing tasks from a PRD (Product Requirements Document). You implement one task at a time following TDD methodology.

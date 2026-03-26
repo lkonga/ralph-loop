@@ -95,8 +95,26 @@
 				},
 				"ralph-loop.featureBranch.enabled": {
 					"type": "boolean",
-					"default": true,
+					"default": false,
 					"description": "Enable automatic feature branch creation and enforcement."
+				},
+				"ralph-loop.preFlightWizard": {
+					"type": "string",
+					"enum": ["always", "countdown", "never"],
+					"default": "countdown",
+					"description": "Show pre-flight configuration wizard on loop start. 'always' shows full wizard, 'countdown' auto-starts with defaults after timeout, 'never' skips wizard entirely."
+				},
+				"ralph-loop.preFlightCountdownSeconds": {
+					"type": "number",
+					"default": 15,
+					"minimum": 1,
+					"maximum": 120,
+					"description": "Seconds before auto-starting with defaults when preFlightWizard is 'countdown'."
+				},
+				"ralph-loop.checkpointQuestions": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show structured questions at checkpoints, stagnation recovery, and session end via askQuestions. When false, uses simple notifications."
 				}
 			}
 		}
