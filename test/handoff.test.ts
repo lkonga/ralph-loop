@@ -84,5 +84,42 @@ describe('handoff', () => {
 				'workbench.action.chat.openEditSession',
 			]);
 		});
+
+		it('strategy 7: executes newChat then chat.open with query', async () => {
+			vi.spyOn(vscode.workspace.fs, 'stat').mockResolvedValue({ type: 1, ctime: 0, mtime: 0, size: 100 } as any);
+
+			await executeHandoff(logger, 7);
+
+			const commands = executedCommands.map(c => c.command);
+			expect(commands).toEqual([
+				'workbench.action.chat.newChat',
+				'workbench.action.chat.open',
+			]);
+			expect(executedCommands[1].args[0]).toEqual({ query: buildHandoffPrompt() });
+			expect(logger.log).toHaveBeenCalledWith('Handoff: executed strategy 7');
+		});
+
+		it('falls back to strategy 1 for unknown variant', async () => {
+			vi.spyOn(vscode.workspace.fs, 'stat').mockResolvedValue({ type: 1, ctime: 0, mtime: 0, size: 100 } as any);
+
+			await executeHandoff(logger, 99);
+
+			const commands = executedCommands.map(c => c.command);
+			expect(commands).toEqual([
+				'workbench.action.chat.newEditSession',
+				'workbench.action.chat.openEditSession',
+			]);
+		});
+
+		it('uses specified variant when in range 1-12', async () => {
+			vi.spyOn(vscode.workspace.fs, 'stat').mockResolvedValue({ type: 1, ctime: 0, mtime: 0, size: 100 } as any);
+
+			await executeHandoff(logger, 3);
+
+			const commands = executedCommands.map(c => c.command);
+			expect(commands[0]).toBe('workbench.action.chat.newEditSession');
+			expect(commands[1]).toBe('workbench.action.chat.open');
+			expect(logger.log).toHaveBeenCalledWith('Handoff: executed strategy 3');
+		});
 	});
 });
