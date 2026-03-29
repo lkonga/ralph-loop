@@ -198,6 +198,29 @@ Initial design questions:
 **Source**: Hybrid verification discussion after `feat/hybrid-checkpoint-lock`
 **Description**: Replace the current coarse external lock-file mechanism with a structured verifier-lane contract. The verifier lane should explicitly emit a machine-readable result (approve / reject / retry / escalate) that Ralph can consume before moving to the next task.
 
+---
+
+### ISS-014: Log trace of starting with subscription expired (zombie session auth) [#24](https://github.com/lkonga/ralph-loop/issues/24)
+
+**Priority**: P3
+**Source**: User report (2026-03-27)
+**Description**: Investigation/Log of a crash-loop state when the extension starts with an expired GitHub Copilot subscription. The log shows a `TypeError` during contribution loading ("Cannot add property forkHandler, object is not extensible") followed by 403 Forbidden errors when fetching models/tokens.
+
+**Trace**:
+```
+2026-03-27 20:47:37.805 [info] [GitExtensionServiceImpl] Initializing Git extension service.
+2026-03-27 20:47:37.805 [info] 🔖 Build: ralph-fork {v0.42-lean-true-limits@12d589282}
+2026-03-27 20:47:37.805 [info] ConversationFeature: Waiting for copilot token to activate conversation feature
+2026-03-27 20:47:37.805 [error] TypeError: Cannot add property forkHandler, object is not extensible
+    at new Hke (/home/lkonga/.vscode-insiders/extensions/github.copilot-chat-0.42.2026032707/dist/extension.js:2246:16192)
+    at new lse (/home/lkonga/.vscode-insiders/extensions/github.copilot-chat-0.42.2026032707/dist/extension.js:2246:9751)
+    ...
+2026-03-27 20:47:38.428 [info] FetcherService: electron-fetch failed with status: 403 
+2026-03-27 20:47:40.006 [warning] Failed to get copilot token due to: Thank you for using GitHub Copilot. Your subscription has ended. You are currently logged in as lkonga.
+2026-03-27 20:47:44.225 [error] Error pinging TypeScript server plugin:: Error: <main> TypeScript Server Error (5.9.3)
+```
+
+
 Questions to resolve:
 - What is the canonical verifier result schema?
 - Does approval require tests/builds, human signoff, model signoff, or all three?
