@@ -37,8 +37,12 @@ function extractTopicHint(): string {
 export function buildHandoffPrompt(): string {
 	const absPath = getTranscriptPath();
 	const topic = extractTopicHint();
-	const topicLine = topic ? `\nPrevious topics: ${topic}` : "";
-	return `Session handoff.${topicLine}\nDispatch the transcript-summarizer subagent with this prompt: "Analyze the full transcript at ${absPath} and return a PD index." Use the returned index to understand context and continue where we left off.`;
+	const intro = topic
+		? `Resuming work on: ${topic}`
+		: `Resuming previous session`;
+	return `${intro}
+
+Dispatch the transcript-summarizer subagent with this prompt: "Analyze the full transcript at ${absPath} and return a PD index." Use the returned index to understand context and continue where we left off.`;
 }
 
 export function buildTranscriptSummary(): string {
