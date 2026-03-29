@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
-import { watch, mkdirSync, readFileSync, unlinkSync, type FSWatcher } from "node:fs";
+import { mkdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
+import { createServer, type Server } from "node:net";
 import { executeHandoff } from "./handoff";
 import {
 	type HookBridgeDisposable,
@@ -29,7 +30,7 @@ let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.LogOutputChannel;
 let hookBridgeDisposable: HookBridgeDisposable | undefined;
 let sessionTrackingDisposable: vscode.Disposable | undefined;
-let handoffWatcher: FSWatcher | undefined;
+let handoffServer: Server | undefined;
 
 /**
  * Shared finalizer: runs orchestrator.start() and guarantees idle cleanup
@@ -642,25 +643,29 @@ export function activate(context: vscode.ExtensionContext): void {
 
 	logger.log("Ralph Loop extension activated");
 
-	// Watch for handoff trigger file written by dump-chat-transcript.sh hook
+	// Unix socket server for handoff triggers (replaces flaky fs.watch)
 	const handoffDir = join(process.env.HOME ?? "", ".local/share/chat-handoffs");
-	let debounce: ReturnType<typeof setTimeout> | undefined;
+	const sockPath = join(handoffDir, "handoff.sock");
 	try {
 		mkdirSync(handoffDir, { recursive: true });
-		handoffWatcher = watch(handoffDir, (_ev, file) => {
-			if (file !== "trigger") return;
-			if (debounce) clearTimeout(debounce);
-			debounce = setTimeout(() => {
-				const triggerPath = join(handoffDir, "trigger");
+		try { unlinkSync(sockPath); } catch { /* stale socket */ }
+		handoffServer = createServer((conn: import("node:net").Socket) => {
+			let data = "";
+			conn.on("data", (chunk: Buffer) => { data += chunk; });
+			conn.on("end", () => {
+				const trimmed = data.trim();
 				let variant: number | undefined;
-				try {
-					const content = readFileSync(triggerPath, "utf-8").trim();
-					const n = parseInt(content, 10);
-					if (n >= 1 && n <= 12) variant = n;
-				} catch { /* default */ }
-				try { unlinkSync(triggerPath); } catch { /* already gone */ }
+				const n = parseInt(trimmed, 10);
+				if (n >= 1 && n <= 12) variant = n;
+				logger.log(`Handoff: received variant ${variant ?? "(default)"} via socket`);
 				vscode.commands.executeCommand("ralph-loop.handoff", variant);
-			}, 300);
+			});
+		});
+		handoffServer.listen(sockPath, () => {
+			logger.log(`Handoff socket listening at ${sockPath}`);
+		});
+		handoffServer.on("error", (err: Error) => {
+			logger.warn(`Handoff socket error: ${err.message}`);
 		});
 	} catch { /* non-critical */ }
 
@@ -688,6 +693,7 @@ export function deactivate(): void {
 	hookBridgeDisposable = undefined;
 	sessionTrackingDisposable?.dispose();
 	sessionTrackingDisposable = undefined;
-	handoffWatcher?.close();
-	handoffWatcher = undefined;
+	handoffServer?.close();
+	handoffServer = undefined;
+	try { unlinkSync(join(process.env.HOME ?? "", ".local/share/chat-handoffs/handoff.sock")); } catch { /* already gone */ }
 }
