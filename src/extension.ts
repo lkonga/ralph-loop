@@ -636,7 +636,7 @@ export function activate(context: vscode.ExtensionContext): void {
 			}
 		}),
 
-		vscode.commands.registerCommand("ralph-loop.handoff", (variant?: number) => executeHandoff(logger, variant)),
+vscode.commands.registerCommand("ralph-loop.handoff", (opts?: import("./handoff").HandoffOptions | number) => executeHandoff(logger, opts)),
 
 		outputChannel,
 	);
@@ -654,11 +654,18 @@ export function activate(context: vscode.ExtensionContext): void {
 			conn.on("data", (chunk: Buffer) => { data += chunk; });
 			conn.on("end", () => {
 				const trimmed = data.trim();
-				let variant: number | undefined;
-				const n = parseInt(trimmed, 10);
-				if (n >= 1 && n <= 12) variant = n;
-				logger.log(`Handoff: received variant ${variant ?? "(default)"} via socket`);
-				vscode.commands.executeCommand("ralph-loop.handoff", variant);
+				// Protocol: "7" (simple) or "13|model:claude-sonnet-4" (extended)
+				const parts = trimmed.split("|");
+				const n = parseInt(parts[0], 10);
+				const variant = (n >= 1 && n <= 15) ? n : undefined;
+				let model: string | undefined;
+				for (const part of parts.slice(1)) {
+					if (part.startsWith("model:")) {
+						model = part.slice(6);
+					}
+				}
+				logger.log(`Handoff: received variant ${variant ?? "(default)"}${model ? ` model=${model}` : ""} via socket`);
+				vscode.commands.executeCommand("ralph-loop.handoff", { variant, model });
 			});
 		});
 		handoffServer.listen(sockPath, () => {

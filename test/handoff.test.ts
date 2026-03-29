@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as vscode from 'vscode';
-import { executeHandoff, buildHandoffPrompt, getTranscriptPath } from '../src/handoff';
+import { executeHandoff, buildHandoffPrompt, getTranscriptPath, buildTranscriptSummary } from '../src/handoff';
 import type { ILogger } from '../src/types';
 
 describe('handoff', () => {
@@ -34,10 +34,10 @@ describe('handoff', () => {
 			expect(prompt).toContain('latest-transcript.jsonl');
 		});
 
-		it('instructs to read only last 100 lines first', () => {
+		it('instructs to read transcript via tail command', () => {
 			const prompt = buildHandoffPrompt();
-			expect(prompt).toContain('last 100 lines');
-			expect(prompt).toContain('tail');
+			expect(prompt).toContain('tail -100');
+			expect(prompt).toContain('latest-transcript.jsonl');
 		});
 	});
 
@@ -120,6 +120,49 @@ describe('handoff', () => {
 			expect(commands[0]).toBe('workbench.action.chat.newEditSession');
 			expect(commands[1]).toBe('workbench.action.chat.open');
 			expect(logger.log).toHaveBeenCalledWith('Handoff: executed strategy 3');
+		});
+
+		it('strategy 13: uses previousRequests and modelSelector', async () => {
+			vi.spyOn(vscode.workspace.fs, 'stat').mockResolvedValue({ type: 1, ctime: 0, mtime: 0, size: 100 } as any);
+
+			await executeHandoff(logger, { variant: 13, model: 'claude-sonnet-4' });
+
+			const commands = executedCommands.map(c => c.command);
+			expect(commands).toEqual(['workbench.action.chat.newChat', 'workbench.action.chat.open']);
+			const openArgs = executedCommands[1].args[0] as Record<string, unknown>;
+			expect(openArgs.modelSelector).toEqual({ id: 'claude-sonnet-4' });
+			expect(openArgs.previousRequests).toBeDefined();
+			expect(openArgs.mode).toBe('agent');
+		});
+
+		it('strategy 14: injects summary and keeps transcript prompt', async () => {
+			vi.spyOn(vscode.workspace.fs, 'stat').mockResolvedValue({ type: 1, ctime: 0, mtime: 0, size: 100 } as any);
+
+			await executeHandoff(logger, { variant: 14 });
+
+			const commands = executedCommands.map(c => c.command);
+			expect(commands).toEqual(['workbench.action.chat.newChat', 'workbench.action.chat.open']);
+			const openArgs = executedCommands[1].args[0] as Record<string, unknown>;
+			expect(openArgs.previousRequests).toBeDefined();
+			expect((openArgs.query as string)).toContain('tail -100');
+		});
+
+		it('strategy 15: pure context injection without transcript read', async () => {
+			vi.spyOn(vscode.workspace.fs, 'stat').mockResolvedValue({ type: 1, ctime: 0, mtime: 0, size: 100 } as any);
+
+			await executeHandoff(logger, { variant: 15 });
+
+			const openArgs = executedCommands[1].args[0] as Record<string, unknown>;
+			expect((openArgs.query as string)).toContain('rotated the session');
+			expect(openArgs.previousRequests).toBeDefined();
+		});
+
+		it('accepts number for backward compatibility', async () => {
+			vi.spyOn(vscode.workspace.fs, 'stat').mockResolvedValue({ type: 1, ctime: 0, mtime: 0, size: 100 } as any);
+
+			await executeHandoff(logger, 7);
+
+			expect(executedCommands[0].command).toBe('workbench.action.chat.newChat');
 		});
 	});
 });
