@@ -646,6 +646,8 @@ export function activate(context: vscode.ExtensionContext): void {
 	// Unix socket server for handoff triggers (replaces flaky fs.watch)
 	const handoffDir = join(process.env.HOME ?? "", ".local/share/chat-handoffs");
 	const sockPath = join(handoffDir, "handoff.sock");
+	let lastHandoffTime = 0;
+	const HANDOFF_COOLDOWN_MS = 5000;
 	try {
 		mkdirSync(handoffDir, { recursive: true });
 		try { unlinkSync(sockPath); } catch { /* stale socket */ }
@@ -653,6 +655,12 @@ export function activate(context: vscode.ExtensionContext): void {
 			let data = "";
 			conn.on("data", (chunk: Buffer) => { data += chunk; });
 			conn.on("end", () => {
+				const now = Date.now();
+				if (now - lastHandoffTime < HANDOFF_COOLDOWN_MS) {
+					logger.log("Handoff: ignoring duplicate trigger (cooldown)");
+					return;
+				}
+				lastHandoffTime = now;
 				const trimmed = data.trim();
 				let variant: number | undefined;
 				const n = parseInt(trimmed, 10);
