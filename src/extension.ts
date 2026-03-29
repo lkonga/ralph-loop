@@ -1,4 +1,7 @@
 import * as vscode from "vscode";
+import { watch, mkdirSync, readFileSync, type FSWatcher } from "node:fs";
+import { join } from "node:path";
+import { executeHandoff } from "./handoff";
 import {
 	type HookBridgeDisposable,
 	registerHookBridge,
@@ -26,6 +29,7 @@ let orchestrator: LoopOrchestrator | undefined;
 let outputChannel: vscode.LogOutputChannel;
 let hookBridgeDisposable: HookBridgeDisposable | undefined;
 let sessionTrackingDisposable: vscode.Disposable | undefined;
+let handoffWatcher: FSWatcher | undefined;
 
 /**
  * Shared finalizer: runs orchestrator.start() and guarantees idle cleanup
@@ -631,10 +635,32 @@ export function activate(context: vscode.ExtensionContext): void {
 			}
 		}),
 
+		vscode.commands.registerCommand("ralph-loop.handoff", (variant?: number) => executeHandoff(logger, variant)),
+
 		outputChannel,
 	);
 
 	logger.log("Ralph Loop extension activated");
+
+	// Watch for handoff trigger file written by dump-chat-transcript.sh hook
+	const handoffDir = join(process.env.HOME ?? "", ".local/share/chat-handoffs");
+	let debounce: ReturnType<typeof setTimeout> | undefined;
+	try {
+		mkdirSync(handoffDir, { recursive: true });
+		handoffWatcher = watch(handoffDir, (_ev, file) => {
+			if (file !== "trigger") return;
+			if (debounce) clearTimeout(debounce);
+			debounce = setTimeout(() => {
+				let variant: number | undefined;
+				try {
+					const content = readFileSync(join(handoffDir, "trigger"), "utf-8").trim();
+					const n = parseInt(content, 10);
+					if (n >= 1 && n <= 12) variant = n;
+				} catch { /* default */ }
+				vscode.commands.executeCommand("ralph-loop.handoff", variant);
+			}, 300);
+		});
+	} catch { /* non-critical */ }
 
 	// Auto-resume incomplete session on activation (no user prompt needed)
 	const folders = vscode.workspace.workspaceFolders;
@@ -660,4 +686,6 @@ export function deactivate(): void {
 	hookBridgeDisposable = undefined;
 	sessionTrackingDisposable?.dispose();
 	sessionTrackingDisposable = undefined;
+	handoffWatcher?.close();
+	handoffWatcher = undefined;
 }
