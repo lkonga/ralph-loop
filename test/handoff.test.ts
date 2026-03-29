@@ -92,11 +92,10 @@ describe('handoff', () => {
 
 			const commands = executedCommands.map(c => c.command);
 			expect(commands).toEqual([
-				'workbench.panel.chat.view.copilot.focus',
 				'workbench.action.chat.newChat',
 				'workbench.action.chat.open',
 			]);
-			expect(executedCommands[2].args[0]).toEqual({ query: buildHandoffPrompt() });
+			expect(executedCommands[1].args[0]).toEqual({ query: buildHandoffPrompt() });
 			expect(logger.log).toHaveBeenCalledWith('Handoff: executed strategy 7');
 		});
 
