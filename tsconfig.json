@@ -4,8 +4,12 @@
 		"target": "ES2022",
 		"outDir": "out",
 		"rootDir": ".",
-		"lib": ["ES2022"],
-		"types": ["node"],
+		"lib": [
+			"ES2022"
+		],
+		"types": [
+			"node"
+		],
 		"sourceMap": true,
 		"strict": true,
 		"esModuleInterop": true,
@@ -14,6 +18,12 @@
 		"resolveJsonModule": true,
 		"declaration": true
 	},
-	"include": ["src/**/*.ts", "cli/**/*.ts"],
-	"exclude": ["node_modules", "out"]
+	"include": [
+		"src/**/*.ts",
+		"cli/**/*.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"out"
+	]
 }
