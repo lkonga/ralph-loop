@@ -70,7 +70,7 @@ describe('handoff', () => {
 
 			await executeHandoff(logger);
 
-			expect(logger.log).toHaveBeenCalledWith('Handoff: reset session and sent transcript prompt');
+			expect(logger.log).toHaveBeenCalledWith('Handoff: executed strategy 1');
 		});
 
 		it('executes commands in correct order: newSession → focus → type → submit', async () => {

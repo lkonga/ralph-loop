@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { watch, mkdirSync, readFileSync, type FSWatcher } from "node:fs";
+import { watch, mkdirSync, readFileSync, unlinkSync, type FSWatcher } from "node:fs";
 import { join } from "node:path";
 import { executeHandoff } from "./handoff";
 import {
@@ -651,12 +651,14 @@ export function activate(context: vscode.ExtensionContext): void {
 			if (file !== "trigger") return;
 			if (debounce) clearTimeout(debounce);
 			debounce = setTimeout(() => {
+				const triggerPath = join(handoffDir, "trigger");
 				let variant: number | undefined;
 				try {
-					const content = readFileSync(join(handoffDir, "trigger"), "utf-8").trim();
+					const content = readFileSync(triggerPath, "utf-8").trim();
 					const n = parseInt(content, 10);
 					if (n >= 1 && n <= 12) variant = n;
 				} catch { /* default */ }
+				try { unlinkSync(triggerPath); } catch { /* already gone */ }
 				vscode.commands.executeCommand("ralph-loop.handoff", variant);
 			}, 300);
 		});
