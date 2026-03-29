@@ -34,9 +34,9 @@ describe('handoff', () => {
 			expect(prompt).toContain('latest-transcript.jsonl');
 		});
 
-		it('instructs to read transcript via tail command', () => {
+		it('instructs to dispatch transcript-summarizer subagent', () => {
 			const prompt = buildHandoffPrompt();
-			expect(prompt).toContain('tail -100');
+			expect(prompt).toContain('transcript-summarizer');
 			expect(prompt).toContain('latest-transcript.jsonl');
 		});
 	});
@@ -85,7 +85,7 @@ describe('handoff', () => {
 			]);
 		});
 
-		it('strategy 7: executes newChat then chat.open with query', async () => {
+		it('strategy 7: executes newChat, toggles modes, then chat.open with query', async () => {
 			vi.spyOn(vscode.workspace.fs, 'stat').mockResolvedValue({ type: 1, ctime: 0, mtime: 0, size: 100 } as any);
 
 			await executeHandoff(logger, 7);
@@ -93,9 +93,13 @@ describe('handoff', () => {
 			const commands = executedCommands.map(c => c.command);
 			expect(commands).toEqual([
 				'workbench.action.chat.newChat',
+				'workbench.action.chat.toggleAgentMode',
+				'workbench.action.chat.toggleAgentMode',
 				'workbench.action.chat.open',
 			]);
-			expect(executedCommands[1].args[0]).toEqual({ query: buildHandoffPrompt() });
+			const openArgs = executedCommands[3].args[0] as Record<string, unknown>;
+			expect(openArgs.query).toBe(buildHandoffPrompt());
+			expect(openArgs.mode).toBe('agent');
 			expect(logger.log).toHaveBeenCalledWith('Handoff: executed strategy 7');
 		});
 
@@ -144,7 +148,7 @@ describe('handoff', () => {
 			expect(commands).toEqual(['workbench.action.chat.newChat', 'workbench.action.chat.open']);
 			const openArgs = executedCommands[1].args[0] as Record<string, unknown>;
 			expect(openArgs.previousRequests).toBeDefined();
-			expect((openArgs.query as string)).toContain('tail -100');
+			expect((openArgs.query as string)).toContain('transcript-summarizer');
 		});
 
 		it('strategy 15: pure context injection without transcript read', async () => {

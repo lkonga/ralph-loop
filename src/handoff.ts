@@ -13,9 +13,32 @@ export async function checkTranscriptExists(transcriptPath: string): Promise<boo
 	return vscode.workspace.fs.stat(vscode.Uri.file(transcriptPath)).then(() => true, () => false);
 }
 
+function extractTopicHint(): string {
+	const absPath = getTranscriptPath();
+	try {
+		const raw = readFileSync(absPath, "utf-8");
+		const lines = raw.split("\n").filter(Boolean);
+		const hints: string[] = [];
+		for (const line of lines) {
+			if (hints.length >= 3) break;
+			try {
+				const obj = JSON.parse(line);
+				if (obj.type === "user.message" && obj.data?.content) {
+					hints.push(String(obj.data.content).slice(0, 120));
+				}
+			} catch { /* skip */ }
+		}
+		return hints.length > 0 ? hints.join(" | ") : "";
+	} catch {
+		return "";
+	}
+}
+
 export function buildHandoffPrompt(): string {
 	const absPath = getTranscriptPath();
-	return `Session handoff. Dispatch the transcript-summarizer subagent with this prompt: "Analyze the full transcript at ${absPath} and return a PD index." Use the returned index to understand context and continue where we left off.`;
+	const topic = extractTopicHint();
+	const topicLine = topic ? `\nPrevious topics: ${topic}` : "";
+	return `Session handoff.${topicLine}\nDispatch the transcript-summarizer subagent with this prompt: "Analyze the full transcript at ${absPath} and return a PD index." Use the returned index to understand context and continue where we left off.`;
 }
 
 export function buildTranscriptSummary(): string {
