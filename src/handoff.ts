@@ -53,7 +53,10 @@ const strategies: Record<number, Strategy> = {
 		await vscode.commands.executeCommand("workbench.action.chat.submit");
 	},
 	7: async (prompt) => {
+		await vscode.commands.executeCommand("workbench.panel.chat.view.copilot.focus");
+		await delay(100);
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
+		await delay(100);
 		await vscode.commands.executeCommand("workbench.action.chat.open", { query: prompt });
 	},
 	8: async (prompt) => {
