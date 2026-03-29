@@ -5,6 +5,7 @@
 		"outDir": "out",
 		"rootDir": ".",
 		"lib": ["ES2022"],
+		"types": ["node"],
 		"sourceMap": true,
 		"strict": true,
 		"esModuleInterop": true,
