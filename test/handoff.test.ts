@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as vscode from 'vscode';
-import { executeHandoff, buildHandoffPrompt, getTranscriptPath, buildTranscriptSummary } from '../src/handoff';
+import { executeHandoff, buildHandoffPrompt, getTranscriptPath, buildTranscriptTail } from '../src/handoff';
 import type { ILogger } from '../src/types';
 
 describe('handoff', () => {
@@ -34,9 +34,9 @@ describe('handoff', () => {
 			expect(prompt).toContain('latest-transcript.jsonl');
 		});
 
-		it('instructs to dispatch transcript-summarizer subagent', () => {
+		it('includes context continuation instruction', () => {
 			const prompt = buildHandoffPrompt();
-			expect(prompt).toContain('transcript-summarizer');
+			expect(prompt).toContain('Resuming');
 			expect(prompt).toContain('latest-transcript.jsonl');
 		});
 	});
@@ -148,7 +148,7 @@ describe('handoff', () => {
 			expect(commands).toEqual(['workbench.action.chat.newChat', 'workbench.action.chat.open']);
 			const openArgs = executedCommands[1].args[0] as Record<string, unknown>;
 			expect(openArgs.previousRequests).toBeDefined();
-			expect((openArgs.query as string)).toContain('transcript-summarizer');
+			expect((openArgs.query as string)).toContain('Resuming');
 		});
 
 		it('strategy 15: pure context injection without transcript read', async () => {

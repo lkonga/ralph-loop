@@ -638,6 +638,18 @@ export function activate(context: vscode.ExtensionContext): void {
 
 vscode.commands.registerCommand("ralph-loop.handoff", (opts?: import("./handoff").HandoffOptions | number) => executeHandoff(logger, opts)),
 
+vscode.commands.registerCommand("ralph-loop.testPreviousRequests", async () => {
+	await vscode.commands.executeCommand("workbench.action.chat.newChat");
+	await vscode.commands.executeCommand("workbench.action.chat.open", {
+		query: "What context do you see from the previous conversation above? List it.",
+		mode: "agent",
+		previousRequests: [
+			{ request: "What were we working on?", response: "We were investigating how to disable the Delete key in VS Code chat pane. Key findings:\n1. deleteAgentSession exists with confirmation modal\n2. chatSessionsProvider has archive events but not wired\n3. No 'archived' field in Claude session schema\n\nNext step: find the exact keybinding handler for Delete in the chat sessions list." },
+		],
+	});
+	logger.log("Test: previousRequests sent");
+}),
+
 		outputChannel,
 	);
 

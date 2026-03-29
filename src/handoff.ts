@@ -45,7 +45,7 @@ export function buildHandoffPrompt(): string {
 Dispatch the transcript-summarizer subagent with this prompt: "Analyze the full transcript at ${absPath} and return a PD index." Use the returned index to understand context and continue where we left off.`;
 }
 
-export function buildTranscriptSummary(): string {
+export function buildTranscriptTail(): string {
 	const absPath = getTranscriptPath();
 	try {
 		const raw = readFileSync(absPath, "utf-8");
@@ -168,21 +168,21 @@ function buildChatOpenOptions(prompt: string, opts: HandoffOptions, summary?: st
 const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) => Promise<void>> = {
 	// Strategy 13: previousRequests summary injection + modelSelector (no transcript reading needed)
 	13: async (prompt, opts) => {
-		const summary = buildTranscriptSummary();
+		const summary = buildTranscriptTail();
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions("Continue from where we left off. What was I working on?", opts, summary));
 	},
 	// Strategy 14: same as 13 but keeps the original prompt (transcript read instruction as fallback)
 	14: async (prompt, opts) => {
-		const summary = buildTranscriptSummary();
+		const summary = buildTranscriptTail();
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions(prompt, opts, summary));
 	},
 	// Strategy 15: previousRequests only, no query prompt — pure context injection
 	15: async (_prompt, opts) => {
-		const summary = buildTranscriptSummary();
+		const summary = buildTranscriptTail();
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions("I just rotated the session for performance. The previous conversation context is already loaded above. Pick up where we left off.", opts, summary));
