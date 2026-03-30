@@ -124,13 +124,6 @@ const strategies: Record<number, Strategy> = {
 		await vscode.commands.executeCommand("type", { text: prompt });
 		await vscode.commands.executeCommand("workbench.action.chat.submit");
 	},
-	7: async (prompt) => {
-		await vscode.commands.executeCommand("workbench.action.chat.newChat");
-		// Toggle mode twice to force-reset to default Copilot agent (clears custom agent selection)
-		await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "ask" });
-		await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "agent" });
-		await vscode.commands.executeCommand("workbench.action.chat.open", { query: prompt, mode: "agent" });
-	},
 	8: async (prompt) => {
 		await vscode.commands.executeCommand("workbench.action.chat.newEditSession");
 		await delay(2000);
@@ -175,6 +168,16 @@ function buildChatOpenOptions(prompt: string, opts: HandoffOptions, summary?: st
 }
 
 const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) => Promise<void>> = {
+	7: async (prompt, opts) => {
+		await vscode.commands.executeCommand("workbench.action.chat.newChat");
+		await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "ask" });
+		await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "agent" });
+		const openOpts: Record<string, unknown> = { query: prompt, mode: "agent" };
+		if (opts.model) {
+			openOpts.modelSelector = { id: opts.model };
+		}
+		await vscode.commands.executeCommand("workbench.action.chat.open", openOpts);
+	},
 	13: async (prompt, opts) => {
 		const summary = buildTranscriptTail(opts.sessionId);
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
