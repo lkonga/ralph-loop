@@ -154,11 +154,8 @@ const strategies: Record<number, Strategy> = {
 	},
 };
 
-function buildChatOpenOptions(prompt: string, opts: HandoffOptions, summary?: string): Record<string, unknown> {
+function buildChatOpenOptions(prompt: string, _opts: HandoffOptions, summary?: string): Record<string, unknown> {
 	const options: Record<string, unknown> = { query: prompt, mode: "agent" };
-	if (opts.model) {
-		options.modelSelector = { id: opts.model };
-	}
 	if (summary) {
 		options.previousRequests = [
 			{ request: "Session context from previous conversation", response: summary },
@@ -167,32 +164,42 @@ function buildChatOpenOptions(prompt: string, opts: HandoffOptions, summary?: st
 	return options;
 }
 
+async function applyModelIfNeeded(opts: HandoffOptions): Promise<void> {
+	if (!opts.model) return;
+	const models = await vscode.lm.selectChatModels({ id: opts.model, vendor: "copilot" });
+	const model = models[0];
+	if (model) {
+		await vscode.commands.executeCommand("workbench.action.chat.changeModel",
+			{ id: model.id, vendor: model.vendor, family: model.family });
+	}
+}
+
 const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) => Promise<void>> = {
 	7: async (prompt, opts) => {
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
 		await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "ask" });
 		await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "agent" });
-		const openOpts: Record<string, unknown> = { query: prompt, mode: "agent" };
-		if (opts.model) {
-			openOpts.modelSelector = { id: opts.model };
-		}
-		await vscode.commands.executeCommand("workbench.action.chat.open", openOpts);
+		await applyModelIfNeeded(opts);
+		await vscode.commands.executeCommand("workbench.action.chat.open", { query: prompt, mode: "agent" });
 	},
 	13: async (prompt, opts) => {
 		const summary = buildTranscriptTail(opts.sessionId);
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
+		await applyModelIfNeeded(opts);
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions("Continue from where we left off. What was I working on?", opts, summary));
 	},
 	14: async (prompt, opts) => {
 		const summary = buildTranscriptTail(opts.sessionId);
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
+		await applyModelIfNeeded(opts);
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions(prompt, opts, summary));
 	},
 	15: async (_prompt, opts) => {
 		const summary = buildTranscriptTail(opts.sessionId);
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
+		await applyModelIfNeeded(opts);
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions("I just rotated the session for performance. The previous conversation context is already loaded above. Pick up where we left off.", opts, summary));
 	},
@@ -210,11 +217,18 @@ export async function executeHandoff(logger: ILogger, opts?: HandoffOptions | nu
 	const prompt = buildHandoffPrompt(sid);
 	const v = options.variant ?? 1;
 
-	if (advancedStrategies[v]) {
-		await advancedStrategies[v](prompt, options);
-	} else {
-		const strategy = strategies[v] ?? strategies[1];
-		await strategy(prompt);
+	try {
+		if (advancedStrategies[v]) {
+			await advancedStrategies[v](prompt, options);
+		} else {
+			const strategy = strategies[v] ?? strategies[1];
+			await strategy(prompt);
+		}
+	} catch (err) {
+		const msg = err instanceof Error ? err.message : String(err);
+		logger.error(`Handoff: strategy ${v} threw: ${msg}`);
+		vscode.window.showErrorMessage(`Handoff strategy ${v} failed: ${msg}`);
+		return false;
 	}
 
 	logger.log(`Handoff: executed strategy ${v}${sid ? ` (session: ${sid})` : ""}${options.model ? ` (model: ${options.model})` : ""}`);

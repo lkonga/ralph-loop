@@ -31,6 +31,7 @@ let outputChannel: vscode.LogOutputChannel;
 let hookBridgeDisposable: HookBridgeDisposable | undefined;
 let sessionTrackingDisposable: vscode.Disposable | undefined;
 let handoffServer: Server | undefined;
+let handoffSockPath: string | undefined;
 
 /**
  * Shared finalizer: runs orchestrator.start() and guarantees idle cleanup
@@ -655,9 +656,15 @@ vscode.commands.registerCommand("ralph-loop.testPreviousRequests", async () => {
 
 	logger.log("Ralph Loop extension activated");
 
-	// Unix socket server for handoff triggers (replaces flaky fs.watch)
+	// Unix socket server for handoff triggers — scoped per workspace to avoid cross-window bleeding
 	const handoffDir = join(process.env.HOME ?? "", ".local/share/chat-handoffs");
-	const sockPath = join(handoffDir, "handoff.sock");
+	let workspaceId = "default";
+	if (context.storageUri) {
+		const m = context.storageUri.fsPath.match(/workspaceStorage\/([a-f0-9]+)/);
+		if (m) workspaceId = m[1];
+	}
+	const sockPath = join(handoffDir, `handoff-${workspaceId}.sock`);
+	handoffSockPath = sockPath;
 	try {
 		mkdirSync(handoffDir, { recursive: true });
 		try { unlinkSync(sockPath); } catch { /* stale socket */ }
@@ -680,7 +687,9 @@ vscode.commands.registerCommand("ralph-loop.testPreviousRequests", async () => {
 					}
 				}
 				logger.log(`Handoff: received variant ${variant ?? "(default)"}${model ? ` model=${model}` : ""}${sessionId ? ` session=${sessionId}` : ""} via socket`);
-				vscode.commands.executeCommand("ralph-loop.handoff", { variant, model, sessionId });
+				Promise.resolve(vscode.commands.executeCommand("ralph-loop.handoff", { variant, model, sessionId }))
+					.then(() => logger.log("Handoff: command completed"))
+					.catch((err: unknown) => logger.error(`Handoff: command failed: ${err instanceof Error ? err.message : String(err)}`));
 			});
 		});
 		handoffServer.listen(sockPath, () => {
@@ -717,5 +726,8 @@ export function deactivate(): void {
 	sessionTrackingDisposable = undefined;
 	handoffServer?.close();
 	handoffServer = undefined;
-	try { unlinkSync(join(process.env.HOME ?? "", ".local/share/chat-handoffs/handoff.sock")); } catch { /* already gone */ }
+	if (handoffSockPath) {
+		try { unlinkSync(handoffSockPath); } catch { /* already gone */ }
+		handoffSockPath = undefined;
+	}
 }
