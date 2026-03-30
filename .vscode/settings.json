@@ -8,4 +8,7 @@
         "**/.git/objects/**": true,
         "**/.git/subtree-cache/**": true
     }
+,
+  "chat.includeApplyingInstructions": false,
+  "chat.includeReferencedInstructions": false
 }
