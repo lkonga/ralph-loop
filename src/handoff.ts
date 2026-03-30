@@ -1,20 +1,28 @@
 import * as vscode from 'vscode';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync, unlinkSync } from 'node:fs';
 import type { ILogger } from './types';
 
 const HANDOFF_DIR = '.local/share/chat-handoffs';
 const TRANSCRIPT_NAME = 'latest-transcript.jsonl';
 
-export function getTranscriptPath(): string {
-	return `${process.env.HOME}/${HANDOFF_DIR}/${TRANSCRIPT_NAME}`;
+function handoffDir(): string {
+	return `${process.env.HOME}/${HANDOFF_DIR}`;
+}
+
+export function getTranscriptPath(sessionId?: string): string {
+	if (sessionId) {
+		const sessionPath = `${handoffDir()}/transcript-${sessionId}.jsonl`;
+		if (existsSync(sessionPath)) return sessionPath;
+	}
+	return `${handoffDir()}/${TRANSCRIPT_NAME}`;
 }
 
 export async function checkTranscriptExists(transcriptPath: string): Promise<boolean> {
 	return vscode.workspace.fs.stat(vscode.Uri.file(transcriptPath)).then(() => true, () => false);
 }
 
-function extractTopicHint(): string {
-	const absPath = getTranscriptPath();
+function extractTopicHint(sessionId?: string): string {
+	const absPath = getTranscriptPath(sessionId);
 	try {
 		const raw = readFileSync(absPath, "utf-8");
 		const lines = raw.split("\n").filter(Boolean);
@@ -34,9 +42,9 @@ function extractTopicHint(): string {
 	}
 }
 
-export function buildHandoffPrompt(): string {
-	const absPath = getTranscriptPath();
-	const topic = extractTopicHint();
+export function buildHandoffPrompt(sessionId?: string): string {
+	const absPath = getTranscriptPath(sessionId);
+	const topic = extractTopicHint(sessionId);
 	const intro = topic
 		? `Resuming work on: ${topic}`
 		: `Resuming previous session`;
@@ -45,8 +53,8 @@ export function buildHandoffPrompt(): string {
 Dispatch the transcript-summarizer subagent with this prompt: "Analyze the full transcript at ${absPath} and return a PD index." Use the returned index to understand context and continue where we left off.`;
 }
 
-export function buildTranscriptTail(): string {
-	const absPath = getTranscriptPath();
+export function buildTranscriptTail(sessionId?: string): string {
+	const absPath = getTranscriptPath(sessionId);
 	try {
 		const raw = readFileSync(absPath, "utf-8");
 		const lines = raw.split("\n").filter(Boolean);
@@ -77,6 +85,7 @@ export function buildTranscriptTail(): string {
 export interface HandoffOptions {
 	variant?: number;
 	model?: string;
+	sessionId?: string;
 }
 
 const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
@@ -166,23 +175,20 @@ function buildChatOpenOptions(prompt: string, opts: HandoffOptions, summary?: st
 }
 
 const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) => Promise<void>> = {
-	// Strategy 13: previousRequests summary injection + modelSelector (no transcript reading needed)
 	13: async (prompt, opts) => {
-		const summary = buildTranscriptTail();
+		const summary = buildTranscriptTail(opts.sessionId);
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions("Continue from where we left off. What was I working on?", opts, summary));
 	},
-	// Strategy 14: same as 13 but keeps the original prompt (transcript read instruction as fallback)
 	14: async (prompt, opts) => {
-		const summary = buildTranscriptTail();
+		const summary = buildTranscriptTail(opts.sessionId);
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions(prompt, opts, summary));
 	},
-	// Strategy 15: previousRequests only, no query prompt — pure context injection
 	15: async (_prompt, opts) => {
-		const summary = buildTranscriptTail();
+		const summary = buildTranscriptTail(opts.sessionId);
 		await vscode.commands.executeCommand("workbench.action.chat.newChat");
 		await vscode.commands.executeCommand("workbench.action.chat.open",
 			buildChatOpenOptions("I just rotated the session for performance. The previous conversation context is already loaded above. Pick up where we left off.", opts, summary));
@@ -191,13 +197,14 @@ const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) 
 
 export async function executeHandoff(logger: ILogger, opts?: HandoffOptions | number): Promise<boolean> {
 	const options: HandoffOptions = typeof opts === "number" ? { variant: opts } : (opts ?? {});
-	const transcriptPath = getTranscriptPath();
+	const sid = options.sessionId;
+	const transcriptPath = getTranscriptPath(sid);
 	const exists = await checkTranscriptExists(transcriptPath);
 	if (!exists) {
 		vscode.window.showWarningMessage("No handoff transcript found. Run /handoff first.");
 		return false;
 	}
-	const prompt = buildHandoffPrompt();
+	const prompt = buildHandoffPrompt(sid);
 	const v = options.variant ?? 1;
 
 	if (advancedStrategies[v]) {
@@ -206,6 +213,13 @@ export async function executeHandoff(logger: ILogger, opts?: HandoffOptions | nu
 		const strategy = strategies[v] ?? strategies[1];
 		await strategy(prompt);
 	}
-	logger.log(`Handoff: executed strategy ${v}${options.model ? ` (model: ${options.model})` : ""}`);
+
+	// Clean up session-specific transcript after consumption
+	if (sid) {
+		const sessionFile = `${handoffDir()}/transcript-${sid}.jsonl`;
+		try { unlinkSync(sessionFile); } catch { /* already gone */ }
+	}
+
+	logger.log(`Handoff: executed strategy ${v}${sid ? ` (session: ${sid})` : ""}${options.model ? ` (model: ${options.model})` : ""}`);
 	return true;
 }

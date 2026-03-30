@@ -666,18 +666,21 @@ vscode.commands.registerCommand("ralph-loop.testPreviousRequests", async () => {
 			conn.on("data", (chunk: Buffer) => { data += chunk; });
 			conn.on("end", () => {
 				const trimmed = data.trim();
-				// Protocol: "7" (simple) or "13|model:claude-sonnet-4" (extended)
+				// Protocol: "7" (simple) or "7|model:claude-sonnet-4|session:abc123" (extended)
 				const parts = trimmed.split("|");
 				const n = parseInt(parts[0], 10);
 				const variant = (n >= 1 && n <= 15) ? n : undefined;
 				let model: string | undefined;
+				let sessionId: string | undefined;
 				for (const part of parts.slice(1)) {
 					if (part.startsWith("model:")) {
 						model = part.slice(6);
+					} else if (part.startsWith("session:")) {
+						sessionId = part.slice(8);
 					}
 				}
-				logger.log(`Handoff: received variant ${variant ?? "(default)"}${model ? ` model=${model}` : ""} via socket`);
-				vscode.commands.executeCommand("ralph-loop.handoff", { variant, model });
+				logger.log(`Handoff: received variant ${variant ?? "(default)"}${model ? ` model=${model}` : ""}${sessionId ? ` session=${sessionId}` : ""} via socket`);
+				vscode.commands.executeCommand("ralph-loop.handoff", { variant, model, sessionId });
 			});
 		});
 		handoffServer.listen(sockPath, () => {
