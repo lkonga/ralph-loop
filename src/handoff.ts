@@ -214,12 +214,6 @@ export async function executeHandoff(logger: ILogger, opts?: HandoffOptions | nu
 		await strategy(prompt);
 	}
 
-	// Clean up session-specific transcript after consumption
-	if (sid) {
-		const sessionFile = `${handoffDir()}/transcript-${sid}.jsonl`;
-		try { unlinkSync(sessionFile); } catch { /* already gone */ }
-	}
-
 	logger.log(`Handoff: executed strategy ${v}${sid ? ` (session: ${sid})` : ""}${options.model ? ` (model: ${options.model})` : ""}`);
 	return true;
 }
