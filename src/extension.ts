@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { mkdirSync, unlinkSync } from "node:fs";
+import { mkdirSync, unlinkSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createServer, type Server } from "node:net";
 import { executeHandoff } from "./handoff";
@@ -656,17 +656,33 @@ vscode.commands.registerCommand("ralph-loop.testPreviousRequests", async () => {
 
 	logger.log("Ralph Loop extension activated");
 
-	// Unix socket server for handoff triggers — scoped per workspace to avoid cross-window bleeding
+	// Unix socket server for handoff triggers — scoped per workspace AND per PID
+	// to avoid cross-window bleeding when the same workspace is open in multiple windows/profiles
 	const handoffDir = join(process.env.HOME ?? "", ".local/share/chat-handoffs");
 	let workspaceId = "default";
 	if (context.storageUri) {
 		const m = context.storageUri.fsPath.match(/workspaceStorage\/([a-f0-9]+)/);
 		if (m) workspaceId = m[1];
 	}
-	const sockPath = join(handoffDir, `handoff-${workspaceId}.sock`);
+	const sockPath = join(handoffDir, `handoff-${workspaceId}-${process.pid}.sock`);
 	handoffSockPath = sockPath;
 	try {
 		mkdirSync(handoffDir, { recursive: true });
+		// Clean up stale sockets for this workspace (dead PIDs)
+		try {
+			const prefix = `handoff-${workspaceId}-`;
+			for (const f of readdirSync(handoffDir)) {
+				if (f.startsWith(prefix) && f.endsWith(".sock")) {
+					const pidStr = f.slice(prefix.length, -5);
+					const pid = parseInt(pidStr, 10);
+					if (!isNaN(pid) && pid !== process.pid) {
+						try { readFileSync(`/proc/${pid}/stat`); } catch {
+							try { unlinkSync(join(handoffDir, f)); } catch { /* ignore */ }
+						}
+					}
+				}
+			}
+		} catch { /* non-critical cleanup */ }
 		try { unlinkSync(sockPath); } catch { /* stale socket */ }
 		handoffServer = createServer((conn: import("node:net").Socket) => {
 			let data = "";
