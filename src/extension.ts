@@ -139,8 +139,17 @@ export function activate(context: vscode.ExtensionContext): void {
 	});
 	const logger = createOutputLogger(outputChannel);
 
-	// Always-active watcher for chatSend signal files (used by wave hooks, etc.)
-	context.subscriptions.push(startChatSendWatcher(logger));
+	// Register onStateChange command (fire-and-forget notification)
+	context.subscriptions.push(
+		vscode.commands.registerCommand("ralph-loop.onStateChange", async ({ state, taskId }) => {
+			// This is a placeholder; the actual logic is in fireStateChangeNotification
+			// and consumed by other extensions. The registration here ensures the command
+			// is globally visible for executeCommand calls.
+		}),
+		vscode.commands.registerCommand("ralph-loop.getStateSnapshot", async () => {
+			return orchestrator?.getStateSnapshot();
+		})
+	);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand("ralph-loop.start", async () => {
@@ -251,17 +260,22 @@ export function activate(context: vscode.ExtensionContext): void {
 							logger.log(
 								`👉 Nudge #${event.nudgeCount}: ${event.task.description}`,
 							);
+							fireStateChangeNotification(LoopState.Running, event.task.taskId);
+							updateStatusBar(orchestrator!.getStateSnapshot());
 							break;
 						case LoopEventKind.TaskRetried:
 							logger.warn(
 								`🔄 Retry #${event.retryCount}: ${event.task.description}`,
 							);
+							fireStateChangeNotification(LoopState.Running, event.task.taskId);
+							updateStatusBar(orchestrator!.getStateSnapshot());
 							break;
 						case LoopEventKind.Countdown:
 							vscode.window.setStatusBarMessage(
 								`$(clock) Ralph: Next task in ${event.secondsLeft}s`,
 								1100,
 							);
+							fireStateChangeNotification(LoopState.Paused, "");
 							updateStatusBar(orchestrator!.getStateSnapshot());
 							break;
 						case LoopEventKind.AllDone:
