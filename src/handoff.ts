@@ -176,38 +176,36 @@ async function applyModelIfNeeded(opts: HandoffOptions): Promise<void> {
 
 const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) => Promise<void>> = {
 	7: async (prompt, opts) => {
-		// Fallback ladder: try harder commands first, fall back to simpler ones.
-		// In sidebar-only mode (no detached window), newEditSession is the right command.
+		// Fallback ladder: prefer newChat (sidebar), fall back to newEditSession (inline).
+		// newEditSession opens Ctrl+I inline mode which is wrong for sidebar usage.
 		await new Promise(r => setTimeout(r, 2500)); // brief pause for "Done" to flush
 
 		try {
-			// Attempt 1: newEditSession + toggleAgentMode + openEditSession (sidebar-friendly)
-			await vscode.commands.executeCommand("workbench.action.chat.newEditSession");
-			await delay(500);
-			await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "agent" });
-			await delay(300);
-			await applyModelIfNeeded(opts);
-			// ⚠️ CRITICAL: openEditSession takes a plain string, NOT { query: prompt }
-			await vscode.commands.executeCommand("workbench.action.chat.openEditSession", prompt);
-			return;
-		} catch { /* fall through */ }
-
-		try {
-			// Attempt 2: newEditSession + openEditSession (simpler, no mode toggle)
-			await vscode.commands.executeCommand("workbench.action.chat.newEditSession");
-			await delay(500);
-			await applyModelIfNeeded(opts);
-			await vscode.commands.executeCommand("workbench.action.chat.openEditSession", prompt);
-			return;
-		} catch { /* fall through */ }
-
-		try {
-			// Attempt 3: newChat + open + clipboard as last resort
+			// Attempt 1: newChat + toggleAgentMode + open with mode=agent (sidebar-friendly)
 			await vscode.commands.executeCommand("workbench.action.chat.newChat");
-			await delay(800);
+			await delay(500);
+			await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "ask" });
 			await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "agent" });
 			await applyModelIfNeeded(opts);
-			await vscode.commands.executeCommand("workbench.action.chat.open", prompt);
+			await vscode.commands.executeCommand("workbench.action.chat.open", { query: prompt, mode: "agent" });
+			return;
+		} catch { /* fall through */ }
+
+		try {
+			// Attempt 2: newChat + open (simpler, no toggle)
+			await vscode.commands.executeCommand("workbench.action.chat.newChat");
+			await delay(500);
+			await applyModelIfNeeded(opts);
+			await vscode.commands.executeCommand("workbench.action.chat.open", { query: prompt, mode: "agent" });
+			return;
+		} catch { /* fall through */ }
+
+		try {
+			// Attempt 3: newEditSession as last resort (inline chat)
+			await vscode.commands.executeCommand("workbench.action.chat.newEditSession");
+			await delay(500);
+			await applyModelIfNeeded(opts);
+			await vscode.commands.executeCommand("workbench.action.chat.openEditSession", prompt);
 		} catch { /* exhausted all options */ }
 
 		// All 3 attempts failed — show user-visible error
