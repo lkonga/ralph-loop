@@ -209,6 +209,13 @@ const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) 
 			await applyModelIfNeeded(opts);
 			await vscode.commands.executeCommand("workbench.action.chat.open", prompt);
 		} catch { /* exhausted all options */ }
+
+		// All 3 attempts failed — show user-visible error
+		vscode.window.showErrorMessage(
+			`Handoff strategy 7 exhausted all 3 fallback attempts. ` +
+			`This can happen in forked/subagent sessions that lack a transcript. ` +
+			`The handoff payload was delivered but no chat session was opened.`
+		);
 	},
 	13: async (prompt, opts) => {
 		const summary = buildTranscriptTail(opts.sessionId);
