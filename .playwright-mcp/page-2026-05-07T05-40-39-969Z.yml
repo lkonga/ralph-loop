@@ -1,0 +1,52 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - progressbar [ref=e6]
+      - main [ref=e84]:
+        - generic [ref=e85]:
+          - img [ref=e88]
+          - generic [ref=e93]:
+            - heading "Welcome" [level=1] [ref=e94]
+            - link "lemeshchenkoyuliia@gmail.com selected. Switch account" [ref=e96] [cursor=pointer]:
+              - img [ref=e99]
+              - generic [ref=e101]: lemeshchenkoyuliia@gmail.com
+              - img [ref=e103]
+        - generic [ref=e109]:
+          - generic [ref=e116]:
+            - heading [level=2] [ref=e118]:
+              - img [ref=e120]
+            - generic [ref=e124]: Select "Try another way" to use your passkey for an easier, more secure sign-in
+          - generic [ref=e128]:
+            - generic [ref=e136]:
+              - textbox "Enter your password" [active] [ref=e137]
+              - generic: Enter your password
+            - generic [ref=e144]:
+              - generic [ref=e147] [cursor=pointer]:
+                - checkbox "Show password" [ref=e148]
+                - generic:
+                  - img
+              - generic [ref=e151] [cursor=pointer]: Show password
+        - generic [ref=e153]:
+          - button "Next" [ref=e157]:
+            - generic [ref=e160]: Next
+          - button "Try another way" [ref=e164]:
+            - generic [ref=e167]: Try another way
+    - contentinfo [ref=e69]:
+      - combobox "Change language English (United States)" [ref=e73] [cursor=pointer]:
+        - generic:
+          - generic: English (United States)
+        - generic:
+          - img
+      - list [ref=e75]:
+        - listitem [ref=e76]:
+          - link "Help" [ref=e77] [cursor=pointer]:
+            - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+        - listitem [ref=e78]:
+          - link "Privacy" [ref=e79] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=IN&hl=en-US&privacy=true
+        - listitem [ref=e80]:
+          - link "Terms" [ref=e81] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=IN&hl=en-US
+  - iframe [ref=e82]:
+    
+  - generic [ref=e170]: Welcome

@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { parsePrd } from '../src/prd';
-import { verifyTaskCompletion, allChecksPassed, isAllDone, progressSummary, VerifierRegistry, createBuiltinRegistry, runVerifierChain, resolveVerifiers, computeConfidenceScore, dualExitGateCheck, formatVerificationFeedback } from '../src/verify';
-import { Task, TaskStatus, VerifyResult, VerifierConfig, RalphConfig, DEFAULT_CONFIG, DiffValidationResult } from '../src/types';
+import { DEFAULT_CONFIG, DiffValidationResult, RalphConfig, Task, TaskStatus, VerifierConfig, VerifyResult } from '../src/types';
+import { allChecksPassed, computeConfidenceScore, createBuiltinRegistry, dualExitGateCheck, formatVerificationFeedback, isAllDone, progressSummary, resolveVerifiers, runVerifierChain, VerifierRegistry, verifyTaskCompletion } from '../src/verify';
 
 function tmpPrd(content: string): string {
 	const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ralph-test-'));

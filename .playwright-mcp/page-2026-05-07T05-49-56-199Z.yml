@@ -1,0 +1,189 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - link "Contact us" [ref=e12] [cursor=pointer]:
+            - /url: https://www.namecheap.com/support/
+          - generic [ref=e13]:
+            - link " lemeshchenkoyuliia " [ref=e14] [cursor=pointer]:
+              - /url: https://ap.www.namecheap.com/dashboard
+              - generic [ref=e15]: 
+              - generic [ref=e16]: lemeshchenkoyuliia
+              - generic [ref=e17]: 
+            - text: 
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - link "Your Cart" [ref=e20] [cursor=pointer]:
+              - /url: https://www.namecheap.com/shoppingcart/
+              - generic [ref=e21]: 
+            - text: 
+          - generic [ref=e23]:
+            - generic [ref=e24] [cursor=pointer]:
+              - text: Rs
+              - generic [ref=e25]: INR
+            - text: 
+          - button "Search" [ref=e26] [cursor=pointer]:
+            - generic [ref=e27]: 
+      - generic [ref=e29]:
+        - generic [ref=e31]:
+          - strong [ref=e33]:
+            - link "Namecheap" [ref=e34] [cursor=pointer]:
+              - /url: https://www.namecheap.com/
+              - img "Namecheap" [ref=e35]
+          - text: 
+        - navigation [ref=e36]:
+          - generic:
+            - generic: 
+  - generic [ref=e42]:
+    - generic [ref=e43]:
+      - generic [ref=e344]:
+        - generic [ref=e345] [cursor=pointer]: Close
+        - paragraph [ref=e347]:
+          - text: Oops! Looks like the bharatcloud.in is taken by someone else and removed from the cart. Please find another domain or
+          - link "Confirm Order" [ref=e348] [cursor=pointer]:
+            - /url: /cart/checkout/default.aspx
+          - text: to proceed with your purchase.
+      - generic [ref=e144]:
+        - generic [ref=e349]:
+          - generic [ref=e350]:
+            - img "empty cart" [ref=e351]
+            - generic [ref=e352]:
+              - heading "Your shopping cart is currently empty." [level=3] [ref=e353]
+              - paragraph [ref=e354]: Time to go shopping for low-priced domains and services at Namecheap!
+          - generic [ref=e355]:
+            - searchbox "Go big with your next domain" [ref=e356]
+            - button "Beast Mode" [ref=e357] [cursor=pointer]
+            - button "Search" [ref=e358] [cursor=pointer]
+        - generic [ref=e145]:
+          - heading "Improve Your Site" [level=3] [ref=e146]
+          - button "+" [ref=e147] [cursor=pointer]
+          - generic [ref=e241]:
+            - generic [ref=e243]:
+              - figure [ref=e244]:
+                - img "Web Hosting" [ref=e245]
+              - paragraph [ref=e246]:
+                - strong [ref=e247]: Web Hosting
+                - emphasis [ref=e248]: Website Builder included
+              - paragraph [ref=e249]:
+                - text: Host your website. Enjoy unmetered bandwidth with free Website Builder, cPanel, and WordPress.
+                - link "Learn more" [ref=e250] [cursor=pointer]:
+                  - /url: https://www.namecheap.com/hosting/shared/
+              - button "Free trial" [ref=e252] [cursor=pointer]
+              - generic [ref=e253]: Renews at ₹534.76/mo
+            - generic [ref=e255]:
+              - figure [ref=e256]:
+                - img "Business Email" [ref=e257]
+              - paragraph [ref=e258]:
+                - strong [ref=e259]: Business Email
+                - emphasis [ref=e260]: Custom email@your-domain
+              - paragraph [ref=e261]:
+                - text: Get a fast, secure and reliable email system designed for all your personal and business needs. Free for the first month.
+                - link "Learn more" [ref=e262] [cursor=pointer]:
+                  - /url: https://www.namecheap.com/hosting/email/
+              - button "Free trial" [ref=e264] [cursor=pointer]
+              - generic [ref=e265]: Renews at ₹3,808.80/yr
+            - generic [ref=e267]:
+              - figure [ref=e268]:
+                - img "WordPress Hosting" [ref=e269]
+              - paragraph [ref=e270]:
+                - strong [ref=e271]: WordPress Hosting
+                - emphasis [ref=e272]: Managed WordPress Hosting
+              - paragraph [ref=e273]: Launch and host WordPress in less than 30 seconds with EasyWP. Fastest WordPress hosting, free SSL, easy backups, highly secure with easy to use dashboard.
+              - button "Free Trial" [ref=e275] [cursor=pointer]
+              - generic [ref=e276]: Renews at ₹898.54/mo
+            - generic [ref=e278]:
+              - figure [ref=e279]:
+                - img "Rank Higher in Search" [ref=e280]
+              - paragraph [ref=e281]:
+                - strong [ref=e282]: Rank Higher in Search
+                - emphasis [ref=e283]: Customized SEO tasks with step-by-step guides
+              - paragraph [ref=e284]: Get found online, without the complexity. SEO for small businesses has never been easier, with a Dashboard list of tasks and step-by-step guides. Plus competitor tracking.
+              - button "Free trial" [ref=e286] [cursor=pointer]
+            - generic [ref=e288]:
+              - figure [ref=e289]:
+                - img "SSL" [ref=e290]
+              - paragraph [ref=e291]:
+                - strong [ref=e292]: SSL
+                - emphasis [ref=e293]: Site security made simple
+              - paragraph [ref=e294]:
+                - text: Secure your new domain with an SSL certificate, covers 1 domain and is issued in 15 minutes. Learn how HTTPS can give you a
+                - link "SEO boost" [ref=e295] [cursor=pointer]:
+                  - /url: https://www.namecheap.com/blog/https-secure-your-site-and-boost-your-seo/
+                - text: .
+              - button "₹544.76/yr" [ref=e297] [cursor=pointer]
+              - generic [ref=e298]: Renews at ₹1,200.48/yr
+            - generic [ref=e300]:
+              - figure [ref=e301]:
+                - img "Premium DNS" [ref=e302]
+              - paragraph [ref=e303]:
+                - strong [ref=e304]: Premium DNS
+                - emphasis [ref=e305]: DNS Speed & Security
+              - paragraph [ref=e306]:
+                - paragraph [ref=e307]:
+                  - text: Boost your DNS performance with our 30+ Anycast servers, get 100% DNS uptime and DDoS protection.
+                  - link "Learn more" [ref=e308] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/premiumdns/
+                  - text: .
+              - button "₹361.96" [ref=e310] [cursor=pointer]
+              - generic [ref=e311]: Renews at ₹907.64
+            - generic [ref=e313]:
+              - figure [ref=e314]:
+                - img "Boost Your Social with AI" [ref=e315]
+              - paragraph [ref=e316]:
+                - strong [ref=e317]: Boost Your Social with AI
+                - emphasis [ref=e318]: Use AI-generated content to grow your reach
+              - paragraph [ref=e319]:
+                - paragraph [ref=e320]: Use AI to create posts in seconds. Auto-publish. Facebook, Instagram, X, LinkedIn, and Google Business Profile — in one simple dashboard. The easy way to grow your business.
+              - button "Free trial" [ref=e322] [cursor=pointer]
+            - generic [ref=e324]:
+              - figure [ref=e325]:
+                - img "Review Manager" [ref=e326]
+              - paragraph [ref=e327]:
+                - strong [ref=e328]: Review Manager
+                - emphasis [ref=e329]: Improve customer ratings with AI power
+              - paragraph [ref=e330]:
+                - paragraph [ref=e331]: Monitor customer feedback, respond fast using templates, get new reviews, and keep improving with AI insights. All in one integrated Dashboard. The easy way to manage your online reputation and build brand trust.
+              - button "Free trial" [ref=e333] [cursor=pointer]
+            - generic [ref=e335]:
+              - figure [ref=e336]:
+                - img "SiteLock Website Protection" [ref=e337]
+              - paragraph [ref=e338]:
+                - strong [ref=e339]: SiteLock Website Protection
+                - emphasis [ref=e340]: Threat monitoring and instant malware fixes.
+              - paragraph [ref=e341]: Protect your website with constant threat monitoring, instant malware removal, vulnerability patching, and a real-time Trust Badge showing your customers they're safe.
+              - button "₹443.81/mo" [ref=e343] [cursor=pointer]
+    - complementary [ref=e189]:
+      - generic [ref=e190]:
+        - generic [ref=e191]: Your Subtotal
+        - generic [ref=e195]:
+          - text: Subtotal
+          - generic [ref=e197]: Rs0.00
+  - generic [ref=e213]:
+    - paragraph [ref=e215]:
+      - generic [ref=e216]: Need help?
+      - text: We're always here for you.
+    - link " Go to Live Chat page" [ref=e218] [cursor=pointer]:
+      - /url: https://www.namecheap.com/help-center/live-chat?loc=/general.aspx
+      - generic [ref=e219]: 
+      - text: Go to Live Chat page
+  - contentinfo [ref=e223]:
+    - generic [ref=e226]:
+      - link "Namecheap" [ref=e228] [cursor=pointer]:
+        - /url: https://www.namecheap.com/
+        - img "Namecheap" [ref=e230]
+      - generic [ref=e231]:
+        - paragraph [ref=e232]: The entirety of this site is protected by copyright © 2000–2026 Namecheap, Inc.
+        - paragraph [ref=e233]: 4600 East Washington Street, Suite 300, Phoenix, AZ 85034, USA
+      - generic [ref=e234]:
+        - link "Terms and Conditions" [ref=e235] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/
+        - link "Privacy Policy" [ref=e236] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/privacy-policy/
+        - link "UDRP" [ref=e237] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/domains/udrp/
+          - generic [ref=e238]: UDRP
+        - link "Domain Registration Data Disclosure Policy" [ref=e239] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/domain-registration-data-disclosure-policy-guide/
+        - link "Cookie Preferences" [ref=e240] [cursor=pointer]:
+          - /url: javascript:void(0);

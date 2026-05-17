@@ -1,8 +1,6 @@
 {
+    "biome.enabled": true,
     "typescript.tsserver.enable": false,
-    "workbench.colorCustomizations": {
-        "editorCursor.foreground": "#e9dbb7"
-    },
     "files.watcherExclude": {
         "**/node_modules/**": true,
         "**/.git/objects/**": true,

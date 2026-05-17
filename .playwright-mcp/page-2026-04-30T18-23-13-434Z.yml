@@ -1,0 +1,3167 @@
+- generic [ref=e445]:
+  - generic [ref=e446]:
+    - navigation [ref=e449]:
+      - generic [ref=e450]:
+        - generic [ref=e451]:
+          - link "Coolify" [ref=e452] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.474" [ref=e453] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.474
+        - button / [ref=e455]:
+          - img [ref=e456]
+          - generic [ref=e458]: /
+        - button "Preferences 9+" [ref=e461] [cursor=pointer]:
+          - img "Preferences" [ref=e462]
+          - generic [ref=e464]: 9+
+      - combobox [ref=e467]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+      - list [ref=e468]:
+        - listitem [ref=e469]:
+          - list [ref=e470]:
+            - listitem [ref=e471]:
+              - link "Dashboard" [ref=e472] [cursor=pointer]:
+                - /url: /
+                - img [ref=e473]
+                - generic [ref=e475]: Dashboard
+            - listitem [ref=e476]:
+              - link "Projects" [ref=e477] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e478]
+                - generic [ref=e483]: Projects
+            - listitem [ref=e484]:
+              - link "Servers" [ref=e485] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e486]
+                - generic [ref=e491]: Servers
+            - listitem [ref=e492]:
+              - link "Sources" [ref=e493] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/sources
+                - img [ref=e494]
+                - generic [ref=e496]: Sources
+            - listitem [ref=e497]:
+              - link "Destinations" [ref=e498] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/destinations
+                - img [ref=e499]
+                - generic [ref=e501]: Destinations
+            - listitem [ref=e502]:
+              - link "S3 Storages" [ref=e503] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/storages
+                - img [ref=e504]
+                - generic [ref=e509]: S3 Storages
+            - listitem [ref=e510]:
+              - link "Shared Variables" [ref=e511] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/shared-variables
+                - img [ref=e512]
+                - generic [ref=e516]: Shared Variables
+            - listitem [ref=e517]:
+              - link "Notifications" [ref=e518] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/notifications/email
+                - img [ref=e519]
+                - generic [ref=e521]: Notifications
+            - listitem [ref=e522]:
+              - link "Keys & Tokens" [ref=e523] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/security/private-key
+                - img [ref=e524]
+                - generic [ref=e526]: Keys & Tokens
+            - listitem [ref=e527]:
+              - link "Tags" [ref=e528] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/tags
+                - img [ref=e529]
+                - generic [ref=e533]: Tags
+            - listitem [ref=e534]:
+              - link "Terminal" [ref=e535] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/terminal
+                - img [ref=e536]
+                - generic [ref=e539]: Terminal
+            - listitem [ref=e540]:
+              - link "Profile" [ref=e541] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/profile
+                - img [ref=e542]
+                - generic [ref=e547]: Profile
+            - listitem [ref=e548]:
+              - link "Teams" [ref=e549] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/team
+                - img [ref=e550]
+                - generic [ref=e558]: Teams
+            - listitem [ref=e559]:
+              - link "Settings" [ref=e560] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e561]
+                - generic [ref=e565]: Settings
+            - listitem [ref=e124]:
+              - generic "New version available" [ref=e125]:
+                - button "Upgrade" [ref=e127] [cursor=pointer]:
+                  - img [ref=e128]
+                  - text: Upgrade
+            - listitem [ref=e567]:
+              - link "Sponsor us" [ref=e568] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e569]
+                - generic [ref=e573]: Sponsor us
+            - listitem [ref=e574]:
+              - generic "Send us feedback or get help!" [ref=e577] [cursor=pointer]:
+                - img [ref=e578]
+                - generic [ref=e580]: Feedback
+            - listitem [ref=e581]:
+              - button "Logout" [ref=e583]:
+                - img [ref=e584]
+                - generic [ref=e586]: Logout
+    - main [ref=e587]:
+      - generic [ref=e591]:
+        - generic [ref=e592]:
+          - generic [ref=e593]:
+            - heading "New Resource" [level=1] [ref=e594]
+            - combobox [ref=e597]:
+              - 'option "Environment: production" [selected]'
+          - generic [ref=e598]: Deploy resources, like Applications, Databases, Services...
+          - generic [ref=e599]:
+            - textbox "Type / to search..." [active] [ref=e600]
+            - generic [ref=e602] [cursor=pointer]:
+              - generic [ref=e603]: Filter by category
+              - img [ref=e604]
+        - generic [ref=e606]:
+          - heading "Applications" [level=2] [ref=e607]
+          - generic [ref=e608]:
+            - generic [ref=e609]:
+              - heading "Git Based" [level=4] [ref=e610]
+              - generic [ref=e611]:
+                - generic [ref=e614] [cursor=pointer]:
+                  - img [ref=e616]
+                  - generic [ref=e617]:
+                    - generic [ref=e618]: Public Repository
+                    - generic [ref=e619]: You can deploy any kind of public repositories from the supported git providers.
+                - generic [ref=e622] [cursor=pointer]:
+                  - img [ref=e624]
+                  - generic [ref=e625]:
+                    - generic [ref=e626]: Private Repository (with GitHub App)
+                    - generic [ref=e627]: You can deploy public & private repositories through your GitHub Apps.
+                - generic [ref=e630] [cursor=pointer]:
+                  - img [ref=e632]
+                  - generic [ref=e633]:
+                    - generic [ref=e634]: Private Repository (with Deploy Key)
+                    - generic [ref=e635]: You can deploy private repositories with a deploy key.
+            - generic [ref=e636]:
+              - heading "Docker Based" [level=4] [ref=e637]
+              - generic [ref=e638]:
+                - generic [ref=e641] [cursor=pointer]:
+                  - img [ref=e643]
+                  - generic [ref=e644]:
+                    - generic [ref=e645]: Dockerfile
+                    - generic [ref=e646]: You can deploy a simple Dockerfile, without Git.
+                - generic [ref=e649] [cursor=pointer]:
+                  - img [ref=e651]
+                  - generic [ref=e652]:
+                    - generic [ref=e653]: Docker Compose Empty
+                    - generic [ref=e654]: You can deploy complex application easily with Docker Compose, without Git.
+                - generic [ref=e657] [cursor=pointer]:
+                  - img [ref=e659]
+                  - generic [ref=e660]:
+                    - generic [ref=e661]: Docker Image
+                    - generic [ref=e662]: You can deploy an existing Docker Image from any Registry, without Git.
+          - generic [ref=e663]:
+            - heading "Databases" [level=2] [ref=e664]
+            - generic [ref=e665]:
+              - generic [ref=e668] [cursor=pointer]:
+                - img [ref=e672]
+                - generic [ref=e679]:
+                  - generic [ref=e680]: PostgreSQL
+                  - generic [ref=e681]: PostgreSQL is an object-relational database known for its robustness, advanced features, and strong standards compliance.
+              - generic [ref=e684] [cursor=pointer]:
+                - img [ref=e688]
+                - generic [ref=e692]:
+                  - generic [ref=e693]: MySQL
+                  - generic [ref=e694]: MySQL is an open-source relational database management system.
+              - generic [ref=e697] [cursor=pointer]:
+                - img [ref=e701]
+                - generic [ref=e703]:
+                  - generic [ref=e704]: MariaDB
+                  - generic [ref=e705]: MariaDB is a community-developed, commercially supported fork of the MySQL relational database management system, intended to remain free and open-source.
+              - generic [ref=e708] [cursor=pointer]:
+                - img [ref=e712]
+                - generic [ref=e724]:
+                  - generic [ref=e725]: Redis
+                  - generic [ref=e726]: Redis is a source-available, in-memory storage, used as a distributed, in-memory key–value database, cache and message broker, with optional durability.
+              - generic [ref=e729] [cursor=pointer]:
+                - img [ref=e734]
+                - generic [ref=e747]:
+                  - generic [ref=e748]: KeyDB
+                  - generic [ref=e749]: KeyDB is a database that offers high performance, low latency, and scalability for various data structures and workloads.
+              - generic [ref=e752] [cursor=pointer]:
+                - img [ref=e757]
+                - generic [ref=e759]:
+                  - generic [ref=e760]: Dragonfly
+                  - generic [ref=e761]: Dragonfly DB is a drop-in Redis replacement that delivers 25x more throughput and 12x faster snapshotting than Redis.
+              - generic [ref=e764] [cursor=pointer]:
+                - img [ref=e768]
+                - generic [ref=e791]:
+                  - generic [ref=e792]: MongoDB
+                  - generic [ref=e793]: MongoDB is a source-available, cross-platform, document-oriented database program.
+              - generic [ref=e796] [cursor=pointer]:
+                - img [ref=e801]
+                - generic [ref=e808]:
+                  - generic [ref=e809]: ClickHouse
+                  - generic [ref=e810]: ClickHouse is a column-oriented database that supports real-time analytics, business intelligence, observability, ML and GenAI, and more.
+          - generic [ref=e811]:
+            - generic [ref=e812]:
+              - heading "Services" [level=2] [ref=e813]
+              - button "Reload List" [ref=e814] [cursor=pointer]
+            - generic [ref=e816]:
+              - img [ref=e818]
+              - generic [ref=e820]:
+                - generic [ref=e821]: Trademarks Policy
+                - generic [ref=e822]: The respective trademarks mentioned here are owned by the respective companies, and use of them does not imply any affiliation or endorsement.
+            - generic [ref=e823]:
+              - generic [ref=e824] [cursor=pointer]:
+                - generic [ref=e826]:
+                  - img [ref=e828]
+                  - generic [ref=e829]:
+                    - generic [ref=e830]: Activepieces
+                    - generic [ref=e831]: Open source no-code business automation.
+                - link "View documentation" [ref=e832]:
+                  - /url: https://coolify.io/docs/services/activepieces
+                  - img [ref=e833]
+              - generic [ref=e835] [cursor=pointer]:
+                - generic [ref=e837]:
+                  - img [ref=e839]
+                  - generic [ref=e840]:
+                    - generic [ref=e841]: Actualbudget
+                    - generic [ref=e842]: A local-first personal finance app.
+                - link "View documentation" [ref=e843]:
+                  - /url: https://coolify.io/docs/services/actualbudget
+                  - img [ref=e844]
+              - generic [ref=e846] [cursor=pointer]:
+                - generic [ref=e848]:
+                  - img [ref=e850]
+                  - generic [ref=e851]:
+                    - generic [ref=e852]: Affine
+                    - generic [ref=e853]: Affine is an open-source, all-in-one workspace and OS for knowledge management, a Notion/Miro alternative.
+                - link "View documentation" [ref=e854]:
+                  - /url: https://coolify.io/docs/services/affine
+                  - img [ref=e855]
+              - generic [ref=e857] [cursor=pointer]:
+                - generic [ref=e859]:
+                  - img [ref=e861]
+                  - generic [ref=e862]:
+                    - generic [ref=e863]: Alexandrie
+                    - generic [ref=e864]: A powerful Markdown workspace designed for speed, clarity, and creativity.
+                - link "View documentation" [ref=e865]:
+                  - /url: https://coolify.io/docs/services/alexandrie
+                  - img [ref=e866]
+              - generic [ref=e868] [cursor=pointer]:
+                - generic [ref=e870]:
+                  - img [ref=e872]
+                  - generic [ref=e873]:
+                    - generic [ref=e874]: Anythingllm
+                    - generic [ref=e875]: AnythingLLM is the easiest to use, all-in-one AI application that can do RAG, AI Agents, and much more with no code or infrastructure headaches.
+                - link "View documentation" [ref=e876]:
+                  - /url: https://coolify.io/docs/services/anythingllm
+                  - img [ref=e877]
+              - generic [ref=e879] [cursor=pointer]:
+                - generic [ref=e881]:
+                  - img [ref=e883]
+                  - generic [ref=e884]:
+                    - generic [ref=e885]: Appflowy
+                    - generic [ref=e886]: AppFlowy is the AI collaborative workspace where you achieve more without losing control of your data.
+                - link "View documentation" [ref=e887]:
+                  - /url: https://coolify.io/docs/services/appflowy
+                  - img [ref=e888]
+              - generic [ref=e890] [cursor=pointer]:
+                - generic [ref=e892]:
+                  - img [ref=e894]
+                  - generic [ref=e895]:
+                    - generic [ref=e896]: Apprise Api
+                    - generic [ref=e897]: Push Notifications API
+                - link "View documentation" [ref=e898]:
+                  - /url: https://coolify.io/docs/services/apprise-api
+                  - img [ref=e899]
+              - generic [ref=e901] [cursor=pointer]:
+                - generic [ref=e903]:
+                  - img [ref=e905]
+                  - generic [ref=e906]:
+                    - generic [ref=e907]: Appsmith
+                    - generic [ref=e908]: A low-code application platform for building internal tools.
+                - link "View documentation" [ref=e909]:
+                  - /url: https://coolify.io/docs/services/appsmith
+                  - img [ref=e910]
+              - generic [ref=e912] [cursor=pointer]:
+                - generic [ref=e914]:
+                  - img [ref=e916]
+                  - generic [ref=e917]:
+                    - generic [ref=e918]: Appwrite
+                    - generic [ref=e919]: A backend-as-a-service platform that simplifies the web & mobile app development.
+                - link "View documentation" [ref=e920]:
+                  - /url: https://coolify.io/docs/services/appwrite
+                  - img [ref=e921]
+              - generic [ref=e923] [cursor=pointer]:
+                - generic [ref=e925]:
+                  - img [ref=e927]
+                  - generic [ref=e928]:
+                    - generic [ref=e929]: Argilla
+                    - generic [ref=e930]: Argilla is a collaboration tool for AI engineers and domain experts who need to build high-quality datasets for their projects.
+                - link "View documentation" [ref=e931]:
+                  - /url: https://coolify.io/docs/services/argilla
+                  - img [ref=e932]
+              - generic [ref=e934] [cursor=pointer]:
+                - generic [ref=e936]:
+                  - img [ref=e938]
+                  - generic [ref=e939]:
+                    - generic [ref=e940]: Audiobookshelf
+                    - generic [ref=e941]: Self-hosted audiobook, ebook, and podcast server
+                - link "View documentation" [ref=e942]:
+                  - /url: https://coolify.io/docs/services/audiobookshelf
+                  - img [ref=e943]
+              - generic [ref=e945] [cursor=pointer]:
+                - generic [ref=e947]:
+                  - img [ref=e949]
+                  - generic [ref=e950]:
+                    - generic [ref=e951]: Authentik
+                    - generic [ref=e952]: An open-source Identity Provider, focused on flexibility and versatility.
+                - link "View documentation" [ref=e953]:
+                  - /url: https://coolify.io/docs/services/authentik
+                  - img [ref=e954]
+              - generic [ref=e956] [cursor=pointer]:
+                - generic [ref=e958]:
+                  - img [ref=e960]
+                  - generic [ref=e961]:
+                    - generic [ref=e962]: Autobase
+                    - generic [ref=e963]: Autobase for PostgreSQL® is an open-source alternative to cloud-managed databases (self-hosted DBaaS).
+                - link "View documentation" [ref=e964]:
+                  - /url: https://coolify.io/docs/services/autobase
+                  - img [ref=e965]
+              - generic [ref=e967] [cursor=pointer]:
+                - generic [ref=e969]:
+                  - img [ref=e971]
+                  - generic [ref=e972]:
+                    - generic [ref=e973]: Babybuddy
+                    - generic [ref=e974]: It helps parents track their baby's daily activities, growth, and health with ease.
+                - link "View documentation" [ref=e975]:
+                  - /url: https://coolify.io/docs/services/babybuddy
+                  - img [ref=e976]
+              - generic [ref=e978] [cursor=pointer]:
+                - generic [ref=e980]:
+                  - img [ref=e982]
+                  - generic [ref=e983]:
+                    - generic [ref=e984]: Bento Pdf
+                    - generic [ref=e985]: Process PDFs entirely in your browser. No uploads. No servers. Complete privacy.
+                - link "View documentation" [ref=e986]:
+                  - /url: https://coolify.io/docs/services/bento-pdf
+                  - img [ref=e987]
+              - generic [ref=e989] [cursor=pointer]:
+                - generic [ref=e991]:
+                  - img [ref=e993]
+                  - generic [ref=e994]:
+                    - generic [ref=e995]: Beszel
+                    - generic [ref=e996]: A lightweight server resource monitoring hub with historical data, docker stats, and alerts.
+                - link "View documentation" [ref=e997]:
+                  - /url: https://coolify.io/docs/services/beszel
+                  - img [ref=e998]
+              - generic [ref=e1000] [cursor=pointer]:
+                - generic [ref=e1002]:
+                  - img [ref=e1004]
+                  - generic [ref=e1005]:
+                    - generic [ref=e1006]: Beszel Agent
+                    - generic [ref=e1007]: Monitoring agent for Beszel
+                - link "View documentation" [ref=e1008]:
+                  - /url: https://coolify.io/docs/services/beszel-agent
+                  - img [ref=e1009]
+              - generic [ref=e1011] [cursor=pointer]:
+                - generic [ref=e1013]:
+                  - img [ref=e1015]
+                  - generic [ref=e1016]:
+                    - generic [ref=e1017]: Bitcoin Core
+                    - generic [ref=e1018]: A self-hosted Bitcoin Core full node.
+                - link "View documentation" [ref=e1019]:
+                  - /url: https://coolify.io/docs/services/bitcoin-core
+                  - img [ref=e1020]
+              - generic [ref=e1022] [cursor=pointer]:
+                - generic [ref=e1024]:
+                  - img [ref=e1026]
+                  - generic [ref=e1027]:
+                    - generic [ref=e1028]: Bluesky Pds
+                    - generic [ref=e1029]: Bluesky PDS (Personal Data Server)
+                - link "View documentation" [ref=e1030]:
+                  - /url: https://coolify.io/docs/services/bluesky-pds
+                  - img [ref=e1031]
+              - generic [ref=e1033] [cursor=pointer]:
+                - generic [ref=e1035]:
+                  - img [ref=e1037]
+                  - generic [ref=e1038]:
+                    - generic [ref=e1039]: Bookstack
+                    - generic [ref=e1040]: BookStack is a simple, self-hosted, easy-to-use platform for organising and storing information
+                - link "View documentation" [ref=e1041]:
+                  - /url: https://coolify.io/docs/services/bookstack
+                  - img [ref=e1042]
+              - generic [ref=e1044] [cursor=pointer]:
+                - generic [ref=e1046]:
+                  - img [ref=e1048]
+                  - generic [ref=e1049]:
+                    - generic [ref=e1050]: Browserless
+                    - generic [ref=e1051]: A headless Chrome browser as a service.
+                - link "View documentation" [ref=e1052]:
+                  - /url: https://coolify.io/docs/services/browserless
+                  - img [ref=e1053]
+              - generic [ref=e1055] [cursor=pointer]:
+                - generic [ref=e1057]:
+                  - img [ref=e1059]
+                  - generic [ref=e1060]:
+                    - generic [ref=e1061]: Budge
+                    - generic [ref=e1062]: A budgeting personal finance app.
+                - link "View documentation" [ref=e1063]:
+                  - /url: https://coolify.io/docs/services/budge
+                  - img [ref=e1064]
+              - generic [ref=e1066] [cursor=pointer]:
+                - generic [ref=e1068]:
+                  - img [ref=e1070]
+                  - generic [ref=e1071]:
+                    - generic [ref=e1072]: Budibase
+                    - generic [ref=e1073]: Low code platform for building business apps and workflows in minutes. Supports PostgreSQL, MySQL, MSSQL, MongoDB, Rest API, Docker, K8s, and more.
+                - link "View documentation" [ref=e1074]:
+                  - /url: https://coolify.io/docs/services/budibase
+                  - img [ref=e1075]
+              - generic [ref=e1077] [cursor=pointer]:
+                - generic [ref=e1079]:
+                  - img [ref=e1081]
+                  - generic [ref=e1082]:
+                    - generic [ref=e1083]: Bugsink
+                    - generic [ref=e1084]: Self-hosted Error Tracking.
+                - link "View documentation" [ref=e1085]:
+                  - /url: https://coolify.io/docs/services/bugsink
+                  - img [ref=e1086]
+              - generic [ref=e1088] [cursor=pointer]:
+                - generic [ref=e1090]:
+                  - img [ref=e1092]
+                  - generic [ref=e1093]:
+                    - generic [ref=e1094]: Calibre Web
+                    - generic [ref=e1095]: Calibre-web is a web app providing a clean interface for browsing, reading and downloading eBooks.
+                - link "View documentation" [ref=e1096]:
+                  - /url: https://coolify.io/docs/services/calibre-web
+                  - img [ref=e1097]
+              - generic [ref=e1099] [cursor=pointer]:
+                - generic [ref=e1101]:
+                  - img [ref=e1103]
+                  - generic [ref=e1104]:
+                    - generic [ref=e1105]: Calibre Web Automated Book Downloader
+                    - generic [ref=e1106]: An intuitive web interface for searching and requesting book downloads, designed to work seamlessly with Calibre-Web-Automated.
+                - link "View documentation" [ref=e1107]:
+                  - /url: https://coolify.io/docs/services/calibre-web-automated-book-downloader
+                  - img [ref=e1108]
+              - generic [ref=e1110] [cursor=pointer]:
+                - generic [ref=e1112]:
+                  - img [ref=e1114]
+                  - generic [ref=e1115]:
+                    - generic [ref=e1116]: Cap
+                    - generic [ref=e1117]: Cap is the open source alternative to Loom. Lightweight, powerful, and cross-platform. Record and share in seconds.
+                - link "View documentation" [ref=e1118]:
+                  - /url: https://coolify.io/docs/services/cap
+                  - img [ref=e1119]
+              - generic [ref=e1121] [cursor=pointer]:
+                - generic [ref=e1123]:
+                  - img [ref=e1125]
+                  - generic [ref=e1126]:
+                    - generic [ref=e1127]: Cap Captcha
+                    - generic [ref=e1128]: The self-hosted CAPTCHA for the modern web.
+                - link "View documentation" [ref=e1129]:
+                  - /url: https://coolify.io/docs/services/cap-captcha
+                  - img [ref=e1130]
+              - generic [ref=e1132] [cursor=pointer]:
+                - generic [ref=e1134]:
+                  - img [ref=e1136]
+                  - generic [ref=e1137]:
+                    - generic [ref=e1138]: Castopod
+                    - generic [ref=e1139]: Castopod is a free & open-source hosting platform made for podcasters who want engage and interact with their audience.
+                - link "View documentation" [ref=e1140]:
+                  - /url: https://coolify.io/docs/services/castopod
+                  - img [ref=e1141]
+              - generic [ref=e1143] [cursor=pointer]:
+                - generic [ref=e1145]:
+                  - img [ref=e1147]
+                  - generic [ref=e1148]:
+                    - generic [ref=e1149]: Changedetection
+                    - generic [ref=e1150]: Website change detection monitor and notifications.
+                - link "View documentation" [ref=e1151]:
+                  - /url: https://coolify.io/docs/services/changedetection
+                  - img [ref=e1152]
+              - generic [ref=e1154] [cursor=pointer]:
+                - generic [ref=e1156]:
+                  - img [ref=e1158]
+                  - generic [ref=e1159]:
+                    - generic [ref=e1160]: Chaskiq
+                    - generic [ref=e1161]: Chaskiq is an messaging platform for marketing, support & sales
+                - link "View documentation" [ref=e1162]:
+                  - /url: https://coolify.io/docs/services/chaskiq
+                  - img [ref=e1163]
+              - generic [ref=e1165] [cursor=pointer]:
+                - generic [ref=e1167]:
+                  - img [ref=e1169]
+                  - generic [ref=e1170]:
+                    - generic [ref=e1171]: Chatwoot
+                    - generic [ref=e1172]: Delightful customer relationships at scale.
+                - link "View documentation" [ref=e1173]:
+                  - /url: https://coolify.io/docs/services/chatwoot
+                  - img [ref=e1174]
+              - generic [ref=e1176] [cursor=pointer]:
+                - generic [ref=e1178]:
+                  - img [ref=e1180]
+                  - generic [ref=e1181]:
+                    - generic [ref=e1182]: Checkmate
+                    - generic [ref=e1183]: An open source server and websites monitoring application
+                - link "View documentation" [ref=e1184]:
+                  - /url: https://coolify.io/docs/services/checkmate
+                  - img [ref=e1185]
+              - generic [ref=e1187] [cursor=pointer]:
+                - generic [ref=e1189]:
+                  - img [ref=e1191]
+                  - generic [ref=e1192]:
+                    - generic [ref=e1193]: Chibisafe
+                    - generic [ref=e1194]: A beautiful and performant vault to save all your files in the cloud.
+                - link "View documentation" [ref=e1195]:
+                  - /url: https://coolify.io/docs/services/chibisafe
+                  - img [ref=e1196]
+              - generic [ref=e1198] [cursor=pointer]:
+                - generic [ref=e1200]:
+                  - img [ref=e1202]
+                  - generic [ref=e1203]:
+                    - generic [ref=e1204]: Chroma
+                    - generic [ref=e1205]: Chroma is the open-source search and retrieval database for AI applications.
+                - link "View documentation" [ref=e1206]:
+                  - /url: https://coolify.io/docs/services/chroma
+                  - img [ref=e1207]
+              - generic [ref=e1209] [cursor=pointer]:
+                - generic [ref=e1211]:
+                  - img [ref=e1213]
+                  - generic [ref=e1214]:
+                    - generic [ref=e1215]: Classicpress With Mariadb
+                    - generic [ref=e1216]: A lightweight, stable, instantly familiar free open-source content management system, based on WordPress without the block editor (Gutenberg).
+                - link "View documentation" [ref=e1217]:
+                  - /url: https://coolify.io/docs/services/classicpress
+                  - img [ref=e1218]
+              - generic [ref=e1220] [cursor=pointer]:
+                - generic [ref=e1222]:
+                  - img [ref=e1224]
+                  - generic [ref=e1225]:
+                    - generic [ref=e1226]: Classicpress With Mysql
+                    - generic [ref=e1227]: A lightweight, stable, instantly familiar free open-source content management system, based on WordPress without the block editor (Gutenberg).
+                - link "View documentation" [ref=e1228]:
+                  - /url: https://coolify.io/docs/services/classicpress
+                  - img [ref=e1229]
+              - generic [ref=e1231] [cursor=pointer]:
+                - generic [ref=e1233]:
+                  - img [ref=e1235]
+                  - generic [ref=e1236]:
+                    - generic [ref=e1237]: Classicpress Without Database
+                    - generic [ref=e1238]: A lightweight, stable, instantly familiar free open-source content management system, based on WordPress without the block editor (Gutenberg).
+                - link "View documentation" [ref=e1239]:
+                  - /url: https://coolify.io/docs/services/classicpress
+                  - img [ref=e1240]
+              - generic [ref=e1242] [cursor=pointer]:
+                - generic [ref=e1244]:
+                  - img [ref=e1246]
+                  - generic [ref=e1247]:
+                    - generic [ref=e1248]: Cloudbeaver
+                    - generic [ref=e1249]: CloudBeaver is a lightweight web application designed for comprehensive data management.
+                - link "View documentation" [ref=e1250]:
+                  - /url: https://coolify.io/docs/services/cloudbeaver
+                  - img [ref=e1251]
+              - generic [ref=e1253] [cursor=pointer]:
+                - generic [ref=e1255]:
+                  - img [ref=e1257]
+                  - generic [ref=e1258]:
+                    - generic [ref=e1259]: Cloudflared
+                    - generic [ref=e1260]: Client for Cloudflare Tunnel, a daemon that exposes private services through the Cloudflare edge.
+                - link "View documentation" [ref=e1261]:
+                  - /url: https://coolify.io/docs/services/cloudflared
+                  - img [ref=e1262]
+              - generic [ref=e1264] [cursor=pointer]:
+                - generic [ref=e1266]:
+                  - img [ref=e1268]
+                  - generic [ref=e1269]:
+                    - generic [ref=e1270]: Cloudreve
+                    - generic [ref=e1271]: A self-hosted file management and sharing system.
+                - link "View documentation" [ref=e1272]:
+                  - /url: https://coolify.io/docs/services/cloudreve
+                  - img [ref=e1273]
+              - generic [ref=e1275] [cursor=pointer]:
+                - generic [ref=e1277]:
+                  - img [ref=e1279]
+                  - generic [ref=e1280]:
+                    - generic [ref=e1281]: Cockpit
+                    - generic [ref=e1282]: Cockpit is a headless content platform that is lightweight, fast and ready for takeoff.
+                - link "View documentation" [ref=e1283]:
+                  - /url: https://coolify.io/docs/services/cockpit
+                  - img [ref=e1284]
+              - generic [ref=e1286] [cursor=pointer]:
+                - generic [ref=e1288]:
+                  - img [ref=e1290]
+                  - generic [ref=e1291]:
+                    - generic [ref=e1292]: Code Server
+                    - generic [ref=e1293]: Code-Server is a web-based code editor that enables remote coding and collaboration from any device, anywhere.
+                - link "View documentation" [ref=e1294]:
+                  - /url: https://coolify.io/docs/services/code-server
+                  - img [ref=e1295]
+              - generic [ref=e1297] [cursor=pointer]:
+                - generic [ref=e1299]:
+                  - img [ref=e1301]
+                  - generic [ref=e1302]:
+                    - generic [ref=e1303]: Codimd
+                    - generic [ref=e1304]: Realtime collaborative markdown notes on all platforms
+                - link "View documentation" [ref=e1305]:
+                  - /url: https://coolify.io/docs/services/codimd
+                  - img [ref=e1306]
+              - generic [ref=e1308] [cursor=pointer]:
+                - generic [ref=e1310]:
+                  - img [ref=e1312]
+                  - generic [ref=e1313]:
+                    - generic [ref=e1314]: Convertx
+                    - generic [ref=e1315]: A self-hosted online file converter. Supports over a thousand different formats.
+                - link "View documentation" [ref=e1316]:
+                  - /url: https://coolify.io/docs/services/convertx
+                  - img [ref=e1317]
+              - generic [ref=e1319] [cursor=pointer]:
+                - generic [ref=e1321]:
+                  - img [ref=e1323]
+                  - generic [ref=e1324]:
+                    - generic [ref=e1325]: Convex
+                    - generic [ref=e1326]: Convex is the open-source reactive database for app developers.
+                - link "View documentation" [ref=e1327]:
+                  - /url: https://coolify.io/docs/services/convex
+                  - img [ref=e1328]
+              - generic [ref=e1330] [cursor=pointer]:
+                - generic [ref=e1332]:
+                  - img [ref=e1334]
+                  - generic [ref=e1335]:
+                    - generic [ref=e1336]: Cryptgeon
+                    - generic [ref=e1337]: Secure note / file sharing service inspired by PrivNote.
+                - link "View documentation" [ref=e1338]:
+                  - /url: https://coolify.io/docs/services/cryptgeon
+                  - img [ref=e1339]
+              - generic [ref=e1341] [cursor=pointer]:
+                - generic [ref=e1343]:
+                  - img [ref=e1345]
+                  - generic [ref=e1346]:
+                    - generic [ref=e1347]: Cyberchef
+                    - generic [ref=e1348]: The Cyber Swiss Army Knife - a web app for encryption, encoding, compression and data analysis
+                - link "View documentation" [ref=e1349]:
+                  - /url: https://coolify.io/docs/services/cyberchef
+                  - img [ref=e1350]
+              - generic [ref=e1352] [cursor=pointer]:
+                - generic [ref=e1354]:
+                  - img [ref=e1356]
+                  - generic [ref=e1357]:
+                    - generic [ref=e1358]: Dashy
+                    - generic [ref=e1359]: A self-hostable personal dashboard built for you. Includes status-checking, widgets, themes, icon packs, a UI editor and tons more!
+                - link "View documentation" [ref=e1360]:
+                  - /url: https://coolify.io/docs/services/dashy
+                  - img [ref=e1361]
+              - generic [ref=e1363] [cursor=pointer]:
+                - generic [ref=e1365]:
+                  - img [ref=e1367]
+                  - generic [ref=e1368]:
+                    - generic [ref=e1369]: Databasus
+                    - generic [ref=e1370]: Databasus is a free, open source and self-hosted tool to backup PostgreSQL, MySQL, and MongoDB.
+                - link "View documentation" [ref=e1371]:
+                  - /url: https://coolify.io/docs/services/databasus
+                  - img [ref=e1372]
+              - generic [ref=e1374] [cursor=pointer]:
+                - generic [ref=e1376]:
+                  - img [ref=e1378]
+                  - generic [ref=e1379]:
+                    - generic [ref=e1380]: Deno K V
+                    - generic [ref=e1381]: The Denoland key-value database
+                - link "View documentation" [ref=e1382]:
+                  - /url: https://coolify.io/docs/services/deno-k-v
+                  - img [ref=e1383]
+              - generic [ref=e1385] [cursor=pointer]:
+                - generic [ref=e1387]:
+                  - img [ref=e1389]
+                  - generic [ref=e1390]:
+                    - generic [ref=e1391]: Directus
+                    - generic [ref=e1392]: Directus wraps databases with a dynamic API, and provides an intuitive app for managing its content.
+                - link "View documentation" [ref=e1393]:
+                  - /url: https://coolify.io/docs/services/directus
+                  - img [ref=e1394]
+              - generic [ref=e1396] [cursor=pointer]:
+                - generic [ref=e1398]:
+                  - img [ref=e1400]
+                  - generic [ref=e1401]:
+                    - generic [ref=e1402]: Directus With Postgresql
+                    - generic [ref=e1403]: Directus wraps databases with a dynamic API, and provides an intuitive app for managing its content.
+                - link "View documentation" [ref=e1404]:
+                  - /url: https://coolify.io/docs/services/directus
+                  - img [ref=e1405]
+              - generic [ref=e1407] [cursor=pointer]:
+                - generic [ref=e1409]:
+                  - img [ref=e1411]
+                  - generic [ref=e1412]:
+                    - generic [ref=e1413]: Diun
+                    - generic [ref=e1414]: Docker Image Update Notifier is a CLI application to receive notifications when a Docker image is updated on a Docker registry.
+                - link "View documentation" [ref=e1415]:
+                  - /url: https://coolify.io/docs/services/diun
+                  - img [ref=e1416]
+              - generic [ref=e1418] [cursor=pointer]:
+                - generic [ref=e1420]:
+                  - img [ref=e1422]
+                  - generic [ref=e1423]:
+                    - generic [ref=e1424]: Docker Registry
+                    - generic [ref=e1425]: The Docker Registry lets you distribute Docker images.
+                - link "View documentation" [ref=e1426]:
+                  - /url: https://coolify.io/docs/services/docker-registry
+                  - img [ref=e1427]
+              - generic [ref=e1429] [cursor=pointer]:
+                - generic [ref=e1431]:
+                  - img [ref=e1433]
+                  - generic [ref=e1434]:
+                    - generic [ref=e1435]: Docmost
+                    - generic [ref=e1436]: Open-source collaborative wiki and documentation software
+                - link "View documentation" [ref=e1437]:
+                  - /url: https://coolify.io/docs/services/docmost
+                  - img [ref=e1438]
+              - generic [ref=e1440] [cursor=pointer]:
+                - generic [ref=e1442]:
+                  - img [ref=e1444]
+                  - generic [ref=e1445]:
+                    - generic [ref=e1446]: Documenso
+                    - generic [ref=e1447]: Document signing, finally open source
+                - link "View documentation" [ref=e1448]:
+                  - /url: https://coolify.io/docs/services/documenso
+                  - img [ref=e1449]
+              - generic [ref=e1451] [cursor=pointer]:
+                - generic [ref=e1453]:
+                  - img [ref=e1455]
+                  - generic [ref=e1456]:
+                    - generic [ref=e1457]: Docuseal
+                    - generic [ref=e1458]: Document Signing for Everyone free forever for individuals, extensible for businesses and developers. Open Source Alternative to DocuSign, PandaDoc and more.
+                - link "View documentation" [ref=e1459]:
+                  - /url: https://coolify.io/docs/services/docuseal
+                  - img [ref=e1460]
+              - generic [ref=e1462] [cursor=pointer]:
+                - generic [ref=e1464]:
+                  - img [ref=e1466]
+                  - generic [ref=e1467]:
+                    - generic [ref=e1468]: Docuseal With Postgres
+                    - generic [ref=e1469]: Document Signing for Everyone free forever for individuals, extensible for businesses and developers. Open Source Alternative to DocuSign, PandaDoc and more.
+                - link "View documentation" [ref=e1470]:
+                  - /url: https://coolify.io/docs/services/docuseal
+                  - img [ref=e1471]
+              - generic [ref=e1473] [cursor=pointer]:
+                - generic [ref=e1475]:
+                  - img [ref=e1477]
+                  - generic [ref=e1478]:
+                    - generic [ref=e1479]: Dokuwiki
+                    - generic [ref=e1480]: A lightweight and easy-to-use wiki platform for creating and managing documentation and knowledge bases.
+                - link "View documentation" [ref=e1481]:
+                  - /url: https://coolify.io/docs/services/dokuwiki
+                  - img [ref=e1482]
+              - generic [ref=e1484] [cursor=pointer]:
+                - generic [ref=e1486]:
+                  - img [ref=e1488]
+                  - generic [ref=e1489]:
+                    - generic [ref=e1490]: Dolibarr
+                    - generic [ref=e1491]: Dolibarr is a modern software package to manage your organization's activity (contacts, quotes, invoices, orders, stocks, agenda, hr, expense reports, accountancy, ecm, manufacturing, ...).
+                - link "View documentation" [ref=e1492]:
+                  - /url: https://coolify.io/docs/services/dolibarr
+                  - img [ref=e1493]
+              - generic [ref=e1495] [cursor=pointer]:
+                - generic [ref=e1497]:
+                  - img [ref=e1499]
+                  - generic [ref=e1500]:
+                    - generic [ref=e1501]: Dozzle
+                    - generic [ref=e1502]: Dozzle is a simple and lightweight web UI for Docker logs.
+                - link "View documentation" [ref=e1503]:
+                  - /url: https://coolify.io/docs/services/dozzle
+                  - img [ref=e1504]
+              - generic [ref=e1506] [cursor=pointer]:
+                - generic [ref=e1508]:
+                  - img [ref=e1510]
+                  - generic [ref=e1511]:
+                    - generic [ref=e1512]: Dozzle With Auth
+                    - generic [ref=e1513]: Dozzle is a simple and lightweight web UI for Docker logs.
+                - link "View documentation" [ref=e1514]:
+                  - /url: https://coolify.io/docs/services/dozzle
+                  - img [ref=e1515]
+              - generic [ref=e1517] [cursor=pointer]:
+                - generic [ref=e1519]:
+                  - img [ref=e1521]
+                  - generic [ref=e1522]:
+                    - generic [ref=e1523]: Drizzle Gateway
+                    - generic [ref=e1524]: Free self-hosted Drizzle Studio on steroids
+                - link "View documentation" [ref=e1525]:
+                  - /url: https://coolify.io/docs/services/drizzle-gateway
+                  - img [ref=e1526]
+              - generic [ref=e1528] [cursor=pointer]:
+                - generic [ref=e1530]:
+                  - img [ref=e1532]
+                  - generic [ref=e1533]:
+                    - generic [ref=e1534]: Drupal With Postgresql
+                    - generic [ref=e1535]: Drupal is a free and open-source web content management system written in PHP and distributed under the GNU General Public License.
+                - link "View documentation" [ref=e1536]:
+                  - /url: https://coolify.io/docs/services/drupal
+                  - img [ref=e1537]
+              - generic [ref=e1539] [cursor=pointer]:
+                - generic [ref=e1541]:
+                  - img [ref=e1543]
+                  - generic [ref=e1544]:
+                    - generic [ref=e1545]: Duplicati
+                    - generic [ref=e1546]: Duplicati is a backup solution, allowing you to make scheduled backups with encryption.
+                - link "View documentation" [ref=e1547]:
+                  - /url: https://coolify.io/docs/services/duplicati
+                  - img [ref=e1548]
+              - generic [ref=e1550] [cursor=pointer]:
+                - generic [ref=e1552]:
+                  - img [ref=e1554]
+                  - generic [ref=e1555]:
+                    - generic [ref=e1556]: Easyappointments
+                    - generic [ref=e1557]: Schedule Anything. Let's start with easy! Get the best free online appointment scheduler on your server, today.
+                - link "View documentation" [ref=e1558]:
+                  - /url: https://coolify.io/docs/services/easyappointments
+                  - img [ref=e1559]
+              - generic [ref=e1561] [cursor=pointer]:
+                - generic [ref=e1563]:
+                  - img [ref=e1565]
+                  - generic [ref=e1566]:
+                    - generic [ref=e1567]: Elasticsearch
+                    - generic [ref=e1568]: Elasticsearch is free and Open Source, Distributed, RESTful Search Engine.
+                - link "View documentation" [ref=e1569]:
+                  - /url: https://coolify.io/docs/services/elasticsearch
+                  - img [ref=e1570]
+              - generic [ref=e1572] [cursor=pointer]:
+                - generic [ref=e1574]:
+                  - img [ref=e1576]
+                  - generic [ref=e1577]:
+                    - generic [ref=e1578]: Elasticsearch With Kibana
+                    - generic [ref=e1579]: Elastic + Kibana is a Free and Open Source Search, Monitoring, and Visualization Stack
+                - link "View documentation" [ref=e1580]:
+                  - /url: https://coolify.io/docs/services/elasticsearch
+                  - img [ref=e1581]
+              - generic [ref=e1583] [cursor=pointer]:
+                - generic [ref=e1585]:
+                  - img [ref=e1587]
+                  - generic [ref=e1588]:
+                    - generic [ref=e1589]: Electricsql
+                    - generic [ref=e1590]: Sync shape-based subsets of your Postgres data over HTTP.
+                - link "View documentation" [ref=e1591]:
+                  - /url: https://coolify.io/docs/services/electricsql
+                  - img [ref=e1592]
+              - generic [ref=e1594] [cursor=pointer]:
+                - generic [ref=e1596]:
+                  - img [ref=e1598]
+                  - generic [ref=e1599]:
+                    - generic [ref=e1600]: Emby
+                    - generic [ref=e1601]: A media server software that allows you to organize, stream, and access your multimedia content effortlessly.
+                - link "View documentation" [ref=e1602]:
+                  - /url: https://coolify.io/docs/services/emby
+                  - img [ref=e1603]
+              - generic [ref=e1605] [cursor=pointer]:
+                - generic [ref=e1607]:
+                  - img [ref=e1609]
+                  - generic [ref=e1610]:
+                    - generic [ref=e1611]: Embystat
+                    - generic [ref=e1612]: EmbyStat is a web analytics tool, designed to provide insight into website traffic and user behavior.
+                - link "View documentation" [ref=e1613]:
+                  - /url: https://coolify.io/docs/services/embystat
+                  - img [ref=e1614]
+              - generic [ref=e1616] [cursor=pointer]:
+                - generic [ref=e1618]:
+                  - img [ref=e1620]
+                  - generic [ref=e1621]:
+                    - generic [ref=e1622]: Ente Photos
+                    - generic [ref=e1623]: Ente Photos is a fully open source, End to End Encrypted alternative to Google Photos and Apple Photos.
+                - link "View documentation" [ref=e1624]:
+                  - /url: https://coolify.io/docs/services/ente-photos
+                  - img [ref=e1625]
+              - generic [ref=e1627] [cursor=pointer]:
+                - generic [ref=e1629]:
+                  - img [ref=e1631]
+                  - generic [ref=e1632]:
+                    - generic [ref=e1633]: Ente Photos With S3
+                    - generic [ref=e1634]: Ente Photos is a fully open source, End to End Encrypted alternative to Google Photos and Apple Photos.
+                - link "View documentation" [ref=e1635]:
+                  - /url: https://coolify.io/docs/services/ente-photos
+                  - img [ref=e1636]
+              - generic [ref=e1638] [cursor=pointer]:
+                - generic [ref=e1640]:
+                  - img [ref=e1642]
+                  - generic [ref=e1643]:
+                    - generic [ref=e1644]: Esphome
+                    - generic [ref=e1645]: Smart Home Made Simple.
+                - link "View documentation" [ref=e1646]:
+                  - /url: https://coolify.io/docs/services/esphome
+                  - img [ref=e1647]
+              - generic [ref=e1649] [cursor=pointer]:
+                - generic [ref=e1651]:
+                  - img [ref=e1653]
+                  - generic [ref=e1654]:
+                    - generic [ref=e1655]: Espocrm
+                    - generic [ref=e1656]: EspoCRM is a free and open-source CRM platform.
+                - link "View documentation" [ref=e1657]:
+                  - /url: https://coolify.io/docs/services/espocrm
+                  - img [ref=e1658]
+              - generic [ref=e1660] [cursor=pointer]:
+                - generic [ref=e1662]:
+                  - img [ref=e1664]
+                  - generic [ref=e1665]:
+                    - generic [ref=e1666]: Evolution Api
+                    - generic [ref=e1667]: Multi-platform messaging (whatsapp and more) integration API
+                - link "View documentation" [ref=e1668]:
+                  - /url: https://coolify.io/docs/services/evolution-api
+                  - img [ref=e1669]
+              - generic [ref=e1671] [cursor=pointer]:
+                - generic [ref=e1673]:
+                  - img [ref=e1675]
+                  - generic [ref=e1676]:
+                    - generic [ref=e1677]: Excalidraw
+                    - generic [ref=e1678]: Virtual whiteboard for sketching hand-drawn like diagrams
+                - link "View documentation" [ref=e1679]:
+                  - /url: https://coolify.io/docs/services/excalidraw
+                  - img [ref=e1680]
+              - generic [ref=e1682] [cursor=pointer]:
+                - generic [ref=e1684]:
+                  - img [ref=e1686]
+                  - generic [ref=e1687]:
+                    - generic [ref=e1688]: Faraday
+                    - generic [ref=e1689]: Faraday is a powerful, open-source, web-based vulnerability management tool.
+                - link "View documentation" [ref=e1690]:
+                  - /url: https://coolify.io/docs/services/faraday
+                  - img [ref=e1691]
+              - generic [ref=e1693] [cursor=pointer]:
+                - generic [ref=e1695]:
+                  - img [ref=e1697]
+                  - generic [ref=e1698]:
+                    - generic [ref=e1699]: Fider
+                    - generic [ref=e1700]: Fider is a feedback platform for collecting and managing user feedback.
+                - link "View documentation" [ref=e1701]:
+                  - /url: https://coolify.io/docs/services/fider
+                  - img [ref=e1702]
+              - generic [ref=e1704] [cursor=pointer]:
+                - generic [ref=e1706]:
+                  - img [ref=e1708]
+                  - generic [ref=e1709]:
+                    - generic [ref=e1710]: Filebrowser
+                    - generic [ref=e1711]: FileBrowser is a web-based file manager and file explorer with a user-friendly interface.
+                - link "View documentation" [ref=e1712]:
+                  - /url: https://coolify.io/docs/services/filebrowser
+                  - img [ref=e1713]
+              - generic [ref=e1715] [cursor=pointer]:
+                - generic [ref=e1717]:
+                  - img [ref=e1719]
+                  - generic [ref=e1720]:
+                    - generic [ref=e1721]: Fileflows
+                    - generic [ref=e1722]: FileFlows can drastically reduce your files, up to 90%, saving you space and money. No need to buy more hard drives, just shrink your files and start saving.
+                - link "View documentation" [ref=e1723]:
+                  - /url: https://coolify.io/docs/services/fileflows
+                  - img [ref=e1724]
+              - generic [ref=e1726] [cursor=pointer]:
+                - generic [ref=e1728]:
+                  - img [ref=e1730]
+                  - generic [ref=e1731]:
+                    - generic [ref=e1732]: Firefly
+                    - generic [ref=e1733]: A personal finances manager that can help you save money.
+                - link "View documentation" [ref=e1734]:
+                  - /url: https://coolify.io/docs/services/firefly
+                  - img [ref=e1735]
+              - generic [ref=e1737] [cursor=pointer]:
+                - generic [ref=e1739]:
+                  - img [ref=e1741]
+                  - generic [ref=e1742]:
+                    - generic [ref=e1743]: Firefox
+                    - generic [ref=e1744]: Fast, private, and self-hosted secure browser for browsing without limits.
+                - link "View documentation" [ref=e1745]:
+                  - /url: https://coolify.io/docs/services/firefox
+                  - img [ref=e1746]
+              - generic [ref=e1748] [cursor=pointer]:
+                - generic [ref=e1750]:
+                  - img [ref=e1752]
+                  - generic [ref=e1753]:
+                    - generic [ref=e1754]: Fizzy
+                    - generic [ref=e1755]: Kanban tracking tool for issues and ideas by 37signals
+                - link "View documentation" [ref=e1756]:
+                  - /url: https://coolify.io/docs/services/fizzy
+                  - img [ref=e1757]
+              - generic [ref=e1759] [cursor=pointer]:
+                - generic [ref=e1761]:
+                  - img [ref=e1763]
+                  - generic [ref=e1764]:
+                    - generic [ref=e1765]: Flipt
+                    - generic [ref=e1766]: Flipt is a fully managed feature flag solution that enables you to keep your feature flags and remote config next to your code in Git.
+                - link "View documentation" [ref=e1767]:
+                  - /url: https://coolify.io/docs/services/flipt
+                  - img [ref=e1768]
+              - generic [ref=e1770] [cursor=pointer]:
+                - generic [ref=e1772]:
+                  - img [ref=e1774]
+                  - generic [ref=e1775]:
+                    - generic [ref=e1776]: Flowise
+                    - generic [ref=e1777]: Flowise is an open source low-code tool for developers to build customized LLM orchestration flows & AI agents.
+                - link "View documentation" [ref=e1778]:
+                  - /url: https://coolify.io/docs/services/flowise
+                  - img [ref=e1779]
+              - generic [ref=e1781] [cursor=pointer]:
+                - generic [ref=e1783]:
+                  - img [ref=e1785]
+                  - generic [ref=e1786]:
+                    - generic [ref=e1787]: Flowise With Databases
+                    - generic [ref=e1788]: Flowise is an open source low-code tool for developers to build customized LLM orchestration flows & AI agents. Also deploys Redis, Postgres and other services.
+                - link "View documentation" [ref=e1789]:
+                  - /url: https://coolify.io/docs/services/flowise
+                  - img [ref=e1790]
+              - generic [ref=e1792] [cursor=pointer]:
+                - generic [ref=e1794]:
+                  - img [ref=e1796]
+                  - generic [ref=e1797]:
+                    - generic [ref=e1798]: Forgejo
+                    - generic [ref=e1799]: Forgejo is a self-hosted lightweight software forge. Easy to install and low maintenance, it just does the job.
+                - link "View documentation" [ref=e1800]:
+                  - /url: https://coolify.io/docs/services/forgejo
+                  - img [ref=e1801]
+              - generic [ref=e1803] [cursor=pointer]:
+                - generic [ref=e1805]:
+                  - img [ref=e1807]
+                  - generic [ref=e1808]:
+                    - generic [ref=e1809]: Forgejo With Mariadb
+                    - generic [ref=e1810]: Forgejo is a self-hosted lightweight software forge. Easy to install and low maintenance, it just does the job.
+                - link "View documentation" [ref=e1811]:
+                  - /url: https://coolify.io/docs/services/forgejo
+                  - img [ref=e1812]
+              - generic [ref=e1814] [cursor=pointer]:
+                - generic [ref=e1816]:
+                  - img [ref=e1818]
+                  - generic [ref=e1819]:
+                    - generic [ref=e1820]: Forgejo With Mysql
+                    - generic [ref=e1821]: Forgejo is a self-hosted lightweight software forge. Easy to install and low maintenance, it just does the job.
+                - link "View documentation" [ref=e1822]:
+                  - /url: https://coolify.io/docs/services/forgejo
+                  - img [ref=e1823]
+              - generic [ref=e1825] [cursor=pointer]:
+                - generic [ref=e1827]:
+                  - img [ref=e1829]
+                  - generic [ref=e1830]:
+                    - generic [ref=e1831]: Forgejo With Postgresql
+                    - generic [ref=e1832]: Forgejo is a self-hosted lightweight software forge. Easy to install and low maintenance, it just does the job.
+                - link "View documentation" [ref=e1833]:
+                  - /url: https://coolify.io/docs/services/forgejo
+                  - img [ref=e1834]
+              - generic [ref=e1836] [cursor=pointer]:
+                - generic [ref=e1838]:
+                  - img [ref=e1840]
+                  - generic [ref=e1841]:
+                    - generic [ref=e1842]: Formbricks
+                    - generic [ref=e1843]: Open Source Survey Platform
+                - link "View documentation" [ref=e1844]:
+                  - /url: https://coolify.io/docs/services/formbricks
+                  - img [ref=e1845]
+              - generic [ref=e1847] [cursor=pointer]:
+                - generic [ref=e1849]:
+                  - img [ref=e1851]
+                  - generic [ref=e1852]:
+                    - generic [ref=e1853]: Foundryvtt
+                    - generic [ref=e1854]: Foundry Virtual Tabletop is a self-hosted & modern roleplaying platform
+                - link "View documentation" [ref=e1855]:
+                  - /url: https://coolify.io/docs/services/foundryvtt
+                  - img [ref=e1856]
+              - generic [ref=e1858] [cursor=pointer]:
+                - generic [ref=e1860]:
+                  - img [ref=e1862]
+                  - generic [ref=e1863]:
+                    - generic [ref=e1864]: Freescout
+                    - generic [ref=e1865]: FreeScout is the super lightweight and powerful free open source help desk and shared inbox written in PHP (Laravel framework).
+                - link "View documentation" [ref=e1866]:
+                  - /url: https://coolify.io/docs/services/freescout
+                  - img [ref=e1867]
+              - generic [ref=e1869] [cursor=pointer]:
+                - generic [ref=e1871]:
+                  - img [ref=e1873]
+                  - generic [ref=e1874]:
+                    - generic [ref=e1875]: Freshrss
+                    - generic [ref=e1876]: A free, self-hostable feed aggregator.
+                - link "View documentation" [ref=e1877]:
+                  - /url: https://coolify.io/docs/services/freshrss
+                  - img [ref=e1878]
+              - generic [ref=e1880] [cursor=pointer]:
+                - generic [ref=e1882]:
+                  - img [ref=e1884]
+                  - generic [ref=e1885]:
+                    - generic [ref=e1886]: Freshrss With Mariadb
+                    - generic [ref=e1887]: A free, self-hostable feed aggregator.
+                - link "View documentation" [ref=e1888]:
+                  - /url: https://coolify.io/docs/services/freshrss
+                  - img [ref=e1889]
+              - generic [ref=e1891] [cursor=pointer]:
+                - generic [ref=e1893]:
+                  - img [ref=e1895]
+                  - generic [ref=e1896]:
+                    - generic [ref=e1897]: Freshrss With Mysql
+                    - generic [ref=e1898]: A free, self-hostable feed aggregator.
+                - link "View documentation" [ref=e1899]:
+                  - /url: https://coolify.io/docs/services/freshrss
+                  - img [ref=e1900]
+              - generic [ref=e1902] [cursor=pointer]:
+                - generic [ref=e1904]:
+                  - img [ref=e1906]
+                  - generic [ref=e1907]:
+                    - generic [ref=e1908]: Freshrss With Postgresql
+                    - generic [ref=e1909]: A free, self-hostable feed aggregator.
+                - link "View documentation" [ref=e1910]:
+                  - /url: https://coolify.io/docs/services/freshrss
+                  - img [ref=e1911]
+              - generic [ref=e1913] [cursor=pointer]:
+                - generic [ref=e1915]:
+                  - img [ref=e1917]
+                  - generic [ref=e1918]:
+                    - generic [ref=e1919]: Garage
+                    - generic [ref=e1920]: Garage is an S3-compatible distributed object storage service designed for self-hosting.
+                - link "View documentation" [ref=e1921]:
+                  - /url: https://coolify.io/docs/services/garage
+                  - img [ref=e1922]
+              - generic [ref=e1924] [cursor=pointer]:
+                - generic [ref=e1926]:
+                  - img [ref=e1928]
+                  - generic [ref=e1929]:
+                    - generic [ref=e1930]: Getoutline
+                    - generic [ref=e1931]: Your team’s knowledge base
+                - link "View documentation" [ref=e1932]:
+                  - /url: https://coolify.io/docs/services/getoutline
+                  - img [ref=e1933]
+              - generic [ref=e1935] [cursor=pointer]:
+                - generic [ref=e1937]:
+                  - img [ref=e1939]
+                  - generic [ref=e1940]:
+                    - generic [ref=e1941]: Ghost
+                    - generic [ref=e1942]: Ghost is a content management system (CMS) and blogging platform.
+                - link "View documentation" [ref=e1943]:
+                  - /url: https://coolify.io/docs/services/ghost
+                  - img [ref=e1944]
+              - generic [ref=e1946] [cursor=pointer]:
+                - generic [ref=e1948]:
+                  - img [ref=e1950]
+                  - generic [ref=e1951]:
+                    - generic [ref=e1952]: Gitea
+                    - generic [ref=e1953]: Gitea is a self-hosted, lightweight Git service, offering version control, collaboration, and code hosting.
+                - link "View documentation" [ref=e1954]:
+                  - /url: https://coolify.io/docs/services/gitea
+                  - img [ref=e1955]
+              - generic [ref=e1957] [cursor=pointer]:
+                - generic [ref=e1959]:
+                  - img [ref=e1961]
+                  - generic [ref=e1962]:
+                    - generic [ref=e1963]: Gitea With Mariadb
+                    - generic [ref=e1964]: Gitea is a self-hosted, lightweight Git service, offering version control, collaboration, and code hosting.
+                - link "View documentation" [ref=e1965]:
+                  - /url: https://coolify.io/docs/services/gitea
+                  - img [ref=e1966]
+              - generic [ref=e1968] [cursor=pointer]:
+                - generic [ref=e1970]:
+                  - img [ref=e1972]
+                  - generic [ref=e1973]:
+                    - generic [ref=e1974]: Gitea With Mysql
+                    - generic [ref=e1975]: Gitea is a self-hosted, lightweight Git service, offering version control, collaboration, and code hosting.
+                - link "View documentation" [ref=e1976]:
+                  - /url: https://coolify.io/docs/services/gitea
+                  - img [ref=e1977]
+              - generic [ref=e1979] [cursor=pointer]:
+                - generic [ref=e1981]:
+                  - img [ref=e1983]
+                  - generic [ref=e1984]:
+                    - generic [ref=e1985]: Gitea With Postgresql
+                    - generic [ref=e1986]: Gitea is a self-hosted, lightweight Git service, offering version control, collaboration, and code hosting.
+                - link "View documentation" [ref=e1987]:
+                  - /url: https://coolify.io/docs/services/gitea
+                  - img [ref=e1988]
+              - generic [ref=e1990] [cursor=pointer]:
+                - generic [ref=e1992]:
+                  - img [ref=e1994]
+                  - generic [ref=e1995]:
+                    - generic [ref=e1996]: Github Runner
+                    - generic [ref=e1997]: A GitHub Actions runner for Docker
+                - link "View documentation" [ref=e1998]:
+                  - /url: https://coolify.io/docs/services/github-runner
+                  - img [ref=e1999]
+              - generic [ref=e2001] [cursor=pointer]:
+                - generic [ref=e2003]:
+                  - img [ref=e2005]
+                  - generic [ref=e2006]:
+                    - generic [ref=e2007]: Gitlab
+                    - generic [ref=e2008]: The all-in-one DevOps platform for seamless collaboration and continuous delivery.
+                - link "View documentation" [ref=e2009]:
+                  - /url: https://coolify.io/docs/services/gitlab
+                  - img [ref=e2010]
+              - generic [ref=e2012] [cursor=pointer]:
+                - generic [ref=e2014]:
+                  - img [ref=e2016]
+                  - generic [ref=e2017]:
+                    - generic [ref=e2018]: Glance
+                    - generic [ref=e2019]: A self-hosted dashboard that puts all your feeds in one place.
+                - link "View documentation" [ref=e2020]:
+                  - /url: https://coolify.io/docs/services/glance
+                  - img [ref=e2021]
+              - generic [ref=e2023] [cursor=pointer]:
+                - generic [ref=e2025]:
+                  - img [ref=e2027]
+                  - generic [ref=e2028]:
+                    - generic [ref=e2029]: Glances
+                    - generic [ref=e2030]: An Eye on your system
+                - link "View documentation" [ref=e2031]:
+                  - /url: https://coolify.io/docs/services/glances
+                  - img [ref=e2032]
+              - generic [ref=e2034] [cursor=pointer]:
+                - generic [ref=e2036]:
+                  - img [ref=e2038]
+                  - generic [ref=e2039]:
+                    - generic [ref=e2040]: Glitchtip
+                    - generic [ref=e2041]: GlitchTip is a error tracking system.
+                - link "View documentation" [ref=e2042]:
+                  - /url: https://coolify.io/docs/services/glitchtip
+                  - img [ref=e2043]
+              - generic [ref=e2045] [cursor=pointer]:
+                - generic [ref=e2047]:
+                  - img [ref=e2049]
+                  - generic [ref=e2050]:
+                    - generic [ref=e2051]: Glpi
+                    - generic [ref=e2052]: GLPI (Gestionnaire Libre de Parc Informatique) is a free, open-source IT Service Management (ITSM) platform used for IT asset management, helpdesk, and service desk operations.
+                - link "View documentation" [ref=e2053]:
+                  - /url: https://coolify.io/docs/services/glpi
+                  - img [ref=e2054]
+              - generic [ref=e2056] [cursor=pointer]:
+                - generic [ref=e2058]:
+                  - img [ref=e2060]
+                  - generic [ref=e2061]:
+                    - generic [ref=e2062]: Goatcounter
+                    - generic [ref=e2063]: Lightweight web analytics platform.
+                - link "View documentation" [ref=e2064]:
+                  - /url: https://coolify.io/docs/services/goatcounter
+                  - img [ref=e2065]
+              - generic [ref=e2067] [cursor=pointer]:
+                - generic [ref=e2069]:
+                  - img [ref=e2071]
+                  - generic [ref=e2072]:
+                    - generic [ref=e2073]: Gotenberg
+                    - generic [ref=e2074]: Gotenberg is a Docker-powered stateless API for PDF files.
+                - link "View documentation" [ref=e2075]:
+                  - /url: https://coolify.io/docs/services/gotenberg
+                  - img [ref=e2076]
+              - generic [ref=e2078] [cursor=pointer]:
+                - generic [ref=e2080]:
+                  - img [ref=e2082]
+                  - generic [ref=e2083]:
+                    - generic [ref=e2084]: Gotify
+                    - generic [ref=e2085]: Gotify is an open-source self-hosted notification server.
+                - link "View documentation" [ref=e2086]:
+                  - /url: https://coolify.io/docs/services/gotify
+                  - img [ref=e2087]
+              - generic [ref=e2089] [cursor=pointer]:
+                - generic [ref=e2091]:
+                  - img [ref=e2093]
+                  - generic [ref=e2094]:
+                    - generic [ref=e2095]: Gowa
+                    - generic [ref=e2096]: Golang WhatsApp - Built with Go for efficient memory use
+                - link "View documentation" [ref=e2097]:
+                  - /url: https://coolify.io/docs/services/gowa
+                  - img [ref=e2098]
+              - generic [ref=e2100] [cursor=pointer]:
+                - generic [ref=e2102]:
+                  - img [ref=e2104]
+                  - generic [ref=e2105]:
+                    - generic [ref=e2106]: Grafana
+                    - generic [ref=e2107]: Grafana is the open source analytics & monitoring solution for every database.
+                - link "View documentation" [ref=e2108]:
+                  - /url: https://coolify.io/docs/services/grafana
+                  - img [ref=e2109]
+              - generic [ref=e2111] [cursor=pointer]:
+                - generic [ref=e2113]:
+                  - img [ref=e2115]
+                  - generic [ref=e2116]:
+                    - generic [ref=e2117]: Grafana With Postgresql
+                    - generic [ref=e2118]: Grafana is the open source analytics & monitoring solution for every database.
+                - link "View documentation" [ref=e2119]:
+                  - /url: https://coolify.io/docs/services/grafana
+                  - img [ref=e2120]
+              - generic [ref=e2122] [cursor=pointer]:
+                - generic [ref=e2124]:
+                  - img [ref=e2126]
+                  - generic [ref=e2127]:
+                    - generic [ref=e2128]: Gramps Web
+                    - generic [ref=e2129]: Open Source Online Genealogy System.
+                - link "View documentation" [ref=e2130]:
+                  - /url: https://coolify.io/docs/services/gramps-web
+                  - img [ref=e2131]
+              - generic [ref=e2133] [cursor=pointer]:
+                - generic [ref=e2135]:
+                  - img [ref=e2137]
+                  - generic [ref=e2138]:
+                    - generic [ref=e2139]: Grimmory
+                    - generic [ref=e2140]: Grimmory is a self-hosted application for managing your entire book collection in one place. Organize, read, annotate, sync across devices, and share without relying on third-party services.
+                - link "View documentation" [ref=e2141]:
+                  - /url: https://coolify.io/docs/services/grimmory
+                  - img [ref=e2142]
+              - generic [ref=e2144] [cursor=pointer]:
+                - generic [ref=e2146]:
+                  - img [ref=e2148]
+                  - generic [ref=e2149]:
+                    - generic [ref=e2150]: Grist
+                    - generic [ref=e2151]: Grist is a modern relational spreadsheet. It combines the flexibility of a spreadsheet with the robustness of a database.
+                - link "View documentation" [ref=e2152]:
+                  - /url: https://coolify.io/docs/services/grist
+                  - img [ref=e2153]
+              - generic [ref=e2155] [cursor=pointer]:
+                - generic [ref=e2157]:
+                  - img [ref=e2159]
+                  - generic [ref=e2160]:
+                    - generic [ref=e2161]: Grocy
+                    - generic [ref=e2162]: Grocy is a web-based household management and grocery list application.
+                - link "View documentation" [ref=e2163]:
+                  - /url: https://coolify.io/docs/services/grocy
+                  - img [ref=e2164]
+              - generic [ref=e2166] [cursor=pointer]:
+                - generic [ref=e2168]:
+                  - img [ref=e2170]
+                  - generic [ref=e2171]:
+                    - generic [ref=e2172]: Hatchet
+                    - generic [ref=e2173]: Hatchet allows you to run background tasks at scale with a high-throughput, low-latency computing service built on an open-source, fault-tolerant queue.
+                - link "View documentation" [ref=e2174]:
+                  - /url: https://coolify.io/docs/services/hatchet
+                  - img [ref=e2175]
+              - generic [ref=e2177] [cursor=pointer]:
+                - generic [ref=e2179]:
+                  - img [ref=e2181]
+                  - generic [ref=e2182]:
+                    - generic [ref=e2183]: Heimdall
+                    - generic [ref=e2184]: Heimdall is a dashboard for managing and organizing your server applications.
+                - link "View documentation" [ref=e2185]:
+                  - /url: https://coolify.io/docs/services/heimdall
+                  - img [ref=e2186]
+              - generic [ref=e2188] [cursor=pointer]:
+                - generic [ref=e2190]:
+                  - img [ref=e2192]
+                  - generic [ref=e2193]:
+                    - generic [ref=e2194]: Heyform
+                    - generic [ref=e2195]: Allows anyone to create engaging conversational forms for surveys, questionnaires, quizzes, and polls. No coding skills required.
+                - link "View documentation" [ref=e2196]:
+                  - /url: https://coolify.io/docs/services/heyform
+                  - img [ref=e2197]
+              - generic [ref=e2199] [cursor=pointer]:
+                - generic [ref=e2201]:
+                  - img [ref=e2203]
+                  - generic [ref=e2204]:
+                    - generic [ref=e2205]: Homarr
+                    - generic [ref=e2206]: Homarr is a self-hosted homepage for your services.
+                - link "View documentation" [ref=e2207]:
+                  - /url: https://coolify.io/docs/services/homarr
+                  - img [ref=e2208]
+              - generic [ref=e2210] [cursor=pointer]:
+                - generic [ref=e2212]:
+                  - img [ref=e2214]
+                  - generic [ref=e2215]:
+                    - generic [ref=e2216]: Home Assistant
+                    - generic [ref=e2217]: Open source home automation that puts local control and privacy first.
+                - link "View documentation" [ref=e2218]:
+                  - /url: https://coolify.io/docs/services/home-assistant
+                  - img [ref=e2219]
+              - generic [ref=e2221] [cursor=pointer]:
+                - generic [ref=e2223]:
+                  - img [ref=e2225]
+                  - generic [ref=e2226]:
+                    - generic [ref=e2227]: Homebox
+                    - generic [ref=e2228]: Homebox is the inventory and organization system built for the Home User.
+                - link "View documentation" [ref=e2229]:
+                  - /url: https://coolify.io/docs/services/homebox
+                  - img [ref=e2230]
+              - generic [ref=e2232] [cursor=pointer]:
+                - generic [ref=e2234]:
+                  - img [ref=e2236]
+                  - generic [ref=e2237]:
+                    - generic [ref=e2238]: Homepage
+                    - generic [ref=e2239]: A modern, fully static, fast, secure fully proxied, highly customizable application dashboard
+                - link "View documentation" [ref=e2240]:
+                  - /url: https://coolify.io/docs/services/homepage
+                  - img [ref=e2241]
+              - generic [ref=e2243] [cursor=pointer]:
+                - generic [ref=e2245]:
+                  - img [ref=e2247]
+                  - generic [ref=e2248]:
+                    - generic [ref=e2249]: Hoppscotch
+                    - generic [ref=e2250]: The Open Source API Development Platform
+                - link "View documentation" [ref=e2251]:
+                  - /url: https://coolify.io/docs/services/hoppscotch
+                  - img [ref=e2252]
+              - generic [ref=e2254] [cursor=pointer]:
+                - generic [ref=e2256]:
+                  - img [ref=e2258]
+                  - generic [ref=e2259]:
+                    - generic [ref=e2260]: Imgcompress
+                    - generic [ref=e2261]: Offline image compression, conversion, and AI background removal for Docker homelabs.
+                - link "View documentation" [ref=e2262]:
+                  - /url: https://coolify.io/docs/services/imgcompress
+                  - img [ref=e2263]
+              - generic [ref=e2265] [cursor=pointer]:
+                - generic [ref=e2267]:
+                  - img [ref=e2269]
+                  - generic [ref=e2270]:
+                    - generic [ref=e2271]: Immich
+                    - generic [ref=e2272]: Self-hosted photo and video management solution.
+                - link "View documentation" [ref=e2273]:
+                  - /url: https://coolify.io/docs/services/immich
+                  - img [ref=e2274]
+              - generic [ref=e2276] [cursor=pointer]:
+                - generic [ref=e2278]:
+                  - img [ref=e2280]
+                  - generic [ref=e2281]:
+                    - generic [ref=e2282]: Infisical
+                    - generic [ref=e2283]: Infisical is the open source secret management platform that developers use to centralize their application configuration and secrets like API keys and database credentials.
+                - link "View documentation" [ref=e2284]:
+                  - /url: https://coolify.io/docs/services/infisical
+                  - img [ref=e2285]
+              - generic [ref=e2287] [cursor=pointer]:
+                - generic [ref=e2289]:
+                  - img [ref=e2291]
+                  - generic [ref=e2292]:
+                    - generic [ref=e2293]: Invoice Ninja
+                    - generic [ref=e2294]: The leading open-source invoicing platform
+                - link "View documentation" [ref=e2295]:
+                  - /url: https://coolify.io/docs/services/invoice-ninja
+                  - img [ref=e2296]
+              - generic [ref=e2298] [cursor=pointer]:
+                - generic [ref=e2300]:
+                  - img [ref=e2302]
+                  - generic [ref=e2303]:
+                    - generic [ref=e2304]: It Tools
+                    - generic [ref=e2305]: IT Tools is a self-hosted solution for managing various IT tasks.
+                - link "View documentation" [ref=e2306]:
+                  - /url: https://coolify.io/docs/services/it-tools
+                  - img [ref=e2307]
+              - generic [ref=e2309] [cursor=pointer]:
+                - generic [ref=e2311]:
+                  - img [ref=e2313]
+                  - generic [ref=e2314]:
+                    - generic [ref=e2315]: Jellyfin
+                    - generic [ref=e2316]: Jellyfin is a media server for hosting and streaming your media collection.
+                - link "View documentation" [ref=e2317]:
+                  - /url: https://coolify.io/docs/services/jellyfin
+                  - img [ref=e2318]
+              - generic [ref=e2320] [cursor=pointer]:
+                - generic [ref=e2322]:
+                  - img [ref=e2324]
+                  - generic [ref=e2325]:
+                    - generic [ref=e2326]: Jenkins
+                    - generic [ref=e2327]: Jenkins is an open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.
+                - link "View documentation" [ref=e2328]:
+                  - /url: https://coolify.io/docs/services/jenkins
+                  - img [ref=e2329]
+              - generic [ref=e2331] [cursor=pointer]:
+                - generic [ref=e2333]:
+                  - img [ref=e2335]
+                  - generic [ref=e2336]:
+                    - generic [ref=e2337]: Jitsi
+                    - generic [ref=e2338]: Self-hosted Jitsi Meet — open-source video conferencing platform
+                - link "View documentation" [ref=e2339]:
+                  - /url: https://coolify.io/docs/services/jitsi
+                  - img [ref=e2340]
+              - generic [ref=e2342] [cursor=pointer]:
+                - generic [ref=e2344]:
+                  - img [ref=e2346]
+                  - generic [ref=e2347]:
+                    - generic [ref=e2348]: Joomla With Mariadb
+                    - generic [ref=e2349]: Joomla! is the mobile-ready and user-friendly way to build your website. Choose from thousands of features and designs. Joomla! is free and open source.
+                - link "View documentation" [ref=e2350]:
+                  - /url: https://coolify.io/docs/services/joomla
+                  - img [ref=e2351]
+              - generic [ref=e2353] [cursor=pointer]:
+                - generic [ref=e2355]:
+                  - img [ref=e2357]
+                  - generic [ref=e2358]:
+                    - generic [ref=e2359]: Joplin
+                    - generic [ref=e2360]: Self-hosted sync server for Joplin
+                - link "View documentation" [ref=e2361]:
+                  - /url: https://coolify.io/docs/services/joplin
+                  - img [ref=e2362]
+              - generic [ref=e2364] [cursor=pointer]:
+                - generic [ref=e2366]:
+                  - img [ref=e2368]
+                  - generic [ref=e2369]:
+                    - generic [ref=e2370]: Jupyter Notebook Python
+                    - generic [ref=e2371]: Jupyter Notebook is an open-source web application that allows you to create and share documents that contain live code, equations, visualizations, and narrative text.
+                - link "View documentation" [ref=e2372]:
+                  - /url: https://coolify.io/docs/services/jupyter-notebook-python
+                  - img [ref=e2373]
+              - generic [ref=e2375] [cursor=pointer]:
+                - generic [ref=e2377]:
+                  - img [ref=e2379]
+                  - generic [ref=e2380]:
+                    - generic [ref=e2381]: Karakeep
+                    - generic [ref=e2382]: A self-hostable bookmark-everything app (links, notes and images) with AI-based automatic tagging and full text search
+                - link "View documentation" [ref=e2383]:
+                  - /url: https://coolify.io/docs/services/karakeep
+                  - img [ref=e2384]
+              - generic [ref=e2386] [cursor=pointer]:
+                - generic [ref=e2388]:
+                  - img [ref=e2390]
+                  - generic [ref=e2391]:
+                    - generic [ref=e2392]: Keycloak
+                    - generic [ref=e2393]: Keycloak is an open-source Identity and Access Management tool.
+                - link "View documentation" [ref=e2394]:
+                  - /url: https://coolify.io/docs/services/keycloak
+                  - img [ref=e2395]
+              - generic [ref=e2397] [cursor=pointer]:
+                - generic [ref=e2399]:
+                  - img [ref=e2401]
+                  - generic [ref=e2402]:
+                    - generic [ref=e2403]: Keycloak With Postgres
+                    - generic [ref=e2404]: Keycloak is an open-source Identity and Access Management tool.
+                - link "View documentation" [ref=e2405]:
+                  - /url: https://coolify.io/docs/services/keycloak
+                  - img [ref=e2406]
+              - generic [ref=e2408] [cursor=pointer]:
+                - generic [ref=e2410]:
+                  - img [ref=e2412]
+                  - generic [ref=e2413]:
+                    - generic [ref=e2414]: Kimai
+                    - generic [ref=e2415]: Open source time-tracking app.
+                - link "View documentation" [ref=e2416]:
+                  - /url: https://coolify.io/docs/services/kimai
+                  - img [ref=e2417]
+              - generic [ref=e2419] [cursor=pointer]:
+                - generic [ref=e2421]:
+                  - img [ref=e2423]
+                  - generic [ref=e2424]:
+                    - generic [ref=e2425]: Kuzzle
+                    - generic [ref=e2426]: Kuzzle is a generic backend offering the basic building blocks common to every application.
+                - link "View documentation" [ref=e2427]:
+                  - /url: https://coolify.io/docs/services/kuzzle
+                  - img [ref=e2428]
+              - generic [ref=e2430] [cursor=pointer]:
+                - generic [ref=e2432]:
+                  - img [ref=e2434]
+                  - generic [ref=e2435]:
+                    - generic [ref=e2436]: Labelstudio
+                    - generic [ref=e2437]: Label Studio is a multi-type data labeling and annotation tool with standardized output format
+                - link "View documentation" [ref=e2438]:
+                  - /url: https://coolify.io/docs/services/labelstudio
+                  - img [ref=e2439]
+              - generic [ref=e2441] [cursor=pointer]:
+                - generic [ref=e2443]:
+                  - img [ref=e2445]
+                  - generic [ref=e2446]:
+                    - generic [ref=e2447]: Langflow
+                    - generic [ref=e2448]: Langflow is an open-source, Python-based, customizable framework for building AI applications.
+                - link "View documentation" [ref=e2449]:
+                  - /url: https://coolify.io/docs/services/langflow
+                  - img [ref=e2450]
+              - generic [ref=e2452] [cursor=pointer]:
+                - generic [ref=e2454]:
+                  - img [ref=e2456]
+                  - generic [ref=e2457]:
+                    - generic [ref=e2458]: Langfuse
+                    - generic [ref=e2459]: Langfuse is an open-source LLM engineering platform that helps teams collaboratively debug, analyze, and iterate on their LLM applications.
+                - link "View documentation" [ref=e2460]:
+                  - /url: https://coolify.io/docs/services/langfuse
+                  - img [ref=e2461]
+              - generic [ref=e2463] [cursor=pointer]:
+                - generic [ref=e2465]:
+                  - img [ref=e2467]
+                  - generic [ref=e2468]:
+                    - generic [ref=e2469]: Leantime
+                    - generic [ref=e2470]: Leantime is a goals focused project management system for non-project managers.
+                - link "View documentation" [ref=e2471]:
+                  - /url: https://coolify.io/docs/services/leantime
+                  - img [ref=e2472]
+              - generic [ref=e2474] [cursor=pointer]:
+                - generic [ref=e2476]:
+                  - img [ref=e2478]
+                  - generic [ref=e2479]:
+                    - generic [ref=e2480]: Librechat
+                    - generic [ref=e2481]: Self-hosted, powerful, and privacy-focused chat UI for multiple AI models
+                - link "View documentation" [ref=e2482]:
+                  - /url: https://coolify.io/docs/services/librechat
+                  - img [ref=e2483]
+              - generic [ref=e2485] [cursor=pointer]:
+                - generic [ref=e2487]:
+                  - img [ref=e2489]
+                  - generic [ref=e2490]:
+                    - generic [ref=e2491]: Libreoffice
+                    - generic [ref=e2492]: LibreOffice is a free and powerful office suite.
+                - link "View documentation" [ref=e2493]:
+                  - /url: https://coolify.io/docs/services/libreoffice
+                  - img [ref=e2494]
+              - generic [ref=e2496] [cursor=pointer]:
+                - generic [ref=e2498]:
+                  - img [ref=e2500]
+                  - generic [ref=e2501]:
+                    - generic [ref=e2502]: Librespeed
+                    - generic [ref=e2503]: Self-hosted lightweight Speed Test.
+                - link "View documentation" [ref=e2504]:
+                  - /url: https://coolify.io/docs/services/librespeed
+                  - img [ref=e2505]
+              - generic [ref=e2507] [cursor=pointer]:
+                - generic [ref=e2509]:
+                  - img [ref=e2511]
+                  - generic [ref=e2512]:
+                    - generic [ref=e2513]: Libretranslate
+                    - generic [ref=e2514]: Free and open-source machine translation API, entirely self-hosted.
+                - link "View documentation" [ref=e2515]:
+                  - /url: https://coolify.io/docs/services/libretranslate
+                  - img [ref=e2516]
+              - generic [ref=e2518] [cursor=pointer]:
+                - generic [ref=e2520]:
+                  - img [ref=e2522]
+                  - generic [ref=e2523]:
+                    - generic [ref=e2524]: Limesurvey
+                    - generic [ref=e2525]: Simple, quick and anonymous online survey tool that's bursting with juicy insights.
+                - link "View documentation" [ref=e2526]:
+                  - /url: https://coolify.io/docs/services/limesurvey
+                  - img [ref=e2527]
+              - generic [ref=e2529] [cursor=pointer]:
+                - generic [ref=e2531]:
+                  - img [ref=e2533]
+                  - generic [ref=e2534]:
+                    - generic [ref=e2535]: Linkding
+                    - generic [ref=e2536]: A self-hosted bookmark manager designed to be minimal, fast, and easy to set up.
+                - link "View documentation" [ref=e2537]:
+                  - /url: https://coolify.io/docs/services/linkding
+                  - img [ref=e2538]
+              - generic [ref=e2540] [cursor=pointer]:
+                - generic [ref=e2542]:
+                  - img [ref=e2544]
+                  - generic [ref=e2545]:
+                    - generic [ref=e2546]: Linkding Plus
+                    - generic [ref=e2547]: A self-hosted bookmark manager designed to be minimal, fast, and easy to set up. (Includes feature for archiving websites as HTML snapshots)
+                - link "View documentation" [ref=e2548]:
+                  - /url: https://coolify.io/docs/services/linkding-plus
+                  - img [ref=e2549]
+              - generic [ref=e2551] [cursor=pointer]:
+                - generic [ref=e2553]:
+                  - img [ref=e2555]
+                  - generic [ref=e2556]:
+                    - generic [ref=e2557]: Listmonk
+                    - generic [ref=e2558]: Self-hosted newsletter and mailing list manager
+                - link "View documentation" [ref=e2559]:
+                  - /url: https://coolify.io/docs/services/listmonk
+                  - img [ref=e2560]
+              - generic [ref=e2562] [cursor=pointer]:
+                - generic [ref=e2564]:
+                  - img [ref=e2566]
+                  - generic [ref=e2567]:
+                    - generic [ref=e2568]: Litellm
+                    - generic [ref=e2569]: Call all LLM APIs using the OpenAI format. Use Bedrock, Azure, OpenAI, Cohere, Anthropic, Ollama, Sagemaker, HuggingFace, Replicate, Groq (100+ LLMs)
+                - link "View documentation" [ref=e2570]:
+                  - /url: https://coolify.io/docs/services/litellm
+                  - img [ref=e2571]
+              - generic [ref=e2573] [cursor=pointer]:
+                - generic [ref=e2575]:
+                  - img [ref=e2577]
+                  - generic [ref=e2578]:
+                    - generic [ref=e2579]: Litequeen
+                    - generic [ref=e2580]: Lite Queen is an open-source SQLite database management software that runs on your server.
+                - link "View documentation" [ref=e2581]:
+                  - /url: https://coolify.io/docs/services/litequeen
+                  - img [ref=e2582]
+              - generic [ref=e2584] [cursor=pointer]:
+                - generic [ref=e2586]:
+                  - img [ref=e2588]
+                  - generic [ref=e2589]:
+                    - generic [ref=e2590]: Lobe Chat
+                    - generic [ref=e2591]: An open-source, modern-design AI chat framework.
+                - link "View documentation" [ref=e2592]:
+                  - /url: https://coolify.io/docs/services/lobe-chat
+                  - img [ref=e2593]
+              - generic [ref=e2595] [cursor=pointer]:
+                - generic [ref=e2597]:
+                  - img [ref=e2599]
+                  - generic [ref=e2600]:
+                    - generic [ref=e2601]: Logto
+                    - generic [ref=e2602]: A comprehensive identity solution covering both the front and backend, complete with pre-built infrastructure and enterprise-grade solutions.
+                - link "View documentation" [ref=e2603]:
+                  - /url: https://coolify.io/docs/services/logto
+                  - img [ref=e2604]
+              - generic [ref=e2606] [cursor=pointer]:
+                - generic [ref=e2608]:
+                  - img [ref=e2610]
+                  - generic [ref=e2611]:
+                    - generic [ref=e2612]: Lowcoder
+                    - generic [ref=e2613]: Lowcoder (forked from OpenBlocks) is a self-hosted, open-source, low-code platform for building internal tools.
+                - link "View documentation" [ref=e2614]:
+                  - /url: https://coolify.io/docs/services/lowcoder
+                  - img [ref=e2615]
+              - generic [ref=e2617] [cursor=pointer]:
+                - generic [ref=e2619]:
+                  - img [ref=e2621]
+                  - generic [ref=e2622]:
+                    - generic [ref=e2623]: Mage Ai
+                    - generic [ref=e2624]: Build, run, and manage data pipelines for integrating and transforming data.
+                - link "View documentation" [ref=e2625]:
+                  - /url: https://coolify.io/docs/services/mage-ai
+                  - img [ref=e2626]
+              - generic [ref=e2628] [cursor=pointer]:
+                - generic [ref=e2630]:
+                  - img [ref=e2632]
+                  - generic [ref=e2633]:
+                    - generic [ref=e2634]: Mailpit
+                    - generic [ref=e2635]: Email & SMTP testing tool with API for developers
+                - link "View documentation" [ref=e2636]:
+                  - /url: https://coolify.io/docs/services/mailpit
+                  - img [ref=e2637]
+              - generic [ref=e2639] [cursor=pointer]:
+                - generic [ref=e2641]:
+                  - img [ref=e2643]
+                  - generic [ref=e2644]:
+                    - generic [ref=e2645]: Marimo
+                    - generic [ref=e2646]: An open-source reactive notebook for Python — reproducible, git-friendly, SQL built-in, executable as a script, and shareable as an app.
+                - link "View documentation" [ref=e2647]:
+                  - /url: https://coolify.io/docs/services/marimo
+                  - img [ref=e2648]
+              - generic [ref=e2650] [cursor=pointer]:
+                - generic [ref=e2652]:
+                  - img [ref=e2654]
+                  - generic [ref=e2655]:
+                    - generic [ref=e2656]: Martin
+                    - generic [ref=e2657]: Martin is a tile server able to generate and serve vector tiles on the fly from large PostGIS databases, PMTiles (local or remote), and MBTiles files, allowing multiple tile sources to be dynamically combined into one.
+                - link "View documentation" [ref=e2658]:
+                  - /url: https://coolify.io/docs/services/martin
+                  - img [ref=e2659]
+              - generic [ref=e2661] [cursor=pointer]:
+                - generic [ref=e2663]:
+                  - img [ref=e2665]
+                  - generic [ref=e2666]:
+                    - generic [ref=e2667]: Matrix Synapse With Postgresql
+                    - generic [ref=e2668]: Chat securely with your family, friends, community, or build great apps with Matrix!
+                - link "View documentation" [ref=e2669]:
+                  - /url: https://coolify.io/docs/services/matrix-synapse
+                  - img [ref=e2670]
+              - generic [ref=e2672] [cursor=pointer]:
+                - generic [ref=e2674]:
+                  - img [ref=e2676]
+                  - generic [ref=e2677]:
+                    - generic [ref=e2678]: Matrix Synapse With Sqlite
+                    - generic [ref=e2679]: Chat securely with your family, friends, community, or build great apps with Matrix!
+                - link "View documentation" [ref=e2680]:
+                  - /url: https://coolify.io/docs/services/matrix-synapse
+                  - img [ref=e2681]
+              - generic [ref=e2683] [cursor=pointer]:
+                - generic [ref=e2685]:
+                  - img [ref=e2687]
+                  - generic [ref=e2688]:
+                    - generic [ref=e2689]: Mattermost
+                    - generic [ref=e2690]: Mattermost is an open source, self-hosted Slack-alternative.
+                - link "View documentation" [ref=e2691]:
+                  - /url: https://coolify.io/docs/services/mattermost
+                  - img [ref=e2692]
+              - generic [ref=e2694] [cursor=pointer]:
+                - generic [ref=e2696]:
+                  - img [ref=e2698]
+                  - generic [ref=e2699]:
+                    - generic [ref=e2700]: Mealie
+                    - generic [ref=e2701]: A recipe manager and meal planner.
+                - link "View documentation" [ref=e2702]:
+                  - /url: https://coolify.io/docs/services/mealie
+                  - img [ref=e2703]
+              - generic [ref=e2705] [cursor=pointer]:
+                - generic [ref=e2707]:
+                  - img [ref=e2709]
+                  - generic [ref=e2710]:
+                    - generic [ref=e2711]: Mediawiki
+                    - generic [ref=e2712]: MediaWiki is a collaboration and documentation platform brought to you by a vibrant community.
+                - link "View documentation" [ref=e2713]:
+                  - /url: https://coolify.io/docs/services/mediawiki
+                  - img [ref=e2714]
+              - generic [ref=e2716] [cursor=pointer]:
+                - generic [ref=e2718]:
+                  - img [ref=e2720]
+                  - generic [ref=e2721]:
+                    - generic [ref=e2722]: Meilisearch
+                    - generic [ref=e2723]: MeiliSearch is a powerful, fast, easy to use and deploy search engine.
+                - link "View documentation" [ref=e2724]:
+                  - /url: https://coolify.io/docs/services/meilisearch
+                  - img [ref=e2725]
+              - generic [ref=e2727] [cursor=pointer]:
+                - generic [ref=e2729]:
+                  - img [ref=e2731]
+                  - generic [ref=e2732]:
+                    - generic [ref=e2733]: Memos
+                    - generic [ref=e2734]: An open-source, lightweight note-taking solution. The pain-less way to create your meaningful notes. Your Notes, Your Way.
+                - link "View documentation" [ref=e2735]:
+                  - /url: https://coolify.io/docs/services/memos
+                  - img [ref=e2736]
+              - generic [ref=e2738] [cursor=pointer]:
+                - generic [ref=e2740]:
+                  - img [ref=e2742]
+                  - generic [ref=e2743]:
+                    - generic [ref=e2744]: Metabase
+                    - generic [ref=e2745]: Fast analytics with the friendly UX and integrated tooling to let your company explore data on their own.
+                - link "View documentation" [ref=e2746]:
+                  - /url: https://coolify.io/docs/services/metabase
+                  - img [ref=e2747]
+              - generic [ref=e2749] [cursor=pointer]:
+                - generic [ref=e2751]:
+                  - img [ref=e2753]
+                  - generic [ref=e2754]:
+                    - generic [ref=e2755]: Metamcp
+                    - generic [ref=e2756]: MCP Aggregator, Orchestrator, Middleware, Gateway in one app
+                - link "View documentation" [ref=e2757]:
+                  - /url: https://coolify.io/docs/services/metamcp
+                  - img [ref=e2758]
+              - generic [ref=e2760] [cursor=pointer]:
+                - generic [ref=e2762]:
+                  - img [ref=e2764]
+                  - generic [ref=e2765]:
+                    - generic [ref=e2766]: Metube
+                    - generic [ref=e2767]: A web GUI for youtube-dl with playlist support. It enables you to effortlessly download videos from YouTube and dozens of other sites.
+                - link "View documentation" [ref=e2768]:
+                  - /url: https://coolify.io/docs/services/metube
+                  - img [ref=e2769]
+              - generic [ref=e2771] [cursor=pointer]:
+                - generic [ref=e2773]:
+                  - img [ref=e2775]
+                  - generic [ref=e2776]:
+                    - generic [ref=e2777]: Mindsdb
+                    - generic [ref=e2778]: MindsDB is the platform for building AI from enterprise data, enabling smarter organizations.
+                - link "View documentation" [ref=e2779]:
+                  - /url: https://coolify.io/docs/services/mindsdb
+                  - img [ref=e2780]
+              - generic [ref=e2782] [cursor=pointer]:
+                - generic [ref=e2784]:
+                  - img [ref=e2786]
+                  - generic [ref=e2787]:
+                    - generic [ref=e2788]: Minecraft
+                    - generic [ref=e2789]: Minecraft Server that will automatically download selected version at startup.
+                - link "View documentation" [ref=e2790]:
+                  - /url: https://coolify.io/docs/services/minecraft
+                  - img [ref=e2791]
+              - generic [ref=e2793] [cursor=pointer]:
+                - generic [ref=e2795]:
+                  - img [ref=e2797]
+                  - generic [ref=e2798]:
+                    - generic [ref=e2799]: Miniflux
+                    - generic [ref=e2800]: Miniflux is a minimalist and opinionated feed reader.
+                - link "View documentation" [ref=e2801]:
+                  - /url: https://coolify.io/docs/services/miniflux
+                  - img [ref=e2802]
+              - generic [ref=e2804] [cursor=pointer]:
+                - generic [ref=e2806]:
+                  - img [ref=e2808]
+                  - generic [ref=e2809]:
+                    - generic [ref=e2810]: Mixpost
+                    - generic [ref=e2811]: Mixpost is a robust and versatile social media management software, designed to streamline social media operations and enhance content marketing strategies.
+                - link "View documentation" [ref=e2812]:
+                  - /url: https://coolify.io/docs/services/mixpost
+                  - img [ref=e2813]
+              - generic [ref=e2815] [cursor=pointer]:
+                - generic [ref=e2817]:
+                  - img [ref=e2819]
+                  - generic [ref=e2820]:
+                    - generic [ref=e2821]: Moodle
+                    - generic [ref=e2822]: Moodle is the world’s most customisable and trusted eLearning solution that empowers educators to improve our world.
+                - link "View documentation" [ref=e2823]:
+                  - /url: https://coolify.io/docs/services/moodle
+                  - img [ref=e2824]
+              - generic [ref=e2826] [cursor=pointer]:
+                - generic [ref=e2828]:
+                  - img [ref=e2830]
+                  - generic [ref=e2831]:
+                    - generic [ref=e2832]: Mosquitto
+                    - generic [ref=e2833]: Mosquitto is lightweight and suitable for use on all devices, from low-power single-board computers to full servers.
+                - link "View documentation" [ref=e2834]:
+                  - /url: https://coolify.io/docs/services/mosquitto
+                  - img [ref=e2835]
+              - generic [ref=e2837] [cursor=pointer]:
+                - generic [ref=e2839]:
+                  - img [ref=e2841]
+                  - generic [ref=e2842]:
+                    - generic [ref=e2843]: N8N
+                    - generic [ref=e2844]: n8n is an extendable workflow automation tool.
+                - link "View documentation" [ref=e2845]:
+                  - /url: https://coolify.io/docs/services/n8n
+                  - img [ref=e2846]
+              - generic [ref=e2848] [cursor=pointer]:
+                - generic [ref=e2850]:
+                  - img [ref=e2852]
+                  - generic [ref=e2853]:
+                    - generic [ref=e2854]: N8N With Postgres And Worker
+                    - generic [ref=e2855]: n8n is an extendable workflow automation tool with queue mode and workers.
+                - link "View documentation" [ref=e2856]:
+                  - /url: https://coolify.io/docs/services/n8n
+                  - img [ref=e2857]
+              - generic [ref=e2859] [cursor=pointer]:
+                - generic [ref=e2861]:
+                  - img [ref=e2863]
+                  - generic [ref=e2864]:
+                    - generic [ref=e2865]: N8N With Postgresql
+                    - generic [ref=e2866]: n8n is an extendable workflow automation tool.
+                - link "View documentation" [ref=e2867]:
+                  - /url: https://coolify.io/docs/services/n8n
+                  - img [ref=e2868]
+              - generic [ref=e2870] [cursor=pointer]:
+                - generic [ref=e2872]:
+                  - img [ref=e2874]
+                  - generic [ref=e2875]:
+                    - generic [ref=e2876]: Navidrome
+                    - generic [ref=e2877]: Standalone server, that allows you to browse and listen to your music collection using a web browser or any Subsonic-compatible client.
+                - link "View documentation" [ref=e2878]:
+                  - /url: https://coolify.io/docs/services/navidrome
+                  - img [ref=e2879]
+              - generic [ref=e2881] [cursor=pointer]:
+                - generic [ref=e2883]:
+                  - img [ref=e2885]
+                  - generic [ref=e2886]:
+                    - generic [ref=e2887]: Neon Ws Proxy
+                    - generic [ref=e2888]: The database you love, on a serverless platform designed to help you build reliable and scalable applications faster.
+                - link "View documentation" [ref=e2889]:
+                  - /url: https://coolify.io/docs/services/neon-ws-proxy
+                  - img [ref=e2890]
+              - generic [ref=e2892] [cursor=pointer]:
+                - generic [ref=e2894]:
+                  - img [ref=e2896]
+                  - generic [ref=e2897]:
+                    - generic [ref=e2898]: Netbird Client
+                    - generic [ref=e2899]: Connect your devices into a secure WireGuard®-based overlay network with SSO, MFA and granular access controls.
+                - link "View documentation" [ref=e2900]:
+                  - /url: https://coolify.io/docs/services/netbird-client
+                  - img [ref=e2901]
+              - generic [ref=e2903] [cursor=pointer]:
+                - generic [ref=e2905]:
+                  - img [ref=e2907]
+                  - generic [ref=e2908]:
+                    - generic [ref=e2909]: Newapi
+                    - generic [ref=e2910]: The next-generation LLM gateway and AI asset management system supports multiple languages.
+                - link "View documentation" [ref=e2911]:
+                  - /url: https://coolify.io/docs/services/newapi
+                  - img [ref=e2912]
+              - generic [ref=e2914] [cursor=pointer]:
+                - generic [ref=e2916]:
+                  - img [ref=e2918]
+                  - generic [ref=e2919]:
+                    - generic [ref=e2920]: Newt Pangolin
+                    - generic [ref=e2921]: Pangolin tunnels your services to the internet so you can access anything from anywhere.
+                - link "View documentation" [ref=e2922]:
+                  - /url: https://coolify.io/docs/services/newt-pangolin
+                  - img [ref=e2923]
+              - generic [ref=e2925] [cursor=pointer]:
+                - generic [ref=e2927]:
+                  - img [ref=e2929]
+                  - generic [ref=e2930]:
+                    - generic [ref=e2931]: Next Image Transformation
+                    - generic [ref=e2932]: Drop-in replacement for Vercel's Nextjs image optimization service.
+                - link "View documentation" [ref=e2933]:
+                  - /url: https://coolify.io/docs/services/next-image-transformation
+                  - img [ref=e2934]
+              - generic [ref=e2936] [cursor=pointer]:
+                - generic [ref=e2938]:
+                  - img [ref=e2940]
+                  - generic [ref=e2941]:
+                    - generic [ref=e2942]: Nextcloud
+                    - generic [ref=e2943]: NextCloud is a self-hosted, open-source platform that provides file storage, collaboration, and communication tools for seamless data management.
+                - link "View documentation" [ref=e2944]:
+                  - /url: https://coolify.io/docs/services/nextcloud
+                  - img [ref=e2945]
+              - generic [ref=e2947] [cursor=pointer]:
+                - generic [ref=e2949]:
+                  - img [ref=e2951]
+                  - generic [ref=e2952]:
+                    - generic [ref=e2953]: Nextcloud With Mariadb
+                    - generic [ref=e2954]: NextCloud is a self-hosted, open-source platform that provides file storage, collaboration, and communication tools for seamless data management.
+                - link "View documentation" [ref=e2955]:
+                  - /url: https://coolify.io/docs/services/nextcloud
+                  - img [ref=e2956]
+              - generic [ref=e2958] [cursor=pointer]:
+                - generic [ref=e2960]:
+                  - img [ref=e2962]
+                  - generic [ref=e2963]:
+                    - generic [ref=e2964]: Nextcloud With Mysql
+                    - generic [ref=e2965]: NextCloud is a self-hosted, open-source platform that provides file storage, collaboration, and communication tools for seamless data management.
+                - link "View documentation" [ref=e2966]:
+                  - /url: https://coolify.io/docs/services/nextcloud
+                  - img [ref=e2967]
+              - generic [ref=e2969] [cursor=pointer]:
+                - generic [ref=e2971]:
+                  - img [ref=e2973]
+                  - generic [ref=e2974]:
+                    - generic [ref=e2975]: Nextcloud With Postgres
+                    - generic [ref=e2976]: NextCloud is a self-hosted, open-source platform that provides file storage, collaboration, and communication tools for seamless data management.
+                - link "View documentation" [ref=e2977]:
+                  - /url: https://coolify.io/docs/services/nextcloud
+                  - img [ref=e2978]
+              - generic [ref=e2980] [cursor=pointer]:
+                - generic [ref=e2982]:
+                  - img [ref=e2984]
+                  - generic [ref=e2985]:
+                    - generic [ref=e2986]: Nexus
+                    - generic [ref=e2987]: "Open source Universal Repository Manager (x86_64 version, official), default credentials: admin/admin123"
+                - link "View documentation" [ref=e2988]:
+                  - /url: https://coolify.io/docs/services/nexus
+                  - img [ref=e2989]
+              - generic [ref=e2991] [cursor=pointer]:
+                - generic [ref=e2993]:
+                  - img [ref=e2995]
+                  - generic [ref=e2996]:
+                    - generic [ref=e2997]: Nexus Arm
+                    - generic [ref=e2998]: "Open source Universal Repository Manager (ARM version, community edition), default credentials: admin/admin123"
+                - link "View documentation" [ref=e2999]:
+                  - /url: https://coolify.io/docs/services/nexus-arm
+                  - img [ref=e3000]
+              - generic [ref=e3002] [cursor=pointer]:
+                - generic [ref=e3004]:
+                  - img [ref=e3006]
+                  - generic [ref=e3007]:
+                    - generic [ref=e3008]: Nitropage
+                    - generic [ref=e3009]: Nitropage is an extensible, visual website builder, offering a growing library of versatile building blocks, focal-point image cropping and sovereign font management.
+                - link "View documentation" [ref=e3010]:
+                  - /url: https://coolify.io/docs/services/nitropage
+                  - img [ref=e3011]
+              - generic [ref=e3013] [cursor=pointer]:
+                - generic [ref=e3015]:
+                  - img [ref=e3017]
+                  - generic [ref=e3018]:
+                    - generic [ref=e3019]: Nitropage With Postgresql
+                    - generic [ref=e3020]: Nitropage is an extensible, visual website builder, offering a growing library of versatile building blocks, focal-point image cropping and sovereign font management.
+                - link "View documentation" [ref=e3021]:
+                  - /url: https://coolify.io/docs/services/nitropage
+                  - img [ref=e3022]
+              - generic [ref=e3024] [cursor=pointer]:
+                - generic [ref=e3026]:
+                  - img [ref=e3028]
+                  - generic [ref=e3029]:
+                    - generic [ref=e3030]: Nocobase
+                    - generic [ref=e3031]: NocoBase is the most extensible AI-powered no-code/low-code platform.
+                - link "View documentation" [ref=e3032]:
+                  - /url: https://coolify.io/docs/services/nocobase
+                  - img [ref=e3033]
+              - generic [ref=e3035] [cursor=pointer]:
+                - generic [ref=e3037]:
+                  - img [ref=e3039]
+                  - generic [ref=e3040]:
+                    - generic [ref=e3041]: Nocodb
+                    - generic [ref=e3042]: NocoDB is an open source Airtable alternative. Turns any MySQL, PostgreSQL, SQL Server, SQLite & MariaDB into a smart-spreadsheet.
+                - link "View documentation" [ref=e3043]:
+                  - /url: https://coolify.io/docs/services/nocodb
+                  - img [ref=e3044]
+              - generic [ref=e3046] [cursor=pointer]:
+                - generic [ref=e3048]:
+                  - img [ref=e3050]
+                  - generic [ref=e3051]:
+                    - generic [ref=e3052]: Nodebb
+                    - generic [ref=e3053]: A next-generation discussion platform.
+                - link "View documentation" [ref=e3054]:
+                  - /url: https://coolify.io/docs/services/nodebb
+                  - img [ref=e3055]
+              - generic [ref=e3057] [cursor=pointer]:
+                - generic [ref=e3059]:
+                  - img [ref=e3061]
+                  - generic [ref=e3062]:
+                    - generic [ref=e3063]: Ntfy
+                    - generic [ref=e3064]: ntfy is a simple HTTP-based pub-sub notification service. It allows you to send notifications to your phone or desktop via scripts from any computer, and/or using a REST API.
+                - link "View documentation" [ref=e3065]:
+                  - /url: https://coolify.io/docs/services/ntfy
+                  - img [ref=e3066]
+              - generic [ref=e3068] [cursor=pointer]:
+                - generic [ref=e3070]:
+                  - img [ref=e3072]
+                  - generic [ref=e3073]:
+                    - generic [ref=e3074]: Observium
+                    - generic [ref=e3075]: Observium is a comprehensive network monitoring platform designed to deliver powerful monitoring capabilities, combined with an elegant and intuitive user interface.
+                - link "View documentation" [ref=e3076]:
+                  - /url: https://coolify.io/docs/services/observium
+                  - img [ref=e3077]
+              - generic [ref=e3079] [cursor=pointer]:
+                - generic [ref=e3081]:
+                  - img [ref=e3083]
+                  - generic [ref=e3084]:
+                    - generic [ref=e3085]: Odoo
+                    - generic [ref=e3086]: Odoo is a suite of open-source business apps that cover all your company needs.
+                - link "View documentation" [ref=e3087]:
+                  - /url: https://coolify.io/docs/services/odoo
+                  - img [ref=e3088]
+              - generic [ref=e3090] [cursor=pointer]:
+                - generic [ref=e3092]:
+                  - img [ref=e3094]
+                  - generic [ref=e3095]:
+                    - generic [ref=e3096]: Ollama With Open Webui
+                    - generic [ref=e3097]: Ollama with Open Web UI integrates AI model deployment with a user-friendly interface.
+                - link "View documentation" [ref=e3098]:
+                  - /url: https://coolify.io/docs/services/ollama
+                  - img [ref=e3099]
+              - generic [ref=e3101] [cursor=pointer]:
+                - generic [ref=e3103]:
+                  - img [ref=e3105]
+                  - generic [ref=e3106]:
+                    - generic [ref=e3107]: Once Campfire
+                    - generic [ref=e3108]: Super simple group chat, without a subscription.
+                - link "View documentation" [ref=e3109]:
+                  - /url: https://coolify.io/docs/services/once-campfire
+                  - img [ref=e3110]
+              - generic [ref=e3112] [cursor=pointer]:
+                - generic [ref=e3114]:
+                  - img [ref=e3116]
+                  - generic [ref=e3117]:
+                    - generic [ref=e3118]: Onedev
+                    - generic [ref=e3119]: Git server with CI/CD, kanban, and packages. Seamless integration. Unparalleled experience.
+                - link "View documentation" [ref=e3120]:
+                  - /url: https://coolify.io/docs/services/onedev
+                  - img [ref=e3121]
+              - generic [ref=e3123] [cursor=pointer]:
+                - generic [ref=e3125]:
+                  - img [ref=e3127]
+                  - generic [ref=e3128]:
+                    - generic [ref=e3129]: Onetimesecret
+                    - generic [ref=e3130]: Share sensitive information securely with self-destructing links that are only viewable once.
+                - link "View documentation" [ref=e3131]:
+                  - /url: https://coolify.io/docs/services/onetimesecret
+                  - img [ref=e3132]
+              - generic [ref=e3134] [cursor=pointer]:
+                - generic [ref=e3136]:
+                  - img [ref=e3138]
+                  - generic [ref=e3139]:
+                    - generic [ref=e3140]: Open Archiver
+                    - generic [ref=e3141]: A self-hosted, open-source email archiving solution with full-text search capability.
+                - link "View documentation" [ref=e3142]:
+                  - /url: https://coolify.io/docs/services/open-archiver
+                  - img [ref=e3143]
+              - generic [ref=e3145] [cursor=pointer]:
+                - generic [ref=e3147]:
+                  - img [ref=e3149]
+                  - generic [ref=e3150]:
+                    - generic [ref=e3151]: Open Webui
+                    - generic [ref=e3152]: User-friendly AI Interface (Supports Ollama, OpenAI API, ...)
+                - link "View documentation" [ref=e3153]:
+                  - /url: https://coolify.io/docs/services/open-webui
+                  - img [ref=e3154]
+              - generic [ref=e3156] [cursor=pointer]:
+                - generic [ref=e3158]:
+                  - img [ref=e3160]
+                  - generic [ref=e3161]:
+                    - generic [ref=e3162]: Openclaw
+                    - generic [ref=e3163]: AI-powered coding assistant with multi-provider support and browser automation.
+                - link "View documentation" [ref=e3164]:
+                  - /url: https://coolify.io/docs/services/openclaw
+                  - img [ref=e3165]
+              - generic [ref=e3167] [cursor=pointer]:
+                - generic [ref=e3169]:
+                  - img [ref=e3171]
+                  - generic [ref=e3172]:
+                    - generic [ref=e3173]: Openpanel
+                    - generic [ref=e3174]: Open source alternative to Mixpanel and Plausible for product analytics
+                - link "View documentation" [ref=e3175]:
+                  - /url: https://coolify.io/docs/services/openpanel
+                  - img [ref=e3176]
+              - generic [ref=e3178] [cursor=pointer]:
+                - generic [ref=e3180]:
+                  - img [ref=e3182]
+                  - generic [ref=e3183]:
+                    - generic [ref=e3184]: Opnform
+                    - generic [ref=e3185]: OpnForm is an open-source form builder that lets you create beautiful forms and share them anywhere. It's super fast, you don't need to know how to code
+                - link "View documentation" [ref=e3186]:
+                  - /url: https://coolify.io/docs/services/opnform
+                  - img [ref=e3187]
+              - generic [ref=e3189] [cursor=pointer]:
+                - generic [ref=e3191]:
+                  - img [ref=e3193]
+                  - generic [ref=e3194]:
+                    - generic [ref=e3195]: Orangehrm
+                    - generic [ref=e3196]: OrangeHRM open source HR management software.
+                - link "View documentation" [ref=e3197]:
+                  - /url: https://coolify.io/docs/services/orangehrm
+                  - img [ref=e3198]
+              - generic [ref=e3200] [cursor=pointer]:
+                - generic [ref=e3202]:
+                  - img [ref=e3204]
+                  - generic [ref=e3205]:
+                    - generic [ref=e3206]: Organizr
+                    - generic [ref=e3207]: Homelab Services Organizer
+                - link "View documentation" [ref=e3208]:
+                  - /url: https://coolify.io/docs/services/organizr
+                  - img [ref=e3209]
+              - generic [ref=e3211] [cursor=pointer]:
+                - generic [ref=e3213]:
+                  - img [ref=e3215]
+                  - generic [ref=e3216]:
+                    - generic [ref=e3217]: Osticket
+                    - generic [ref=e3218]: osTicket is a widely-used open source support ticket system.
+                - link "View documentation" [ref=e3219]:
+                  - /url: https://coolify.io/docs/services/osticket
+                  - img [ref=e3220]
+              - generic [ref=e3222] [cursor=pointer]:
+                - generic [ref=e3224]:
+                  - img [ref=e3226]
+                  - generic [ref=e3227]:
+                    - generic [ref=e3228]: Overseerr
+                    - generic [ref=e3229]: Overseerr is a request management and media discovery tool built to work with your existing Plex ecosystem.
+                - link "View documentation" [ref=e3230]:
+                  - /url: https://coolify.io/docs/services/overseerr
+                  - img [ref=e3231]
+              - generic [ref=e3233] [cursor=pointer]:
+                - generic [ref=e3235]:
+                  - img [ref=e3237]
+                  - generic [ref=e3238]:
+                    - generic [ref=e3239]: Owncloud
+                    - generic [ref=e3240]: OwnCloud with Open Web UI integrates file management with a powerful, user-friendly interface.
+                - link "View documentation" [ref=e3241]:
+                  - /url: https://coolify.io/docs/services/owncloud
+                  - img [ref=e3242]
+              - generic [ref=e3244] [cursor=pointer]:
+                - generic [ref=e3246]:
+                  - img [ref=e3248]
+                  - generic [ref=e3249]:
+                    - generic [ref=e3250]: Pairdrop
+                    - generic [ref=e3251]: Pairdrop is a self-hosted file sharing and collaboration platform, offering secure file sharing and collaboration capabilities for efficient teamwork.
+                - link "View documentation" [ref=e3252]:
+                  - /url: https://coolify.io/docs/services/pairdrop
+                  - img [ref=e3253]
+              - generic [ref=e3255] [cursor=pointer]:
+                - generic [ref=e3257]:
+                  - img [ref=e3259]
+                  - generic [ref=e3260]:
+                    - generic [ref=e3261]: Palworld
+                    - generic [ref=e3262]: Palworld.yaml
+                - link "View documentation" [ref=e3263]:
+                  - /url: https://coolify.io/docs/services/palworld
+                  - img [ref=e3264]
+              - generic [ref=e3266] [cursor=pointer]:
+                - generic [ref=e3268]:
+                  - img [ref=e3270]
+                  - generic [ref=e3271]:
+                    - generic [ref=e3272]: Paperless
+                    - generic [ref=e3273]: Paperless-ngx is a community-supported open-source document management system that transforms your physical documents into a searchable online archive so you can keep, well, less paper.
+                - link "View documentation" [ref=e3274]:
+                  - /url: https://coolify.io/docs/services/paperless
+                  - img [ref=e3275]
+              - generic [ref=e3277] [cursor=pointer]:
+                - generic [ref=e3279]:
+                  - img [ref=e3281]
+                  - generic [ref=e3282]:
+                    - generic [ref=e3283]: Passbolt
+                    - generic [ref=e3284]: Passbolt Community Edition (CE) API. The JSON API for the open source password manager for teams!
+                - link "View documentation" [ref=e3285]:
+                  - /url: https://coolify.io/docs/services/passbolt
+                  - img [ref=e3286]
+              - generic [ref=e3288] [cursor=pointer]:
+                - generic [ref=e3290]:
+                  - img [ref=e3292]
+                  - generic [ref=e3293]:
+                    - generic [ref=e3294]: Paymenter
+                    - generic [ref=e3295]: Open-Source Billing, Built for Hosting
+                - link "View documentation" [ref=e3296]:
+                  - /url: https://coolify.io/docs/services/paymenter
+                  - img [ref=e3297]
+              - generic [ref=e3299] [cursor=pointer]:
+                - generic [ref=e3301]:
+                  - img [ref=e3303]
+                  - generic [ref=e3304]:
+                    - generic [ref=e3305]: Penpot
+                    - generic [ref=e3306]: Penpot is the first Open Source design and prototyping platform for product teams.
+                - link "View documentation" [ref=e3307]:
+                  - /url: https://coolify.io/docs/services/penpot
+                  - img [ref=e3308]
+              - generic [ref=e3310] [cursor=pointer]:
+                - generic [ref=e3312]:
+                  - img [ref=e3314]
+                  - generic [ref=e3315]:
+                    - generic [ref=e3316]: Penpot With S3
+                    - generic [ref=e3317]: Penpot is the first Open Source design and prototyping platform for product teams.
+                - link "View documentation" [ref=e3318]:
+                  - /url: https://coolify.io/docs/services/penpot
+                  - img [ref=e3319]
+              - generic [ref=e3321] [cursor=pointer]:
+                - generic [ref=e3323]:
+                  - img [ref=e3325]
+                  - generic [ref=e3326]:
+                    - generic [ref=e3327]: Pgadmin
+                    - generic [ref=e3328]: pgAdmin is a web-based database management tool for administering your PostgreSQL databases through a user-friendly interface.
+                - link "View documentation" [ref=e3329]:
+                  - /url: https://coolify.io/docs/services/pgadmin
+                  - img [ref=e3330]
+              - generic [ref=e3332] [cursor=pointer]:
+                - generic [ref=e3334]:
+                  - img [ref=e3336]
+                  - generic [ref=e3337]:
+                    - generic [ref=e3338]: Pgbackweb
+                    - generic [ref=e3339]: Effortless PostgreSQL backups with a user-friendly web interface!
+                - link "View documentation" [ref=e3340]:
+                  - /url: https://coolify.io/docs/services/pgbackweb
+                  - img [ref=e3341]
+              - generic [ref=e3343] [cursor=pointer]:
+                - generic [ref=e3345]:
+                  - img [ref=e3347]
+                  - generic [ref=e3348]:
+                    - generic [ref=e3349]: Phpmyadmin
+                    - generic [ref=e3350]: phpMyAdmin is a web-based database management tool for administering your MySQL and MariaDB databases through a user-friendly interface.
+                - link "View documentation" [ref=e3351]:
+                  - /url: https://coolify.io/docs/services/phpmyadmin
+                  - img [ref=e3352]
+              - generic [ref=e3354] [cursor=pointer]:
+                - generic [ref=e3356]:
+                  - img [ref=e3358]
+                  - generic [ref=e3359]:
+                    - generic [ref=e3360]: Pi Hole
+                    - generic [ref=e3361]: Network-wide Ad Blocking
+                - link "View documentation" [ref=e3362]:
+                  - /url: https://coolify.io/docs/services/pi-hole
+                  - img [ref=e3363]
+              - generic [ref=e3365] [cursor=pointer]:
+                - generic [ref=e3367]:
+                  - img [ref=e3369]
+                  - generic [ref=e3370]:
+                    - generic [ref=e3371]: Plane
+                    - generic [ref=e3372]: The open source project management tool
+                - link "View documentation" [ref=e3373]:
+                  - /url: https://coolify.io/docs/services/plane
+                  - img [ref=e3374]
+              - generic [ref=e3376] [cursor=pointer]:
+                - generic [ref=e3378]:
+                  - img [ref=e3380]
+                  - generic [ref=e3381]:
+                    - generic [ref=e3382]: Plex
+                    - generic [ref=e3383]: Plex organizes video, music and photos from personal media libraries and streams them to smart TVs, streaming boxes and mobile devices.
+                - link "View documentation" [ref=e3384]:
+                  - /url: https://coolify.io/docs/services/plex
+                  - img [ref=e3385]
+              - generic [ref=e3387] [cursor=pointer]:
+                - generic [ref=e3389]:
+                  - img [ref=e3391]
+                  - generic [ref=e3392]:
+                    - generic [ref=e3393]: Plunk
+                    - generic [ref=e3394]: Plunk, The Open-Source Email Platform for AWS
+                - link "View documentation" [ref=e3395]:
+                  - /url: https://coolify.io/docs/services/plunk
+                  - img [ref=e3396]
+              - generic [ref=e3398] [cursor=pointer]:
+                - generic [ref=e3400]:
+                  - img [ref=e3402]
+                  - generic [ref=e3403]:
+                    - generic [ref=e3404]: Pocket Id
+                    - generic [ref=e3405]: A simple and secure OIDC provider with passkey authentication
+                - link "View documentation" [ref=e3406]:
+                  - /url: https://coolify.io/docs/services/pocket-id
+                  - img [ref=e3407]
+              - generic [ref=e3409] [cursor=pointer]:
+                - generic [ref=e3411]:
+                  - img [ref=e3413]
+                  - generic [ref=e3414]:
+                    - generic [ref=e3415]: Pocket Id With Postgresql
+                    - generic [ref=e3416]: A simple and secure OIDC provider with passkey authentication
+                - link "View documentation" [ref=e3417]:
+                  - /url: https://coolify.io/docs/services/pocket-id
+                  - img [ref=e3418]
+              - generic [ref=e3420] [cursor=pointer]:
+                - generic [ref=e3422]:
+                  - img [ref=e3424]
+                  - generic [ref=e3425]:
+                    - generic [ref=e3426]: Pocketbase
+                    - generic [ref=e3427]: Open Source backend for your next SaaS and Mobile app in 1 file
+                - link "View documentation" [ref=e3428]:
+                  - /url: https://coolify.io/docs/services/pocketbase
+                  - img [ref=e3429]
+              - generic [ref=e3431] [cursor=pointer]:
+                - generic [ref=e3433]:
+                  - img [ref=e3435]
+                  - generic [ref=e3436]:
+                    - generic [ref=e3437]: Portainer
+                    - generic [ref=e3438]: Portainer is a lightweight management UI for Docker
+                - link "View documentation" [ref=e3439]:
+                  - /url: https://coolify.io/docs/services/portainer
+                  - img [ref=e3440]
+              - generic [ref=e3442] [cursor=pointer]:
+                - generic [ref=e3444]:
+                  - img [ref=e3446]
+                  - generic [ref=e3447]:
+                    - generic [ref=e3448]: Postiz
+                    - generic [ref=e3449]: Open source social media scheduling tool.
+                - link "View documentation" [ref=e3450]:
+                  - /url: https://coolify.io/docs/services/postiz
+                  - img [ref=e3451]
+              - generic [ref=e3453] [cursor=pointer]:
+                - generic [ref=e3455]:
+                  - img [ref=e3457]
+                  - generic [ref=e3458]:
+                    - generic [ref=e3459]: Prefect
+                    - generic [ref=e3460]: Prefect is an orchestration and observability platform that empowers developers to build and scale workflows quickly.
+                - link "View documentation" [ref=e3461]:
+                  - /url: https://coolify.io/docs/services/prefect
+                  - img [ref=e3462]
+              - generic [ref=e3464] [cursor=pointer]:
+                - generic [ref=e3466]:
+                  - img [ref=e3468]
+                  - generic [ref=e3469]:
+                    - generic [ref=e3470]: Privatebin
+                    - generic [ref=e3471]: PrivateBin is a minimalist, open source online pastebin where the server has zero knowledge of pasted data.
+                - link "View documentation" [ref=e3472]:
+                  - /url: https://coolify.io/docs/services/privatebin
+                  - img [ref=e3473]
+              - generic [ref=e3475] [cursor=pointer]:
+                - generic [ref=e3477]:
+                  - img [ref=e3479]
+                  - generic [ref=e3480]:
+                    - generic [ref=e3481]: Prowlarr
+                    - generic [ref=e3482]: Prowlarr⁠ is a indexer manager/proxy built on the popular arr .net/reactjs base stack to integrate with your various PVR apps.
+                - link "View documentation" [ref=e3483]:
+                  - /url: https://coolify.io/docs/services/prowlarr
+                  - img [ref=e3484]
+              - generic [ref=e3486] [cursor=pointer]:
+                - generic [ref=e3488]:
+                  - img [ref=e3490]
+                  - generic [ref=e3491]:
+                    - generic [ref=e3492]: Proxyscotch
+                    - generic [ref=e3493]: A simple proxy server created for https://hoppscotch.io - CORS proxy
+                - link "View documentation" [ref=e3494]:
+                  - /url: https://coolify.io/docs/services/proxyscotch
+                  - img [ref=e3495]
+              - generic [ref=e3497] [cursor=pointer]:
+                - generic [ref=e3499]:
+                  - img [ref=e3501]
+                  - generic [ref=e3502]:
+                    - generic [ref=e3503]: Pydio Cells
+                    - generic [ref=e3504]: High-performance large file sharing, native no-code automation, and a collaboration-centric architecture that simplifies access control without compromising security or compliance.
+                - link "View documentation" [ref=e3505]:
+                  - /url: https://coolify.io/docs/services/pydio-cells
+                  - img [ref=e3506]
+              - generic [ref=e3508] [cursor=pointer]:
+                - generic [ref=e3510]:
+                  - img [ref=e3512]
+                  - generic [ref=e3513]:
+                    - generic [ref=e3514]: Qbittorrent
+                    - generic [ref=e3515]: The qBittorrent project aims to provide an open-source software alternative to μTorrent.
+                - link "View documentation" [ref=e3516]:
+                  - /url: https://coolify.io/docs/services/qbittorrent
+                  - img [ref=e3517]
+              - generic [ref=e3519] [cursor=pointer]:
+                - generic [ref=e3521]:
+                  - img [ref=e3523]
+                  - generic [ref=e3524]:
+                    - generic [ref=e3525]: Qdrant
+                    - generic [ref=e3526]: Qdrant is a vector similarity search engine that provides a production-ready service with a convenient API to store, search, and manage points (i.e. vectors) with an additional payload.
+                - link "View documentation" [ref=e3527]:
+                  - /url: https://coolify.io/docs/services/qdrant
+                  - img [ref=e3528]
+              - generic [ref=e3530] [cursor=pointer]:
+                - generic [ref=e3532]:
+                  - img [ref=e3534]
+                  - generic [ref=e3535]:
+                    - generic [ref=e3536]: Rabbitmq
+                    - generic [ref=e3537]: With tens of thousands of users, RabbitMQ is one of the most popular open source message brokers.
+                - link "View documentation" [ref=e3538]:
+                  - /url: https://coolify.io/docs/services/rabbitmq
+                  - img [ref=e3539]
+              - generic [ref=e3541] [cursor=pointer]:
+                - generic [ref=e3543]:
+                  - img [ref=e3545]
+                  - generic [ref=e3546]:
+                    - generic [ref=e3547]: Radarr
+                    - generic [ref=e3548]: Radarr⁠ - A fork of Sonarr to work with movies à la Couchpotato.
+                - link "View documentation" [ref=e3549]:
+                  - /url: https://coolify.io/docs/services/radarr
+                  - img [ref=e3550]
+              - generic [ref=e3552] [cursor=pointer]:
+                - generic [ref=e3554]:
+                  - img [ref=e3556]
+                  - generic [ref=e3557]:
+                    - generic [ref=e3558]: Rallly
+                    - generic [ref=e3559]: Rallly is an open-source scheduling and collaboration tool designed to make organizing events and meetings easier.
+                - link "View documentation" [ref=e3560]:
+                  - /url: https://coolify.io/docs/services/rallly
+                  - img [ref=e3561]
+              - generic [ref=e3563] [cursor=pointer]:
+                - generic [ref=e3565]:
+                  - img [ref=e3567]
+                  - generic [ref=e3568]:
+                    - generic [ref=e3569]: Reactive Resume
+                    - generic [ref=e3570]: A one-of-a-kind resume builder that keeps your privacy in mind.
+                - link "View documentation" [ref=e3571]:
+                  - /url: https://coolify.io/docs/services/reactive-resume
+                  - img [ref=e3572]
+              - generic [ref=e3574] [cursor=pointer]:
+                - generic [ref=e3576]:
+                  - img [ref=e3578]
+                  - generic [ref=e3579]:
+                    - generic [ref=e3580]: Readeck
+                    - generic [ref=e3581]: Simple web application that lets you save the precious readable content of web pages you like and want to keep forever.
+                - link "View documentation" [ref=e3582]:
+                  - /url: https://coolify.io/docs/services/readeck
+                  - img [ref=e3583]
+              - generic [ref=e3585] [cursor=pointer]:
+                - generic [ref=e3587]:
+                  - img [ref=e3589]
+                  - generic [ref=e3590]:
+                    - generic [ref=e3591]: Redis Insight
+                    - generic [ref=e3592]: Redis Insight lets you do both GUI- and CLI-based interactions in a fully-featured desktop GUI client.
+                - link "View documentation" [ref=e3593]:
+                  - /url: https://coolify.io/docs/services/redis-insight
+                  - img [ref=e3594]
+              - generic [ref=e3596] [cursor=pointer]:
+                - generic [ref=e3598]:
+                  - img [ref=e3600]
+                  - generic [ref=e3601]:
+                    - generic [ref=e3602]: Redlib
+                    - generic [ref=e3603]: An alternative private front-end to Reddit, with its origins in Libreddit.
+                - link "View documentation" [ref=e3604]:
+                  - /url: https://coolify.io/docs/services/redlib
+                  - img [ref=e3605]
+              - generic [ref=e3607] [cursor=pointer]:
+                - generic [ref=e3609]:
+                  - img [ref=e3611]
+                  - generic [ref=e3612]:
+                    - generic [ref=e3613]: Redmine
+                    - generic [ref=e3614]: Redmine is a flexible project management web application.
+                - link "View documentation" [ref=e3615]:
+                  - /url: https://coolify.io/docs/services/redmine
+                  - img [ref=e3616]
+              - generic [ref=e3618] [cursor=pointer]:
+                - generic [ref=e3620]:
+                  - img [ref=e3622]
+                  - generic [ref=e3623]:
+                    - generic [ref=e3624]: Rivet Engine
+                    - generic [ref=e3625]: Build and scale stateful workloads with long-lived processes
+                - link "View documentation" [ref=e3626]:
+                  - /url: https://coolify.io/docs/services/rivet-engine
+                  - img [ref=e3627]
+              - generic [ref=e3629] [cursor=pointer]:
+                - generic [ref=e3631]:
+                  - img [ref=e3633]
+                  - generic [ref=e3634]:
+                    - generic [ref=e3635]: Rocketchat
+                    - generic [ref=e3636]: Self-hosted, secure and highly customizable open-source communication platform for organizations with sophisticated security and privacy concerns.
+                - link "View documentation" [ref=e3637]:
+                  - /url: https://coolify.io/docs/services/rocketchat
+                  - img [ref=e3638]
+              - generic [ref=e3640] [cursor=pointer]:
+                - generic [ref=e3642]:
+                  - img [ref=e3644]
+                  - generic [ref=e3645]:
+                    - generic [ref=e3646]: Rybbit
+                    - generic [ref=e3647]: Open-source, privacy-first web analytics.
+                - link "View documentation" [ref=e3648]:
+                  - /url: https://coolify.io/docs/services/rybbit
+                  - img [ref=e3649]
+              - generic [ref=e3651] [cursor=pointer]:
+                - generic [ref=e3653]:
+                  - img [ref=e3655]
+                  - generic [ref=e3656]:
+                    - generic [ref=e3657]: Ryot
+                    - generic [ref=e3658]: Roll your own tracker! Ryot is a self-hosted platform for tracking various aspects of life such as media consumption, fitness activities, and more.
+                - link "View documentation" [ref=e3659]:
+                  - /url: https://coolify.io/docs/services/ryot
+                  - img [ref=e3660]
+              - generic [ref=e3662] [cursor=pointer]:
+                - generic [ref=e3664]:
+                  - img [ref=e3666]
+                  - generic [ref=e3667]:
+                    - generic [ref=e3668]: Satisfactory
+                    - generic [ref=e3669]: Satisfactory Dedicated Server for hosting your own Satisfactory game sessions.
+                - link "View documentation" [ref=e3670]:
+                  - /url: https://coolify.io/docs/services/satisfactory
+                  - img [ref=e3671]
+              - generic [ref=e3673] [cursor=pointer]:
+                - generic [ref=e3675]:
+                  - img [ref=e3677]
+                  - generic [ref=e3678]:
+                    - generic [ref=e3679]: Seafile
+                    - generic [ref=e3680]: Open source cloud storage system for file sync, share and document collaboration
+                - link "View documentation" [ref=e3681]:
+                  - /url: https://coolify.io/docs/services/seafile
+                  - img [ref=e3682]
+              - generic [ref=e3684] [cursor=pointer]:
+                - generic [ref=e3686]:
+                  - img [ref=e3688]
+                  - generic [ref=e3689]:
+                    - generic [ref=e3690]: Searxng
+                    - generic [ref=e3691]: SearXNG is a free internet metasearch engine which aggregates results from more than 70 search services.
+                - link "View documentation" [ref=e3692]:
+                  - /url: https://coolify.io/docs/services/searxng
+                  - img [ref=e3693]
+              - generic [ref=e3695] [cursor=pointer]:
+                - generic [ref=e3697]:
+                  - img [ref=e3699]
+                  - generic [ref=e3700]:
+                    - generic [ref=e3701]: Seaweedfs
+                    - generic [ref=e3702]: SeaweedFS is a simple and highly scalable distributed file system. Compatible with S3, with an admin web interface.
+                - link "View documentation" [ref=e3703]:
+                  - /url: https://coolify.io/docs/services/seaweedfs
+                  - img [ref=e3704]
+              - generic [ref=e3706] [cursor=pointer]:
+                - generic [ref=e3708]:
+                  - img [ref=e3710]
+                  - generic [ref=e3711]:
+                    - generic [ref=e3712]: Sequin
+                    - generic [ref=e3713]: The fastest Postgres change data capture
+                - link "View documentation" [ref=e3714]:
+                  - /url: https://coolify.io/docs/services/sequin
+                  - img [ref=e3715]
+              - generic [ref=e3717] [cursor=pointer]:
+                - generic [ref=e3719]:
+                  - img [ref=e3721]
+                  - generic [ref=e3722]:
+                    - generic [ref=e3723]: Sessy
+                    - generic [ref=e3724]: Email observability platform for monitoring and analyzing email systems.
+                - link "View documentation" [ref=e3725]:
+                  - /url: https://coolify.io/docs/services/sessy
+                  - img [ref=e3726]
+              - generic [ref=e3728] [cursor=pointer]:
+                - generic [ref=e3730]:
+                  - img [ref=e3732]
+                  - generic [ref=e3733]:
+                    - generic [ref=e3734]: Sftpgo
+                    - generic [ref=e3735]: SFTPGo is an event-driven SFTP, FTP/S, HTTP/S and WebDAV server.
+                - link "View documentation" [ref=e3736]:
+                  - /url: https://coolify.io/docs/services/sftpgo
+                  - img [ref=e3737]
+              - generic [ref=e3739] [cursor=pointer]:
+                - generic [ref=e3741]:
+                  - img [ref=e3743]
+                  - generic [ref=e3744]:
+                    - generic [ref=e3745]: Shlink
+                    - generic [ref=e3746]: The definitive self-hosted URL shortener
+                - link "View documentation" [ref=e3747]:
+                  - /url: https://coolify.io/docs/services/shlink
+                  - img [ref=e3748]
+              - generic [ref=e3750] [cursor=pointer]:
+                - generic [ref=e3752]:
+                  - img [ref=e3754]
+                  - generic [ref=e3755]:
+                    - generic [ref=e3756]: Signoz
+                    - generic [ref=e3757]: An observability platform native to OpenTelemetry with logs, traces and metrics.
+                - link "View documentation" [ref=e3758]:
+                  - /url: https://coolify.io/docs/services/signoz
+                  - img [ref=e3759]
+              - generic [ref=e3761] [cursor=pointer]:
+                - generic [ref=e3763]:
+                  - img [ref=e3765]
+                  - generic [ref=e3766]:
+                    - generic [ref=e3767]: Silverbullet
+                    - generic [ref=e3768]: SilverBullet is a tool to develop, organize, and structure your personal knowledge and to make it universally accessible across all your devices.
+                - link "View documentation" [ref=e3769]:
+                  - /url: https://coolify.io/docs/services/silverbullet
+                  - img [ref=e3770]
+              - generic [ref=e3772] [cursor=pointer]:
+                - generic [ref=e3774]:
+                  - img [ref=e3776]
+                  - generic [ref=e3777]:
+                    - generic [ref=e3778]: Siyuan
+                    - generic [ref=e3779]: A privacy-first, self-hosted, fully open source personal knowledge management software, written in typescript and golang.
+                - link "View documentation" [ref=e3780]:
+                  - /url: https://coolify.io/docs/services/siyuan
+                  - img [ref=e3781]
+              - generic [ref=e3783] [cursor=pointer]:
+                - generic [ref=e3785]:
+                  - img [ref=e3787]
+                  - generic [ref=e3788]:
+                    - generic [ref=e3789]: Slash
+                    - generic [ref=e3790]: An open source, self-hosted links shortener and sharing platform.
+                - link "View documentation" [ref=e3791]:
+                  - /url: https://coolify.io/docs/services/slash
+                  - img [ref=e3792]
+              - generic [ref=e3794] [cursor=pointer]:
+                - generic [ref=e3796]:
+                  - img [ref=e3798]
+                  - generic [ref=e3799]:
+                    - generic [ref=e3800]: Snapdrop
+                    - generic [ref=e3801]: A self-hosted file-sharing service for secure and convenient file transfers, whether on a local network or the internet.
+                - link "View documentation" [ref=e3802]:
+                  - /url: https://coolify.io/docs/services/snapdrop
+                  - img [ref=e3803]
+              - generic [ref=e3805] [cursor=pointer]:
+                - generic [ref=e3807]:
+                  - img [ref=e3809]
+                  - generic [ref=e3810]:
+                    - generic [ref=e3811]: Soju
+                    - generic [ref=e3812]: A user-friendly IRC bouncer with a modern web interface
+                - link "View documentation" [ref=e3813]:
+                  - /url: https://coolify.io/docs/services/soju
+                  - img [ref=e3814]
+              - generic [ref=e3816] [cursor=pointer]:
+                - generic [ref=e3818]:
+                  - img [ref=e3820]
+                  - generic [ref=e3821]:
+                    - generic [ref=e3822]: Soketi
+                    - generic [ref=e3823]: Soketi is your simple, fast, and resilient open-source WebSockets server.
+                - link "View documentation" [ref=e3824]:
+                  - /url: https://coolify.io/docs/services/soketi
+                  - img [ref=e3825]
+              - generic [ref=e3827] [cursor=pointer]:
+                - generic [ref=e3829]:
+                  - img [ref=e3831]
+                  - generic [ref=e3832]:
+                    - generic [ref=e3833]: Soketi App Manager
+                    - generic [ref=e3834]: Manage soketi websocket server and apps with ease.
+                - link "View documentation" [ref=e3835]:
+                  - /url: https://coolify.io/docs/services/soketi-app-manager
+                  - img [ref=e3836]
+              - generic [ref=e3838] [cursor=pointer]:
+                - generic [ref=e3840]:
+                  - img [ref=e3842]
+                  - generic [ref=e3843]:
+                    - generic [ref=e3844]: Sonarr
+                    - generic [ref=e3845]: Sonarr⁠ (formerly NZBdrone) is a PVR for usenet and bittorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
+                - link "View documentation" [ref=e3846]:
+                  - /url: https://coolify.io/docs/services/sonarr
+                  - img [ref=e3847]
+              - generic [ref=e3849] [cursor=pointer]:
+                - generic [ref=e3851]:
+                  - img [ref=e3853]
+                  - generic [ref=e3854]:
+                    - generic [ref=e3855]: Spacebot
+                    - generic [ref=e3856]: An agentic AI system with specialized processes for thinking, working, and remembering.
+                - link "View documentation" [ref=e3857]:
+                  - /url: https://coolify.io/docs/services/spacebot
+                  - img [ref=e3858]
+              - generic [ref=e3860] [cursor=pointer]:
+                - generic [ref=e3862]:
+                  - img [ref=e3864]
+                  - generic [ref=e3865]:
+                    - generic [ref=e3866]: Sparkyfitness
+                    - generic [ref=e3867]: SparkyFitness is a comprehensive fitness tracking and management application designed to help users monitor their nutrition, exercise, and body measurements. It provides tools for daily progress tracking, goal setting, and insightful reports to support a healthy lifestyle.
+                - link "View documentation" [ref=e3868]:
+                  - /url: https://coolify.io/docs/services/sparkyfitness
+                  - img [ref=e3869]
+              - generic [ref=e3871] [cursor=pointer]:
+                - generic [ref=e3873]:
+                  - img [ref=e3875]
+                  - generic [ref=e3876]:
+                    - generic [ref=e3877]: Statusnook
+                    - generic [ref=e3878]: Effortlessly deploy a status page and start monitoring endpoints in minutes
+                - link "View documentation" [ref=e3879]:
+                  - /url: https://coolify.io/docs/services/statusnook
+                  - img [ref=e3880]
+              - generic [ref=e3882] [cursor=pointer]:
+                - generic [ref=e3884]:
+                  - img [ref=e3886]
+                  - generic [ref=e3887]:
+                    - generic [ref=e3888]: Stirling Pdf
+                    - generic [ref=e3889]: Stirling is a powerful web based PDF manipulation tool
+                - link "View documentation" [ref=e3890]:
+                  - /url: https://coolify.io/docs/services/stirling-pdf
+                  - img [ref=e3891]
+              - generic [ref=e3893] [cursor=pointer]:
+                - generic [ref=e3895]:
+                  - img [ref=e3897]
+                  - generic [ref=e3898]:
+                    - generic [ref=e3899]: Strapi
+                    - generic [ref=e3900]: Open-source headless CMS to build powerful APIs with built-in content management.
+                - link "View documentation" [ref=e3901]:
+                  - /url: https://coolify.io/docs/services/strapi
+                  - img [ref=e3902]
+              - generic [ref=e3904] [cursor=pointer]:
+                - generic [ref=e3906]:
+                  - img [ref=e3908]
+                  - generic [ref=e3909]:
+                    - generic [ref=e3910]: Supabase
+                    - generic [ref=e3911]: The open source Firebase alternative.
+                - link "View documentation" [ref=e3912]:
+                  - /url: https://coolify.io/docs/services/supabase
+                  - img [ref=e3913]
+              - generic [ref=e3915] [cursor=pointer]:
+                - generic [ref=e3917]:
+                  - img [ref=e3919]
+                  - generic [ref=e3920]:
+                    - generic [ref=e3921]: Superset With Postgresql
+                    - generic [ref=e3922]: Modern data exploration and visualization platform (unofficial community docker image)
+                - link "View documentation" [ref=e3923]:
+                  - /url: https://coolify.io/docs/services/superset
+                  - img [ref=e3924]
+              - generic [ref=e3926] [cursor=pointer]:
+                - generic [ref=e3928]:
+                  - img [ref=e3930]
+                  - generic [ref=e3931]:
+                    - generic [ref=e3932]: Supertokens With Mysql
+                    - generic [ref=e3933]: An open-source authentication solution that simplifies the implementation of secure user authentication and session management for web and mobile applications.
+                - link "View documentation" [ref=e3934]:
+                  - /url: https://coolify.io/docs/services/supertokens
+                  - img [ref=e3935]
+              - generic [ref=e3937] [cursor=pointer]:
+                - generic [ref=e3939]:
+                  - img [ref=e3941]
+                  - generic [ref=e3942]:
+                    - generic [ref=e3943]: Supertokens With Postgresql
+                    - generic [ref=e3944]: An open-source authentication solution that simplifies the implementation of secure user authentication and session management for web and mobile applications.
+                - link "View documentation" [ref=e3945]:
+                  - /url: https://coolify.io/docs/services/supertokens
+                  - img [ref=e3946]
+              - generic [ref=e3948] [cursor=pointer]:
+                - generic [ref=e3950]:
+                  - img [ref=e3952]
+                  - generic [ref=e3953]:
+                    - generic [ref=e3954]: Sure
+                    - generic [ref=e3955]: An all-in-one personal finance platform.
+                - link "View documentation" [ref=e3956]:
+                  - /url: https://coolify.io/docs/services/sure
+                  - img [ref=e3957]
+              - generic [ref=e3959] [cursor=pointer]:
+                - generic [ref=e3961]:
+                  - img [ref=e3963]
+                  - generic [ref=e3964]:
+                    - generic [ref=e3965]: Swetrix
+                    - generic [ref=e3966]: Privacy-friendly and cookieless European web analytics alternative to Google Analytics.
+                - link "View documentation" [ref=e3967]:
+                  - /url: https://coolify.io/docs/services/swetrix
+                  - img [ref=e3968]
+              - generic [ref=e3970] [cursor=pointer]:
+                - generic [ref=e3972]:
+                  - img [ref=e3974]
+                  - generic [ref=e3975]:
+                    - generic [ref=e3976]: Syncthing
+                    - generic [ref=e3977]: Syncthing synchronizes files between two or more computers in real time.
+                - link "View documentation" [ref=e3978]:
+                  - /url: https://coolify.io/docs/services/syncthing
+                  - img [ref=e3979]
+              - generic [ref=e3981] [cursor=pointer]:
+                - generic [ref=e3983]:
+                  - img [ref=e3985]
+                  - generic [ref=e3986]:
+                    - generic [ref=e3987]: Tailscale Client
+                    - generic [ref=e3988]: Tailscale securely connects your devices over the internet using WireGuard.
+                - link "View documentation" [ref=e3989]:
+                  - /url: https://coolify.io/docs/services/tailscale-client
+                  - img [ref=e3990]
+              - generic [ref=e3992] [cursor=pointer]:
+                - generic [ref=e3994]:
+                  - img [ref=e3996]
+                  - generic [ref=e3997]:
+                    - generic [ref=e3998]: Teable
+                    - generic [ref=e3999]: Teable is a powerful visual interface built on relational databases (PostgreSQL).
+                - link "View documentation" [ref=e4000]:
+                  - /url: https://coolify.io/docs/services/teable
+                  - img [ref=e4001]
+              - generic [ref=e4003] [cursor=pointer]:
+                - generic [ref=e4005]:
+                  - img [ref=e4007]
+                  - generic [ref=e4008]:
+                    - generic [ref=e4009]: Terraria Server
+                    - generic [ref=e4010]: Docker multi-arch Image for Terraria Server.
+                - link "View documentation" [ref=e4011]:
+                  - /url: https://coolify.io/docs/services/terraria-server
+                  - img [ref=e4012]
+              - generic [ref=e4014] [cursor=pointer]:
+                - generic [ref=e4016]:
+                  - img [ref=e4018]
+                  - generic [ref=e4019]:
+                    - generic [ref=e4020]: Tolgee
+                    - generic [ref=e4021]: Tolgee is a localization management platform for developers and translators.
+                - link "View documentation" [ref=e4022]:
+                  - /url: https://coolify.io/docs/services/tolgee
+                  - img [ref=e4023]
+              - generic [ref=e4025] [cursor=pointer]:
+                - generic [ref=e4027]:
+                  - img [ref=e4029]
+                  - generic [ref=e4030]:
+                    - generic [ref=e4031]: Traccar
+                    - generic [ref=e4032]: Traccar is a free and open source modern GPS tracking system.
+                - link "View documentation" [ref=e4033]:
+                  - /url: https://coolify.io/docs/services/traccar
+                  - img [ref=e4034]
+              - generic [ref=e4036] [cursor=pointer]:
+                - generic [ref=e4038]:
+                  - img [ref=e4040]
+                  - generic [ref=e4041]:
+                    - generic [ref=e4042]: Trailbase
+                    - generic [ref=e4043]: A blazingly fast Rust/SQLite/Wasmtime app server with type-safe APIs
+                - link "View documentation" [ref=e4044]:
+                  - /url: https://coolify.io/docs/services/trailbase
+                  - img [ref=e4045]
+              - generic [ref=e4047] [cursor=pointer]:
+                - generic [ref=e4049]:
+                  - img [ref=e4051]
+                  - generic [ref=e4052]:
+                    - generic [ref=e4053]: Transmission
+                    - generic [ref=e4054]: Fast, easy, and free BitTorrent client.
+                - link "View documentation" [ref=e4055]:
+                  - /url: https://coolify.io/docs/services/transmission
+                  - img [ref=e4056]
+              - generic [ref=e4058] [cursor=pointer]:
+                - generic [ref=e4060]:
+                  - img [ref=e4062]
+                  - generic [ref=e4063]:
+                    - generic [ref=e4064]: Trigger
+                    - generic [ref=e4065]: The open source background jobs platform for developers
+                - link "View documentation" [ref=e4066]:
+                  - /url: https://coolify.io/docs/services/trigger
+                  - img [ref=e4067]
+              - generic [ref=e4069] [cursor=pointer]:
+                - generic [ref=e4071]:
+                  - img [ref=e4073]
+                  - generic [ref=e4074]:
+                    - generic [ref=e4075]: Triliumnext
+                    - generic [ref=e4076]: Build your personal knowledge base with TriliumNext Notes.
+                - link "View documentation" [ref=e4077]:
+                  - /url: https://coolify.io/docs/services/triliumnext
+                  - img [ref=e4078]
+              - generic [ref=e4080] [cursor=pointer]:
+                - generic [ref=e4082]:
+                  - img [ref=e4084]
+                  - generic [ref=e4085]:
+                    - generic [ref=e4086]: Twenty
+                    - generic [ref=e4087]: Twenty is a CRM designed to fit your unique business needs.
+                - link "View documentation" [ref=e4088]:
+                  - /url: https://coolify.io/docs/services/twenty
+                  - img [ref=e4089]
+              - generic [ref=e4091] [cursor=pointer]:
+                - generic [ref=e4093]:
+                  - img [ref=e4095]
+                  - generic [ref=e4096]:
+                    - generic [ref=e4097]: Typesense
+                    - generic [ref=e4098]: Cutting-edge, in-memory search engine for mere mortals. Knowledge of rocket science optional.
+                - link "View documentation" [ref=e4099]:
+                  - /url: https://coolify.io/docs/services/typesense
+                  - img [ref=e4100]
+              - generic [ref=e4102] [cursor=pointer]:
+                - generic [ref=e4104]:
+                  - img [ref=e4106]
+                  - generic [ref=e4107]:
+                    - generic [ref=e4108]: Umami
+                    - generic [ref=e4109]: Umami is web analytics platform which provides insights into visitor behavior without compromising user privacy.
+                - link "View documentation" [ref=e4110]:
+                  - /url: https://coolify.io/docs/services/umami
+                  - img [ref=e4111]
+              - generic [ref=e4113] [cursor=pointer]:
+                - generic [ref=e4115]:
+                  - img [ref=e4117]
+                  - generic [ref=e4118]:
+                    - generic [ref=e4119]: Unleash With Postgresql
+                    - generic [ref=e4120]: Open source feature flag management for enterprises.
+                - link "View documentation" [ref=e4121]:
+                  - /url: https://coolify.io/docs/services/unleash
+                  - img [ref=e4122]
+              - generic [ref=e4124] [cursor=pointer]:
+                - generic [ref=e4126]:
+                  - img [ref=e4128]
+                  - generic [ref=e4129]:
+                    - generic [ref=e4130]: Unleash Without Database
+                    - generic [ref=e4131]: Open source feature flag management for enterprises.
+                - link "View documentation" [ref=e4132]:
+                  - /url: https://coolify.io/docs/services/unleash
+                  - img [ref=e4133]
+              - generic [ref=e4135] [cursor=pointer]:
+                - generic [ref=e4137]:
+                  - img [ref=e4139]
+                  - generic [ref=e4140]:
+                    - generic [ref=e4141]: Unstructured
+                    - generic [ref=e4142]: Unstructured provides a platform and tools to ingest and process unstructured documents for Retrieval Augmented Generation (RAG) and model fine-tuning.
+                - link "View documentation" [ref=e4143]:
+                  - /url: https://coolify.io/docs/services/unstructured
+                  - img [ref=e4144]
+              - generic [ref=e4146] [cursor=pointer]:
+                - generic [ref=e4148]:
+                  - img [ref=e4150]
+                  - generic [ref=e4151]:
+                    - generic [ref=e4152]: Uptime Kuma
+                    - generic [ref=e4153]: Uptime Kuma is a monitoring tool for tracking the status and performance of your applications in real-time.
+                - link "View documentation" [ref=e4154]:
+                  - /url: https://coolify.io/docs/services/uptime-kuma
+                  - img [ref=e4155]
+              - generic [ref=e4157] [cursor=pointer]:
+                - generic [ref=e4159]:
+                  - img [ref=e4161]
+                  - generic [ref=e4162]:
+                    - generic [ref=e4163]: Uptime Kuma With Mariadb
+                    - generic [ref=e4164]: Uptime Kuma is a monitoring tool for tracking the status and performance of your applications in real-time.
+                - link "View documentation" [ref=e4165]:
+                  - /url: https://coolify.io/docs/services/uptime-kuma
+                  - img [ref=e4166]
+              - generic [ref=e4168] [cursor=pointer]:
+                - generic [ref=e4170]:
+                  - img [ref=e4172]
+                  - generic [ref=e4173]:
+                    - generic [ref=e4174]: Uptime Kuma With Mysql
+                    - generic [ref=e4175]: Uptime Kuma is a monitoring tool for tracking the status and performance of your applications in real-time.
+                - link "View documentation" [ref=e4176]:
+                  - /url: https://coolify.io/docs/services/uptime-kuma
+                  - img [ref=e4177]
+              - generic [ref=e4179] [cursor=pointer]:
+                - generic [ref=e4181]:
+                  - img [ref=e4183]
+                  - generic [ref=e4184]:
+                    - generic [ref=e4185]: Usesend
+                    - generic [ref=e4186]: Usesend is an open-source alternative to Resend, Sendgrid, Mailgun and Postmark etc.
+                - link "View documentation" [ref=e4187]:
+                  - /url: https://coolify.io/docs/services/usesend
+                  - img [ref=e4188]
+              - generic [ref=e4190] [cursor=pointer]:
+                - generic [ref=e4192]:
+                  - img [ref=e4194]
+                  - generic [ref=e4195]:
+                    - generic [ref=e4196]: Vaultwarden
+                    - generic [ref=e4197]: Vaultwarden is a password manager that allows you to securely store and manage your passwords.
+                - link "View documentation" [ref=e4198]:
+                  - /url: https://coolify.io/docs/services/vaultwarden
+                  - img [ref=e4199]
+              - generic [ref=e4201] [cursor=pointer]:
+                - generic [ref=e4203]:
+                  - img [ref=e4205]
+                  - generic [ref=e4206]:
+                    - generic [ref=e4207]: Vert
+                    - generic [ref=e4208]: The next-generation file converter. Open source, fully local and free forever.
+                - link "View documentation" [ref=e4209]:
+                  - /url: https://coolify.io/docs/services/vert
+                  - img [ref=e4210]
+              - generic [ref=e4212] [cursor=pointer]:
+                - generic [ref=e4214]:
+                  - img [ref=e4216]
+                  - generic [ref=e4217]:
+                    - generic [ref=e4218]: Vikunja
+                    - generic [ref=e4219]: The open-source, self-hostable to-do app. Organize everything, on all platforms.
+                - link "View documentation" [ref=e4220]:
+                  - /url: https://coolify.io/docs/services/vikunja
+                  - img [ref=e4221]
+              - generic [ref=e4223] [cursor=pointer]:
+                - generic [ref=e4225]:
+                  - img [ref=e4227]
+                  - generic [ref=e4228]:
+                    - generic [ref=e4229]: Vikunja With Postgresql
+                    - generic [ref=e4230]: The open-source, self-hostable to-do app. Organize everything, on all platforms.
+                - link "View documentation" [ref=e4231]:
+                  - /url: https://coolify.io/docs/services/vikunja
+                  - img [ref=e4232]
+              - generic [ref=e4234] [cursor=pointer]:
+                - generic [ref=e4236]:
+                  - img [ref=e4238]
+                  - generic [ref=e4239]:
+                    - generic [ref=e4240]: Vvveb
+                    - generic [ref=e4241]: Powerful and easy to use cms to build websites, blogs or ecommerce stores.
+                - link "View documentation" [ref=e4242]:
+                  - /url: https://coolify.io/docs/services/vvveb
+                  - img [ref=e4243]
+              - generic [ref=e4245] [cursor=pointer]:
+                - generic [ref=e4247]:
+                  - img [ref=e4249]
+                  - generic [ref=e4250]:
+                    - generic [ref=e4251]: Vvveb With Mariadb
+                    - generic [ref=e4252]: Powerful and easy to use cms to build websites, blogs or ecommerce stores.
+                - link "View documentation" [ref=e4253]:
+                  - /url: https://coolify.io/docs/services/vvveb
+                  - img [ref=e4254]
+              - generic [ref=e4256] [cursor=pointer]:
+                - generic [ref=e4258]:
+                  - img [ref=e4260]
+                  - generic [ref=e4261]:
+                    - generic [ref=e4262]: Vvveb With Mysql
+                    - generic [ref=e4263]: Powerful and easy to use cms to build websites, blogs or ecommerce stores.
+                - link "View documentation" [ref=e4264]:
+                  - /url: https://coolify.io/docs/services/vvveb
+                  - img [ref=e4265]
+              - generic [ref=e4267] [cursor=pointer]:
+                - generic [ref=e4269]:
+                  - img [ref=e4271]
+                  - generic [ref=e4272]:
+                    - generic [ref=e4273]: Wakapi
+                    - generic [ref=e4274]: A minimalist, self-hosted WakaTime-compatible backend for coding statistics
+                - link "View documentation" [ref=e4275]:
+                  - /url: https://coolify.io/docs/services/wakapi
+                  - img [ref=e4276]
+              - generic [ref=e4278] [cursor=pointer]:
+                - generic [ref=e4280]:
+                  - img [ref=e4282]
+                  - generic [ref=e4283]:
+                    - generic [ref=e4284]: Weaviate
+                    - generic [ref=e4285]: Weaviate is an open-source vector database that stores both objects and vectors, allowing for combining vector search with structured filtering.
+                - link "View documentation" [ref=e4286]:
+                  - /url: https://coolify.io/docs/services/weaviate
+                  - img [ref=e4287]
+              - generic [ref=e4289] [cursor=pointer]:
+                - generic [ref=e4291]:
+                  - img [ref=e4293]
+                  - generic [ref=e4294]:
+                    - generic [ref=e4295]: Web Check
+                    - generic [ref=e4296]: All-in-one OSINT tool for analysing any website
+                - link "View documentation" [ref=e4297]:
+                  - /url: https://coolify.io/docs/services/web-check
+                  - img [ref=e4298]
+              - generic [ref=e4300] [cursor=pointer]:
+                - generic [ref=e4302]:
+                  - img [ref=e4304]
+                  - generic [ref=e4305]:
+                    - generic [ref=e4306]: Weblate
+                    - generic [ref=e4307]: Weblate is a libre software web-based continuous localization system.
+                - link "View documentation" [ref=e4308]:
+                  - /url: https://coolify.io/docs/services/weblate
+                  - img [ref=e4309]
+              - generic [ref=e4311] [cursor=pointer]:
+                - generic [ref=e4313]:
+                  - img [ref=e4315]
+                  - generic [ref=e4316]:
+                    - generic [ref=e4317]: Whoogle
+                    - generic [ref=e4318]: Whoogle is a self-hosted, privacy-focused search engine front-end for accessing Google search results without tracking and data collection.
+                - link "View documentation" [ref=e4319]:
+                  - /url: https://coolify.io/docs/services/whoogle
+                  - img [ref=e4320]
+              - generic [ref=e4322] [cursor=pointer]:
+                - generic [ref=e4324]:
+                  - img [ref=e4326]
+                  - generic [ref=e4327]:
+                    - generic [ref=e4328]: Wikijs
+                    - generic [ref=e4329]: The most powerful and extensible open source Wiki software.
+                - link "View documentation" [ref=e4330]:
+                  - /url: https://coolify.io/docs/services/wikijs
+                  - img [ref=e4331]
+              - generic [ref=e4333] [cursor=pointer]:
+                - generic [ref=e4335]:
+                  - img [ref=e4337]
+                  - generic [ref=e4338]:
+                    - generic [ref=e4339]: Windmill
+                    - generic [ref=e4340]: Windmill is a developer platform to build production-grade multi-steps automations and internal apps.
+                - link "View documentation" [ref=e4341]:
+                  - /url: https://coolify.io/docs/services/windmill
+                  - img [ref=e4342]
+              - generic [ref=e4344] [cursor=pointer]:
+                - generic [ref=e4346]:
+                  - img [ref=e4348]
+                  - generic [ref=e4349]:
+                    - generic [ref=e4350]: Wings
+                    - generic [ref=e4351]: The server control plane for Pterodactyl Panel. Written from the ground-up with security, speed, and stability in mind.
+                - link "View documentation" [ref=e4352]:
+                  - /url: https://coolify.io/docs/services/wings
+                  - img [ref=e4353]
+              - generic [ref=e4355] [cursor=pointer]:
+                - generic [ref=e4357]:
+                  - img [ref=e4359]
+                  - generic [ref=e4360]:
+                    - generic [ref=e4361]: Wireguard Easy
+                    - generic [ref=e4362]: The easiest way to run WireGuard VPN + Web-based Admin UI.
+                - link "View documentation" [ref=e4363]:
+                  - /url: https://coolify.io/docs/services/wireguard-easy
+                  - img [ref=e4364]
+              - generic [ref=e4366] [cursor=pointer]:
+                - generic [ref=e4368]:
+                  - img [ref=e4370]
+                  - generic [ref=e4371]:
+                    - generic [ref=e4372]: Wordpress With Mariadb
+                    - generic [ref=e4373]: WordPress is open source software you can use to create a beautiful website, blog, or app.
+                - link "View documentation" [ref=e4374]:
+                  - /url: https://coolify.io/docs/services/wordpress
+                  - img [ref=e4375]
+              - generic [ref=e4377] [cursor=pointer]:
+                - generic [ref=e4379]:
+                  - img [ref=e4381]
+                  - generic [ref=e4382]:
+                    - generic [ref=e4383]: Wordpress With Mysql
+                    - generic [ref=e4384]: WordPress is open source software you can use to create a beautiful website, blog, or app.
+                - link "View documentation" [ref=e4385]:
+                  - /url: https://coolify.io/docs/services/wordpress
+                  - img [ref=e4386]
+              - generic [ref=e4388] [cursor=pointer]:
+                - generic [ref=e4390]:
+                  - img [ref=e4392]
+                  - generic [ref=e4393]:
+                    - generic [ref=e4394]: Wordpress Without Database
+                    - generic [ref=e4395]: WordPress is open source software you can use to create a beautiful website, blog, or app.
+                - link "View documentation" [ref=e4396]:
+                  - /url: https://coolify.io/docs/services/wordpress
+                  - img [ref=e4397]
+              - generic [ref=e4399] [cursor=pointer]:
+                - generic [ref=e4401]:
+                  - img [ref=e4403]
+                  - generic [ref=e4404]:
+                    - generic [ref=e4405]: Yamtrack
+                    - generic [ref=e4406]: Yamtrack is a self hosted media tracker for movies, tv shows, anime, manga, video games and books.
+                - link "View documentation" [ref=e4407]:
+                  - /url: https://coolify.io/docs/services/yamtrack
+                  - img [ref=e4408]
+              - generic [ref=e4410] [cursor=pointer]:
+                - generic [ref=e4412]:
+                  - img [ref=e4414]
+                  - generic [ref=e4415]:
+                    - generic [ref=e4416]: Yamtrack With Postgresql
+                    - generic [ref=e4417]: Yamtrack is a self hosted media tracker for movies, tv shows, anime, manga, video games and books.
+                - link "View documentation" [ref=e4418]:
+                  - /url: https://coolify.io/docs/services/yamtrack
+                  - img [ref=e4419]
+              - generic [ref=e4421] [cursor=pointer]:
+                - generic [ref=e4423]:
+                  - img [ref=e4425]
+                  - generic [ref=e4426]:
+                    - generic [ref=e4427]: Zipline
+                    - generic [ref=e4428]: A ShareX/file upload server that is easy to use, packed with features, and with an easy setup!
+                - link "View documentation" [ref=e4429]:
+                  - /url: https://coolify.io/docs/services/zipline
+                  - img [ref=e4430]
+  - list

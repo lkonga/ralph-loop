@@ -1,0 +1,39 @@
+[     659ms] TypeError: Cannot use 'in' operator to search for 'render' in undefined
+    at https://static.nc-img.com/uishoppingcart/app.ceb896bed23496a217ea.js:6:126764
+    at Object.execCb (https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:26444)
+    at b.check (https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:20189)
+    at b.<anonymous> (https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:22610)
+    at https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:14377
+    at https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:23071
+    at each (https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:13816)
+    at b.emit (https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:23039)
+    at b.check (https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:20748)
+    at b.enable (https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:125:22937)
+[    1764ms] [ERROR] Event @ https://d2jbt8279safi9.cloudfront.net/umd/main.841406bd.js:1
+[    2042ms] [ERROR] Access to script at 'https://connect.facebook.net/en_US/fbevents.js' from origin 'https://www.namecheap.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.namecheap.com/shoppingcart/?_gl=1*18qjkfn*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjEzNjAxNDI0NjUuMTc3ODE1MjgyMy4xNzc4MTUyOTE3*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxNDcxMTckbzIkZzEkdDE3NzgxNTI5MzAkajMwJGwwJGgw:0
+[    2042ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://connect.facebook.net/en_US/fbevents.js:0
+[   13164ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-700-webfont.woff2:0
+[   13164ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/gb-icon.woff2:0
+[   13164ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-500-webfont.woff2:0
+[   13165ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-300-webfont.woff2:0
+[   13254ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.namecheap.com/cart/checkout/payment/payment.aspx?checkout=express&from=checkout&checkoutid=4148DCB93E0B4EBAB91D5203D25448DF&mode=ALL:0
+[   13490ms] Uncaught SyntaxError: Invalid regular expression: /^/support(/: Unterminated group
+    at <anonymous> (https://files.namecheap.com/cdn/0/assets/js/v1275.global-script.min.js:81:9061)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19648)
+    at isPageMatching (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19500)
+    at isPageAllowed (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19796)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6848)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6270)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6503)
+    at init (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:8541)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:32109)
+    at n (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:109)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:901)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:911)
+[ 4483802ms] Uncaught SyntaxError: Invalid regular expression: /^/support(/: Unterminated group
+    at <anonymous> (https://files.namecheap.com/cdn/0/assets/js/v1275.global-script.min.js:81:9061)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19648)
+    at isPageMatching (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19500)
+    at isPageAllowed (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19796)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6848)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6270)

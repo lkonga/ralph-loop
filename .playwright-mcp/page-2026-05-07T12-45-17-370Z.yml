@@ -1,0 +1,558 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - link "Contact us" [ref=e12] [cursor=pointer]:
+            - /url: https://www.namecheap.com/support/
+          - generic [ref=e13]:
+            - link " lemeshchenkoyuliia " [ref=e14] [cursor=pointer]:
+              - /url: https://ap.www.namecheap.com/dashboard
+              - generic [ref=e15]: 
+              - generic [ref=e16]: lemeshchenkoyuliia
+              - generic [ref=e17]: 
+            - text: 
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - link "Your Cart" [ref=e20] [cursor=pointer]:
+              - /url: https://www.namecheap.com/shoppingcart/
+              - generic [ref=e21]: 
+            - text: 
+          - generic [ref=e22]:
+            - generic [ref=e23] [cursor=pointer]:
+              - text: Rs
+              - generic [ref=e24]: INR
+            - text: 
+          - button "Search" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]: 
+      - generic [ref=e28]:
+        - generic [ref=e30]:
+          - strong [ref=e32]:
+            - link "Namecheap" [ref=e33] [cursor=pointer]:
+              - /url: https://www.namecheap.com/
+              - img "Namecheap" [ref=e34]
+          - text: 
+        - navigation [ref=e35]:
+          - generic [ref=e36]:
+            - generic: 
+            - generic [ref=e37]:
+              - link "Domains NEW" [ref=e38] [cursor=pointer]:
+                - /url: https://www.namecheap.com/domains/
+                - text: Domains
+                - generic [ref=e39]: NEW
+              - text: 
+            - generic [ref=e40]:
+              - link "Hosting" [ref=e41] [cursor=pointer]:
+                - /url: https://www.namecheap.com/hosting/
+              - text: 
+            - generic [ref=e42]:
+              - link "WordPress" [ref=e43] [cursor=pointer]:
+                - /url: https://www.namecheap.com/wordpress/
+              - text: 
+            - generic [ref=e44]:
+              - link "Email" [ref=e45] [cursor=pointer]:
+                - /url: https://www.namecheap.com/hosting/email/
+              - text: 
+            - generic [ref=e46]:
+              - link "Marketing Tools NEW" [ref=e47] [cursor=pointer]:
+                - /url: https://www.namecheap.com/apps/
+                - text: Marketing Tools
+                - generic [ref=e48]: NEW
+              - text:     
+            - generic [ref=e49]:
+              - link "Security NEW" [ref=e50] [cursor=pointer]:
+                - /url: https://www.namecheap.com/security/
+                - text: Security
+                - generic [ref=e51]: NEW
+              - text: 
+            - generic [ref=e52]:
+              - link "Transfer to Us TRY ME" [ref=e53] [cursor=pointer]:
+                - /url: https://www.namecheap.com/domains/transfer/
+                - text: Transfer to Us
+                - generic [ref=e54]: TRY ME
+              - text: 
+            - generic [ref=e55]:
+              - link "Help Center NEW" [ref=e56] [cursor=pointer]:
+                - /url: https://www.namecheap.com/help-center/
+                - text: Help Center
+                - generic [ref=e57]: NEW
+              - text: 
+            - generic [ref=e58]:
+              - button "Account NEW" [ref=e59] [cursor=pointer]:
+                - text: Account
+                - generic [ref=e60]: NEW
+              - text: 
+  - generic [ref=e61]:
+    - navigation [ref=e66]:
+      - navigation [ref=e67]:
+        - link " Dashboard" [ref=e69] [cursor=pointer]:
+          - /url: https://ap.www.namecheap.com/dashboard
+          - generic [ref=e70]: 
+          - text: Dashboard
+        - link " Expiring / Expired" [ref=e72] [cursor=pointer]:
+          - /url: https://ap.www.namecheap.com/domains/expiringlist/
+          - generic [ref=e73]: 
+          - text: Expiring / Expired
+        - link " Domain List" [ref=e75] [cursor=pointer]:
+          - /url: https://ap.www.namecheap.com/Domains
+          - generic [ref=e76]: 
+          - text: Domain List
+        - link " Hosting List" [ref=e78] [cursor=pointer]:
+          - /url: https://ap.www.namecheap.com/ProductList/HostingSubscriptions
+          - generic [ref=e79]: 
+          - text: Hosting List
+        - link " Private Email" [ref=e81] [cursor=pointer]:
+          - /url: https://ap.www.namecheap.com/ProductList/EmailSubscriptions
+          - generic [ref=e82]: 
+          - text: Private Email
+        - link " SSL Certificates" [ref=e84] [cursor=pointer]:
+          - /url: https://ap.www.namecheap.com/ProductList/SslCertificates
+          - generic [ref=e85]: 
+          - text: SSL Certificates
+        - link " Growth Tools" [ref=e87] [cursor=pointer]:
+          - /url: https://www.namecheap.com/relate
+          - generic [ref=e88]: 
+          - text: Growth Tools
+        - link " Apps" [ref=e90] [cursor=pointer]:
+          - /url: https://www.namecheap.com/apps/dashboard
+          - generic [ref=e91]: 
+          - text: Apps
+        - link " My Offers May" [ref=e93] [cursor=pointer]:
+          - /url: https://ap.www.namecheap.com/myoffers/offers
+          - generic [ref=e94]: 
+          - text: My Offers
+          - generic [ref=e95]: May
+        - link " Profile" [ref=e97] [cursor=pointer]:
+          - /url: https://ap.www.namecheap.com/Profile
+          - generic [ref=e98]: 
+          - text: Profile
+    - generic [ref=e104]:
+      - generic [ref=e108]:
+        - searchbox "Search for your next domain" [ref=e109]
+        - link "Beast Mode" [ref=e110] [cursor=pointer]:
+          - /url: https://www.namecheap.com/domains/registration/results/?type=beast&domain=
+        - button "Search" [ref=e111] [cursor=pointer]
+      - generic [ref=e113]:
+        - generic [ref=e114]:
+          - heading "Domain List" [level=2] [ref=e115]
+          - generic [ref=e117] [cursor=pointer]:
+            - generic [ref=e118]: 
+            - text: Refresh
+        - generic [ref=e122] [cursor=pointer]:
+          - generic [ref=e123]: 
+          - generic [ref=e124]: Domains
+      - separator [ref=e125]
+  - generic [ref=e131]:
+    - paragraph [ref=e133]:
+      - generic [ref=e134]: Need help?
+      - text: We're always here for you.
+    - link " Go to Live Chat page" [ref=e136] [cursor=pointer]:
+      - /url: https://www.namecheap.com/help-center/live-chat?loc=/hosting/
+      - generic [ref=e137]: 
+      - text: Go to Live Chat page
+  - contentinfo [ref=e141]:
+    - generic [ref=e144]:
+      - img "Ukraine flag" [ref=e146]
+      - generic [ref=e147]:
+        - text: We ❤️ Ukraine. Namecheap is a US based registrar. Many of our colleagues originate from or are located within Ukraine. To support Ukraine in their time of need visit this
+        - link "page" [ref=e148] [cursor=pointer]:
+          - /url: https://u24.gov.ua/
+          - generic [ref=e149]: page
+        - text: .
+    - generic [ref=e151]:
+      - generic [ref=e152]:
+        - generic [ref=e153]:
+          - link "Namecheap" [ref=e155] [cursor=pointer]:
+            - /url: https://www.namecheap.com/
+            - img "Namecheap" [ref=e157]
+          - paragraph [ref=e158]: We make registering, hosting, and managing domains for yourself or others easy and affordable, because the internet needs people.
+          - generic [ref=e159]:
+            - paragraph [ref=e160]:
+              - link "About Namecheap " [ref=e161] [cursor=pointer]:
+                - /url: https://www.namecheap.com/about/
+                - generic [ref=e162]: About Namecheap
+                - generic [ref=e163]: 
+            - paragraph [ref=e164]:
+              - link "Read our blog " [ref=e165] [cursor=pointer]:
+                - /url: https://www.namecheap.com/blog/
+                - generic [ref=e166]: Read our blog
+                - generic [ref=e167]: 
+          - paragraph [ref=e168]:
+            - generic [ref=e169]: Join Our Newsletter & Marketing Communication
+            - generic [ref=e170]: We'll send you news and offers.
+          - generic [ref=e172]:
+            - textbox "Join Our Newsletter & Marketing Communication We'll send you news and offers." [ref=e173]:
+              - /placeholder: you@yours.com
+            - button "Join" [ref=e174] [cursor=pointer]:
+              - generic [ref=e175]: Join
+          - list [ref=e176]:
+            - listitem [ref=e177]:
+              - link "Twitter" [ref=e178] [cursor=pointer]:
+                - /url: https://twitter.com/namecheap
+            - listitem [ref=e180]:
+              - link "Facebook" [ref=e181] [cursor=pointer]:
+                - /url: https://www.facebook.com/NameCheap
+            - listitem [ref=e183]:
+              - link "Instagram" [ref=e184] [cursor=pointer]:
+                - /url: https://www.instagram.com/namecheap/
+            - listitem [ref=e186]:
+              - link "Pinterest" [ref=e187] [cursor=pointer]:
+                - /url: https://www.pinterest.com/namecheap/
+        - generic [ref=e190]:
+          - generic [ref=e191]:
+            - generic [ref=e192]:
+              - link "Domains" [ref=e194] [cursor=pointer]:
+                - /url: https://www.namecheap.com/domains/
+              - list [ref=e195]:
+                - listitem [ref=e196]:
+                  - link "Domain Name Search" [ref=e197] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/domains/domain-name-search/
+                - listitem [ref=e198]:
+                  - link "Domain Transfer" [ref=e199] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/domains/transfer/
+                - listitem [ref=e200]:
+                  - link "New TLDs" [ref=e201] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/domains/new-tlds/explore/
+                - listitem [ref=e202]:
+                  - link "Handshake domains NEW" [ref=e203] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/domains/handshake-domains/
+                    - text: Handshake domains
+                    - generic [ref=e204]: NEW
+                - listitem [ref=e205]:
+                  - link "Personal Domain" [ref=e206] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/domains/personal/
+                - listitem [ref=e207]:
+                  - link "Namecheap Market" [ref=e208] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/market/
+                - listitem [ref=e209]:
+                  - link "Whois Lookup" [ref=e210] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/domains/whois/
+                - listitem [ref=e211]:
+                  - link "PremiumDNS" [ref=e212] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/premiumdns/
+                - listitem [ref=e213]:
+                  - link "FreeDNS" [ref=e214] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/domains/freedns/
+            - generic [ref=e215]:
+              - link "Hosting" [ref=e217] [cursor=pointer]:
+                - /url: https://www.namecheap.com/hosting/
+              - list [ref=e218]:
+                - listitem [ref=e219]:
+                  - link "Shared Hosting" [ref=e220] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/shared/
+                - listitem [ref=e221]:
+                  - link "Hosting for WordPress" [ref=e222] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/wordpress/
+                - listitem [ref=e223]:
+                  - link "Reseller Hosting" [ref=e224] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/reseller/
+                - listitem [ref=e225]:
+                  - link "VPS Hosting" [ref=e226] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/vps/
+                - listitem [ref=e227]:
+                  - link "Dedicated Servers" [ref=e228] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/dedicated-servers/
+                - listitem [ref=e229]:
+                  - link "Private Email Hosting" [ref=e230] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/email/
+                - listitem [ref=e231]:
+                  - link "Migrate to Namecheap" [ref=e232] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/hosting-migrate-to-namecheap/
+            - generic [ref=e233]:
+              - link "WordPress" [ref=e235] [cursor=pointer]:
+                - /url: https://www.namecheap.com/wordpress/
+              - list [ref=e236]:
+                - listitem [ref=e237]:
+                  - link "Shared Hosting" [ref=e238] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/shared/
+                - listitem [ref=e239]:
+                  - link "Hosting for WordPress" [ref=e240] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/wordpress/
+                - listitem [ref=e241]:
+                  - link "Migrate WordPress" [ref=e242] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/wordpress/migrate/
+          - generic [ref=e243]:
+            - generic [ref=e244]:
+              - link "Security" [ref=e246] [cursor=pointer]:
+                - /url: https://www.namecheap.com/security/
+              - list [ref=e247]:
+                - listitem [ref=e248]:
+                  - link "Domain Privacy" [ref=e249] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/domain-privacy-service/
+                - listitem [ref=e250]:
+                  - link "Website Security NEW" [ref=e251] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/protect-website/
+                    - text: Website Security
+                    - generic [ref=e252]: NEW
+                - listitem [ref=e253]:
+                  - link "Fix Hacked Website SOS" [ref=e254] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/fix-hacked-website/
+                    - text: Fix Hacked Website
+                    - generic [ref=e255]: SOS
+                - listitem [ref=e256]:
+                  - link "Domain Vault NEW" [ref=e257] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/domain-vault/
+                    - text: Domain Vault
+                    - generic [ref=e258]: NEW
+                - listitem [ref=e259]:
+                  - link "PremiumDNS" [ref=e260] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/premiumdns/
+                - listitem [ref=e261]:
+                  - link "CDN" [ref=e262] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/supersonic-cdn/
+                - listitem [ref=e263]:
+                  - link "FastVPN UPDATED" [ref=e264] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/vpn/
+                    - text: FastVPN
+                    - generic [ref=e265]: UPDATED
+                - listitem [ref=e266]:
+                  - link "Cyber Insurance NEW" [ref=e267] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/cyber-insurance/
+                    - text: Cyber Insurance
+                    - generic [ref=e268]: NEW
+                - listitem [ref=e269]:
+                  - link "2FA" [ref=e270] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/2fa-two-factor-authentication/
+                - listitem [ref=e271]:
+                  - link "Public DNS" [ref=e272] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/dns/free-public-dns/
+                - listitem [ref=e273]:
+                  - link "Anti-Spam Protection" [ref=e274] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/anti-spam-protection/
+            - generic [ref=e275]:
+              - link "Transfer to Us TRY ME" [ref=e277] [cursor=pointer]:
+                - /url: https://www.namecheap.com/domains/transfer/
+                - text: Transfer to Us
+                - generic [ref=e278]: TRY ME
+              - list [ref=e279]:
+                - listitem [ref=e280]:
+                  - link "Domain Transfer" [ref=e281] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/domains/transfer/
+                - listitem [ref=e282]:
+                  - link "Migrate Hosting" [ref=e283] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/hosting-migrate-to-namecheap/
+                - listitem [ref=e284]:
+                  - link "Migrate WordPress" [ref=e285] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/wordpress/migrate/
+                - listitem [ref=e286]:
+                  - link "Migrate Email" [ref=e287] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/email/migrate-email/
+            - generic [ref=e288]:
+              - link "SSL Certificates" [ref=e290] [cursor=pointer]:
+                - /url: https://www.namecheap.com/security/ssl-certificates/
+              - list [ref=e291]:
+                - listitem [ref=e292]:
+                  - link "Comodo" [ref=e293] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/ssl-certificates/comodo/
+                - listitem [ref=e294]:
+                  - link "Organization Validation" [ref=e295] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/ssl-certificates/organization-validation/
+                - listitem [ref=e296]:
+                  - link "Domain Validation" [ref=e297] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/ssl-certificates/domain-validation/
+                - listitem [ref=e298]:
+                  - link "Extended Validation" [ref=e299] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/ssl-certificates/extended-validation/
+                - listitem [ref=e300]:
+                  - link "Single Domain" [ref=e301] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/ssl-certificates/single-domain/
+                - listitem [ref=e302]:
+                  - link "Wildcard" [ref=e303] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/ssl-certificates/wildcard/
+                - listitem [ref=e304]:
+                  - link "Multi-Domain" [ref=e305] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/security/ssl-certificates/multi-domain/
+            - generic [ref=e306]:
+              - link "Resellers" [ref=e308] [cursor=pointer]:
+                - /url: https://www.namecheap.com/resellers/ssl-certificates/join-the-program/
+              - list [ref=e309]:
+                - listitem [ref=e310]:
+                  - link "SSL Certificates" [ref=e311] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/resellers/ssl-certificates/join-the-program/
+                - listitem [ref=e312]:
+                  - link "Reseller Hosting" [ref=e313] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/hosting/reseller/
+            - generic [ref=e314]:
+              - link "Promos" [ref=e316] [cursor=pointer]:
+                - /url: https://www.namecheap.com/promos/
+              - list
+          - generic [ref=e317]:
+            - generic [ref=e318]:
+              - link "Guru Guides" [ref=e320] [cursor=pointer]:
+                - /url: https://www.namecheap.com/guru-guides/
+              - list
+            - generic [ref=e321]:
+              - link "Help Center" [ref=e323] [cursor=pointer]:
+                - /url: https://www.namecheap.com/help-center/
+              - list [ref=e324]:
+                - listitem [ref=e325]:
+                  - link "Status Updates" [ref=e326] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/status-updates/
+                - listitem [ref=e327]:
+                  - link "Knowledgebase" [ref=e328] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/support/knowledgebase/
+                - listitem [ref=e329]:
+                  - link "How-To Videos" [ref=e330] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/support/knowledgebase/category/2253/howto-videos/
+                - listitem [ref=e331]:
+                  - link "Submit Ticket" [ref=e332] [cursor=pointer]:
+                    - /url: https://support.namecheap.com/index.php?/Tickets/Submit
+                - listitem [ref=e333]:
+                  - link "Live Chat" [ref=e334] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/help-center/live-chat/
+                - listitem [ref=e335]:
+                  - link "Report Abuse" [ref=e336] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/support/knowledgebase/article.aspx/9196/5/how-and-where-can-i-file-abuse-complaints/
+            - generic [ref=e337]:
+              - link "Marketing Tools" [ref=e339] [cursor=pointer]:
+                - /url: https://www.namecheap.com/apps/
+              - list [ref=e340]:
+                - listitem [ref=e341]:
+                  - link "Marketplace" [ref=e342] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/apps/
+                - listitem [ref=e343]:
+                  - link "How to Get Started NEW" [ref=e344] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/build-and-grow-hub/
+                    - text: How to Get Started
+                    - generic [ref=e345]: NEW
+                - listitem [ref=e346]:
+                  - link "Business Starter Kit FREE" [ref=e347] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/apps/business-starter-kit/?aff_sub2=top_nav
+                    - text: Business Starter Kit
+                    - generic [ref=e348]: FREE
+                - listitem [ref=e349]:
+                  - link "Business Formation FREE" [ref=e350] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/apps/business-starter-kit/?aff_sub2=top_nav
+                    - text: Business Formation
+                    - generic [ref=e351]: FREE
+                - listitem [ref=e352]:
+                  - link "Relate Marketing Suite SAVE" [ref=e353] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/relate/
+                    - text: Relate Marketing Suite
+                    - generic [ref=e354]: SAVE
+                - listitem [ref=e355]:
+                  - link "RelateSEO AI" [ref=e356] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/relate/seo/
+                    - text: RelateSEO
+                    - generic [ref=e357]: AI
+                - listitem [ref=e358]:
+                  - link "RelateSocial NEW AI" [ref=e359] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/relate/social/
+                    - text: RelateSocial
+                    - generic [ref=e360]: NEW
+                    - generic [ref=e361]: AI
+                - listitem [ref=e362]:
+                  - link "RelateReviews NEW AI" [ref=e363] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/relate/reviews/
+                    - text: RelateReviews
+                    - generic [ref=e364]: NEW
+                    - generic [ref=e365]: AI
+                - listitem [ref=e366]:
+                  - link "RelateAds AI" [ref=e367] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/relate/ads/
+                    - text: RelateAds
+                    - generic [ref=e368]: AI
+                - listitem [ref=e369]:
+                  - link "RelateLocal AI" [ref=e370] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/relate/local/
+                    - text: RelateLocal
+                    - generic [ref=e371]: AI
+                - listitem [ref=e372]:
+                  - link "Brand Monitoring AI" [ref=e373] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/relate/radar/
+                    - text: Brand Monitoring
+                    - generic [ref=e374]: AI
+                - listitem [ref=e375]:
+                  - link "Visual" [ref=e376] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/visual/
+                - listitem [ref=e377]:
+                  - link "Site Maker NEW" [ref=e378] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/visual/site-maker/
+                    - text: Site Maker
+                    - generic [ref=e379]: NEW
+                - listitem [ref=e380]:
+                  - link "Font Maker NEW" [ref=e381] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/visual/font-generator/
+                    - text: Font Maker
+                    - generic [ref=e382]: NEW
+                - listitem [ref=e383]:
+                  - link "Logo Maker AI" [ref=e384] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/logo-maker/
+                    - text: Logo Maker
+                    - generic [ref=e385]: AI
+                - listitem [ref=e386]:
+                  - link "Business Name Generator" [ref=e387] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/visual/business-name-generator/
+                - listitem [ref=e388]:
+                  - link "Stencil Graphics" [ref=e389] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/visual/stencil/
+                - listitem [ref=e390]:
+                  - link "Business Card Maker" [ref=e391] [cursor=pointer]:
+                    - /url: https://www.namecheap.com/visual/card-maker/
+            - generic [ref=e392]:
+              - link "Careers" [ref=e394] [cursor=pointer]:
+                - /url: https://www.namecheap.com/careers/
+              - list
+            - generic [ref=e395]:
+              - link "Affiliates" [ref=e397] [cursor=pointer]:
+                - /url: https://www.namecheap.com/affiliates/
+              - list
+            - generic [ref=e398]:
+              - link "Send us Feedback" [ref=e400] [cursor=pointer]:
+                - /url: mailto:feedback@namecheap.com?subject=Send%20us%20Feedback
+              - list
+            - generic:
+              - list
+      - generic [ref=e401]:
+        - generic [ref=e402]:
+          - paragraph [ref=e403]: The entirety of this site is protected by copyright © 2000–2026 Namecheap, Inc.
+          - paragraph [ref=e404]: 4600 East Washington Street, Suite 300, Phoenix, AZ 85034, USA
+        - generic [ref=e405]:
+          - link "Terms and Conditions" [ref=e406] [cursor=pointer]:
+            - /url: https://www.namecheap.com/legal/
+          - link "Privacy Policy" [ref=e407] [cursor=pointer]:
+            - /url: https://www.namecheap.com/legal/general/privacy-policy/
+          - link "UDRP" [ref=e408] [cursor=pointer]:
+            - /url: https://www.namecheap.com/legal/domains/udrp/
+            - generic [ref=e409]: UDRP
+          - link "Domain Registration Data Disclosure Policy" [ref=e410] [cursor=pointer]:
+            - /url: https://www.namecheap.com/legal/general/domain-registration-data-disclosure-policy-guide/
+          - link "Cookie Preferences" [ref=e411] [cursor=pointer]:
+            - /url: javascript:void(0);
+    - generic [ref=e414]:
+      - strong [ref=e416]: WE SUPPORT
+      - generic [ref=e418]: Electronic Frontier Foundation
+      - generic [ref=e420]: Fight For The Future
+    - generic [ref=e423]:
+      - paragraph [ref=e428]:
+        - generic [ref=e429]:
+          - text: We are an ICANN-accredited registrar.
+          - text: Serving customers since 2001.
+      - generic [ref=e431]:
+        - paragraph [ref=e432]: Payment Options
+        - list [ref=e433]:
+          - listitem "American Express" [ref=e434]:
+            - generic [ref=e435]: American Express
+          - listitem "Bitcoin" [ref=e436]:
+            - generic [ref=e437]: Bitcoin
+          - listitem "MasterCard" [ref=e438]:
+            - generic [ref=e439]: MasterCard
+          - listitem "PayPal" [ref=e440]:
+            - generic [ref=e441]: PayPal
+          - listitem "Visa" [ref=e442]:
+            - generic [ref=e443]: Visa
+          - listitem "Discover" [ref=e444]:
+            - generic [ref=e445]: Discover
+      - list [ref=e447]:
+        - listitem [ref=e448]:
+          - link "Sectigo" [ref=e449] [cursor=pointer]:
+            - /url: https://secure.trust-provider.com/ttb_searcher/trustlogo?v_querytype=W&v_shortname=SECEV&v_search=http://ap.www.namecheap.com/&x=6&y=5
+            - img "Sectigo" [ref=e450]
+        - listitem [ref=e451]:
+          - link "Android app on google play" [ref=e452] [cursor=pointer]:
+            - /url: https://nc1.app.link/W1qV0gjLZG
+            - generic [ref=e453]: Android app on google play
+        - listitem [ref=e454]:
+          - link "iOS App Store" [ref=e455] [cursor=pointer]:
+            - /url: https://nc1.app.link/W1qV0gjLZG
+            - generic [ref=e456]: iOS App Store

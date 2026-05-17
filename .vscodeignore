@@ -13,6 +13,7 @@ __mocks__/**
 node_modules/**
 
 # Agent/config wiring (dev-time only, discovered via settings.json)
+agents/**
 agents.source/**
 .github/agents/**
 AGENTS.md

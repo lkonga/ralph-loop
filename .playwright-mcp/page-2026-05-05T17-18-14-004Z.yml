@@ -1,0 +1,355 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Coolify" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.474" [ref=e9] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.474
+        - button / [ref=e11]:
+          - img [ref=e12]
+          - generic [ref=e14]: /
+        - button "Preferences 9+" [ref=e17] [cursor=pointer]:
+          - img "Preferences" [ref=e18]
+          - generic [ref=e20]: 9+
+      - combobox [ref=e23]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+      - list [ref=e24]:
+        - listitem [ref=e25]:
+          - list [ref=e26]:
+            - listitem [ref=e27]:
+              - link "Dashboard" [ref=e28] [cursor=pointer]:
+                - /url: /
+                - img [ref=e29]
+                - generic [ref=e31]: Dashboard
+            - listitem [ref=e32]:
+              - link "Projects" [ref=e33] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e34]
+                - generic [ref=e39]: Projects
+            - listitem [ref=e40]:
+              - link "Servers" [ref=e41] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e42]
+                - generic [ref=e47]: Servers
+            - listitem [ref=e48]:
+              - link "Sources" [ref=e49] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/sources
+                - img [ref=e50]
+                - generic [ref=e52]: Sources
+            - listitem [ref=e53]:
+              - link "Destinations" [ref=e54] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/destinations
+                - img [ref=e55]
+                - generic [ref=e57]: Destinations
+            - listitem [ref=e58]:
+              - link "S3 Storages" [ref=e59] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/storages
+                - img [ref=e60]
+                - generic [ref=e65]: S3 Storages
+            - listitem [ref=e66]:
+              - link "Shared Variables" [ref=e67] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/shared-variables
+                - img [ref=e68]
+                - generic [ref=e72]: Shared Variables
+            - listitem [ref=e73]:
+              - link "Notifications" [ref=e74] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/notifications/email
+                - img [ref=e75]
+                - generic [ref=e77]: Notifications
+            - listitem [ref=e78]:
+              - link "Keys & Tokens" [ref=e79] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/security/private-key
+                - img [ref=e80]
+                - generic [ref=e82]: Keys & Tokens
+            - listitem [ref=e83]:
+              - link "Tags" [ref=e84] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/tags
+                - img [ref=e85]
+                - generic [ref=e89]: Tags
+            - listitem [ref=e90]:
+              - link "Terminal" [ref=e91] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/terminal
+                - img [ref=e92]
+                - generic [ref=e95]: Terminal
+            - listitem [ref=e96]:
+              - link "Profile" [ref=e97] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/profile
+                - img [ref=e98]
+                - generic [ref=e103]: Profile
+            - listitem [ref=e104]:
+              - link "Teams" [ref=e105] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/team
+                - img [ref=e106]
+                - generic [ref=e114]: Teams
+            - listitem [ref=e115]:
+              - link "Settings" [ref=e116] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e117]
+                - generic [ref=e121]: Settings
+            - listitem [ref=e123]:
+              - generic "New version available" [ref=e124]:
+                - button "Upgrade" [ref=e126] [cursor=pointer]:
+                  - img [ref=e127]
+                  - text: Upgrade
+            - listitem [ref=e130]:
+              - link "Sponsor us" [ref=e131] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e132]
+                - generic [ref=e136]: Sponsor us
+            - listitem [ref=e137]:
+              - generic "Send us feedback or get help!" [ref=e140] [cursor=pointer]:
+                - img [ref=e141]
+                - generic [ref=e143]: Feedback
+            - listitem [ref=e144]:
+              - button "Logout" [ref=e146]:
+                - img [ref=e147]
+                - generic [ref=e149]: Logout
+    - main [ref=e150]:
+      - generic [ref=e152]:
+        - heading "Configuration" [level=1] [ref=e153]
+        - navigation [ref=e154]:
+          - navigation [ref=e155]:
+            - list [ref=e156]:
+              - listitem [ref=e157]:
+                - generic [ref=e158]:
+                  - link "My first project" [ref=e159] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r
+                  - button [ref=e160]:
+                    - img [ref=e161]
+              - listitem [ref=e163]:
+                - generic [ref=e164]:
+                  - link "production" [ref=e165] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i
+                  - button [ref=e166]:
+                    - img [ref=e167]
+              - listitem [ref=e169]:
+                - link "bharat-cloud-demo (localhost)" [ref=e170] [cursor=pointer]:
+                  - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b
+              - generic [ref=e171]:
+                - generic [ref=e173]:
+                  - link "Running" [ref=e176] [cursor=pointer]:
+                    - /url: github.com/lkonga/bharat-cloud-demo/commit/b5c423f593572bba5c8b3ca28b9b6b9bda851017
+                  - generic [ref=e177]: (unknown)
+                  - img [ref=e181] [cursor=pointer]
+                - button "Refresh Status" [ref=e182]:
+                  - img [ref=e183]
+          - generic [ref=e185]:
+            - navigation [ref=e186]:
+              - link "Configuration" [ref=e187] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b
+              - link "Deployments" [ref=e188] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/deployment
+              - link "Logs" [ref=e189] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/logs
+                - generic [ref=e190]: Logs
+              - link "Terminal" [ref=e191] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/terminal
+              - button "Links" [ref=e194]:
+                - generic [ref=e195]: Links
+                - img [ref=e196]
+            - generic [ref=e199]:
+              - button "Advanced" [ref=e202]:
+                - generic [ref=e203]: Advanced
+                - img [ref=e204]
+              - generic [ref=e206]:
+                - button "Redeploy" [ref=e207] [cursor=pointer]:
+                  - img [ref=e208]
+                  - text: Redeploy
+                - button "Restart" [ref=e210] [cursor=pointer]:
+                  - img [ref=e211]
+                  - text: Restart
+                - button "Stop" [ref=e216] [cursor=pointer]:
+                  - img [ref=e217]
+                  - text: Stop
+        - generic [ref=e219]:
+          - generic [ref=e220]:
+            - link "General" [ref=e221] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b
+              - generic [ref=e222]: General
+            - link "Advanced" [ref=e223] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/advanced
+              - generic [ref=e224]: Advanced
+            - link "Environment Variables" [ref=e225] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/environment-variables
+              - generic [ref=e226]: Environment Variables
+            - link "Persistent Storage" [ref=e227] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/persistent-storage
+              - generic [ref=e228]: Persistent Storage
+            - link "Git Source" [ref=e229] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/source
+              - generic [ref=e230]: Git Source
+            - link "Servers" [ref=e231] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/servers
+              - generic [ref=e232]: Servers
+            - link "Scheduled Tasks" [ref=e233] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/scheduled-tasks
+              - generic [ref=e234]: Scheduled Tasks
+            - link "Webhooks" [ref=e235] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/webhooks
+              - generic [ref=e236]: Webhooks
+            - link "Preview Deployments" [ref=e237] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/preview-deployments
+              - generic [ref=e238]: Preview Deployments
+            - link "Healthcheck" [ref=e239] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/healthcheck
+              - generic [ref=e240]: Healthcheck
+            - link "Rollback" [ref=e241] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/rollback
+              - generic [ref=e242]: Rollback
+            - link "Resource Limits" [ref=e243] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/resource-limits
+              - generic [ref=e244]: Resource Limits
+            - link "Resource Operations" [ref=e245] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/resource-operations
+              - generic [ref=e246]: Resource Operations
+            - link "Metrics" [ref=e247] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/metrics
+              - generic [ref=e248]: Metrics
+            - link "Tags" [ref=e249] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/tags
+              - generic [ref=e250]: Tags
+            - link "Danger Zone" [ref=e251] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/danger
+              - generic [ref=e252]: Danger Zone
+          - generic [ref=e255]:
+            - generic [ref=e256]:
+              - heading "General" [level=2] [ref=e257]
+              - button "Save" [ref=e258] [cursor=pointer]
+            - generic [ref=e259]: General configuration for your application.
+            - generic [ref=e260]:
+              - generic [ref=e261]:
+                - generic [ref=e262]:
+                  - generic [ref=e263]:
+                    - text: Name
+                    - generic [ref=e264]: "*"
+                  - textbox [ref=e265]: bharat-cloud-demo
+                - generic [ref=e266]:
+                  - generic [ref=e267]: Description
+                  - textbox [ref=e268]: BharatCloud demo (Vite+Tailwind+Alpine)
+              - generic [ref=e270]:
+                - generic [ref=e271]:
+                  - generic [ref=e272]:
+                    - text: Build Pack
+                    - generic [ref=e273]: "*"
+                  - combobox [ref=e274]:
+                    - option "Nixpacks"
+                    - option "Static" [selected]
+                    - option "Dockerfile"
+                    - option "Docker Compose"
+                - generic [ref=e275]:
+                  - generic [ref=e276]:
+                    - text: Static Image
+                    - generic [ref=e277]: "*"
+                  - combobox [ref=e278]:
+                    - option "nginx:alpine" [selected]
+                    - option "apache:alpine" [disabled]
+              - generic [ref=e279]:
+                - generic [ref=e280]:
+                  - text: Custom Nginx Configuration
+                  - img [ref=e283] [cursor=pointer]
+                - textbox "Empty means default configuration will be used." [ref=e285]
+              - button "Generate Default Nginx Configuration" [ref=e287] [cursor=pointer]
+              - generic [ref=e288]:
+                - generic [ref=e289]:
+                  - generic [ref=e290]:
+                    - text: Domains
+                    - img [ref=e293] [cursor=pointer]
+                  - textbox "https://coolify.io" [ref=e295]: http://cdev-bharatcloud.trylatest.in
+                - button "Generate Domain" [ref=e296] [cursor=pointer]
+              - generic [ref=e297]:
+                - generic [ref=e298]:
+                  - generic [ref=e299]:
+                    - text: Direction
+                    - generic [ref=e300]: "*"
+                    - img [ref=e303] [cursor=pointer]
+                  - combobox [ref=e305]:
+                    - option "Allow www & non-www." [selected]
+                    - option "Redirect to www."
+                    - option "Redirect to non-www."
+                - button "Set Direction" [ref=e307] [cursor=pointer]:
+                  - generic [ref=e308]: Set Direction
+              - generic [ref=e309]:
+                - heading "Docker Registry" [level=3] [ref=e310]
+                - img [ref=e313] [cursor=pointer]
+              - generic [ref=e315]:
+                - generic [ref=e316]:
+                  - generic [ref=e317]:
+                    - text: Docker Image
+                    - img [ref=e320] [cursor=pointer]
+                  - textbox "Empty means it won't push the image to a docker registry." [ref=e322]
+                - generic [ref=e323]:
+                  - generic [ref=e324]:
+                    - text: Docker Image Tag
+                    - img [ref=e327] [cursor=pointer]
+                  - textbox "Empty means only push commit sha tag." [ref=e329]
+              - generic [ref=e330]:
+                - heading "Build" [level=3] [ref=e331]
+                - generic [ref=e332]:
+                  - generic [ref=e334]:
+                    - generic [ref=e335]:
+                      - text: Base Directory
+                      - img [ref=e338] [cursor=pointer]
+                    - textbox / [ref=e340]
+                  - generic [ref=e341]:
+                    - generic [ref=e342]:
+                      - text: Custom Docker Options
+                      - img [ref=e345] [cursor=pointer]
+                    - textbox "--cap-add SYS_ADMIN --device=/dev/fuse --security-opt apparmor:unconfined --ulimit nofile=1024:1024 --tmpfs /run:rw,noexec,nosuid,size=65536k --hostname=myapp" [ref=e347]
+                  - generic [ref=e350]:
+                    - generic [ref=e351]:
+                      - text: Use a Build Server?
+                      - img [ref=e354] [cursor=pointer]
+                    - checkbox "Use a Build Server?" [ref=e356] [cursor=pointer]
+              - heading "Network" [level=3] [ref=e357]
+              - generic [ref=e358]:
+                - generic [ref=e359]:
+                  - generic [ref=e360]: Ports Exposes
+                  - textbox [ref=e361]: "80"
+                - generic [ref=e362]:
+                  - generic [ref=e363]:
+                    - text: Port Mappings
+                    - img [ref=e366] [cursor=pointer]
+                  - textbox "3000:3000" [ref=e368]
+                - generic [ref=e369]:
+                  - generic [ref=e370]:
+                    - text: Network Aliases
+                    - img [ref=e373] [cursor=pointer]
+                  - textbox [ref=e375]
+              - heading "HTTP Basic Authentication" [level=3] [ref=e376]
+              - generic [ref=e380]:
+                - generic [ref=e381]:
+                  - text: Enable
+                  - img [ref=e384] [cursor=pointer]
+                - checkbox "Enable" [ref=e386] [cursor=pointer]
+              - heading "Labels" [level=3] [ref=e387]
+              - generic [ref=e388]:
+                - generic [ref=e389]: Container Labels
+                - generic [ref=e394]: Start typing here
+              - generic [ref=e395]:
+                - generic [ref=e397]:
+                  - generic [ref=e398]:
+                    - text: Readonly labels
+                    - img [ref=e401] [cursor=pointer]
+                  - checkbox "Readonly labels" [checked] [ref=e403] [cursor=pointer]
+                - generic [ref=e405]:
+                  - generic [ref=e406]:
+                    - text: Escape special characters in labels?
+                    - img [ref=e409] [cursor=pointer]
+                  - checkbox "Escape special characters in labels?" [checked] [ref=e411] [cursor=pointer]
+              - button "Reset Labels to Defaults" [ref=e413] [cursor=pointer]
+              - heading "Pre/Post Deployment Commands" [level=3] [ref=e414]
+              - generic [ref=e416]:
+                - generic [ref=e417]:
+                  - text: Pre-deployment
+                  - img [ref=e420] [cursor=pointer]
+                - textbox "php artisan migrate" [ref=e422]
+              - generic [ref=e424]:
+                - generic [ref=e425]:
+                  - text: Post-deployment
+                  - img [ref=e428] [cursor=pointer]
+                - textbox "php artisan migrate" [ref=e430]
+  - img
+  - list

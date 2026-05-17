@@ -1,0 +1,16 @@
+[     311ms] [WARNING] Alpine Expression Error: Unexpected token '>'
+
+Expression: "!($application->settings->is_raw_compose_deployment_enabled)"
+
+ JSHandle@node @ https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:0
+[     346ms] SyntaxError: Unexpected token '>'
+    at new AsyncFunction (<anonymous>)
+    at https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:743
+    at Bl (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:967)
+    at jl (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:1012)
+    at Yi (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:331)
+    at F (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:181)
+    at Function.<anonymous> (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:35693)
+    at r (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:3083)
+    at n (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:3113)
+    at Kl (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:3123)

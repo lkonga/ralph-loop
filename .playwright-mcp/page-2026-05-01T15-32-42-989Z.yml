@@ -1,0 +1,506 @@
+- main [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - paragraph [ref=e6]: Proxy fabric
+      - heading "Surfshark Manager" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Fast control for Tailnet SOCKS5 and authenticated HTTP endpoints.
+    - generic [ref=e9]:
+      - generic [ref=e10]: Healthy
+      - button "Refresh" [ref=e12] [cursor=pointer]
+  - generic [ref=e458]: Copied socks5h://g5kc.tail1e9037.ts.net:10851
+  - generic [ref=e13]:
+    - article [ref=e14]:
+      - generic [ref=e15]: Running
+      - strong [ref=e16]: 5/5
+    - article [ref=e17]:
+      - generic [ref=e18]: Available
+      - strong [ref=e19]: "142"
+    - article [ref=e20]:
+      - generic [ref=e21]: Disabled
+      - strong [ref=e22]: "137"
+    - article [ref=e23]:
+      - generic [ref=e24]: Version
+      - strong [ref=e25]: 0.4.0
+  - generic [ref=e26]:
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - heading "Live endpoints" [level=2] [ref=e29]
+        - paragraph [ref=e30]: Click an endpoint to copy it. Use Auth HTTP for Chrome and coworkers.
+      - generic [ref=e31]: HTTP = SOCKS + 8000
+    - generic [ref=e32]:
+      - article [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - heading "in-mum" [level=3] [ref=e36]
+            - paragraph [ref=e37]: India · Mumbai
+          - generic [ref=e38]: running
+        - generic [ref=e39]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10851" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]: SOCKS5
+            - code [ref=e42]: g5kc.tail1e9037.ts.net:10851
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18851" [ref=e43] [cursor=pointer]:
+            - generic [ref=e44]: Auth HTTP
+            - code [ref=e45]: g5kc.tail1e9037.ts.net:18851
+        - generic [ref=e46]:
+          - button "Test SOCKS" [ref=e47] [cursor=pointer]
+          - button "Test HTTP" [ref=e48] [cursor=pointer]
+          - button "Restart" [ref=e49] [cursor=pointer]
+          - button "Disable" [ref=e50] [cursor=pointer]
+      - article [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - heading "nl-ams" [level=3] [ref=e54]
+            - paragraph [ref=e55]: Netherlands · Amsterdam
+          - generic [ref=e56]: running
+        - generic [ref=e57]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10877" [ref=e58] [cursor=pointer]:
+            - generic [ref=e59]: SOCKS5
+            - code [ref=e60]: g5kc.tail1e9037.ts.net:10877
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18877" [ref=e61] [cursor=pointer]:
+            - generic [ref=e62]: Auth HTTP
+            - code [ref=e63]: g5kc.tail1e9037.ts.net:18877
+        - generic [ref=e64]:
+          - button "Test SOCKS" [ref=e65] [cursor=pointer]
+          - button "Test HTTP" [ref=e66] [cursor=pointer]
+          - button "Restart" [ref=e67] [cursor=pointer]
+          - button "Disable" [ref=e68] [cursor=pointer]
+      - article [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - heading "sg-sng" [level=3] [ref=e72]
+            - paragraph [ref=e73]: Singapore · Singapore
+          - generic [ref=e74]: running
+        - generic [ref=e75]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10895" [ref=e76] [cursor=pointer]:
+            - generic [ref=e77]: SOCKS5
+            - code [ref=e78]: g5kc.tail1e9037.ts.net:10895
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18895" [ref=e79] [cursor=pointer]:
+            - generic [ref=e80]: Auth HTTP
+            - code [ref=e81]: g5kc.tail1e9037.ts.net:18895
+        - generic [ref=e82]:
+          - button "Test SOCKS" [ref=e83] [cursor=pointer]
+          - button "Test HTTP" [ref=e84] [cursor=pointer]
+          - button "Restart" [ref=e85] [cursor=pointer]
+          - button "Disable" [ref=e86] [cursor=pointer]
+      - article [ref=e87]:
+        - generic [ref=e88]:
+          - generic [ref=e89]:
+            - heading "uk-lon" [level=3] [ref=e90]
+            - paragraph [ref=e91]: United Kingdom · London
+          - generic [ref=e92]: running
+        - generic [ref=e93]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10911" [ref=e94] [cursor=pointer]:
+            - generic [ref=e95]: SOCKS5
+            - code [ref=e96]: g5kc.tail1e9037.ts.net:10911
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18911" [ref=e97] [cursor=pointer]:
+            - generic [ref=e98]: Auth HTTP
+            - code [ref=e99]: g5kc.tail1e9037.ts.net:18911
+        - generic [ref=e100]:
+          - button "Test SOCKS" [ref=e101] [cursor=pointer]
+          - button "Test HTTP" [ref=e102] [cursor=pointer]
+          - button "Restart" [ref=e103] [cursor=pointer]
+          - button "Disable" [ref=e104] [cursor=pointer]
+      - article [ref=e105]:
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - heading "us-nyc" [level=3] [ref=e108]
+            - paragraph [ref=e109]: United States · New York
+          - generic [ref=e110]: running
+        - generic [ref=e111]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10919" [ref=e112] [cursor=pointer]:
+            - generic [ref=e113]: SOCKS5
+            - code [ref=e114]: g5kc.tail1e9037.ts.net:10919
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18919" [ref=e115] [cursor=pointer]:
+            - generic [ref=e116]: Auth HTTP
+            - code [ref=e117]: g5kc.tail1e9037.ts.net:18919
+        - generic [ref=e118]:
+          - button "Test SOCKS" [ref=e119] [cursor=pointer]
+          - button "Test HTTP" [ref=e120] [cursor=pointer]
+          - button "Restart" [ref=e121] [cursor=pointer]
+          - button "Disable" [ref=e122] [cursor=pointer]
+  - generic [ref=e123]:
+    - generic [ref=e124]:
+      - generic [ref=e125]:
+        - heading "Locations" [level=2] [ref=e126]
+        - paragraph [ref=e127]: Search, test, enable, or disable published proxy locations.
+      - generic [ref=e128]:
+        - textbox "Search code, country, city, endpoint, port..." [ref=e129]
+        - combobox [ref=e130]:
+          - option "All" [selected]
+          - option "Enabled"
+          - option "Disabled"
+          - option "Running"
+    - table [ref=e132]:
+      - rowgroup [ref=e133]:
+        - row "Status Code Location Ports Endpoint Action" [ref=e134]:
+          - columnheader "Status" [ref=e135]
+          - columnheader "Code" [ref=e136]
+          - columnheader "Location" [ref=e137]
+          - columnheader "Ports" [ref=e138]
+          - columnheader "Endpoint" [ref=e139]
+          - columnheader "Action" [ref=e140]
+      - rowgroup [ref=e141]:
+        - row "Available al-tia Albania Tirana SOCKS 10801 AUTH 18801 al-tia.prod.surfshark.com Enable" [ref=e142]:
+          - cell "Available" [ref=e143]:
+            - generic [ref=e144]: Available
+          - cell "al-tia" [ref=e145]:
+            - code [ref=e146]: al-tia
+          - cell "Albania Tirana" [ref=e147]:
+            - strong [ref=e148]: Albania
+            - text: Tirana
+          - cell "SOCKS 10801 AUTH 18801" [ref=e149]:
+            - generic [ref=e150]:
+              - text: SOCKS 10801
+              - text: AUTH 18801
+          - cell "al-tia.prod.surfshark.com" [ref=e151]
+          - cell "Enable" [ref=e152]:
+            - button "Enable" [disabled] [ref=e154]
+        - row "Available dz-alg Algeria Algiers SOCKS 10802 AUTH 18802 dz-alg.prod.surfshark.com Enable" [ref=e155]:
+          - cell "Available" [ref=e156]:
+            - generic [ref=e157]: Available
+          - cell "dz-alg" [ref=e158]:
+            - code [ref=e159]: dz-alg
+          - cell "Algeria Algiers" [ref=e160]:
+            - strong [ref=e161]: Algeria
+            - text: Algiers
+          - cell "SOCKS 10802 AUTH 18802" [ref=e162]:
+            - generic [ref=e163]:
+              - text: SOCKS 10802
+              - text: AUTH 18802
+          - cell "dz-alg.prod.surfshark.com" [ref=e164]
+          - cell "Enable" [ref=e165]:
+            - button "Enable" [disabled] [ref=e167]
+        - row "Available ad-leu Andorra Andorra la Vella SOCKS 10803 AUTH 18803 ad-leu.prod.surfshark.com Enable" [ref=e168]:
+          - cell "Available" [ref=e169]:
+            - generic [ref=e170]: Available
+          - cell "ad-leu" [ref=e171]:
+            - code [ref=e172]: ad-leu
+          - cell "Andorra Andorra la Vella" [ref=e173]:
+            - strong [ref=e174]: Andorra
+            - text: Andorra la Vella
+          - cell "SOCKS 10803 AUTH 18803" [ref=e175]:
+            - generic [ref=e176]:
+              - text: SOCKS 10803
+              - text: AUTH 18803
+          - cell "ad-leu.prod.surfshark.com" [ref=e177]
+          - cell "Enable" [ref=e178]:
+            - button "Enable" [disabled] [ref=e180]
+        - row "Available ar-bua Argentina Buenos Aires SOCKS 10804 AUTH 18804 ar-bua.prod.surfshark.com Enable" [ref=e181]:
+          - cell "Available" [ref=e182]:
+            - generic [ref=e183]: Available
+          - cell "ar-bua" [ref=e184]:
+            - code [ref=e185]: ar-bua
+          - cell "Argentina Buenos Aires" [ref=e186]:
+            - strong [ref=e187]: Argentina
+            - text: Buenos Aires
+          - cell "SOCKS 10804 AUTH 18804" [ref=e188]:
+            - generic [ref=e189]:
+              - text: SOCKS 10804
+              - text: AUTH 18804
+          - cell "ar-bua.prod.surfshark.com" [ref=e190]
+          - cell "Enable" [ref=e191]:
+            - button "Enable" [disabled] [ref=e193]
+        - row "Available am-evn Armenia Yerevan SOCKS 10805 AUTH 18805 am-evn.prod.surfshark.com Enable" [ref=e194]:
+          - cell "Available" [ref=e195]:
+            - generic [ref=e196]: Available
+          - cell "am-evn" [ref=e197]:
+            - code [ref=e198]: am-evn
+          - cell "Armenia Yerevan" [ref=e199]:
+            - strong [ref=e200]: Armenia
+            - text: Yerevan
+          - cell "SOCKS 10805 AUTH 18805" [ref=e201]:
+            - generic [ref=e202]:
+              - text: SOCKS 10805
+              - text: AUTH 18805
+          - cell "am-evn.prod.surfshark.com" [ref=e203]
+          - cell "Enable" [ref=e204]:
+            - button "Enable" [disabled] [ref=e206]
+        - row "Available au-per Australia Perth SOCKS 10806 AUTH 18806 au-per.prod.surfshark.com Enable" [ref=e207]:
+          - cell "Available" [ref=e208]:
+            - generic [ref=e209]: Available
+          - cell "au-per" [ref=e210]:
+            - code [ref=e211]: au-per
+          - cell "Australia Perth" [ref=e212]:
+            - strong [ref=e213]: Australia
+            - text: Perth
+          - cell "SOCKS 10806 AUTH 18806" [ref=e214]:
+            - generic [ref=e215]:
+              - text: SOCKS 10806
+              - text: AUTH 18806
+          - cell "au-per.prod.surfshark.com" [ref=e216]
+          - cell "Enable" [ref=e217]:
+            - button "Enable" [disabled] [ref=e219]
+        - row "Available au-adl Australia Adelaide SOCKS 10807 AUTH 18807 au-adl.prod.surfshark.com Enable" [ref=e220]:
+          - cell "Available" [ref=e221]:
+            - generic [ref=e222]: Available
+          - cell "au-adl" [ref=e223]:
+            - code [ref=e224]: au-adl
+          - cell "Australia Adelaide" [ref=e225]:
+            - strong [ref=e226]: Australia
+            - text: Adelaide
+          - cell "SOCKS 10807 AUTH 18807" [ref=e227]:
+            - generic [ref=e228]:
+              - text: SOCKS 10807
+              - text: AUTH 18807
+          - cell "au-adl.prod.surfshark.com" [ref=e229]
+          - cell "Enable" [ref=e230]:
+            - button "Enable" [disabled] [ref=e232]
+        - row "Available au-mel Australia Melbourne SOCKS 10808 AUTH 18808 au-mel.prod.surfshark.com Enable" [ref=e233]:
+          - cell "Available" [ref=e234]:
+            - generic [ref=e235]: Available
+          - cell "au-mel" [ref=e236]:
+            - code [ref=e237]: au-mel
+          - cell "Australia Melbourne" [ref=e238]:
+            - strong [ref=e239]: Australia
+            - text: Melbourne
+          - cell "SOCKS 10808 AUTH 18808" [ref=e240]:
+            - generic [ref=e241]:
+              - text: SOCKS 10808
+              - text: AUTH 18808
+          - cell "au-mel.prod.surfshark.com" [ref=e242]
+          - cell "Enable" [ref=e243]:
+            - button "Enable" [disabled] [ref=e245]
+        - row "Available au-bne Australia Brisbane SOCKS 10809 AUTH 18809 au-bne.prod.surfshark.com Enable" [ref=e246]:
+          - cell "Available" [ref=e247]:
+            - generic [ref=e248]: Available
+          - cell "au-bne" [ref=e249]:
+            - code [ref=e250]: au-bne
+          - cell "Australia Brisbane" [ref=e251]:
+            - strong [ref=e252]: Australia
+            - text: Brisbane
+          - cell "SOCKS 10809 AUTH 18809" [ref=e253]:
+            - generic [ref=e254]:
+              - text: SOCKS 10809
+              - text: AUTH 18809
+          - cell "au-bne.prod.surfshark.com" [ref=e255]
+          - cell "Enable" [ref=e256]:
+            - button "Enable" [disabled] [ref=e258]
+        - row "Available au-syd Australia Sydney SOCKS 10810 AUTH 18810 au-syd.prod.surfshark.com Enable" [ref=e259]:
+          - cell "Available" [ref=e260]:
+            - generic [ref=e261]: Available
+          - cell "au-syd" [ref=e262]:
+            - code [ref=e263]: au-syd
+          - cell "Australia Sydney" [ref=e264]:
+            - strong [ref=e265]: Australia
+            - text: Sydney
+          - cell "SOCKS 10810 AUTH 18810" [ref=e266]:
+            - generic [ref=e267]:
+              - text: SOCKS 10810
+              - text: AUTH 18810
+          - cell "au-syd.prod.surfshark.com" [ref=e268]
+          - cell "Enable" [ref=e269]:
+            - button "Enable" [disabled] [ref=e271]
+        - row "Available at-vie Austria Vienna SOCKS 10811 AUTH 18811 at-vie.prod.surfshark.com Enable" [ref=e272]:
+          - cell "Available" [ref=e273]:
+            - generic [ref=e274]: Available
+          - cell "at-vie" [ref=e275]:
+            - code [ref=e276]: at-vie
+          - cell "Austria Vienna" [ref=e277]:
+            - strong [ref=e278]: Austria
+            - text: Vienna
+          - cell "SOCKS 10811 AUTH 18811" [ref=e279]:
+            - generic [ref=e280]:
+              - text: SOCKS 10811
+              - text: AUTH 18811
+          - cell "at-vie.prod.surfshark.com" [ref=e281]
+          - cell "Enable" [ref=e282]:
+            - button "Enable" [disabled] [ref=e284]
+        - row "Available az-bak Azerbaijan Baku SOCKS 10812 AUTH 18812 az-bak.prod.surfshark.com Enable" [ref=e285]:
+          - cell "Available" [ref=e286]:
+            - generic [ref=e287]: Available
+          - cell "az-bak" [ref=e288]:
+            - code [ref=e289]: az-bak
+          - cell "Azerbaijan Baku" [ref=e290]:
+            - strong [ref=e291]: Azerbaijan
+            - text: Baku
+          - cell "SOCKS 10812 AUTH 18812" [ref=e292]:
+            - generic [ref=e293]:
+              - text: SOCKS 10812
+              - text: AUTH 18812
+          - cell "az-bak.prod.surfshark.com" [ref=e294]
+          - cell "Enable" [ref=e295]:
+            - button "Enable" [disabled] [ref=e297]
+        - row "Available bs-nas Bahamas Bahamas SOCKS 10813 AUTH 18813 bs-nas.prod.surfshark.com Enable" [ref=e298]:
+          - cell "Available" [ref=e299]:
+            - generic [ref=e300]: Available
+          - cell "bs-nas" [ref=e301]:
+            - code [ref=e302]: bs-nas
+          - cell "Bahamas Bahamas" [ref=e303]:
+            - strong [ref=e304]: Bahamas
+            - text: Bahamas
+          - cell "SOCKS 10813 AUTH 18813" [ref=e305]:
+            - generic [ref=e306]:
+              - text: SOCKS 10813
+              - text: AUTH 18813
+          - cell "bs-nas.prod.surfshark.com" [ref=e307]
+          - cell "Enable" [ref=e308]:
+            - button "Enable" [disabled] [ref=e310]
+        - row "Available bd-dac Bangladesh Dhaka SOCKS 10814 AUTH 18814 bd-dac.prod.surfshark.com Enable" [ref=e311]:
+          - cell "Available" [ref=e312]:
+            - generic [ref=e313]: Available
+          - cell "bd-dac" [ref=e314]:
+            - code [ref=e315]: bd-dac
+          - cell "Bangladesh Dhaka" [ref=e316]:
+            - strong [ref=e317]: Bangladesh
+            - text: Dhaka
+          - cell "SOCKS 10814 AUTH 18814" [ref=e318]:
+            - generic [ref=e319]:
+              - text: SOCKS 10814
+              - text: AUTH 18814
+          - cell "bd-dac.prod.surfshark.com" [ref=e320]
+          - cell "Enable" [ref=e321]:
+            - button "Enable" [disabled] [ref=e323]
+        - row "Available be-anr Belgium Antwerp SOCKS 10815 AUTH 18815 be-anr.prod.surfshark.com Enable" [ref=e324]:
+          - cell "Available" [ref=e325]:
+            - generic [ref=e326]: Available
+          - cell "be-anr" [ref=e327]:
+            - code [ref=e328]: be-anr
+          - cell "Belgium Antwerp" [ref=e329]:
+            - strong [ref=e330]: Belgium
+            - text: Antwerp
+          - cell "SOCKS 10815 AUTH 18815" [ref=e331]:
+            - generic [ref=e332]:
+              - text: SOCKS 10815
+              - text: AUTH 18815
+          - cell "be-anr.prod.surfshark.com" [ref=e333]
+          - cell "Enable" [ref=e334]:
+            - button "Enable" [disabled] [ref=e336]
+        - row "Available be-bru Belgium Brussels SOCKS 10816 AUTH 18816 be-bru.prod.surfshark.com Enable" [ref=e337]:
+          - cell "Available" [ref=e338]:
+            - generic [ref=e339]: Available
+          - cell "be-bru" [ref=e340]:
+            - code [ref=e341]: be-bru
+          - cell "Belgium Brussels" [ref=e342]:
+            - strong [ref=e343]: Belgium
+            - text: Brussels
+          - cell "SOCKS 10816 AUTH 18816" [ref=e344]:
+            - generic [ref=e345]:
+              - text: SOCKS 10816
+              - text: AUTH 18816
+          - cell "be-bru.prod.surfshark.com" [ref=e346]
+          - cell "Enable" [ref=e347]:
+            - button "Enable" [disabled] [ref=e349]
+        - row "Available bz-blp Belize Belmopan SOCKS 10817 AUTH 18817 bz-blp.prod.surfshark.com Enable" [ref=e350]:
+          - cell "Available" [ref=e351]:
+            - generic [ref=e352]: Available
+          - cell "bz-blp" [ref=e353]:
+            - code [ref=e354]: bz-blp
+          - cell "Belize Belmopan" [ref=e355]:
+            - strong [ref=e356]: Belize
+            - text: Belmopan
+          - cell "SOCKS 10817 AUTH 18817" [ref=e357]:
+            - generic [ref=e358]:
+              - text: SOCKS 10817
+              - text: AUTH 18817
+          - cell "bz-blp.prod.surfshark.com" [ref=e359]
+          - cell "Enable" [ref=e360]:
+            - button "Enable" [disabled] [ref=e362]
+        - row "Available bt-pbh Bhutan Thimphu SOCKS 10818 AUTH 18818 bt-pbh.prod.surfshark.com Enable" [ref=e363]:
+          - cell "Available" [ref=e364]:
+            - generic [ref=e365]: Available
+          - cell "bt-pbh" [ref=e366]:
+            - code [ref=e367]: bt-pbh
+          - cell "Bhutan Thimphu" [ref=e368]:
+            - strong [ref=e369]: Bhutan
+            - text: Thimphu
+          - cell "SOCKS 10818 AUTH 18818" [ref=e370]:
+            - generic [ref=e371]:
+              - text: SOCKS 10818
+              - text: AUTH 18818
+          - cell "bt-pbh.prod.surfshark.com" [ref=e372]
+          - cell "Enable" [ref=e373]:
+            - button "Enable" [disabled] [ref=e375]
+        - row "Available bo-sre Bolivia Sucre SOCKS 10819 AUTH 18819 bo-sre.prod.surfshark.com Enable" [ref=e376]:
+          - cell "Available" [ref=e377]:
+            - generic [ref=e378]: Available
+          - cell "bo-sre" [ref=e379]:
+            - code [ref=e380]: bo-sre
+          - cell "Bolivia Sucre" [ref=e381]:
+            - strong [ref=e382]: Bolivia
+            - text: Sucre
+          - cell "SOCKS 10819 AUTH 18819" [ref=e383]:
+            - generic [ref=e384]:
+              - text: SOCKS 10819
+              - text: AUTH 18819
+          - cell "bo-sre.prod.surfshark.com" [ref=e385]
+          - cell "Enable" [ref=e386]:
+            - button "Enable" [disabled] [ref=e388]
+        - row "Available ba-sjj Bosnia and Herzegovina Sarajevo SOCKS 10820 AUTH 18820 ba-sjj.prod.surfshark.com Enable" [ref=e389]:
+          - cell "Available" [ref=e390]:
+            - generic [ref=e391]: Available
+          - cell "ba-sjj" [ref=e392]:
+            - code [ref=e393]: ba-sjj
+          - cell "Bosnia and Herzegovina Sarajevo" [ref=e394]:
+            - strong [ref=e395]: Bosnia and Herzegovina
+            - text: Sarajevo
+          - cell "SOCKS 10820 AUTH 18820" [ref=e396]:
+            - generic [ref=e397]:
+              - text: SOCKS 10820
+              - text: AUTH 18820
+          - cell "ba-sjj.prod.surfshark.com" [ref=e398]
+          - cell "Enable" [ref=e399]:
+            - button "Enable" [disabled] [ref=e401]
+        - row "Available br-sao Brazil Sao Paulo SOCKS 10821 AUTH 18821 br-sao.prod.surfshark.com Enable" [ref=e402]:
+          - cell "Available" [ref=e403]:
+            - generic [ref=e404]: Available
+          - cell "br-sao" [ref=e405]:
+            - code [ref=e406]: br-sao
+          - cell "Brazil Sao Paulo" [ref=e407]:
+            - strong [ref=e408]: Brazil
+            - text: Sao Paulo
+          - cell "SOCKS 10821 AUTH 18821" [ref=e409]:
+            - generic [ref=e410]:
+              - text: SOCKS 10821
+              - text: AUTH 18821
+          - cell "br-sao.prod.surfshark.com" [ref=e411]
+          - cell "Enable" [ref=e412]:
+            - button "Enable" [disabled] [ref=e414]
+        - row "Available bn-bwn Brunei Begawan SOCKS 10822 AUTH 18822 bn-bwn.prod.surfshark.com Enable" [ref=e415]:
+          - cell "Available" [ref=e416]:
+            - generic [ref=e417]: Available
+          - cell "bn-bwn" [ref=e418]:
+            - code [ref=e419]: bn-bwn
+          - cell "Brunei Begawan" [ref=e420]:
+            - strong [ref=e421]: Brunei
+            - text: Begawan
+          - cell "SOCKS 10822 AUTH 18822" [ref=e422]:
+            - generic [ref=e423]:
+              - text: SOCKS 10822
+              - text: AUTH 18822
+          - cell "bn-bwn.prod.surfshark.com" [ref=e424]
+          - cell "Enable" [ref=e425]:
+            - button "Enable" [disabled] [ref=e427]
+        - row "Available bg-sof Bulgaria Sofia SOCKS 10823 AUTH 18823 bg-sof.prod.surfshark.com Enable" [ref=e428]:
+          - cell "Available" [ref=e429]:
+            - generic [ref=e430]: Available
+          - cell "bg-sof" [ref=e431]:
+            - code [ref=e432]: bg-sof
+          - cell "Bulgaria Sofia" [ref=e433]:
+            - strong [ref=e434]: Bulgaria
+            - text: Sofia
+          - cell "SOCKS 10823 AUTH 18823" [ref=e435]:
+            - generic [ref=e436]:
+              - text: SOCKS 10823
+              - text: AUTH 18823
+          - cell "bg-sof.prod.surfshark.com" [ref=e437]
+          - cell "Enable" [ref=e438]:
+            - button "Enable" [disabled] [ref=e440]
+        - row "Available kh-pnh Cambodia Phnom Penh SOCKS 10824 AUTH 18824 kh-pnh.prod.surfshark.com Enable" [ref=e441]:
+          - cell "Available" [ref=e442]:
+            - generic [ref=e443]: Available
+          - cell "kh-pnh" [ref=e444]:
+            - code [ref=e445]: kh-pnh
+          - cell "Cambodia Phnom Penh" [ref=e446]:
+            - strong [ref=e447]: Cambodia
+            - text: Phnom Penh
+          - cell "SOCKS 10824 AUTH 18824" [ref=e448]:
+            - generic [ref=e449]:
+              - text: SOCKS 10824
+              - text: AUTH 18824
+          - cell "kh-pnh.prod.surfshark.com" [ref=e450]
+          - cell "Enable" [ref=e451]:
+            - button "Enable" [disabled] [ref=e453]
+    - generic [ref=e454]:
+      - button "Prev" [disabled] [ref=e455]
+      - generic [ref=e456]: Page 1 / 6 · 142 matches
+      - button "Next" [ref=e457] [cursor=pointer]

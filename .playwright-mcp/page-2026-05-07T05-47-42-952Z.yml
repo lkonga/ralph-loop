@@ -1,0 +1,120 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - link "Contact us" [ref=e12] [cursor=pointer]:
+            - /url: https://www.namecheap.com/support/
+          - generic [ref=e13]:
+            - link " lemeshchenkoyuliia " [ref=e14] [cursor=pointer]:
+              - /url: https://ap.www.namecheap.com/dashboard
+              - generic [ref=e15]: 
+              - generic [ref=e16]: lemeshchenkoyuliia
+              - generic [ref=e17]: 
+            - text: 
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - link "Your Cart" [ref=e20] [cursor=pointer]:
+              - /url: https://www.namecheap.com/shoppingcart/
+              - generic [ref=e21]: 
+            - text: 
+          - generic [ref=e22]:
+            - generic [ref=e23] [cursor=pointer]:
+              - text: Rs
+              - generic [ref=e24]: INR
+            - text: 
+          - button "Search" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]: 
+      - generic [ref=e28]:
+        - generic [ref=e30]:
+          - strong [ref=e32]:
+            - link "Namecheap" [ref=e33] [cursor=pointer]:
+              - /url: https://www.namecheap.com/
+              - img "Namecheap" [ref=e34]
+          - text: 
+        - navigation [ref=e35]:
+          - generic:
+            - generic: 
+  - generic [ref=e41]:
+    - generic [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44] [cursor=pointer]: Close
+        - paragraph [ref=e46]:
+          - strong [ref=e47]: No items in cart
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - img "empty cart"
+            - generic [ref=e51]:
+              - heading "Your shopping cart is currently empty." [level=3] [ref=e52]
+              - paragraph [ref=e53]: Time to go shopping for low-priced domains and services at Namecheap!
+          - generic [ref=e54]:
+            - searchbox "Go big with your next domain" [ref=e55]
+            - button "Beast Mode" [ref=e56] [cursor=pointer]
+            - button "Search" [ref=e57] [cursor=pointer]
+        - generic [ref=e58]:
+          - heading "Improve Your Site" [level=3] [ref=e59]
+          - button "+" [ref=e60] [cursor=pointer]
+          - generic [ref=e61]:
+            - generic [ref=e63]:
+              - figure [ref=e64]:
+                - img "Empty addon" [ref=e65]
+              - paragraph [ref=e66]:
+                - strong
+                - emphasis [ref=e67]
+              - paragraph [ref=e68]
+            - generic [ref=e72]:
+              - figure [ref=e73]:
+                - img "Empty addon" [ref=e74]
+              - paragraph [ref=e75]:
+                - strong
+                - emphasis [ref=e76]
+              - paragraph [ref=e77]
+            - generic [ref=e81]:
+              - figure [ref=e82]:
+                - img "Empty addon" [ref=e83]
+              - paragraph [ref=e84]:
+                - strong
+                - emphasis [ref=e85]
+              - paragraph [ref=e86]
+            - generic [ref=e90]:
+              - figure [ref=e91]:
+                - img "Empty addon" [ref=e92]
+              - paragraph [ref=e93]:
+                - strong
+                - emphasis [ref=e94]
+              - paragraph [ref=e95]
+    - complementary [ref=e100]:
+      - generic [ref=e101]:
+        - generic [ref=e102]: Your Subtotal
+        - generic [ref=e106]:
+          - text: Subtotal
+          - generic [ref=e108]: Rs0.00
+  - generic [ref=e114]:
+    - paragraph [ref=e116]:
+      - generic [ref=e117]: Need help?
+      - text: We're always here for you.
+    - link " Go to Live Chat page" [ref=e119] [cursor=pointer]:
+      - /url: https://www.namecheap.com/help-center/live-chat?loc=
+      - generic [ref=e120]: 
+      - text: Go to Live Chat page
+  - contentinfo [ref=e124]:
+    - generic [ref=e127]:
+      - link "Namecheap" [ref=e129] [cursor=pointer]:
+        - /url: https://www.namecheap.com/
+        - img "Namecheap" [ref=e131]
+      - generic [ref=e132]:
+        - paragraph [ref=e133]: The entirety of this site is protected by copyright © 2000–2026 Namecheap, Inc.
+        - paragraph [ref=e134]: 4600 East Washington Street, Suite 300, Phoenix, AZ 85034, USA
+      - generic [ref=e135]:
+        - link "Terms and Conditions" [ref=e136] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/
+        - link "Privacy Policy" [ref=e137] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/privacy-policy/
+        - link "UDRP" [ref=e138] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/domains/udrp/
+          - generic [ref=e139]: UDRP
+        - link "Domain Registration Data Disclosure Policy" [ref=e140] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/domain-registration-data-disclosure-policy-guide/
+        - link "Cookie Preferences" [ref=e141] [cursor=pointer]:
+          - /url: javascript:void(0);

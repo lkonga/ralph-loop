@@ -576,8 +576,7 @@ export interface RalphConfig {
 	autoCloseEditors?: boolean;
 	preFlightWizard?: 'always' | 'countdown' | 'never';
 	preFlightCountdownSeconds?: number;
-	checkpointQuestions?: boolean;
-}
+	checkpointQuestions?: boolean;	autoDiscoverVerifiers?: boolean;}
 
 export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	prdPath: 'PRD.md',
@@ -622,6 +621,7 @@ export const DEFAULT_CONFIG: Omit<RalphConfig, 'workspaceRoot'> = {
 	preFlightWizard: 'countdown',
 	preFlightCountdownSeconds: 15,
 	checkpointQuestions: true,
+	autoDiscoverVerifiers: true,
 };
 
 // --- Verification ---

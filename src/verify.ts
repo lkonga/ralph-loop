@@ -1,8 +1,8 @@
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from 'child_process';
-import { PrdSnapshot, Task, TaskStatus, VerifyResult, VerifyCheck, VerifierFn, VerifierConfig, VerificationTemplate, RalphConfig, ILogger, DiffValidationResult } from './types';
 import { readPrdSnapshot } from './prd';
+import { DiffValidationResult, ILogger, PrdSnapshot, RalphConfig, Task, TaskStatus, VerificationTemplate, VerifierConfig, VerifierFn, VerifyCheck, VerifyResult } from './types';
 
 function extractExecDetail(err: unknown): string {
 	if (err && typeof err === 'object' && 'stderr' in err) {

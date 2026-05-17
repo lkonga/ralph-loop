@@ -1,0 +1,117 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - text: Need a robust API to Geolocate IPs and fetch other crucial information? Try
+    - link "IPinfo.io" [ref=e4] [cursor=pointer]:
+      - /url: https://ipinfo.io/?utm_source=ifconfig.me&utm_medium=referral&utm_campaign=upsell_sister_sites
+    - text: .
+  - generic [ref=e5]:
+    - table [ref=e7]:
+      - rowgroup [ref=e8]:
+        - row "What Is My IP Address? - ifconfig.me" [ref=e9]:
+          - cell "What Is My IP Address? - ifconfig.me" [ref=e10]:
+            - heading "What Is My IP Address? - ifconfig.me" [level=1] [ref=e11]:
+              - link "What Is My IP Address? - ifconfig.me" [ref=e12] [cursor=pointer]:
+                - /url: http://ifconfig.me
+          - cell [ref=e13]
+        - row [ref=e14]:
+          - cell [ref=e15]
+          - cell [ref=e16]:
+            - generic [ref=e17]:
+              - generic:
+                - link:
+                  - /url: http://twitter.com/share
+              - iframe [ref=e18]:
+                
+    - generic [ref=e19]:
+      - heading "Your Connection" [level=2] [ref=e20]
+      - table "info" [ref=e21]:
+        - rowgroup [ref=e22]:
+          - row "IP Address 157.48.191.138" [ref=e23]:
+            - cell "IP Address" [ref=e24]
+            - cell "157.48.191.138" [ref=e25]:
+              - strong [ref=e26]: 157.48.191.138
+          - row "User Agent Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" [ref=e27]:
+            - cell "User Agent" [ref=e28]
+            - cell "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" [ref=e29]
+          - row "Language en-US,en;q=0.9" [ref=e30]:
+            - cell "Language" [ref=e31]
+            - cell "en-US,en;q=0.9" [ref=e32]
+          - row "Referer" [ref=e33]:
+            - cell "Referer" [ref=e34]
+            - cell [ref=e35]
+          - row "Method GET" [ref=e36]:
+            - cell "Method" [ref=e37]
+            - cell "GET" [ref=e38]
+          - row "Encoding gzip, deflate, br, zstd" [ref=e39]:
+            - cell "Encoding" [ref=e40]
+            - cell "gzip, deflate, br, zstd" [ref=e41]
+          - row "MIME Type text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7" [ref=e42]:
+            - cell "MIME Type" [ref=e43]
+            - cell "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7" [ref=e44]
+          - row "Charset" [ref=e45]:
+            - cell "Charset" [ref=e46]
+            - cell [ref=e47]
+          - row "X-Forwarded-For 157.48.191.138,34.160.111.145" [ref=e48]:
+            - cell "X-Forwarded-For" [ref=e49]
+            - cell "157.48.191.138,34.160.111.145" [ref=e50]
+    - generic [ref=e51]:
+      - heading "Command Line Interface" [level=2] [ref=e52]
+      - table "cli" [ref=e53]:
+        - rowgroup [ref=e54]:
+          - row "$ curl ifconfig.me ⇒ 157.48.191.138" [ref=e55]:
+            - cell "$ curl ifconfig.me" [ref=e56]
+            - cell "⇒" [ref=e57]
+            - cell "157.48.191.138" [ref=e58]
+          - row "$ curl ifconfig.me/ip ⇒ 157.48.191.138" [ref=e59]:
+            - cell "$ curl ifconfig.me/ip" [ref=e60]
+            - cell "⇒" [ref=e61]
+            - cell "157.48.191.138" [ref=e62]
+          - row "$ curl ifconfig.me/ua ⇒ Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" [ref=e63]:
+            - cell "$ curl ifconfig.me/ua" [ref=e64]
+            - cell "⇒" [ref=e65]
+            - cell "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36" [ref=e66]
+          - row "$ curl ifconfig.me/lang ⇒ en-US,en;q=0.9" [ref=e67]:
+            - cell "$ curl ifconfig.me/lang" [ref=e68]
+            - cell "⇒" [ref=e69]
+            - cell "en-US,en;q=0.9" [ref=e70]
+          - row "$ curl ifconfig.me/encoding ⇒ gzip, deflate, br, zstd" [ref=e71]:
+            - cell "$ curl ifconfig.me/encoding" [ref=e72]
+            - cell "⇒" [ref=e73]
+            - cell "gzip, deflate, br, zstd" [ref=e74]
+          - row "$ curl ifconfig.me/mime ⇒ text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7" [ref=e75]:
+            - cell "$ curl ifconfig.me/mime" [ref=e76]
+            - cell "⇒" [ref=e77]
+            - cell "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7" [ref=e78]
+          - row "$ curl ifconfig.me/charset ⇒" [ref=e79]:
+            - cell "$ curl ifconfig.me/charset" [ref=e80]
+            - cell "⇒" [ref=e81]
+            - cell [ref=e82]
+          - row "$ curl ifconfig.me/forwarded ⇒ 157.48.191.138,34.160.111.145" [ref=e83]:
+            - cell "$ curl ifconfig.me/forwarded" [ref=e84]
+            - cell "⇒" [ref=e85]
+            - cell "157.48.191.138,34.160.111.145" [ref=e86]
+          - 'row "$ curl ifconfig.me/all ⇒ ip_addr: 157.48.191.138 remote_host: unavailable user_agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 port: 55342 language: en-US,en;q=0.9 referer: connection: keep_alive: method: GET encoding: gzip, deflate, br, zstd mime: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7 charset: via: 1.1 google forwarded: 157.48.191.138,34.160.111.145" [ref=e87]':
+            - cell "$ curl ifconfig.me/all" [ref=e88]
+            - cell "⇒" [ref=e89]
+            - 'cell "ip_addr: 157.48.191.138 remote_host: unavailable user_agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 port: 55342 language: en-US,en;q=0.9 referer: connection: keep_alive: method: GET encoding: gzip, deflate, br, zstd mime: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7 charset: via: 1.1 google forwarded: 157.48.191.138,34.160.111.145" [ref=e90]':
+              - text: "ip_addr: 157.48.191.138"
+              - text: "remote_host: unavailable"
+              - text: "user_agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+              - text: "port: 55342"
+              - text: "language: en-US,en;q=0.9"
+              - text: "referer:"
+              - text: "connection:"
+              - text: "keep_alive:"
+              - text: "method: GET"
+              - text: "encoding: gzip, deflate, br, zstd"
+              - text: "mime: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+              - text: "charset:"
+              - text: "via: 1.1 google"
+              - text: "forwarded: 157.48.191.138,34.160.111.145"
+          - 'row "$ curl ifconfig.me/all.json ⇒ {\"ip_addr\":\"157.48.191.138\",\"user_agent\":\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36\",\"port\":\"55342\",\"method\":\"GET\",\"encoding\":\"gzip, deflate, br, zstd\",\"mime\":\"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7\",\"via\":\"1.1 google\",\"forwarded\":\"157.48.191.138,34.160.111.145\",\"language\":\"en-US,en;q=0.9\"}" [ref=e91]':
+            - cell "$ curl ifconfig.me/all.json" [ref=e92]
+            - cell "⇒" [ref=e93]
+            - 'cell "{\"ip_addr\":\"157.48.191.138\",\"user_agent\":\"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36\",\"port\":\"55342\",\"method\":\"GET\",\"encoding\":\"gzip, deflate, br, zstd\",\"mime\":\"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7\",\"via\":\"1.1 google\",\"forwarded\":\"157.48.191.138,34.160.111.145\",\"language\":\"en-US,en;q=0.9\"}" [ref=e94]'
+    - generic [ref=e95]: © 2024 ifconfig.me
+  - iframe [ref=e96]:
+    

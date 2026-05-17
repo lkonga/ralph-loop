@@ -1,0 +1,241 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - link "Contact us" [ref=e10] [cursor=pointer]:
+            - /url: /support.aspx
+          - text:  
+          - generic [ref=e11]:
+            - button " lemeshchenkoyuliia " [ref=e12] [cursor=pointer]:
+              - generic [ref=e13]: 
+              - generic [ref=e14]: lemeshchenkoyuliia
+              - generic [ref=e15]: 
+            - text: 
+        - generic [ref=e16]:
+          - link "" [ref=e17] [cursor=pointer]:
+            - /url: /shoppingcart/
+            - generic [ref=e18]: 
+          - generic [ref=e19] [cursor=pointer]: INR
+          - button "Search" [ref=e20] [cursor=pointer]:
+            - generic [ref=e21]: 
+      - generic [ref=e23]:
+        - generic [ref=e25]:
+          - strong [ref=e27]:
+            - link "Namecheap" [ref=e28] [cursor=pointer]:
+              - /url: /
+              - img "Namecheap" [ref=e29]
+          - text: 
+        - navigation [ref=e30]:
+          - generic [ref=e31]:
+            - search: 
+            - list [ref=e33]:
+              - listitem [ref=e34]:
+                - generic [ref=e35]: Setup
+              - listitem [ref=e36]:
+                - generic [ref=e37]: Billing
+              - listitem [ref=e38]:
+                - generic [ref=e39]: Order
+              - listitem [ref=e40]:
+                - generic [ref=e41]: Done
+  - generic [ref=e42]:
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - banner [ref=e45]: Payment Method
+        - list [ref=e46]:
+          - listitem [ref=e47]:
+            - generic [ref=e48]:
+              - generic [ref=e49]:
+                - radio "Secure Card Payment visa mastercard american express discover unionpay jcb diners club" [checked] [ref=e50]
+                - text: Secure Card Payment
+                - generic [ref=e51]:
+                  - generic [ref=e52]: visa
+                  - generic [ref=e53]: mastercard
+                  - generic [ref=e54]: american express
+                  - generic [ref=e55]: discover
+                  - generic [ref=e56]: unionpay
+                  - generic [ref=e57]: jcb
+                  - generic [ref=e58]: diners club
+              - generic [ref=e59]:
+                - paragraph [ref=e60]:
+                  - text: Your credit card information is secure, and your card is not charged until after you've confirmed your order. Adding a new card?
+                  - link "Learn More" [ref=e61] [cursor=pointer]:
+                    - /url: "#"
+                - generic [ref=e62]:
+                  - heading "Card Details" [level=2] [ref=e63]
+                  - generic [ref=e65] [cursor=pointer]: Use default account card
+                  - combobox [ref=e67]:
+                    - option "Use default account card" [selected]
+                    - option "Add new card"
+                    - option "Use previously saved card"
+                - generic [ref=e68]:
+                  - generic [ref=e69]:
+                    - text: Yuliia Lemeshchenko
+                    - generic [ref=e70]: "**** **** **** 2465 Edit"
+                  - generic [ref=e72]:
+                    - text: Yuliia Lemeshchenko
+                    - text: Okeanivska street 30, 88
+                    - text: Mykolayiv city, Mykolayiv city, 0571561
+                    - text: AE
+              - generic [ref=e73]:
+                - radio "Paypal visa mastercard american express discover unionpay jcb diners club" [ref=e74]
+                - text: Paypal
+                - generic [ref=e75]:
+                  - generic [ref=e76]: visa
+                  - generic [ref=e77]: mastercard
+                  - generic [ref=e78]: american express
+                  - generic [ref=e79]: discover
+                  - generic [ref=e80]: unionpay
+                  - generic [ref=e81]: jcb
+                  - generic [ref=e82]: diners club
+              - generic [ref=e83]:
+                - radio "Account Funds visa mastercard american express discover unionpay jcb diners club paypal bitcoin" [ref=e84]
+                - text: Account Funds
+                - generic [ref=e85]:
+                  - generic [ref=e86]: visa
+                  - generic [ref=e87]: mastercard
+                  - generic [ref=e88]: american express
+                  - generic [ref=e89]: discover
+                  - generic [ref=e90]: unionpay
+                  - generic [ref=e91]: jcb
+                  - generic [ref=e92]: diners club
+                  - generic [ref=e93]: paypal
+                  - generic [ref=e94]: bitcoin
+      - generic [ref=e95]:
+        - banner [ref=e96]: Receipt Details
+        - list [ref=e97]:
+          - listitem [ref=e98]:
+            - paragraph [ref=e99]: We'll provide your receipt. Please confirm the address.
+            - generic [ref=e100]:
+              - heading "Billing Address" [level=2] [ref=e101]
+              - generic [ref=e103] [cursor=pointer]: Use default account contact
+              - combobox [ref=e105] [cursor=pointer]:
+                - option "Use default account contact" [selected]
+                - option "Add new contact"
+            - generic [ref=e107]:
+              - generic [ref=e108]:
+                - text: Yuliia Lemeshchenko
+                - text: Okeanivska street 30, 88
+                - text: Mykolayiv city, Mykolayiv city, 571561
+                - text: UA
+              - generic [ref=e109]:
+                - text: "tel: +971.585112397"
+                - text: lemeshchenkoyuliia@gmail.com
+      - generic [ref=e110]:
+        - banner [ref=e111]: Renewal Settings for Your Purchase
+        - list [ref=e112]:
+          - listitem [ref=e113]:
+            - paragraph [ref=e114]: Some items in your purchase are eligible for auto-renewal. We've set all eligible items to auto-renew. If you'd prefer to personally select which items to auto-renew, please uncheck the box below.
+            - paragraph [ref=e115]:
+              - generic [ref=e116]:
+                - checkbox "Automatically renew all of my eligible new services before expiration. Recommended" [ref=e117]
+                - text: Automatically renew all of my eligible new services before expiration.
+                - generic [ref=e118]: Recommended
+            - generic [ref=e119]:
+              - generic [ref=e120]:
+                - checkbox "Domain Registration bharatcloudlabs.com" [checked] [ref=e121]
+                - text: Domain Registration bharatcloudlabs.com
+              - generic [ref=e122]:
+                - checkbox "PremiumDNS for bharatcloudlabs.com" [ref=e123]
+                - text: PremiumDNS for bharatcloudlabs.com
+              - generic [ref=e124]:
+                - checkbox "Free Domain Privacy for bharatcloudlabs.com" [checked] [ref=e125]
+                - text: Free Domain Privacy for bharatcloudlabs.com
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - checkbox "Save the configuration above to my default payment settings" [ref=e128]
+          - strong [ref=e129]: Save the configuration above to my default payment settings
+        - paragraph [ref=e130]: We'll save this information for future use.
+      - generic [ref=e131]:
+        - separator [ref=e132]
+        - paragraph:
+          - link "Continue" [ref=e133] [cursor=pointer]:
+            - /url: javascript:void(0)
+    - generic [ref=e136]:
+      - banner [ref=e137]:
+        - heading "Your Cart" [level=3] [ref=e139]
+        - link "Edit" [ref=e140] [cursor=pointer]:
+          - /url: /shoppingcart/
+      - list [ref=e141]:
+        - listitem [ref=e142]:
+          - list [ref=e143]:
+            - listitem [ref=e144]:
+              - strong [ref=e145]: bharatcloudlabs.com
+              - paragraph [ref=e146]:
+                - generic [ref=e147]: 1 year registration
+                - generic [ref=e148]: Rs1,038.88
+              - paragraph [ref=e149]:
+                - link "ICANN fee" [ref=e151] [cursor=pointer]:
+                  - /url: /legal/domains/icann-fee.aspx
+                - generic [ref=e152]: Rs18.92
+        - listitem [ref=e153]:
+          - text: Subtotal
+          - generic [ref=e154]: Rs1,057.80
+      - paragraph [ref=e155]:
+        - link "Continue" [ref=e156] [cursor=pointer]:
+          - /url: javascript:void(0)
+  - generic [ref=e160]:
+    - paragraph [ref=e162]: Need help? We're always here for you.
+    - link " Chat with a Live Person" [ref=e164] [cursor=pointer]:
+      - /url: /support/live-chat//general/
+      - generic [ref=e165]: 
+      - text: Chat with a Live Person
+  - contentinfo [ref=e166]:
+    - generic [ref=e167]:
+      - generic [ref=e169]:
+        - generic [ref=e172]:
+          - link "Namecheap" [ref=e174] [cursor=pointer]:
+            - /url: /
+            - img "Namecheap" [ref=e176]
+          - paragraph [ref=e177]: We make registering, hosting, and managing domains for yourself or others easy and affordable, because the internet needs people.
+        - generic [ref=e178]:
+          - generic [ref=e179]:
+            - paragraph [ref=e180]: The entirety of this site is protected by copyright © 2000–2026 Namecheap, Inc.
+            - paragraph [ref=e181]: 4600 East Washington Street, Suite 305, Phoenix, AZ 85034, USA
+          - generic [ref=e182]:
+            - link "Terms and Conditions" [ref=e183] [cursor=pointer]:
+              - /url: /legal/
+            - link "Privacy Policy" [ref=e184] [cursor=pointer]:
+              - /url: /legal/general/privacy-policy/
+            - link "UDRP" [ref=e185] [cursor=pointer]:
+              - /url: /legal/domains/udrp/
+              - generic [ref=e186]: UDRP
+            - link "Domain Registration Data Disclosure Policy" [ref=e187] [cursor=pointer]:
+              - /url: /legal/general/domain-registration-data-disclosure-policy-guide/
+      - generic [ref=e190]:
+        - strong [ref=e192]: WE SUPPORT
+        - generic [ref=e194]: Electronic Frontier Foundation
+        - generic [ref=e196]: Fight For The Future
+      - generic [ref=e199]:
+        - paragraph [ref=e204]:
+          - generic [ref=e205]:
+            - text: We are an ICANN-accredited registrar.
+            - text: Serving customers since 2001.
+        - generic [ref=e207]:
+          - paragraph [ref=e208]: Payment Options
+          - list [ref=e209]:
+            - listitem "American Express" [ref=e210]:
+              - generic [ref=e211]: American Express
+            - listitem "Bitcoin" [ref=e212]:
+              - generic [ref=e213]: Bitcoin
+            - listitem "MasterCard" [ref=e214]:
+              - generic [ref=e215]: MasterCard
+            - listitem "PayPal" [ref=e216]:
+              - generic [ref=e217]: PayPal
+            - listitem "Visa" [ref=e218]:
+              - generic [ref=e219]: Visa
+            - listitem "Discover" [ref=e220]:
+              - generic [ref=e221]: Discover
+        - list [ref=e223]:
+          - listitem [ref=e224]:
+            - link "Sentigo" [ref=e225] [cursor=pointer]:
+              - /url: https://secure.trust-provider.com/ttb_searcher/trustlogo?v_querytype=W&v_shortname=SECEV&v_search=https://www.namecheap.com/cart/checkout/payment/Payment.aspx?checkoutid=73F13C7343FB48318E454A03905123DE&checkout=standard&isRegularPaymentFlow=true&x=1&y=1
+              - img "Sentigo" [ref=e226]
+          - listitem [ref=e227]:
+            - link "Android app on google play" [ref=e228] [cursor=pointer]:
+              - /url: https://nc1.app.link/W1qV0gjLZG
+              - generic [ref=e229]: Android app on google play
+          - listitem [ref=e230]:
+            - link "iOS App Store" [ref=e231] [cursor=pointer]:
+              - /url: https://nc1.app.link/W1qV0gjLZG
+              - generic [ref=e232]: iOS App Store

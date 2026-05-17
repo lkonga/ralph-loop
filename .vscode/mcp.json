@@ -1,0 +1,88 @@
+{
+	"servers": {
+		"markitdown": {
+			"url": "http://g5kc:8204/mcp",
+			"type": "http"
+		},
+		"brave-search": {
+			"url": "http://g5kc:8202/mcp",
+			"type": "http"
+		},
+		"playwright-ext": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@playwright/mcp@latest",
+				"--extension"
+			],
+			"env": {
+				"PLAYWRIGHT_MCP_EXTENSION_TOKEN": "BAgqtY57mz-eyp4HGtXkYw1_PcL4UxOyyuAANetTZp4"
+			},
+			"type": "stdio"
+		},
+		"playwright": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@playwright/mcp@latest",
+				"--headless",
+				"--isolated"
+			],
+			"type": "stdio"
+		},
+		"time": {
+			"url": "http://g5kc:8203/mcp",
+			"type": "http"
+		},
+		"searxng-search": {
+			"url": "http://g5kc:8200/mcp",
+			"type": "http"
+		},
+		"crawl4ai": {
+			"url": "http://g5kc:8201/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": [
+		{
+			"password": true,
+			"id": "OPENROUTER_API_KEY",
+			"type": "promptString",
+			"description": "OpenRouter API Key"
+		},
+		{
+			"password": true,
+			"id": "GITHUB_PERSONAL_ACCESS_TOKEN",
+			"type": "promptString",
+			"description": "GitHub Personal Access Token"
+		},
+		{
+			"id": "browser_url",
+			"type": "promptString",
+			"description": "Optional: connect to an already-running Chrome. Example: http://127.0.0.1:9222",
+			"password": false,
+			"default": ""
+		},
+		{
+			"id": "headless",
+			"type": "promptString",
+			"description": "Run Chrome headless (true/false). Default: false",
+			"password": false,
+			"default": "false"
+		},
+		{
+			"id": "isolated",
+			"type": "promptString",
+			"description": "Use a temporary user-data-dir (true/false). Default: false",
+			"password": false,
+			"default": "false"
+		},
+		{
+			"id": "chrome_channel",
+			"type": "promptString",
+			"description": "Chrome channel: stable | canary | beta | dev (default: stable)",
+			"password": false,
+			"default": "stable"
+		}
+	]
+}

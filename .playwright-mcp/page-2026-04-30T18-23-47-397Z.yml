@@ -1,0 +1,118 @@
+- generic [active] [ref=e445]:
+  - generic [ref=e446]:
+    - navigation [ref=e449]:
+      - generic [ref=e450]:
+        - generic [ref=e451]:
+          - link "Coolify" [ref=e452] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.474" [ref=e453] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.474
+        - button / [ref=e455]:
+          - img [ref=e456]
+          - generic [ref=e458]: /
+        - button "Preferences 9+" [ref=e461] [cursor=pointer]:
+          - img "Preferences" [ref=e462]
+          - generic [ref=e464]: 9+
+      - combobox [ref=e467]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+      - list [ref=e468]:
+        - listitem [ref=e469]:
+          - list [ref=e470]:
+            - listitem [ref=e471]:
+              - link "Dashboard" [ref=e472] [cursor=pointer]:
+                - /url: /
+                - img [ref=e473]
+                - generic [ref=e475]: Dashboard
+            - listitem [ref=e476]:
+              - link "Projects" [ref=e477] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e478]
+                - generic [ref=e483]: Projects
+            - listitem [ref=e484]:
+              - link "Servers" [ref=e485] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e486]
+                - generic [ref=e491]: Servers
+            - listitem [ref=e492]:
+              - link "Sources" [ref=e493] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/sources
+                - img [ref=e494]
+                - generic [ref=e496]: Sources
+            - listitem [ref=e497]:
+              - link "Destinations" [ref=e498] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/destinations
+                - img [ref=e499]
+                - generic [ref=e501]: Destinations
+            - listitem [ref=e502]:
+              - link "S3 Storages" [ref=e503] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/storages
+                - img [ref=e504]
+                - generic [ref=e509]: S3 Storages
+            - listitem [ref=e510]:
+              - link "Shared Variables" [ref=e511] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/shared-variables
+                - img [ref=e512]
+                - generic [ref=e516]: Shared Variables
+            - listitem [ref=e517]:
+              - link "Notifications" [ref=e518] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/notifications/email
+                - img [ref=e519]
+                - generic [ref=e521]: Notifications
+            - listitem [ref=e522]:
+              - link "Keys & Tokens" [ref=e523] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/security/private-key
+                - img [ref=e524]
+                - generic [ref=e526]: Keys & Tokens
+            - listitem [ref=e527]:
+              - link "Tags" [ref=e528] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/tags
+                - img [ref=e529]
+                - generic [ref=e533]: Tags
+            - listitem [ref=e534]:
+              - link "Terminal" [ref=e535] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/terminal
+                - img [ref=e536]
+                - generic [ref=e539]: Terminal
+            - listitem [ref=e540]:
+              - link "Profile" [ref=e541] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/profile
+                - img [ref=e542]
+                - generic [ref=e547]: Profile
+            - listitem [ref=e548]:
+              - link "Teams" [ref=e549] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/team
+                - img [ref=e550]
+                - generic [ref=e558]: Teams
+            - listitem [ref=e559]:
+              - link "Settings" [ref=e560] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e561]
+                - generic [ref=e565]: Settings
+            - listitem [ref=e124]:
+              - generic "New version available" [ref=e125]:
+                - button "Upgrade" [ref=e127] [cursor=pointer]:
+                  - img [ref=e128]
+                  - text: Upgrade
+            - listitem [ref=e567]:
+              - link "Sponsor us" [ref=e568] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e569]
+                - generic [ref=e573]: Sponsor us
+            - listitem [ref=e574]:
+              - generic "Send us feedback or get help!" [ref=e577] [cursor=pointer]:
+                - img [ref=e578]
+                - generic [ref=e580]: Feedback
+            - listitem [ref=e581]:
+              - button "Logout" [ref=e583]:
+                - img [ref=e584]
+                - generic [ref=e586]: Logout
+    - main [ref=e587]:
+      - generic [ref=e590]:
+        - heading "Select a server" [level=2] [ref=e4432]
+        - generic [ref=e4434]:
+          - generic [ref=e4437] [cursor=pointer]: VPS-toprupees-prod
+          - generic [ref=e4439] [cursor=pointer]:
+            - generic [ref=e4440]: localhost
+            - generic [ref=e4441]: This is the server where Coolify is running on. Don't delete this!
+  - list

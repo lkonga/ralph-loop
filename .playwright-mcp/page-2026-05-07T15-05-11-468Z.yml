@@ -1,0 +1,187 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Coolify" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.474" [ref=e9] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.474
+        - button / [ref=e11]:
+          - img [ref=e12]
+          - generic [ref=e14]: /
+        - button "Preferences 9+" [ref=e17] [cursor=pointer]:
+          - img "Preferences" [ref=e18]
+          - generic [ref=e20]: 9+
+      - combobox [ref=e23]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+      - list [ref=e24]:
+        - listitem [ref=e25]:
+          - list [ref=e26]:
+            - listitem [ref=e27]:
+              - link "Dashboard" [ref=e28] [cursor=pointer]:
+                - /url: /
+                - img [ref=e29]
+                - generic [ref=e31]: Dashboard
+            - listitem [ref=e32]:
+              - link "Projects" [ref=e33] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e34]
+                - generic [ref=e39]: Projects
+            - listitem [ref=e40]:
+              - link "Servers" [ref=e41] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e42]
+                - generic [ref=e47]: Servers
+            - listitem [ref=e48]:
+              - link "Sources" [ref=e49] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/sources
+                - img [ref=e50]
+                - generic [ref=e52]: Sources
+            - listitem [ref=e53]:
+              - link "Destinations" [ref=e54] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/destinations
+                - img [ref=e55]
+                - generic [ref=e57]: Destinations
+            - listitem [ref=e58]:
+              - link "S3 Storages" [ref=e59] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/storages
+                - img [ref=e60]
+                - generic [ref=e65]: S3 Storages
+            - listitem [ref=e66]:
+              - link "Shared Variables" [ref=e67] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/shared-variables
+                - img [ref=e68]
+                - generic [ref=e72]: Shared Variables
+            - listitem [ref=e73]:
+              - link "Notifications" [ref=e74] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/notifications/email
+                - img [ref=e75]
+                - generic [ref=e77]: Notifications
+            - listitem [ref=e78]:
+              - link "Keys & Tokens" [ref=e79] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/security/private-key
+                - img [ref=e80]
+                - generic [ref=e82]: Keys & Tokens
+            - listitem [ref=e83]:
+              - link "Tags" [ref=e84] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/tags
+                - img [ref=e85]
+                - generic [ref=e89]: Tags
+            - listitem [ref=e90]:
+              - link "Terminal" [ref=e91] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/terminal
+                - img [ref=e92]
+                - generic [ref=e95]: Terminal
+            - listitem [ref=e96]:
+              - link "Profile" [ref=e97] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/profile
+                - img [ref=e98]
+                - generic [ref=e103]: Profile
+            - listitem [ref=e104]:
+              - link "Teams" [ref=e105] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/team
+                - img [ref=e106]
+                - generic [ref=e114]: Teams
+            - listitem [ref=e115]:
+              - link "Settings" [ref=e116] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e117]
+                - generic [ref=e121]: Settings
+            - listitem [ref=e124]:
+              - generic "New version available" [ref=e125]:
+                - button "Upgrade" [ref=e127] [cursor=pointer]:
+                  - img [ref=e128]
+                  - text: Upgrade
+            - listitem [ref=e131]:
+              - link "Sponsor us" [ref=e132] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e133]
+                - generic [ref=e137]: Sponsor us
+            - listitem [ref=e138]:
+              - generic "Send us feedback or get help!" [ref=e141] [cursor=pointer]:
+                - img [ref=e142]
+                - generic [ref=e144]: Feedback
+            - listitem [ref=e145]:
+              - button "Logout" [ref=e147]:
+                - img [ref=e148]
+                - generic [ref=e150]: Logout
+    - main [ref=e151]:
+      - generic [ref=e153]:
+        - generic [ref=e154]:
+          - heading "Clone" [level=1] [ref=e155]
+          - generic [ref=e156]: Quickly clone all resources to a new project or environment.
+        - generic [ref=e157]:
+          - generic [ref=e158]:
+            - text: New Name
+            - generic [ref=e159]: "*"
+          - textbox [ref=e160]: my-first-project-clone-isw8lz2eg3gyhqikrfoq3rvw
+        - heading "Destination Server" [level=3] [ref=e161]
+        - generic [ref=e162]: Choose the server and network to clone the resources to.
+        - table [ref=e168]:
+          - rowgroup [ref=e169]:
+            - row "Server Network" [ref=e170]:
+              - columnheader "Server" [ref=e171]
+              - columnheader "Network" [ref=e172]
+          - rowgroup [ref=e173]:
+            - row "localhost coolify" [ref=e174] [cursor=pointer]:
+              - cell "localhost" [ref=e175]
+              - cell "coolify" [ref=e176]
+            - row "VPS-toprupees-prod coolify" [ref=e177] [cursor=pointer]:
+              - cell "VPS-toprupees-prod" [ref=e178]
+              - cell "coolify" [ref=e179]
+        - heading "Resources" [level=3] [ref=e180]
+        - generic [ref=e181]: These will be cloned to the new project
+        - table [ref=e187]:
+          - rowgroup [ref=e188]:
+            - row "Name Type Description" [ref=e189]:
+              - columnheader "Name" [ref=e190]
+              - columnheader "Type" [ref=e191]
+              - columnheader "Description" [ref=e192]
+          - rowgroup [ref=e193]:
+            - row "bharat-cloud-demo Application BharatCloud demo (Vite+Tailwind+Alpine)" [ref=e194]:
+              - cell "bharat-cloud-demo" [ref=e195]
+              - cell "Application" [ref=e196]
+              - cell "BharatCloud demo (Vite+Tailwind+Alpine)" [ref=e197]
+            - row "euro-physics-b Application -" [ref=e198]:
+              - cell "euro-physics-b" [ref=e199]
+              - cell "Application" [ref=e200]
+              - cell "-" [ref=e201]
+            - row "expensive-echidna-m13m6wtyinjwcbpdirbi0yuv Application -" [ref=e202]:
+              - cell "expensive-echidna-m13m6wtyinjwcbpdirbi0yuv" [ref=e203]
+              - cell "Application" [ref=e204]
+              - cell "-" [ref=e205]
+            - row "fix-wheel-handle Application -" [ref=e206]:
+              - cell "fix-wheel-handle" [ref=e207]
+              - cell "Application" [ref=e208]
+              - cell "-" [ref=e209]
+            - row "lively-lobster-bl7bco02xzkpl51l5ti3sut9 Application -" [ref=e210]:
+              - cell "lively-lobster-bl7bco02xzkpl51l5ti3sut9" [ref=e211]
+              - cell "Application" [ref=e212]
+              - cell "-" [ref=e213]
+            - row "mini-roulette-dev Application -" [ref=e214]:
+              - cell "mini-roulette-dev" [ref=e215]
+              - cell "Application" [ref=e216]
+              - cell "-" [ref=e217]
+            - row "responsive Application -" [ref=e218]:
+              - cell "responsive" [ref=e219]
+              - cell "Application" [ref=e220]
+              - cell "-" [ref=e221]
+            - row "toprupees-website Application -" [ref=e222]:
+              - cell "toprupees-website" [ref=e223]
+              - cell "Application" [ref=e224]
+              - cell "-" [ref=e225]
+            - row "toprupees-website-staging Application -" [ref=e226]:
+              - cell "toprupees-website-staging" [ref=e227]
+              - cell "Application" [ref=e228]
+              - cell "-" [ref=e229]
+            - row "wireproxy-surfshark Service Surfshark-backed wireproxy manager container for selected SOCKS5 endpoints." [ref=e230]:
+              - cell "wireproxy-surfshark" [ref=e231]
+              - cell "Service" [ref=e232]
+              - cell "Surfshark-backed wireproxy manager container for selected SOCKS5 endpoints." [ref=e233]
+        - generic [ref=e234]:
+          - button "Clone to new Project" [disabled] [ref=e235]
+          - button "Clone to new Environment" [disabled] [ref=e236]
+  - img
+  - list

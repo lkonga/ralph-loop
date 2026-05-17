@@ -1,0 +1,152 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - link "Contact us" [ref=e12] [cursor=pointer]:
+            - /url: https://www.namecheap.com/support/
+          - generic [ref=e13]:
+            - link " lemeshchenkoyuliia " [ref=e14] [cursor=pointer]:
+              - /url: https://ap.www.namecheap.com/dashboard
+              - generic [ref=e15]: 
+              - generic [ref=e16]: lemeshchenkoyuliia
+              - generic [ref=e17]: 
+            - text: 
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - link "Your Cart" [ref=e20] [cursor=pointer]:
+              - /url: https://www.namecheap.com/shoppingcart/
+              - generic [ref=e21]: 
+            - text: 
+          - generic [ref=e22]:
+            - generic [ref=e23] [cursor=pointer]:
+              - text: Rs
+              - generic [ref=e24]: INR
+            - text: 
+          - button "Search" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]: 
+      - generic [ref=e28]:
+        - generic [ref=e30]:
+          - strong [ref=e32]:
+            - link "Namecheap" [ref=e33] [cursor=pointer]:
+              - /url: https://www.namecheap.com/
+              - img "Namecheap" [ref=e34]
+          - text: 
+        - navigation [ref=e35]:
+          - generic [ref=e36]:
+            - generic: 
+            - generic [ref=e37]:
+              - link "Domains NEW" [ref=e38] [cursor=pointer]:
+                - /url: https://www.namecheap.com/domains/
+                - text: Domains
+                - generic [ref=e39]: NEW
+              - text: 
+            - generic [ref=e40]:
+              - link "Hosting" [ref=e41] [cursor=pointer]:
+                - /url: https://www.namecheap.com/hosting/
+              - text: 
+            - generic [ref=e42]:
+              - link "WordPress" [ref=e43] [cursor=pointer]:
+                - /url: https://www.namecheap.com/wordpress/
+              - text: 
+            - generic [ref=e44]:
+              - link "Email" [ref=e45] [cursor=pointer]:
+                - /url: https://www.namecheap.com/hosting/email/
+              - text: 
+            - generic [ref=e46]:
+              - link "Marketing Tools NEW" [ref=e47] [cursor=pointer]:
+                - /url: https://www.namecheap.com/apps/
+                - text: Marketing Tools
+                - generic [ref=e48]: NEW
+              - text:     
+            - generic [ref=e49]:
+              - link "Security NEW" [ref=e50] [cursor=pointer]:
+                - /url: https://www.namecheap.com/security/
+                - text: Security
+                - generic [ref=e51]: NEW
+              - text: 
+            - generic [ref=e52]:
+              - link "Transfer to Us TRY ME" [ref=e53] [cursor=pointer]:
+                - /url: https://www.namecheap.com/domains/transfer/
+                - text: Transfer to Us
+                - generic [ref=e54]: TRY ME
+              - text: 
+            - generic [ref=e55]:
+              - link "Help Center NEW" [ref=e56] [cursor=pointer]:
+                - /url: https://www.namecheap.com/help-center/
+                - text: Help Center
+                - generic [ref=e57]: NEW
+              - text: 
+            - generic [ref=e58]:
+              - button "Account NEW" [ref=e59] [cursor=pointer]:
+                - text: Account
+                - generic [ref=e60]: NEW
+              - text: 
+        - generic [ref=e62]:
+          - button " 7" [ref=e63] [cursor=pointer]:
+            - generic [ref=e64]: 
+            - generic [ref=e65]: "7"
+          - text:     
+  - generic [ref=e72]:
+    - generic [ref=e74]:
+      - generic [ref=e76]:
+        - button "Search" [ref=e77] [cursor=pointer]
+        - textbox "Search for domains ..." [ref=e78]: bharatcloud.in
+        - button "Clear" [ref=e79] [cursor=pointer]
+      - article [ref=e80]
+    - generic [ref=e86]:
+      - button "Domains" [ref=e87] [cursor=pointer]:
+        - img [ref=e88]
+        - generic [ref=e93]: Domains
+      - button "Auctions" [ref=e94] [cursor=pointer]:
+        - img [ref=e95]
+        - generic [ref=e100]: Auctions
+      - button "Premium" [ref=e101] [cursor=pointer]:
+        - img [ref=e102]
+        - generic [ref=e104]: Premium
+      - button "Generator" [ref=e105] [cursor=pointer]:
+        - img [ref=e106]
+        - generic [ref=e111]: Generator
+      - button "Beast Mode" [ref=e112] [cursor=pointer]:
+        - img [ref=e113]
+        - generic [ref=e119]: Beast Mode
+      - button "Favorites" [ref=e120] [cursor=pointer]:
+        - img [ref=e121]
+        - generic [ref=e123]: Favorites
+    - complementary [ref=e124]:
+      - generic [ref=e125]:
+        - heading "Suggested Results" [level=3] [ref=e126]
+        - button "Hide" [ref=e127] [cursor=pointer]
+      - article [ref=e128]
+      - article [ref=e135]
+      - article [ref=e142]
+      - article [ref=e149]
+      - article [ref=e156]
+  - generic [ref=e168]:
+    - paragraph [ref=e170]:
+      - generic [ref=e171]: Need help?
+      - text: We're always here for you.
+    - link " Go to Live Chat page" [ref=e173] [cursor=pointer]:
+      - /url: https://www.namecheap.com/help-center/live-chat?loc=
+      - generic [ref=e174]: 
+      - text: Go to Live Chat page
+  - contentinfo [ref=e178]:
+    - generic [ref=e181]:
+      - link "Namecheap" [ref=e183] [cursor=pointer]:
+        - /url: https://www.namecheap.com/
+        - img "Namecheap" [ref=e185]
+      - generic [ref=e186]:
+        - paragraph [ref=e187]: The entirety of this site is protected by copyright © 2000–2026 Namecheap, Inc.
+        - paragraph [ref=e188]: 4600 East Washington Street, Suite 300, Phoenix, AZ 85034, USA
+      - generic [ref=e189]:
+        - link "Terms and Conditions" [ref=e190] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/
+        - link "Privacy Policy" [ref=e191] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/privacy-policy/
+        - link "UDRP" [ref=e192] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/domains/udrp/
+          - generic [ref=e193]: UDRP
+        - link "Domain Registration Data Disclosure Policy" [ref=e194] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/domain-registration-data-disclosure-policy-guide/
+        - link "Cookie Preferences" [ref=e195] [cursor=pointer]:
+          - /url: javascript:void(0);

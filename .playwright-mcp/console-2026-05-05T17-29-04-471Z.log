@@ -1,0 +1,2 @@
+[     459ms] Failed to resolve module specifier "alpinejs". Relative references must start with either "/", "./", or "../".
+[     560ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://cdev-bharatcloud.trylatest.in/favicon.svg:0

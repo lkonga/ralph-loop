@@ -2,7 +2,7 @@
 	"name": "ralph-loop",
 	"displayName": "Ralph Loop — Autonomous PRD Loop",
 	"description": "Drives Copilot Agent Mode in a deterministic loop from PRD tasks.",
-	"version": "0.5.51",
+	"version": "0.5.53",
 	"publisher": "ralph-loop",
 	"license": "MIT",
 	"engines": {
@@ -13,7 +13,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"workspaceContains:PRD.md"
+		"onStartupFinished"
 	],
 	"main": "./out/src/extension.js",
 	"bin": {
@@ -49,6 +49,11 @@
 		"configuration": {
 			"title": "Ralph Loop",
 			"properties": {
+				"ralph-loop.enableHandoffSocket": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable Unix socket listener for external handoff triggers (handoff-dump-and-signal.sh). When true, extension creates a socket at ~/.local/share/chat-handoffs/handoff-{workspaceId}-{pid}.sock on activation."
+				},
 				"ralph-loop.prdPath": {
 					"type": "string",
 					"default": "PRD.md",

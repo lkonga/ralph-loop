@@ -1,0 +1,107 @@
+[   37210ms] [WARNING] [Meta Pixel] - Invalid parameter format for content_type. Please refer https://developers.facebook.com/docs/meta-pixel/reference/ for valid parameter specifications. @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   37210ms] [WARNING] [Meta Pixel] - Invalid parameter format for value. Please refer https://developers.facebook.com/docs/meta-pixel/reference/ for valid parameter specifications. @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   37221ms] [WARNING] GA queue (_gaq) is undefined @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   37648ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://premiums.namecheapapi.com/domain/Monthly%20subscription%20for%20bharatcloudlabs.com:0
+[   37649ms] [LOG] getCartItems get Premium domain price error:  Error: Request failed with status code 400 @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   53627ms] TypeError: Cannot use 'in' operator to search for 'render' in undefined
+    at https://static.nc-img.com/uishoppingcart/app.ceb896bed23496a217ea.js:6:126764
+    at Object.execCb (https://www.namecheap.com/shoppingcart/:125:26444)
+    at b.check (https://www.namecheap.com/shoppingcart/:125:20189)
+    at b.<anonymous> (https://www.namecheap.com/shoppingcart/:125:22610)
+    at https://www.namecheap.com/shoppingcart/:125:14377
+    at https://www.namecheap.com/shoppingcart/:125:23071
+    at each (https://www.namecheap.com/shoppingcart/:125:13816)
+    at b.emit (https://www.namecheap.com/shoppingcart/:125:23039)
+    at b.check (https://www.namecheap.com/shoppingcart/:125:20748)
+    at b.enable (https://www.namecheap.com/shoppingcart/:125:22937)
+[   54670ms] [ERROR] Event @ https://d2jbt8279safi9.cloudfront.net/umd/main.841406bd.js:1
+[   55175ms] [ERROR] Access to script at 'https://connect.facebook.net/en_US/fbevents.js' from origin 'https://www.namecheap.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.namecheap.com/shoppingcart/:0
+[   55175ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://connect.facebook.net/en_US/fbevents.js:0
+[   76651ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/gb-icon.woff2:0
+[   76652ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-700-webfont.woff2:0
+[   76652ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-500-webfont.woff2:0
+[   76652ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-300-webfont.woff2:0
+[   76725ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.namecheap.com/cart/checkout/payment/payment.aspx?checkout=express&from=checkout&checkoutid=73F13C7343FB48318E454A03905123DE&mode=ALL:0
+[   77008ms] Uncaught SyntaxError: Invalid regular expression: /^/support(/: Unterminated group
+    at <anonymous> (https://files.namecheap.com/cdn/0/assets/js/v1275.global-script.min.js:81:9061)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19648)
+    at isPageMatching (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19500)
+    at isPageAllowed (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19796)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6848)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6270)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6503)
+    at init (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:8541)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:32109)
+    at n (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:109)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:901)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:911)
+[  107589ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-500-webfont.woff2:0
+[  107589ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-700-webfont.woff2:0
+[  107589ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/gb-icon.woff2:0
+[  107589ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-300-webfont.woff2:0
+[  110244ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.namecheap.com/cart/checkout/payment/Payment.aspx?checkoutid=73F13C7343FB48318E454A03905123DE&checkout=standard&isRegularPaymentFlow=true:0
+[  110513ms] Uncaught SyntaxError: Invalid regular expression: /^/support(/: Unterminated group
+    at <anonymous> (https://files.namecheap.com/cdn/0/assets/js/v1275.global-script.min.js:81:9061)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19648)
+    at isPageMatching (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19500)
+    at isPageAllowed (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19796)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6848)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6270)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6503)
+    at init (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:8541)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:32109)
+    at n (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:109)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:901)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:911)
+[  423728ms] [ERROR] Access to script at 'https://connect.facebook.net/en_US/fbevents.js' from origin 'https://ap.www.namecheap.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://ap.www.namecheap.com/profile/billing/Topup:0
+[  423728ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://connect.facebook.net/en_US/fbevents.js:0
+[  436970ms] TypeError: Cannot use 'in' operator to search for 'render' in undefined
+    at https://static.nc-img.com/uishoppingcart/app.ceb896bed23496a217ea.js:6:126764
+    at Object.execCb (https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:26444)
+    at b.check (https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:20189)
+    at b.<anonymous> (https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:22610)
+    at https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:14377
+    at https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:23071
+    at each (https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:13816)
+    at b.emit (https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:23039)
+    at b.check (https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:20748)
+    at b.enable (https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:125:22937)
+[  438058ms] [ERROR] Event @ https://d2jbt8279safi9.cloudfront.net/umd/main.841406bd.js:1
+[  438510ms] [ERROR] Access to script at 'https://connect.facebook.net/en_US/fbevents.js' from origin 'https://www.namecheap.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.namecheap.com/shoppingcart/?_gl=1*qs8ic3*_gcl_au*MjE0MDYyNjQxNy4xNzc4MTMyMTU2LjkxNzYxMDQxMi4xNzc4MTMzNzUzLjE3NzgxMzM3NTM.*_ga*MTg2MDM2NjU1NC4xNzc4MTMyMTU4*_ga_7DMJMG20P8*czE3NzgxMzIxNTgkbzEkZzEkdDE3NzgxMzM3NjEkajU4JGwwJGgw:0
+[  438510ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://connect.facebook.net/en_US/fbevents.js:0
+[  562202ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-700-webfont.woff2:0
+[  562202ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/gb-icon.woff2:0
+[  562202ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-500-webfont.woff2:0
+[  562202ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-300-webfont.woff2:0
+[  562225ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.namecheap.com/cart/checkout/payment/payment.aspx?checkout=express&from=checkout&checkoutid=3DB0E71BE5EC4A56ADCCDEE7F53060D5&mode=ALL:0
+[  562504ms] Uncaught SyntaxError: Invalid regular expression: /^/support(/: Unterminated group
+    at <anonymous> (https://files.namecheap.com/cdn/0/assets/js/v1275.global-script.min.js:81:9061)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19648)
+    at isPageMatching (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19500)
+    at isPageAllowed (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19796)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6848)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6270)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6503)
+    at init (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:8541)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:32109)
+    at n (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:109)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:901)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:911)
+[  574957ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-500-webfont.woff2:0
+[  574960ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-700-webfont.woff2:0
+[  574960ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/gb-icon.woff2:0
+[  574960ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://files.namecheap.com/cdn/1275/assets/css/fonts/museo-sans-300-webfont.woff2:0
+[  577378ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://www.namecheap.com/cart/checkout/payment/Payment.aspx?checkoutid=3DB0E71BE5EC4A56ADCCDEE7F53060D5&checkout=standard&isRegularPaymentFlow=true:0
+[  577659ms] Uncaught SyntaxError: Invalid regular expression: /^/support(/: Unterminated group
+    at <anonymous> (https://files.namecheap.com/cdn/0/assets/js/v1275.global-script.min.js:81:9061)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19648)
+    at isPageMatching (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19500)
+    at isPageAllowed (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:19796)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6848)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6270)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:6503)
+    at init (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:8541)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:32109)
+    at n (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:109)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:901)
+    at <anonymous> (https://cdn.engagement.ai/production/static/js/sdk/chatSDK.9bd9fc5a78085cdcfb47.js:0:911)

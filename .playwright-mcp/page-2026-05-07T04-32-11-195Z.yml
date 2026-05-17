@@ -1,0 +1,635 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - link "Contact us" [ref=e12] [cursor=pointer]:
+            - /url: https://www.namecheap.com/support/
+          - link "Sign up" [ref=e13] [cursor=pointer]:
+            - /url: https://www.namecheap.com/myaccount/signup/
+          - generic [ref=e14]:
+            - button " Sign in" [ref=e15] [cursor=pointer]:
+              - generic [ref=e16]: 
+              - generic [ref=e17]: Sign in
+            - text: 
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - link "Your Cart" [ref=e20] [cursor=pointer]:
+              - /url: https://www.namecheap.com/shoppingcart/
+              - generic [ref=e21]: 
+              - generic [ref=e645]: $944.26
+            - text: 
+          - generic [ref=e22]:
+            - generic [ref=e23] [cursor=pointer]:
+              - text: $
+              - generic [ref=e24]: USD
+            - text: 
+          - button "Search" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26]: 
+      - generic [ref=e28]:
+        - generic [ref=e30]:
+          - strong [ref=e32]:
+            - link "Namecheap" [ref=e33] [cursor=pointer]:
+              - /url: https://www.namecheap.com/
+              - img "Namecheap" [ref=e34]
+          - text: 
+        - navigation [ref=e35]:
+          - generic [ref=e36]:
+            - generic: 
+            - generic [ref=e37]:
+              - link "Domains NEW" [ref=e38] [cursor=pointer]:
+                - /url: https://www.namecheap.com/domains/
+                - text: Domains
+                - generic [ref=e39]: NEW
+              - text: 
+            - generic [ref=e40]:
+              - link "Hosting" [ref=e41] [cursor=pointer]:
+                - /url: https://www.namecheap.com/hosting/
+              - text: 
+            - generic [ref=e42]:
+              - link "WordPress" [ref=e43] [cursor=pointer]:
+                - /url: https://www.namecheap.com/wordpress/
+              - text: 
+            - generic [ref=e44]:
+              - link "Email" [ref=e45] [cursor=pointer]:
+                - /url: https://www.namecheap.com/hosting/email/
+              - text: 
+            - generic [ref=e46]:
+              - link "Marketing Tools NEW" [ref=e47] [cursor=pointer]:
+                - /url: https://www.namecheap.com/apps/
+                - text: Marketing Tools
+                - generic [ref=e48]: NEW
+              - text:     
+            - generic [ref=e49]:
+              - link "Security NEW" [ref=e50] [cursor=pointer]:
+                - /url: https://www.namecheap.com/security/
+                - text: Security
+                - generic [ref=e51]: NEW
+              - text: 
+            - generic [ref=e52]:
+              - link "Transfer to Us TRY ME" [ref=e53] [cursor=pointer]:
+                - /url: https://www.namecheap.com/domains/transfer/
+                - text: Transfer to Us
+                - generic [ref=e54]: TRY ME
+              - text: 
+            - generic [ref=e55]:
+              - link "Help Center NEW" [ref=e56] [cursor=pointer]:
+                - /url: https://www.namecheap.com/help-center/
+                - text: Help Center
+                - generic [ref=e57]: NEW
+              - text: 
+            - generic [ref=e58]:
+              - button "Account NEW" [ref=e59] [cursor=pointer]:
+                - text: Account
+                - generic [ref=e60]: NEW
+              - text: 
+  - generic [ref=e62]:
+    - generic [ref=e67]:
+      - generic [ref=e69]:
+        - generic [ref=e71]:
+          - button "Search" [ref=e72] [cursor=pointer]
+          - textbox "Search for domains ..." [ref=e73]: bharatcloud.in
+          - button "Clear" [ref=e74] [cursor=pointer]
+        - generic [ref=e191]:
+          - article [ref=e192]:
+            - generic [ref=e195]:
+              - generic [ref=e196]:
+                - heading "bharatcloud.in" [level=2] [ref=e197]
+                - generic [ref=e198]: 17% OFF
+              - emphasis [ref=e199] [cursor=pointer]:
+                - text: More info
+                - generic:
+                  - text: To register from outside India, you may be asked by the
+                  - link "registry":
+                    - /url: https://registry.in/registry-advisory-2025_07_29
+                  - text: to state your business connection or purpose.
+              - button "Add to favorites" [ref=e200] [cursor=pointer]:
+                - img [ref=e201]
+            - generic [ref=e204]:
+              - strong [ref=e205]: ₹907.64/yr
+              - generic [ref=e206]: Retail ₹1,089.53/yr
+            - button "Added to cart" [disabled] [ref=e646]
+          - generic [ref=e648]:
+            - generic [ref=e649]:
+              - heading "Frequently bought together" [level=3] [ref=e650]
+              - button "Hide" [ref=e651] [cursor=pointer]
+            - list [ref=e652]:
+              - listitem [ref=e653]:
+                - article [ref=e654]:
+                  - heading "bharath.cloud" [level=2] [ref=e656]
+                  - generic [ref=e657]:
+                    - strong [ref=e658]: ₹4,547.27
+                    - generic [ref=e659]: Renews at ₹2,999.38/yr
+                  - button "Add to cart" [ref=e660] [cursor=pointer]
+              - listitem [ref=e661]:
+                - article [ref=e663] [cursor=pointer]:
+                  - generic [ref=e664]:
+                    - heading "Web Hosting" [level=2] [ref=e665]
+                    - paragraph [ref=e666]: Website Builder included
+                    - emphasis [ref=e667]:
+                      - text: More info
+                      - generic:
+                        - text: Host your website. Enjoy unmetered bandwidth with free Website Builder, cPanel, and WordPress.
+                        - link "Learn more":
+                          - /url: https://www.namecheap.com/hosting/shared/
+                  - strong [ref=e669]: Free trial
+                  - button "Add to cart" [ref=e670]
+              - listitem [ref=e671]:
+                - article [ref=e673] [cursor=pointer]:
+                  - generic [ref=e674]:
+                    - heading "Business Email" [level=2] [ref=e675]
+                    - paragraph [ref=e676]: Custom email@your-domain
+                    - emphasis [ref=e677]:
+                      - text: More info
+                      - generic:
+                        - text: "Send your brand with a Pro email plan: 1 month free or 28% off the 1-year subscription with MAILDEAL!"
+                        - link "Learn more":
+                          - /url: https://www.namecheap.com/hosting/email/
+                  - strong [ref=e679]: Free trial
+                  - button "Add to cart" [ref=e680]
+              - listitem [ref=e681]:
+                - article [ref=e683] [cursor=pointer]:
+                  - generic [ref=e684]:
+                    - heading "WordPress Hosting" [level=2] [ref=e685]
+                    - paragraph [ref=e686]: Managed WordPress Hosting
+                    - emphasis [ref=e687]:
+                      - text: More info
+                      - generic: Launch and host WordPress in less than 30 seconds with EasyWP. Fastest WordPress hosting, free SSL, easy backups, highly secure with easy to use dashboard.
+                  - strong [ref=e689]: Free trial
+                  - button "Add to cart" [ref=e690]
+              - listitem [ref=e691]:
+                - article [ref=e693] [cursor=pointer]:
+                  - generic [ref=e694]:
+                    - heading "Boost Your Social Media" [level=2] [ref=e695]
+                    - paragraph [ref=e696]: Use AI-generated content to grow your reach
+                    - emphasis [ref=e697]:
+                      - text: More info
+                      - generic: Use AI to create posts in seconds. Auto-publish. Facebook, Instagram, X, LinkedIn, and Google Business Profile — in one simple Dashboard. The easy way to grow your business.
+                  - strong [ref=e699]: Free trial
+                  - button "Add to cart" [ref=e700]
+              - listitem [ref=e701]:
+                - article [ref=e703] [cursor=pointer]:
+                  - generic [ref=e704]:
+                    - heading "SSL" [level=2] [ref=e705]
+                    - paragraph [ref=e706]: Site security made simple
+                    - emphasis [ref=e707]:
+                      - text: More info
+                      - generic:
+                        - text: Secure your new domain with an SSL certificate, covers 1 domain and is issued in 15 minutes. Learn how HTTPS can give you a
+                        - link "SEO boost":
+                          - /url: https://www.namecheap.com/blog/https-secure-your-site-and-boost-your-seo/
+                        - text: .
+                  - strong [ref=e709]: ₹544.76/yr
+                  - button "Add to cart" [ref=e710]
+              - listitem [ref=e711]:
+                - article [ref=e713] [cursor=pointer]:
+                  - generic [ref=e714]:
+                    - heading "Secure Your Browsing with VPN" [level=2] [ref=e715]
+                    - paragraph [ref=e716]: Access Global Content
+                    - emphasis [ref=e717]:
+                      - text: More info
+                      - generic:
+                        - text: Get VPN to secure your data and unlock content.
+                        - link "Learn more.":
+                          - /url: https://www.namecheap.com/vpn/
+                  - strong [ref=e719]: ₹60.02/mo
+                  - button "Add to cart" [ref=e720]
+              - listitem [ref=e721]:
+                - article [ref=e723] [cursor=pointer]:
+                  - generic [ref=e724]:
+                    - heading "Premium DNS" [level=2] [ref=e725]
+                    - paragraph [ref=e726]: DNS Speed & Security
+                    - emphasis [ref=e727]:
+                      - text: More info
+                      - generic: Boost your DNS performance with our 30+ Anycast servers, get 100% DNS uptime and DDoS protection.
+                  - strong [ref=e729]: ₹361.96
+                  - button "Add to cart" [ref=e730]
+      - generic [ref=e81]:
+        - button "Domains" [ref=e82] [cursor=pointer]:
+          - img [ref=e83]
+          - generic [ref=e88]: Domains
+        - button "Auctions" [ref=e89] [cursor=pointer]:
+          - img [ref=e90]
+          - generic [ref=e95]: Auctions
+        - button "Premium" [ref=e96] [cursor=pointer]:
+          - img [ref=e97]
+          - generic [ref=e99]: Premium
+        - button "Generator" [ref=e100] [cursor=pointer]:
+          - img [ref=e101]
+          - generic [ref=e106]: Generator
+        - button "Beast Mode" [ref=e107] [cursor=pointer]:
+          - img [ref=e108]
+          - generic [ref=e114]: Beast Mode
+        - button "Favorites" [ref=e115] [cursor=pointer]:
+          - img [ref=e116]
+          - generic [ref=e118]: Favorites
+      - complementary [ref=e119]:
+        - generic [ref=e120]:
+          - heading "Suggested Results" [level=3] [ref=e121]
+          - button "Hide" [ref=e122] [cursor=pointer]
+        - article [ref=e209]:
+          - generic [ref=e210]:
+            - img [ref=e211]
+            - generic [ref=e212]:
+              - heading "bharatcloud.com" [level=2] [ref=e213]
+              - generic [ref=e214] [cursor=pointer]:
+                - text: Premium
+                - generic:
+                  - text: We offer high value Premium inventory through our registry and aftermarket partners. Premium domain names are usually valued higher because they are brandable keywords, short in length, and/or dictionary words.
+                  - link "Learn More":
+                    - /url: https://www.namecheap.com/support/knowledgebase/article.aspx/9990/35/how-to-get-a-premium-domain/
+                  - text: .
+            - emphasis [ref=e215] [cursor=pointer]:
+              - text: More info
+              - generic:
+                - link "New customers, get a mighty .COM domain for $6.79 with promo code NEWCOM679. Non-premium domains only. Full T&Cs apply.":
+                  - /url: https://www.namecheap.com/domains/registration/gtld/com/
+            - button "Add to favorites" [ref=e216] [cursor=pointer]:
+              - img [ref=e217]
+          - generic [ref=e220]:
+            - strong [ref=e221]: ₹90,491,168.16
+            - generic [ref=e222]: Renews at ₹1,680.67/yr
+          - button "Add to cart" [ref=e224] [cursor=pointer]
+        - article [ref=e225]:
+          - generic [ref=e226]:
+            - img [ref=e227]
+            - heading "bharatcloud.to" [level=2] [ref=e229]
+            - button "Add to favorites" [ref=e230] [cursor=pointer]:
+              - img [ref=e231]
+          - generic [ref=e234]:
+            - strong [ref=e235]: ₹2,726.54/yr
+            - generic [ref=e236]: Retail ₹2,726.54/yr
+          - button "Add to cart" [ref=e238] [cursor=pointer]
+        - article [ref=e240]:
+          - img [ref=e241]
+          - generic [ref=e242]:
+            - heading "SSL" [level=2] [ref=e243]
+            - paragraph [ref=e244]: Site security made simple
+            - emphasis [ref=e245] [cursor=pointer]:
+              - text: More info
+              - generic:
+                - text: Secure your new domain with an SSL certificate, covers 1 domain and is issued in 15 minutes. Learn how HTTPS can give you a
+                - link "SEO boost":
+                  - /url: https://www.namecheap.com/blog/https-secure-your-site-and-boost-your-seo/
+                - text: .
+          - strong [ref=e247]: ₹1,000.40/yr
+          - button "Add to cart" [ref=e248] [cursor=pointer]
+        - article [ref=e250]:
+          - img [ref=e251]
+          - generic [ref=e252]:
+            - heading "Business Cards" [level=2] [ref=e253]
+            - paragraph [ref=e254]: Start free, pay to print
+            - emphasis [ref=e255] [cursor=pointer]:
+              - text: More info
+              - generic: Design stylish, high-quality business cards online in just a few simple steps with Namecheap’s Business Card Maker.
+          - strong [ref=e257]: Free
+          - button "Add to cart" [ref=e258] [cursor=pointer]
+        - article [ref=e260]:
+          - img [ref=e261]
+          - generic [ref=e262]:
+            - heading "Secure Your Browsing with VPN" [level=2] [ref=e263]
+            - paragraph [ref=e264]: Access Global Content
+            - emphasis [ref=e265] [cursor=pointer]:
+              - text: More info
+              - generic:
+                - text: Get VPN to secure your data and unlock content.
+                - link "Learn more.":
+                  - /url: https://www.namecheap.com/vpn/
+          - generic [ref=e266]:
+            - generic [ref=e267]: From
+            - strong [ref=e268]: ₹60.02/mo
+          - button "Add to cart" [ref=e269] [cursor=pointer]
+      - main [ref=e270]:
+        - generic [ref=e271]:
+          - heading "Results" [level=3] [ref=e272]
+          - button "Explore More" [ref=e273] [cursor=pointer]
+        - generic [ref=e274]:
+          - article [ref=e275]:
+            - generic [ref=e276]:
+              - generic [ref=e277]:
+                - heading "bharatcloud.it.com" [level=2] [ref=e278]
+                - generic [ref=e506] [cursor=pointer]:
+                  - text: Taken
+                  - generic: This domain name has already been registered. However, you can make an offer to the current owner to see if they are willing to sell it.
+              - button "Add to favorites" [ref=e279] [cursor=pointer]:
+                - img [ref=e280]
+            - button "Make offer" [ref=e507] [cursor=pointer]
+          - article [ref=e284]:
+            - generic [ref=e285]:
+              - generic [ref=e286]:
+                - heading "bharatcloud.app" [level=2] [ref=e287]
+                - generic [ref=e508]: 28% OFF
+              - emphasis [ref=e288] [cursor=pointer]:
+                - text: More info
+                - generic:
+                  - link "A .APP domain is a secure namespace. If you want to build a website using this domain, you will need an SSL certificate, as it requires an HTTPS connection to operate.":
+                    - /url: https://www.namecheap.com/support/knowledgebase/article.aspx/795/69/how-to-install-ssl-certificates
+              - button "Add to favorites" [ref=e289] [cursor=pointer]:
+                - img [ref=e290]
+            - generic [ref=e510]:
+              - strong [ref=e511]: ₹1,180.47/yr
+              - generic [ref=e512]: Retail ₹1,635.20/yr
+            - button "Add to cart" [ref=e513] [cursor=pointer]
+          - article [ref=e294]:
+            - generic [ref=e295]:
+              - generic [ref=e296]:
+                - heading "bharatcloud.inc" [level=2] [ref=e297]
+                - generic [ref=e514]: 76% OFF
+              - button "Add to favorites" [ref=e298] [cursor=pointer]:
+                - img [ref=e299]
+            - generic [ref=e516]:
+              - strong [ref=e517]: ₹45,290.83/yr
+              - generic [ref=e518]: Retail ₹190,803.53/yr
+            - button "Add to cart" [ref=e519] [cursor=pointer]
+          - article [ref=e303]:
+            - generic [ref=e304]:
+              - generic [ref=e305]:
+                - heading "bharatcloud.dev" [level=2] [ref=e306]
+                - generic [ref=e520]: 19% OFF
+              - emphasis [ref=e307] [cursor=pointer]:
+                - text: More info
+                - generic:
+                  - link "A .DEV domain is a secure namespace. If you want to build a website using this domain, you will need an SSL certificate, as it requires an HTTPS connection to operate.":
+                    - /url: https://www.namecheap.com/support/knowledgebase/article.aspx/795/69/how-to-install-ssl-certificates
+              - button "Add to favorites" [ref=e308] [cursor=pointer]:
+                - img [ref=e309]
+            - generic [ref=e522]:
+              - strong [ref=e523]: ₹1,180.47/yr
+              - generic [ref=e524]: Retail ₹1,453.31/yr
+            - button "Add to cart" [ref=e525] [cursor=pointer]
+          - article [ref=e313]:
+            - generic [ref=e314]:
+              - generic [ref=e315]:
+                - heading "bharatcloud.xyz" [level=2] [ref=e316]
+                - generic [ref=e526]: 95% OFF
+              - button "Add to favorites" [ref=e317] [cursor=pointer]:
+                - img [ref=e318]
+            - generic [ref=e528]:
+              - strong [ref=e529]: ₹90.95/yr
+              - generic [ref=e530]: Retail ₹1,771.62/yr
+            - button "Add to cart" [ref=e531] [cursor=pointer]
+          - article [ref=e322]:
+            - generic [ref=e323]:
+              - generic [ref=e324]:
+                - heading "bharatcloud.fit" [level=2] [ref=e325]
+                - generic [ref=e532]: 91% OFF
+              - button "Add to favorites" [ref=e326] [cursor=pointer]:
+                - img [ref=e327]
+            - generic [ref=e534]:
+              - strong [ref=e535]: ₹271.02/yr
+              - generic [ref=e536]: Retail ₹3,090.33/yr
+            - button "Add to cart" [ref=e537] [cursor=pointer]
+          - article [ref=e331]:
+            - generic [ref=e332]:
+              - generic [ref=e333]:
+                - heading "bharatcloud.fashion" [level=2] [ref=e334]
+                - generic [ref=e538]: 77% OFF
+              - button "Add to favorites" [ref=e335] [cursor=pointer]:
+                - img [ref=e336]
+            - generic [ref=e540]:
+              - strong [ref=e541]: ₹725.74/yr
+              - generic [ref=e542]: Retail ₹3,090.33/yr
+            - button "Add to cart" [ref=e543] [cursor=pointer]
+          - article [ref=e340]:
+            - generic [ref=e341]:
+              - generic [ref=e342]:
+                - heading "bharatcloud.ink" [level=2] [ref=e343]
+                - generic [ref=e544]: 91% OFF
+              - button "Add to favorites" [ref=e344] [cursor=pointer]:
+                - img [ref=e345]
+            - generic [ref=e546]:
+              - strong [ref=e547]: ₹271.02/yr
+              - generic [ref=e548]: Retail ₹3,090.33/yr
+            - button "Add to cart" [ref=e549] [cursor=pointer]
+          - article [ref=e349]:
+            - generic [ref=e350]:
+              - generic [ref=e351]:
+                - heading "bharatcloud.health" [level=2] [ref=e352]
+                - generic [ref=e550]: 95% OFF
+              - button "Add to favorites" [ref=e353] [cursor=pointer]:
+                - img [ref=e354]
+            - generic [ref=e552]:
+              - strong [ref=e553]: ₹361.96/yr
+              - generic [ref=e554]: Retail ₹7,546.65/yr
+            - button "Add to cart" [ref=e555] [cursor=pointer]
+          - article [ref=e358]:
+            - generic [ref=e359]:
+              - generic [ref=e360]:
+                - heading "bharatcloud.io" [level=2] [ref=e361]
+                - generic [ref=e556]: 47% OFF
+              - button "Add to favorites" [ref=e362] [cursor=pointer]:
+                - img [ref=e363]
+            - generic [ref=e558]:
+              - strong [ref=e559]: ₹3,181.27/yr
+              - generic [ref=e560]: Retail ₹6,000.58/yr
+            - button "Add to cart" [ref=e561] [cursor=pointer]
+          - article [ref=e367]:
+            - generic [ref=e368]:
+              - generic [ref=e369]:
+                - heading "bharatcloud.tech" [level=2] [ref=e370]
+                - generic [ref=e562] [cursor=pointer]: Registered in 2025
+              - button "Add to favorites" [ref=e371] [cursor=pointer]:
+                - img [ref=e372]
+            - button "Make offer" [ref=e563] [cursor=pointer]
+          - article [ref=e376]:
+            - generic [ref=e377]:
+              - generic [ref=e378]:
+                - heading "bharatcloud.life" [level=2] [ref=e379]
+                - generic [ref=e564]: 94% OFF
+              - button "Add to favorites" [ref=e380] [cursor=pointer]:
+                - img [ref=e381]
+            - generic [ref=e566]:
+              - strong [ref=e567]: ₹225.54/yr
+              - generic [ref=e568]: Retail ₹3,499.58/yr
+            - button "Add to cart" [ref=e569] [cursor=pointer]
+          - article [ref=e385]:
+            - generic [ref=e386]:
+              - generic [ref=e387]:
+                - heading "bharatcloud.us" [level=2] [ref=e388]
+                - generic [ref=e570]: 59% OFF
+              - emphasis [ref=e389] [cursor=pointer]:
+                - text: More info
+                - generic:
+                  - link "To register, you need to be a citizen, resident, company, organization or a foreign entity with a presence in the United States.":
+                    - /url: https://www.namecheap.com/support/knowledgebase/article.aspx/254/36/us-domain-registration-requirements
+              - button "Add to favorites" [ref=e390] [cursor=pointer]:
+                - img [ref=e391]
+            - generic [ref=e572]:
+              - strong [ref=e573]: ₹316.49/yr
+              - generic [ref=e574]: Retail ₹771.22/yr
+            - button "Add to cart" [ref=e575] [cursor=pointer]
+          - article [ref=e395]:
+            - generic [ref=e396]:
+              - generic [ref=e397]:
+                - heading "bharatcloud.llc" [level=2] [ref=e398]
+                - generic [ref=e576]: 73% OFF
+              - button "Add to favorites" [ref=e399] [cursor=pointer]:
+                - img [ref=e400]
+            - generic [ref=e578]:
+              - strong [ref=e579]: ₹1,089.53/yr
+              - generic [ref=e580]: Retail ₹4,090.73/yr
+            - button "Add to cart" [ref=e581] [cursor=pointer]
+          - article [ref=e404]:
+            - generic [ref=e405]:
+              - generic [ref=e406]:
+                - heading "bharatcloud.online" [level=2] [ref=e407]
+                - generic [ref=e582] [cursor=pointer]: Registered in 2025
+              - emphasis [ref=e408] [cursor=pointer]:
+                - text: More info
+                - generic: Offer is applied automatically on login. Renews at $34.98/yr. Not applicable to premium domains.
+              - button "Add to favorites" [ref=e409] [cursor=pointer]:
+                - img [ref=e410]
+            - button "Make offer" [ref=e583] [cursor=pointer]
+          - article [ref=e414]:
+            - generic [ref=e415]:
+              - generic [ref=e416]:
+                - heading "bharatcloud.site" [level=2] [ref=e417]
+                - generic [ref=e584]: ONE PER CUSTOMER
+              - emphasis [ref=e418] [cursor=pointer]:
+                - text: More info
+                - generic: Offer is applied automatically on login. Renews at $31.98/yr. Not applicable to premium domains.
+              - button "Add to favorites" [ref=e419] [cursor=pointer]:
+                - img [ref=e420]
+            - generic [ref=e586]:
+              - strong [ref=e587]: ₹89.13/yr
+              - generic [ref=e588]: Retail ₹161.88/yr
+            - button "Add to cart" [ref=e589] [cursor=pointer]
+          - article [ref=e424]:
+            - generic [ref=e425]:
+              - generic [ref=e426]:
+                - heading "bharatcloud.live" [level=2] [ref=e427]
+                - generic [ref=e590]: 91% OFF
+              - button "Add to favorites" [ref=e428] [cursor=pointer]:
+                - img [ref=e429]
+            - generic [ref=e592]:
+              - strong [ref=e593]: ₹271.02/yr
+              - generic [ref=e594]: Retail ₹3,135.80/yr
+            - button "Add to cart" [ref=e595] [cursor=pointer]
+          - article [ref=e433]:
+            - generic [ref=e434]:
+              - generic [ref=e435]:
+                - heading "bharatcloud.design" [level=2] [ref=e436]
+                - generic [ref=e596]: 78% OFF
+              - button "Add to favorites" [ref=e437] [cursor=pointer]:
+                - img [ref=e438]
+            - generic [ref=e598]:
+              - strong [ref=e599]: ₹1,180.47/yr
+              - generic [ref=e600]: Retail ₹5,363.96/yr
+            - button "Add to cart" [ref=e601] [cursor=pointer]
+          - article [ref=e442]:
+            - generic [ref=e443]:
+              - generic [ref=e444]:
+                - heading "bharatcloud.biz" [level=2] [ref=e445]
+                - generic [ref=e602]: 91% OFF
+              - button "Add to favorites" [ref=e446] [cursor=pointer]:
+                - img [ref=e447]
+            - generic [ref=e604]:
+              - strong [ref=e605]: ₹180.07/yr
+              - generic [ref=e606]: Retail ₹2,180.87/yr
+            - button "Add to cart" [ref=e607] [cursor=pointer]
+          - article [ref=e451]:
+            - generic [ref=e452]:
+              - generic [ref=e453]:
+                - heading "bharatcloud.store" [level=2] [ref=e454]
+                - generic [ref=e608]: ONE PER CUSTOMER
+              - emphasis [ref=e455] [cursor=pointer]:
+                - text: More info
+                - generic: Offer is applied automatically on login. Renews at $43.98/yr. Not applicable to premium domains.
+              - button "Add to favorites" [ref=e456] [cursor=pointer]:
+                - img [ref=e457]
+            - generic [ref=e610]:
+              - strong [ref=e611]: ₹89.13/yr
+              - generic [ref=e612]: Retail ₹161.88/yr
+            - button "Add to cart" [ref=e613] [cursor=pointer]
+          - article [ref=e461]:
+            - generic [ref=e462]:
+              - heading "bharatcloud.fyi" [level=2] [ref=e464]
+              - button "Add to favorites" [ref=e465] [cursor=pointer]:
+                - img [ref=e466]
+            - generic [ref=e615]:
+              - strong [ref=e616]: ₹634.80/yr
+              - generic [ref=e617]: Retail ₹634.80/yr
+            - button "Add to cart" [ref=e618] [cursor=pointer]
+          - article [ref=e470]:
+            - generic [ref=e471]:
+              - generic [ref=e472]:
+                - heading "bharatcloud.work" [level=2] [ref=e473]
+                - generic [ref=e619]: 79% OFF
+              - button "Add to favorites" [ref=e474] [cursor=pointer]:
+                - img [ref=e475]
+            - generic [ref=e621]:
+              - strong [ref=e622]: ₹271.02/yr
+              - generic [ref=e623]: Retail ₹1,271.42/yr
+            - button "Add to cart" [ref=e624] [cursor=pointer]
+          - article [ref=e479]:
+            - generic [ref=e480]:
+              - generic [ref=e481]:
+                - heading "bharatcloud.vip" [level=2] [ref=e482]
+                - generic [ref=e625]: 72% OFF
+              - button "Add to favorites" [ref=e483] [cursor=pointer]:
+                - img [ref=e484]
+            - generic [ref=e627]:
+              - strong [ref=e628]: ₹452.91/yr
+              - generic [ref=e629]: Retail ₹1,908.04/yr
+            - button "Add to cart" [ref=e630] [cursor=pointer]
+          - article [ref=e488]:
+            - generic [ref=e489]:
+              - generic [ref=e490]:
+                - heading "bharatcloud.club" [level=2] [ref=e491]
+                - generic [ref=e631]: 91% OFF
+              - button "Add to favorites" [ref=e492] [cursor=pointer]:
+                - img [ref=e493]
+            - generic [ref=e633]:
+              - strong [ref=e634]: ₹180.07/yr
+              - generic [ref=e635]: Retail ₹1,908.04/yr
+            - button "Add to cart" [ref=e636] [cursor=pointer]
+          - article [ref=e497]:
+            - generic [ref=e498]:
+              - generic [ref=e499]:
+                - heading "bharatcloud.art" [level=2] [ref=e500]
+                - generic [ref=e637]: $25.98 for 2 years
+              - button "Add to favorites" [ref=e501] [cursor=pointer]:
+                - img [ref=e502]
+            - generic [ref=e639]:
+              - strong [ref=e640]: ₹361.96/yr
+              - generic [ref=e641]: Retail ₹2,362.76/yr
+            - button "Add to cart" [ref=e642] [cursor=pointer]
+        - button "Explore 400+ Additional Extensions" [ref=e644] [cursor=pointer]
+    - generic [ref=e739]:
+      - generic [ref=e740] [cursor=pointer]:
+        - button "View Item" [ref=e741]
+        - generic [ref=e743]:
+          - generic [ref=e744]: 1 item
+          - generic [ref=e745]: Rs944.26
+      - link "Checkout" [ref=e746] [cursor=pointer]:
+        - /url: /shoppingcart/
+        - img [ref=e747]
+        - generic [ref=e753]: Checkout
+  - generic [ref=e163]:
+    - paragraph [ref=e165]:
+      - generic [ref=e166]: Need help?
+      - text: We're always here for you.
+    - link " Go to Live Chat page" [ref=e168] [cursor=pointer]:
+      - /url: https://www.namecheap.com/help-center/live-chat?loc=/domains.aspx
+      - generic [ref=e169]: 
+      - text: Go to Live Chat page
+  - contentinfo [ref=e173]:
+    - generic [ref=e176]:
+      - link "Namecheap" [ref=e178] [cursor=pointer]:
+        - /url: https://www.namecheap.com/
+        - img "Namecheap" [ref=e180]
+      - generic [ref=e181]:
+        - paragraph [ref=e182]: The entirety of this site is protected by copyright © 2000–2026 Namecheap, Inc.
+        - paragraph [ref=e183]: 4600 East Washington Street, Suite 300, Phoenix, AZ 85034, USA
+      - generic [ref=e184]:
+        - link "Terms and Conditions" [ref=e185] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/
+        - link "Privacy Policy" [ref=e186] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/privacy-policy/
+        - link "UDRP" [ref=e187] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/domains/udrp/
+          - generic [ref=e188]: UDRP
+        - link "Domain Registration Data Disclosure Policy" [ref=e189] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/domain-registration-data-disclosure-policy-guide/
+        - link "Cookie Preferences" [ref=e190] [cursor=pointer]:
+          - /url: javascript:void(0);

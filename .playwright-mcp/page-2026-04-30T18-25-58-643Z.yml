@@ -1,0 +1,136 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e262]:
+      - generic [ref=e263]:
+        - link "Coolify" [ref=e264] [cursor=pointer]:
+          - /url: /
+        - combobox [ref=e266]:
+          - option "Switch team" [disabled]
+          - option "Root Team" [selected]
+      - button "Open sidebar" [ref=e267]:
+        - generic [ref=e268]: Open sidebar
+        - img [ref=e269]
+    - main [ref=e151]:
+      - generic [ref=e153]:
+        - generic [ref=e154]:
+          - heading "Configuration" [level=1] [ref=e155]
+          - navigation [ref=e156]:
+            - list [ref=e157]:
+              - listitem [ref=e158]:
+                - generic [ref=e159]:
+                  - link "My first project" [ref=e160] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r
+                  - button [ref=e161]:
+                    - img [ref=e162]
+              - listitem [ref=e164]:
+                - generic [ref=e165]:
+                  - link "production" [ref=e166] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i
+                  - button [ref=e167]:
+                    - img [ref=e168]
+              - listitem [ref=e170]:
+                - link "wireproxy-surfshark (localhost)" [ref=e289] [cursor=pointer]:
+                  - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c
+              - generic [ref=e172]:
+                - generic [ref=e176]: Starting (unhealthy)
+                - button "Refresh Status" [ref=e290]:
+                  - img [ref=e291]
+          - generic [ref=e177]:
+            - navigation [ref=e178]:
+              - link "Configuration" [ref=e179] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c
+                - button "Configuration" [ref=e180]
+              - link "Logs" [ref=e181] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/logs
+                - button "Logs" [ref=e182]
+              - link "Terminal" [ref=e183] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/terminal
+                - button "Terminal" [ref=e184]
+              - button "Links" [ref=e187]:
+                - generic [ref=e188]: Links
+                - img [ref=e189]
+            - generic [ref=e192]:
+              - button "Advanced" [ref=e194]:
+                - generic [ref=e195]: Advanced
+                - img [ref=e196]
+              - button "Stop" [ref=e294] [cursor=pointer]:
+                - img [ref=e295]
+                - text: Stop
+              - button "Deploy" [ref=e297] [cursor=pointer]:
+                - img [ref=e298]
+                - text: Deploy
+        - generic [ref=e202]:
+          - generic [ref=e203]:
+            - link "Documentation" [ref=e204] [cursor=pointer]:
+              - /url: https://coolify.io/docs
+              - generic [ref=e205]: Documentation
+              - img [ref=e206]
+            - link "General" [ref=e208] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c
+              - generic [ref=e209]: General
+            - link "Environment Variables" [ref=e210] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/environment-variables
+              - generic [ref=e211]: Environment Variables
+            - link "Persistent Storages" [ref=e212] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/storages
+              - generic [ref=e213]: Persistent Storages
+            - link "Scheduled Tasks" [ref=e214] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/scheduled-tasks
+              - generic [ref=e215]: Scheduled Tasks
+            - link "Webhooks" [ref=e216] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/webhooks
+              - generic [ref=e217]: Webhooks
+            - link "Resource Operations" [ref=e218] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/resource-operations
+              - generic [ref=e219]: Resource Operations
+            - link "Tags" [ref=e220] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/tags
+              - generic [ref=e221]: Tags
+            - link "Danger Zone" [ref=e222] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/danger
+              - generic [ref=e223]: Danger Zone
+          - generic [ref=e224]:
+            - generic [ref=e225]:
+              - generic [ref=e226]:
+                - generic [ref=e227]:
+                  - heading "Service Stack" [level=2] [ref=e228]
+                  - button "Save" [ref=e229] [cursor=pointer]
+                  - button "Edit Compose File" [ref=e231] [cursor=pointer]
+                - generic [ref=e232]: Configuration
+              - generic [ref=e233]:
+                - generic [ref=e234]:
+                  - generic [ref=e235]:
+                    - text: Service Name
+                    - generic [ref=e236]: "*"
+                  - textbox "My super WordPress site" [ref=e271]: wireproxy-surfshark
+                - generic [ref=e238]:
+                  - generic [ref=e239]: Description
+                  - textbox [ref=e272]: Surfshark-backed wireproxy manager container for selected SOCKS5 endpoints.
+              - heading "Network" [level=3] [ref=e242]
+              - generic [ref=e245]:
+                - generic [ref=e246]:
+                  - text: Connect To Predefined Network
+                  - img [ref=e249] [cursor=pointer]
+                - checkbox "Connect To Predefined Network" [ref=e273] [cursor=pointer]
+            - heading "Services" [level=3] [ref=e252]
+            - generic [ref=e255]:
+              - generic [ref=e256]:
+                - generic [ref=e257]: Wireproxy Surfshark (wireproxy-surfshark-manager:local)
+                - generic [ref=e258]: Exited
+              - link "Settings" [ref=e260] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/eljfbma0eg3jybrz4qoybapy
+  - img
+  - list [ref=e274]
+  - generic [ref=e306]:
+    - generic [ref=e308]:
+      - heading "Service Startup" [level=2] [ref=e309]
+      - button [ref=e310]:
+        - img [ref=e311]
+    - generic [ref=e315]:
+      - generic [ref=e316]:
+        - heading "Logs" [level=3] [ref=e317]
+        - img [ref=e319]
+      - generic [ref=e322]: Saved configuration files to /data/coolify/services/lgnrv23z1n9z4ui7r65ogv3c.
+  - generic [ref=e261]:
+    - alert
+    - alert

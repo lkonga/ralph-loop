@@ -1,0 +1,226 @@
+- generic [active] [ref=e1]:
+  - button "1 deployment" [ref=e4]:
+    - img [ref=e5]
+    - generic [ref=e7]: 1 deployment
+    - img [ref=e8]
+  - generic [ref=e10]:
+    - navigation [ref=e13]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - link "Coolify" [ref=e16] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.474" [ref=e17] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.474
+        - button / [ref=e19]:
+          - img [ref=e20]
+          - generic [ref=e22]: /
+        - button "Preferences 9+" [ref=e25] [cursor=pointer]:
+          - img "Preferences" [ref=e26]
+          - generic [ref=e28]: 9+
+      - combobox [ref=e31]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+      - list [ref=e32]:
+        - listitem [ref=e33]:
+          - list [ref=e34]:
+            - listitem [ref=e35]:
+              - link "Dashboard" [ref=e36] [cursor=pointer]:
+                - /url: /
+                - img [ref=e37]
+                - generic [ref=e39]: Dashboard
+            - listitem [ref=e40]:
+              - link "Projects" [ref=e41] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e42]
+                - generic [ref=e47]: Projects
+            - listitem [ref=e48]:
+              - link "Servers" [ref=e49] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e50]
+                - generic [ref=e55]: Servers
+            - listitem [ref=e56]:
+              - link "Sources" [ref=e57] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/sources
+                - img [ref=e58]
+                - generic [ref=e60]: Sources
+            - listitem [ref=e61]:
+              - link "Destinations" [ref=e62] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/destinations
+                - img [ref=e63]
+                - generic [ref=e65]: Destinations
+            - listitem [ref=e66]:
+              - link "S3 Storages" [ref=e67] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/storages
+                - img [ref=e68]
+                - generic [ref=e73]: S3 Storages
+            - listitem [ref=e74]:
+              - link "Shared Variables" [ref=e75] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/shared-variables
+                - img [ref=e76]
+                - generic [ref=e80]: Shared Variables
+            - listitem [ref=e81]:
+              - link "Notifications" [ref=e82] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/notifications/email
+                - img [ref=e83]
+                - generic [ref=e85]: Notifications
+            - listitem [ref=e86]:
+              - link "Keys & Tokens" [ref=e87] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/security/private-key
+                - img [ref=e88]
+                - generic [ref=e90]: Keys & Tokens
+            - listitem [ref=e91]:
+              - link "Tags" [ref=e92] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/tags
+                - img [ref=e93]
+                - generic [ref=e97]: Tags
+            - listitem [ref=e98]:
+              - link "Terminal" [ref=e99] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/terminal
+                - img [ref=e100]
+                - generic [ref=e103]: Terminal
+            - listitem [ref=e104]:
+              - link "Profile" [ref=e105] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/profile
+                - img [ref=e106]
+                - generic [ref=e111]: Profile
+            - listitem [ref=e112]:
+              - link "Teams" [ref=e113] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/team
+                - img [ref=e114]
+                - generic [ref=e122]: Teams
+            - listitem [ref=e123]:
+              - link "Settings" [ref=e124] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e125]
+                - generic [ref=e129]: Settings
+            - listitem [ref=e132]:
+              - generic "New version available" [ref=e133]:
+                - button "Upgrade" [ref=e135] [cursor=pointer]:
+                  - img [ref=e136]
+                  - text: Upgrade
+            - listitem [ref=e139]:
+              - link "Sponsor us" [ref=e140] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e141]
+                - generic [ref=e145]: Sponsor us
+            - listitem [ref=e146]:
+              - generic "Send us feedback or get help!" [ref=e149] [cursor=pointer]:
+                - img [ref=e150]
+                - generic [ref=e152]: Feedback
+            - listitem [ref=e153]:
+              - button "Logout" [ref=e155]:
+                - img [ref=e156]
+                - generic [ref=e158]: Logout
+    - main [ref=e159]:
+      - generic [ref=e161]:
+        - heading "Deployment" [level=1] [ref=e162]
+        - generic [ref=e164]:
+          - generic [ref=e165]:
+            - img [ref=e166]
+            - generic [ref=e168]:
+              - heading "The latest configuration has not been applied" [level=4] [ref=e169]
+              - generic [ref=e170]: Please redeploy to apply the new configuration.
+          - button [ref=e171]:
+            - img [ref=e172]
+        - navigation [ref=e174]:
+          - navigation [ref=e175]:
+            - list [ref=e176]:
+              - listitem [ref=e177]:
+                - generic [ref=e178]:
+                  - link "My first project" [ref=e179] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r
+                  - button [ref=e180]:
+                    - img [ref=e181]
+              - listitem [ref=e183]:
+                - generic [ref=e184]:
+                  - link "production" [ref=e185] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i
+                  - button [ref=e186]:
+                    - img [ref=e187]
+              - listitem [ref=e189]:
+                - link "bharat-cloud-demo (localhost)" [ref=e190] [cursor=pointer]:
+                  - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b
+              - generic [ref=e191]:
+                - generic [ref=e193]:
+                  - link "Running" [ref=e196] [cursor=pointer]:
+                    - /url: github.com/lkonga/bharat-cloud-demo/commit/3072e71875024823bdfc95c35e9caec342c3b565
+                  - generic [ref=e197]: (unknown)
+                  - img [ref=e201] [cursor=pointer]
+                - button "Refresh Status" [ref=e202]:
+                  - img [ref=e203]
+          - generic [ref=e205]:
+            - navigation [ref=e206]:
+              - link "Configuration" [ref=e207] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b
+              - link "Deployments" [ref=e208] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/deployment
+              - link "Logs" [ref=e209] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/logs
+                - generic [ref=e210]: Logs
+              - link "Terminal" [ref=e211] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/terminal
+              - button "Links" [ref=e214]:
+                - generic [ref=e215]: Links
+                - img [ref=e216]
+            - generic [ref=e219]:
+              - button "Advanced" [ref=e222]:
+                - generic [ref=e223]: Advanced
+                - img [ref=e224]
+              - generic [ref=e226]:
+                - button "Redeploy" [ref=e227] [cursor=pointer]:
+                  - img [ref=e228]
+                  - text: Redeploy
+                - button "Restart" [ref=e230] [cursor=pointer]:
+                  - img [ref=e231]
+                  - text: Restart
+                - button "Stop" [ref=e236] [cursor=pointer]:
+                  - img [ref=e237]
+                  - text: Stop
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - heading "Deployment Log" [level=2] [ref=e241]
+            - button "Cancel" [ref=e242] [cursor=pointer]
+          - generic [ref=e244]:
+            - generic [ref=e245]:
+              - generic [ref=e247]:
+                - generic [ref=e248]: Deployment is
+                - generic [ref=e249]: In Progress
+                - img [ref=e251]
+              - generic [ref=e253]:
+                - generic [ref=e254]:
+                  - img [ref=e255]
+                  - textbox "Find in logs" [ref=e257]
+                - generic [ref=e258]:
+                  - button "Copy Logs" [ref=e259]:
+                    - img [ref=e260]
+                  - button "Download Logs" [ref=e263]:
+                    - img [ref=e264]
+                  - button "Toggle Timestamps" [ref=e266]:
+                    - img [ref=e267]
+                  - button "Show Debug Logs" [ref=e269]:
+                    - img [ref=e270]
+                  - button "Follow Logs" [ref=e272]:
+                    - img [ref=e273]
+                  - button "Fullscreen" [ref=e275]:
+                    - img [ref=e276]
+            - generic [ref=e281]:
+              - generic [ref=e283]:
+                - generic [ref=e284]: 2026-May-07 17:43:27.362802
+                - generic [ref=e285]: Docker 29.2.1 with BuildKit and Buildx detected on deployment server (localhost).
+              - generic [ref=e286]:
+                - generic [ref=e287]: 2026-May-07 17:43:27.367372
+                - generic [ref=e288]: Starting deployment of <REDACTED>:lkonga/bharat-cloud-demo.git:main to localhost.
+              - generic [ref=e289]:
+                - generic [ref=e290]: 2026-May-07 17:43:27.512147
+                - generic [ref=e291]: "Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.13"
+              - generic [ref=e292]:
+                - generic [ref=e293]: 2026-May-07 17:43:31.358610
+                - generic [ref=e294]: Configuration changed. Rebuilding image.
+              - generic [ref=e295]:
+                - generic [ref=e296]: 2026-May-07 17:43:31.362810
+                - generic [ref=e297]: "----------------------------------------"
+              - generic [ref=e298]:
+                - generic [ref=e299]: 2026-May-07 17:43:31.366836
+                - generic [ref=e300]: Importing <REDACTED>:lkonga/bharat-cloud-demo.git:main (commit sha 3072e71875024823bdfc95c35e9caec342c3b565) to /artifacts/bv51yrski0u327ip0m3lj7q7.
+  - img
+  - list

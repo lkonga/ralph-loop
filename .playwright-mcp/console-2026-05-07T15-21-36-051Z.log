@@ -1,0 +1,7 @@
+[ 8438328ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://g5kc.tail1e9037.ts.net:10000/livewire/update:0
+[ 8448326ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://g5kc.tail1e9037.ts.net:10000/livewire/update:0
+[ 8448371ms] InvalidStateError: Failed to execute 'showModal' on 'HTMLDialogElement': The dialog is already open as a non-modal dialog, and therefore cannot be opened as a modal dialog.
+    at vn (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:42397)
+    at Fc (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:6:80)
+    at Yo (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:46576)
+    at async Vt.send (https://g5kc.tail1e9037.ts.net:10000/livewire/livewire.min.js?id=57eb113f:5:42877)

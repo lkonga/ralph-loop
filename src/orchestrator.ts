@@ -79,8 +79,8 @@ import {
 	type LoopEvent,
 	LoopEventKind,
 	LoopState,
-	type PendingHybridVerification,
 	type ParallelMonitorConfig,
+	type PendingHybridVerification,
 	type PreCompleteHookConfig,
 	type PreCompleteHookResult,
 	type PreCompleteInput,
@@ -93,8 +93,11 @@ import {
 import { VerificationCache } from "./verificationCache";
 import {
 	computeConfidenceScore,
+	createBuiltinRegistry,
 	dualExitGateCheck,
 	formatVerificationFeedback,
+	resolveVerifiers,
+	runVerifierChain,
 } from "./verify";
 
 const KNOWN_AGENTS = new Set(["executor", "explore", "research"]);
@@ -1919,42 +1922,42 @@ export class LoopOrchestrator {
 					}
 
 					// Dual exit gate: require BOTH model signal AND machine verification
-					const dualGateChecks: VerifyCheck[] = [];
-					{
-						const snapshot = readPrdSnapshot(prdPath);
-						const foundTask = snapshot.tasks.find(
-							(t) => t.description === task.description,
-						);
-						dualGateChecks.push({
-							name: "checkbox",
+					const verifierRegistry = createBuiltinRegistry();
+					const verifierConfigs = resolveVerifiers(
+						task,
+						this.config,
+						verifierRegistry,
+					);
+					const machineChecks = await runVerifierChain(
+						task,
+						this.config.workspaceRoot,
+						verifierConfigs,
+						verifierRegistry,
+						this.logger,
+					);
+
+					// Inject diff pass/fail manually since it's an orchestrator-level observation
+					const diffCheckIndex = machineChecks.findIndex(
+						(c) => c.name === "diff",
+					);
+					if (diffCheckIndex === -1) {
+						machineChecks.push({
+							name: "diff",
 							result:
-								foundTask?.status === TaskStatus.Complete
+								task.noDiff || waitResult.hadFileChanges
 									? VerifyResult.Pass
 									: VerifyResult.Fail,
-						});
-					}
-					// noDiff tasks (documentation, meta) skip the diff requirement
-					if (task.noDiff) {
-						dualGateChecks.push({
-							name: "diff",
-							result: VerifyResult.Skip,
-							detail: "Skipped (noDiff task)",
-						});
-					} else {
-						dualGateChecks.push({
-							name: "diff",
-							result: waitResult.hadFileChanges
-								? VerifyResult.Pass
-								: VerifyResult.Fail,
-							detail: waitResult.hadFileChanges
-								? "Files changed"
-								: "No file changes detected",
+							detail: task.noDiff
+								? "Skipped (noDiff task)"
+								: waitResult.hadFileChanges
+									? "Files changed"
+									: "No file changes detected",
 						});
 					}
 
 					const gateResult = dualExitGateCheck(
 						waitResult.completed,
-						dualGateChecks,
+						machineChecks,
 					);
 
 					if (gateResult.canComplete) {
@@ -2351,7 +2354,7 @@ export class LoopOrchestrator {
 					} else if (waitResult.completed && !gateResult.canComplete) {
 						// Model signaled complete but dual gate rejected — nudge to fix
 						this.logger.warn(`Dual exit gate rejected: ${gateResult.reason}`);
-						const feedback = formatVerificationFeedback(dualGateChecks);
+						const feedback = formatVerificationFeedback(machineChecks);
 						additionalContext =
 							gateResult.reason ?? "Dual exit gate check failed";
 						if (feedback) {

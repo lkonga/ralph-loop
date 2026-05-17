@@ -1,0 +1,4 @@
+[    2536ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://www.civo.com/cms/api/users/me:0
+[    2537ms] [WARNING] SyntaxError: Unexpected token '<', "<html>
+<h"... is not valid JSON @ https://www.civo.com/_next/static/chunks/9573-2d3095edec3cd384.js:0
+[    4640ms] [WARNING] [quick-fetch] quickFetchScript was not included or running in Node.js environment. Falling back to stubbed implementation. @ https://static.hsappstatic.net/conversations-visitor-ui/static-1.28901/bundles/visitor.js:0

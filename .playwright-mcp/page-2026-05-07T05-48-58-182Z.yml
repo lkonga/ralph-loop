@@ -1,0 +1,204 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - link "Contact us" [ref=e12] [cursor=pointer]:
+            - /url: https://www.namecheap.com/support/
+          - generic [ref=e13]:
+            - link " lemeshchenkoyuliia " [ref=e14] [cursor=pointer]:
+              - /url: https://ap.www.namecheap.com/dashboard
+              - generic [ref=e15]: 
+              - generic [ref=e16]: lemeshchenkoyuliia
+              - generic [ref=e17]: 
+            - text: 
+        - generic [ref=e18]:
+          - generic [ref=e19]:
+            - link "Your Cart" [ref=e20] [cursor=pointer]:
+              - /url: https://www.namecheap.com/shoppingcart/
+              - generic [ref=e21]: 
+              - generic [ref=e22]: Rs944.26
+            - text: 
+          - generic [ref=e23]:
+            - generic [ref=e24] [cursor=pointer]:
+              - text: Rs
+              - generic [ref=e25]: INR
+            - text: 
+          - button "Search" [ref=e26] [cursor=pointer]:
+            - generic [ref=e27]: 
+      - generic [ref=e29]:
+        - generic [ref=e31]:
+          - strong [ref=e33]:
+            - link "Namecheap" [ref=e34] [cursor=pointer]:
+              - /url: https://www.namecheap.com/
+              - img "Namecheap" [ref=e35]
+          - text: 
+        - navigation [ref=e36]:
+          - generic:
+            - generic: 
+  - generic [ref=e42]:
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - button "Bulk Settings" [ref=e46] [cursor=pointer]
+        - generic [ref=e47]:
+          - button "Edit Cart" [ref=e48] [cursor=pointer]
+          - text:  
+      - generic [ref=e51]:
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - strong [ref=e56]: Domain Registration
+            - paragraph [ref=e57]: bharatcloud.in
+          - generic [ref=e58]:
+            - generic [ref=e61] [cursor=pointer]: 1 Year
+            - generic [ref=e62]:
+              - checkbox "AUTO-RENEW" [checked] [ref=e63]
+              - generic [ref=e64] [cursor=pointer]: AUTO-RENEW
+          - generic [ref=e65]:
+            - paragraph [ref=e66]:
+              - generic [ref=e68]: Rs1,133.49
+              - generic [ref=e70]: Rs944.26
+            - text: 17% off 1st year
+          - generic [ref=e71]:
+            - link "" [ref=e72] [cursor=pointer]:
+              - /url: "#"
+            - link "" [ref=e73] [cursor=pointer]:
+              - /url: "#"
+        - paragraph [ref=e75]: Uptime protection
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - generic [ref=e80]:
+              - strong [ref=e82]:
+                - strong [ref=e84]:
+                  - text: PremiumDNS
+                  - superscript [ref=e85]: NEW
+              - paragraph
+            - generic [ref=e86]:
+              - generic [ref=e87]:
+                - checkbox "ENABLE" [ref=e88]
+                - generic [ref=e89] [cursor=pointer]: ENABLE
+              - generic [ref=e90]:
+                - checkbox "AUTO-RENEW" [disabled] [ref=e91]
+                - generic [ref=e92]: AUTO-RENEW
+            - paragraph [ref=e94]:
+              - generic [ref=e98]: Rs376.57
+          - generic [ref=e101]:
+            - link " What is the benefit?" [ref=e102] [cursor=pointer]:
+              - /url: "#"
+              - generic [ref=e103]: 
+              - text: What is the benefit?
+            - generic [ref=e105]: PremiumDNS delivers 100% DNS uptime and DDoS protection with ultra-fast DNS responses worldwide. DNSSEC is also included with PremiumDNS. Recommended for business & important domains.
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]:
+              - generic [ref=e109]:
+                - strong [ref=e111]:
+                  - strong [ref=e112]:
+                    - text: Stellar Web Hosting
+                    - link "EDIT" [ref=e114] [cursor=pointer]:
+                      - /url: /cart/configuration/addons.aspx?itemid=1019751225
+                - paragraph [ref=e115]: Monthly subscription
+              - generic [ref=e116]:
+                - generic [ref=e117]:
+                  - checkbox "ENABLE" [ref=e118]
+                  - generic [ref=e119] [cursor=pointer]: ENABLE
+                - generic [ref=e120]:
+                  - checkbox "AUTO-RENEW" [disabled] [ref=e121]
+                  - generic [ref=e122]: AUTO-RENEW
+              - generic [ref=e123]:
+                - paragraph [ref=e124]:
+                  - generic [ref=e126]: Rs556.34
+                  - generic [ref=e129]: Rs0.00
+                - text: Free trial
+              - link "" [ref=e131] [cursor=pointer]:
+                - /url: "#"
+            - generic [ref=e133]:
+              - link " Learn more" [ref=e134] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e135]: 
+                - text: Learn more
+              - generic [ref=e137]: Launch your site with Stellar Shared Hosting, which offers free website builder, mailboxes, and your choice of CMS including WordPress – all for an unmissable price.
+          - generic [ref=e139]:
+            - generic [ref=e140]: US Datacenter
+            - generic [ref=e143]: Rs0.00
+      - generic [ref=e145]:
+        - heading "Improve Your Site" [level=3] [ref=e146]
+        - button "+" [ref=e147] [cursor=pointer]
+        - generic [ref=e148]:
+          - generic [ref=e150]:
+            - figure [ref=e151]:
+              - img "Empty addon" [ref=e152]
+            - paragraph [ref=e153]:
+              - strong
+              - emphasis [ref=e154]
+            - paragraph [ref=e155]
+          - generic [ref=e159]:
+            - figure [ref=e160]:
+              - img "Empty addon" [ref=e161]
+            - paragraph [ref=e162]:
+              - strong
+              - emphasis [ref=e163]
+            - paragraph [ref=e164]
+          - generic [ref=e168]:
+            - figure [ref=e169]:
+              - img "Empty addon" [ref=e170]
+            - paragraph [ref=e171]:
+              - strong
+              - emphasis [ref=e172]
+            - paragraph [ref=e173]
+          - generic [ref=e177]:
+            - figure [ref=e178]:
+              - img "Empty addon" [ref=e179]
+            - paragraph [ref=e180]:
+              - strong
+              - emphasis [ref=e181]
+            - paragraph [ref=e182]
+      - button "Confirm Order" [ref=e186] [cursor=pointer]
+    - generic [ref=e188]:
+      - complementary [ref=e189]:
+        - generic [ref=e190]:
+          - generic [ref=e191]: Your Subtotal
+          - generic [ref=e192]:
+            - generic [ref=e193]:
+              - generic [ref=e195]:
+                - text: Subtotal
+                - generic [ref=e197]: Rs944.26
+              - generic [ref=e200]:
+                - text: Currency notice — final charges are applied in USD and may be subject to
+                - link "exchange rate" [ref=e201] [cursor=pointer]:
+                  - /url: /support/payment/currency-exchange-rates/
+                - text: changes and additional bank fees
+            - button "Confirm Order" [ref=e203] [cursor=pointer]
+      - generic [ref=e204]:
+        - text: Promo Code
+        - generic [ref=e205]:
+          - textbox "Promo Code" [ref=e206]:
+            - /placeholder: promo code
+          - button "Apply" [ref=e207] [cursor=pointer]
+  - generic [ref=e213]:
+    - paragraph [ref=e215]:
+      - generic [ref=e216]: Need help?
+      - text: We're always here for you.
+    - link " Go to Live Chat page" [ref=e218] [cursor=pointer]:
+      - /url: https://www.namecheap.com/help-center/live-chat?loc=/general.aspx
+      - generic [ref=e219]: 
+      - text: Go to Live Chat page
+  - contentinfo [ref=e223]:
+    - generic [ref=e226]:
+      - link "Namecheap" [ref=e228] [cursor=pointer]:
+        - /url: https://www.namecheap.com/
+        - img "Namecheap" [ref=e230]
+      - generic [ref=e231]:
+        - paragraph [ref=e232]: The entirety of this site is protected by copyright © 2000–2026 Namecheap, Inc.
+        - paragraph [ref=e233]: 4600 East Washington Street, Suite 300, Phoenix, AZ 85034, USA
+      - generic [ref=e234]:
+        - link "Terms and Conditions" [ref=e235] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/
+        - link "Privacy Policy" [ref=e236] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/privacy-policy/
+        - link "UDRP" [ref=e237] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/domains/udrp/
+          - generic [ref=e238]: UDRP
+        - link "Domain Registration Data Disclosure Policy" [ref=e239] [cursor=pointer]:
+          - /url: https://www.namecheap.com/legal/general/domain-registration-data-disclosure-policy-guide/
+        - link "Cookie Preferences" [ref=e240] [cursor=pointer]:
+          - /url: javascript:void(0);

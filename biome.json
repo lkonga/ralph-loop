@@ -1,0 +1,10 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"linter": {
+		"enabled": false
+	}
+}

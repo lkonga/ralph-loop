@@ -1,0 +1,72 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - progressbar [ref=e6]
+      - main [ref=e499]:
+        - generic [ref=e500]:
+          - img [ref=e503]
+          - generic [ref=e508]:
+            - heading "2-Step Verification" [level=1] [ref=e509]
+            - generic [ref=e510]: To help keep your account safe, Google wants to make sure it’s really you trying to sign in
+            - link "lemeshchenkoyuliia@gmail.com selected. Switch account" [ref=e512] [cursor=pointer]:
+              - img [ref=e515]
+              - generic [ref=e517]: lemeshchenkoyuliia@gmail.com
+              - img [ref=e519]
+        - generic [ref=e529]:
+          - heading "Choose how you want to sign in:" [level=2] [ref=e531]:
+            - generic [ref=e532]: "Choose how you want to sign in:"
+          - list [ref=e536]:
+            - listitem [ref=e537]:
+              - link "Tap Yes on your phone or tablet" [ref=e538] [cursor=pointer]:
+                - img [ref=e540]
+                - generic [ref=e542]:
+                  - text: Tap
+                  - strong [ref=e543]: "Yes"
+                  - text: on your phone or tablet
+            - listitem [ref=e544]:
+              - link "Use your phone or tablet to get a security code (even if it’s offline)" [ref=e545] [cursor=pointer]:
+                - img [ref=e547]
+                - generic [ref=e549]: Use your phone or tablet to get a security code (even if it’s offline)
+            - listitem [ref=e550]:
+              - link "Get a verification code from the Google Authenticator app" [ref=e551] [cursor=pointer]:
+                - img [ref=e553]
+                - generic [ref=e555]:
+                  - text: Get a verification code from the
+                  - strong [ref=e556]: Google Authenticator
+                  - text: app
+            - listitem [ref=e557]:
+              - link "Tap Yes on the device your recovery email is signed into Device can’t be reached right now" [disabled]:
+                - generic:
+                  - img
+                - generic:
+                  - text: Tap
+                  - strong: "Yes"
+                  - text: on the device your recovery email is signed into
+                  - generic: Device can’t be reached right now
+            - listitem [ref=e558]:
+              - link "Use your passkey" [ref=e559] [cursor=pointer]:
+                - img [ref=e561]
+                - generic [ref=e563]: Use your passkey
+            - listitem [ref=e564]:
+              - link "Try another way" [ref=e565] [cursor=pointer]:
+                - img [ref=e567]
+                - generic [ref=e569]: Try another way
+    - contentinfo [ref=e69]:
+      - combobox "Change language English (United States)" [ref=e73] [cursor=pointer]:
+        - generic:
+          - generic: English (United States)
+        - generic:
+          - img
+      - list [ref=e75]:
+        - listitem [ref=e76]:
+          - link "Help" [ref=e77] [cursor=pointer]:
+            - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+        - listitem [ref=e78]:
+          - link "Privacy" [ref=e79] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=IN&hl=en-US&privacy=true
+        - listitem [ref=e80]:
+          - link "Terms" [ref=e81] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=IN&hl=en-US
+  - iframe [ref=e82]:
+    
+  - generic [ref=e571]: 2-Step Verification To help keep your account safe, Google wants to make sure it’s really you trying to sign in

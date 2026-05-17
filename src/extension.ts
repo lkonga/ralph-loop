@@ -139,6 +139,69 @@ export function activate(context: vscode.ExtensionContext): void {
 	});
 	const logger = createOutputLogger(outputChannel);
 
+	// Unix socket server for handoff triggers — runs early, before workspace guard
+	// so it's available even without an open folder. Controlled by setting.
+	const cfg = vscode.workspace.getConfiguration("ralph-loop");
+	if (cfg.get<boolean>("enableHandoffSocket", true)) {
+		const handoffDir = join(process.env.HOME ?? "", ".local/share/chat-handoffs");
+		let workspaceId = "default";
+		if (context.storageUri) {
+			const m = context.storageUri.fsPath.match(/workspaceStorage\/([a-f0-9]+)/);
+			if (m) workspaceId = m[1];
+		}
+		const sockPath = join(handoffDir, `handoff-${workspaceId}-${process.pid}.sock`);
+		handoffSockPath = sockPath;
+		try {
+			mkdirSync(handoffDir, { recursive: true });
+			// Clean up stale sockets for this workspace (dead PIDs)
+			try {
+				const prefix = `handoff-${workspaceId}-`;
+				for (const f of readdirSync(handoffDir)) {
+					if (f.startsWith(prefix) && f.endsWith(".sock")) {
+						const pidStr = f.slice(prefix.length, -5);
+						const pid = parseInt(pidStr, 10);
+						if (!isNaN(pid) && pid !== process.pid) {
+							try { readFileSync(`/proc/${pid}/stat`); } catch {
+								try { unlinkSync(join(handoffDir, f)); } catch { /* ignore */ }
+							}
+						}
+					}
+				}
+			} catch { /* non-critical cleanup */ }
+			try { unlinkSync(sockPath); } catch { /* stale socket */ }
+			handoffServer = createServer((conn: import("node:net").Socket) => {
+				let data = "";
+				conn.on("data", (chunk: Buffer) => { data += chunk; });
+				conn.on("end", () => {
+					const trimmed = data.trim();
+					const parts = trimmed.split("|");
+					const n = parseInt(parts[0], 10);
+					const variant = (n >= 1 && n <= 15) ? n : undefined;
+					let model: string | undefined;
+					let sessionId: string | undefined;
+					for (const part of parts.slice(1)) {
+						if (part.startsWith("model:")) { model = part.slice(6); }
+						else if (part.startsWith("session:")) { sessionId = part.slice(8); }
+					}
+					logger.log(`Handoff: received variant ${variant ?? "(default)"}${model ? ` model=${model}` : ""}${sessionId ? ` session=${sessionId}` : ""} via socket`);
+					// Call executeHandoff directly instead of via executeCommand to avoid
+					// "command not found" race — the command registration runs later in this function.
+					executeHandoff(logger, { variant, model, sessionId })
+						.then(() => { logger.log("Handoff: completed"); conn.end(); })
+						.catch((err: unknown) => { logger.error(`Handoff: failed: ${err instanceof Error ? err.message : String(err)}`); conn.end(); });
+				});
+			});
+			handoffServer.listen(sockPath, () => {
+				logger.log(`Handoff socket listening at ${sockPath}`);
+			});
+			handoffServer.on("error", (err: Error) => {
+				logger.warn(`Handoff socket error: ${err.message}`);
+			});
+		} catch { /* non-critical */ }
+	} else {
+		logger.log("Handoff socket disabled (ralph-loop.enableHandoffSocket=false)");
+	}
+
 	// Register onStateChange command (fire-and-forget notification)
 	context.subscriptions.push(
 		vscode.commands.registerCommand("ralph-loop.onStateChange", async ({ state, taskId }) => {
@@ -669,66 +732,6 @@ vscode.commands.registerCommand("ralph-loop.testPreviousRequests", async () => {
 	);
 
 	logger.log("Ralph Loop extension activated");
-
-	// Unix socket server for handoff triggers — scoped per workspace AND per PID
-	// to avoid cross-window bleeding when the same workspace is open in multiple windows/profiles
-	const handoffDir = join(process.env.HOME ?? "", ".local/share/chat-handoffs");
-	let workspaceId = "default";
-	if (context.storageUri) {
-		const m = context.storageUri.fsPath.match(/workspaceStorage\/([a-f0-9]+)/);
-		if (m) workspaceId = m[1];
-	}
-	const sockPath = join(handoffDir, `handoff-${workspaceId}-${process.pid}.sock`);
-	handoffSockPath = sockPath;
-	try {
-		mkdirSync(handoffDir, { recursive: true });
-		// Clean up stale sockets for this workspace (dead PIDs)
-		try {
-			const prefix = `handoff-${workspaceId}-`;
-			for (const f of readdirSync(handoffDir)) {
-				if (f.startsWith(prefix) && f.endsWith(".sock")) {
-					const pidStr = f.slice(prefix.length, -5);
-					const pid = parseInt(pidStr, 10);
-					if (!isNaN(pid) && pid !== process.pid) {
-						try { readFileSync(`/proc/${pid}/stat`); } catch {
-							try { unlinkSync(join(handoffDir, f)); } catch { /* ignore */ }
-						}
-					}
-				}
-			}
-		} catch { /* non-critical cleanup */ }
-		try { unlinkSync(sockPath); } catch { /* stale socket */ }
-		handoffServer = createServer((conn: import("node:net").Socket) => {
-			let data = "";
-			conn.on("data", (chunk: Buffer) => { data += chunk; });
-			conn.on("end", () => {
-				const trimmed = data.trim();
-				// Protocol: "7" (simple) or "7|model:claude-sonnet-4|session:abc123" (extended)
-				const parts = trimmed.split("|");
-				const n = parseInt(parts[0], 10);
-				const variant = (n >= 1 && n <= 15) ? n : undefined;
-				let model: string | undefined;
-				let sessionId: string | undefined;
-				for (const part of parts.slice(1)) {
-					if (part.startsWith("model:")) {
-						model = part.slice(6);
-					} else if (part.startsWith("session:")) {
-						sessionId = part.slice(8);
-					}
-				}
-				logger.log(`Handoff: received variant ${variant ?? "(default)"}${model ? ` model=${model}` : ""}${sessionId ? ` session=${sessionId}` : ""} via socket`);
-				Promise.resolve(vscode.commands.executeCommand("ralph-loop.handoff", { variant, model, sessionId }))
-					.then(() => logger.log("Handoff: command completed"))
-					.catch((err: unknown) => logger.error(`Handoff: command failed: ${err instanceof Error ? err.message : String(err)}`));
-			});
-		});
-		handoffServer.listen(sockPath, () => {
-			logger.log(`Handoff socket listening at ${sockPath}`);
-		});
-		handoffServer.on("error", (err: Error) => {
-			logger.warn(`Handoff socket error: ${err.message}`);
-		});
-	} catch { /* non-critical */ }
 
 	// Auto-resume incomplete session on activation (no user prompt needed)
 	const folders = vscode.workspace.workspaceFolders;

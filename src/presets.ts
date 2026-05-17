@@ -1,4 +1,6 @@
-import { DEFAULT_CONFIG, RalphConfig, RalphPreset, PresetName } from './types';
+import * as fs from 'fs';
+import * as path from 'path';
+import { DEFAULT_CONFIG, PresetName, RalphConfig, RalphPreset, VerifierConfig } from './types';
 
 export { PresetName } from './types';
 
@@ -52,5 +54,49 @@ export function resolveConfig(
 		...presetOverrides,
 		...overrides,
 		workspaceRoot,
+		verifiers: [
+			...(DEFAULT_CONFIG.verifiers ?? []),
+			...(presetOverrides.verifiers ?? []),
+			...(overrides?.verifiers ?? []),
+			...autoDiscoverVerifiers(workspaceRoot, { ...DEFAULT_CONFIG, ...presetOverrides, ...overrides }),
+		],
 	};
+}
+
+function autoDiscoverVerifiers(workspaceRoot: string, config: Partial<RalphConfig>): VerifierConfig[] {
+	if (config.autoDiscoverVerifiers === false) {
+		return [];
+	}
+
+	const discovered: VerifierConfig[] = [];
+
+	// 1. Check for verify.sh (the gold standard for zero-friction)
+	const verifyShPath = path.join(workspaceRoot, 'verify.sh');
+	if (fs.existsSync(verifyShPath)) {
+		discovered.push({
+			type: 'shell',
+			args: { script: './verify.sh' }
+		});
+	}
+
+	// 2. Check for npm test in package.json
+	const pkgPath = path.join(workspaceRoot, 'package.json');
+	if (fs.existsSync(pkgPath)) {
+		try {
+			const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+			if (pkg.scripts?.test) {
+				// Avoid duplication if verify.sh already exists and likely calls npm test
+				if (!discovered.some(v => v.type === 'shell' && v.args?.script === './verify.sh')) {
+					discovered.push({
+						type: 'npm',
+						args: { script: 'test' }
+					});
+				}
+			}
+		} catch {
+			// Ignore malformed package.json
+		}
+	}
+
+	return discovered;
 }

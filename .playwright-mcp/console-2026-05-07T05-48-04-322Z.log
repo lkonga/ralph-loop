@@ -1,0 +1,21 @@
+[     691ms] [WARNING] GetShoppingCartSummary returned null. @ https://static.nc-img.com/uilayout2/app.a6d77156e92549162122.js:0
+[    2039ms] [WARNING] GetShoppingCartSummary returned null. @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   27569ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://premiums.namecheapapi.com/domain/Monthly%20subscription%20for%20bharatcloud.in:0
+[   27570ms] [LOG] getCartItems get Premium domain price error:  Error: Request failed with status code 400 @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   27723ms] [WARNING] [Meta Pixel] - Invalid parameter format for content_type. Please refer https://developers.facebook.com/docs/meta-pixel/reference/ for valid parameter specifications. @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   27723ms] [WARNING] [Meta Pixel] - Invalid parameter format for value. Please refer https://developers.facebook.com/docs/meta-pixel/reference/ for valid parameter specifications. @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   27728ms] [WARNING] GA queue (_gaq) is undefined @ https://d1dijnkjnmzy2z.cloudfront.net/63.js:1
+[   53313ms] TypeError: Cannot use 'in' operator to search for 'render' in undefined
+    at https://static.nc-img.com/uishoppingcart/app.ceb896bed23496a217ea.js:6:126764
+    at Object.execCb (https://www.namecheap.com/shoppingcart/:125:26444)
+    at b.check (https://www.namecheap.com/shoppingcart/:125:20189)
+    at b.<anonymous> (https://www.namecheap.com/shoppingcart/:125:22610)
+    at https://www.namecheap.com/shoppingcart/:125:14377
+    at https://www.namecheap.com/shoppingcart/:125:23071
+    at each (https://www.namecheap.com/shoppingcart/:125:13816)
+    at b.emit (https://www.namecheap.com/shoppingcart/:125:23039)
+    at b.check (https://www.namecheap.com/shoppingcart/:125:20748)
+    at b.enable (https://www.namecheap.com/shoppingcart/:125:22937)
+[   54354ms] [ERROR] Event @ https://d2jbt8279safi9.cloudfront.net/umd/main.841406bd.js:1
+[   54825ms] [ERROR] Access to script at 'https://connect.facebook.net/en_US/fbevents.js' from origin 'https://www.namecheap.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://www.namecheap.com/shoppingcart/:0
+[   54825ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://connect.facebook.net/en_US/fbevents.js:0

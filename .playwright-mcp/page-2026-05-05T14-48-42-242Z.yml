@@ -1,0 +1,247 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Coolify" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.474" [ref=e9] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.474
+        - button / [ref=e11]:
+          - img [ref=e12]
+          - generic [ref=e14]: /
+        - button "Preferences 9+" [ref=e17] [cursor=pointer]:
+          - img "Preferences" [ref=e18]
+          - generic [ref=e20]: 9+
+      - combobox [ref=e23]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+      - list [ref=e24]:
+        - listitem [ref=e25]:
+          - list [ref=e26]:
+            - listitem [ref=e27]:
+              - link "Dashboard" [ref=e28] [cursor=pointer]:
+                - /url: /
+                - img [ref=e29]
+                - generic [ref=e31]: Dashboard
+            - listitem [ref=e32]:
+              - link "Projects" [ref=e33] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e34]
+                - generic [ref=e39]: Projects
+            - listitem [ref=e40]:
+              - link "Servers" [ref=e41] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e42]
+                - generic [ref=e47]: Servers
+            - listitem [ref=e48]:
+              - link "Sources" [ref=e49] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/sources
+                - img [ref=e50]
+                - generic [ref=e52]: Sources
+            - listitem [ref=e53]:
+              - link "Destinations" [ref=e54] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/destinations
+                - img [ref=e55]
+                - generic [ref=e57]: Destinations
+            - listitem [ref=e58]:
+              - link "S3 Storages" [ref=e59] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/storages
+                - img [ref=e60]
+                - generic [ref=e65]: S3 Storages
+            - listitem [ref=e66]:
+              - link "Shared Variables" [ref=e67] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/shared-variables
+                - img [ref=e68]
+                - generic [ref=e72]: Shared Variables
+            - listitem [ref=e73]:
+              - link "Notifications" [ref=e74] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/notifications/email
+                - img [ref=e75]
+                - generic [ref=e77]: Notifications
+            - listitem [ref=e78]:
+              - link "Keys & Tokens" [ref=e79] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/security/private-key
+                - img [ref=e80]
+                - generic [ref=e82]: Keys & Tokens
+            - listitem [ref=e83]:
+              - link "Tags" [ref=e84] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/tags
+                - img [ref=e85]
+                - generic [ref=e89]: Tags
+            - listitem [ref=e90]:
+              - link "Terminal" [ref=e91] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/terminal
+                - img [ref=e92]
+                - generic [ref=e95]: Terminal
+            - listitem [ref=e96]:
+              - link "Profile" [ref=e97] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/profile
+                - img [ref=e98]
+                - generic [ref=e103]: Profile
+            - listitem [ref=e104]:
+              - link "Teams" [ref=e105] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/team
+                - img [ref=e106]
+                - generic [ref=e114]: Teams
+            - listitem [ref=e115]:
+              - link "Settings" [ref=e116] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e117]
+                - generic [ref=e121]: Settings
+            - listitem [ref=e123]:
+              - generic "New version available" [ref=e124]:
+                - button "Upgrade" [ref=e126] [cursor=pointer]:
+                  - img [ref=e127]
+                  - text: Upgrade
+            - listitem [ref=e130]:
+              - link "Sponsor us" [ref=e131] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e132]
+                - generic [ref=e136]: Sponsor us
+            - listitem [ref=e137]:
+              - generic "Send us feedback or get help!" [ref=e140] [cursor=pointer]:
+                - img [ref=e141]
+                - generic [ref=e143]: Feedback
+            - listitem [ref=e144]:
+              - button "Logout" [ref=e146]:
+                - img [ref=e147]
+                - generic [ref=e149]: Logout
+    - main [ref=e150]:
+      - generic [ref=e152]:
+        - generic [ref=e153]:
+          - generic [ref=e154]:
+            - heading "Resources" [level=1] [ref=e155]
+            - link "+ New" [ref=e156] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/new
+            - link "Clone" [ref=e157] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/clone
+            - button "Delete Environment" [ref=e159] [cursor=pointer]
+          - navigation [ref=e160]:
+            - list [ref=e161]:
+              - listitem [ref=e162]:
+                - generic [ref=e163]:
+                  - link "My first project" [ref=e164] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r
+                  - button [ref=e165]:
+                    - img [ref=e166]
+              - listitem [ref=e167]:
+                - link "production" [ref=e169] [cursor=pointer]:
+                  - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i
+        - generic [ref=e170]:
+          - textbox "Search for name, fqdn..." [ref=e172]
+          - heading "Applications" [level=2] [ref=e173]
+          - generic [ref=e174]:
+            - generic [ref=e175]:
+              - 'link "bharat-cloud-demo exited BharatCloud demo (Vite+Tailwind+Alpine) http://cdev-bharatcloud.trylatest.in Server: localhost" [ref=e176] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b
+                - generic [ref=e177]:
+                  - generic [ref=e178]:
+                    - generic [ref=e179]: bharat-cloud-demo
+                    - generic "exited" [ref=e181]
+                  - generic [ref=e182]: BharatCloud demo (Vite+Tailwind+Alpine)
+                  - generic [ref=e183]: http://cdev-bharatcloud.trylatest.in
+                  - generic [ref=e184]: "Server: localhost"
+              - link "Add tag" [ref=e186] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/icijphmy0cfd2d1fndyzwg9b/tags
+            - generic [ref=e187]:
+              - 'link "euro-physics-b exited http://cdev-physics-b.trylatest.in Server: localhost" [ref=e188] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/app-physics-b-6146a219ec1bb7c4
+                - generic [ref=e189]:
+                  - generic [ref=e190]:
+                    - generic [ref=e191]: euro-physics-b
+                    - generic "exited" [ref=e193]
+                  - generic [ref=e194]: http://cdev-physics-b.trylatest.in
+                  - generic [ref=e195]: "Server: localhost"
+              - link "Add tag" [ref=e197] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/app-physics-b-6146a219ec1bb7c4/tags
+            - generic [ref=e198]:
+              - 'link "expensive-echidna-m13m6wtyinjwcbpdirbi0yuv running Server: localhost" [ref=e199] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/m13m6wtyinjwcbpdirbi0yuv
+                - generic [ref=e200]:
+                  - generic [ref=e201]:
+                    - generic [ref=e202]: expensive-echidna-m13m6wtyinjwcbpdirbi0yuv
+                    - generic "running" [ref=e203]
+                  - generic [ref=e204]: "Server: localhost"
+              - link "Add tag" [ref=e206] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/m13m6wtyinjwcbpdirbi0yuv/tags
+            - generic [ref=e207]:
+              - 'link "fix-wheel-handle running http://cdev-fix-wheel.trylatest.in Server: localhost" [ref=e208] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/app-fix-wheel-9d3d78dc5c6be0c7
+                - generic [ref=e209]:
+                  - generic [ref=e210]:
+                    - generic [ref=e211]: fix-wheel-handle
+                    - generic "running" [ref=e213]
+                  - generic [ref=e214]: http://cdev-fix-wheel.trylatest.in
+                  - generic [ref=e215]: "Server: localhost"
+              - link "Add tag" [ref=e217] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/app-fix-wheel-9d3d78dc5c6be0c7/tags
+            - generic [ref=e218]:
+              - 'link "lively-lobster-bl7bco02xzkpl51l5ti3sut9 running http://cdev-european.trylatest.in Server: localhost" [ref=e219] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9
+                - generic [ref=e220]:
+                  - generic [ref=e221]:
+                    - generic [ref=e222]: lively-lobster-bl7bco02xzkpl51l5ti3sut9
+                    - generic "running" [ref=e223]
+                  - generic [ref=e224]: http://cdev-european.trylatest.in
+                  - generic [ref=e225]: "Server: localhost"
+              - link "Add tag" [ref=e227] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/tags
+            - generic [ref=e228]:
+              - 'link "mini-roulette-dev running http://cdev-dev.trylatest.in Server: localhost" [ref=e229] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/app-dev-d84ee4617b809ba5
+                - generic [ref=e230]:
+                  - generic [ref=e231]:
+                    - generic [ref=e232]: mini-roulette-dev
+                    - generic "running" [ref=e234]
+                  - generic [ref=e235]: http://cdev-dev.trylatest.in
+                  - generic [ref=e236]: "Server: localhost"
+              - link "Add tag" [ref=e238] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/app-dev-d84ee4617b809ba5/tags
+            - generic [ref=e239]:
+              - 'link "responsive running http://cdev-responsive.trylatest.in Server: localhost" [ref=e240] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/app-cdev-responsive-6048d241887cbb71
+                - generic [ref=e241]:
+                  - generic [ref=e242]:
+                    - generic [ref=e243]: responsive
+                    - generic "running" [ref=e245]
+                  - generic [ref=e246]: http://cdev-responsive.trylatest.in
+                  - generic [ref=e247]: "Server: localhost"
+              - link "Add tag" [ref=e249] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/app-cdev-responsive-6048d241887cbb71/tags
+            - generic [ref=e250]:
+              - 'link "toprupees-website running http://toprupees.trylatest.in Server: localhost" [ref=e251] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/mgcxjjw27fk5vie3dgpt4kwn
+                - generic [ref=e252]:
+                  - generic [ref=e253]:
+                    - generic [ref=e254]: toprupees-website
+                    - generic "running" [ref=e256]
+                  - generic [ref=e257]: http://toprupees.trylatest.in
+                  - generic [ref=e258]: "Server: localhost"
+              - link "Add tag" [ref=e260] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/mgcxjjw27fk5vie3dgpt4kwn/tags
+            - generic [ref=e261]:
+              - 'link "toprupees-website-staging running http://staging.toprupees.com Server: VPS-toprupees-prod" [ref=e262] [cursor=pointer]':
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/i6ac4g2ox394aq9p3fym7rzv
+                - generic [ref=e263]:
+                  - generic [ref=e264]:
+                    - generic [ref=e265]: toprupees-website-staging
+                    - generic "running" [ref=e267]
+                  - generic [ref=e268]: http://staging.toprupees.com
+                  - generic [ref=e269]: "Server: VPS-toprupees-prod"
+              - link "Add tag" [ref=e271] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/i6ac4g2ox394aq9p3fym7rzv/tags
+          - heading "Services" [level=2] [ref=e272]
+          - generic [ref=e274]:
+            - 'link "wireproxy-surfshark exited Surfshark-backed wireproxy manager container for selected SOCKS5 endpoints. Server: localhost" [ref=e275] [cursor=pointer]':
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c
+              - generic [ref=e276]:
+                - generic [ref=e277]:
+                  - generic [ref=e278]: wireproxy-surfshark
+                  - generic "exited" [ref=e280]
+                - generic [ref=e281]: Surfshark-backed wireproxy manager container for selected SOCKS5 endpoints.
+                - generic [ref=e282]: "Server: localhost"
+            - link "Add tag" [ref=e284] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/service/lgnrv23z1n9z4ui7r65ogv3c/tags
+  - img
+  - list

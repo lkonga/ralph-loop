@@ -1,0 +1,175 @@
+- main [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - paragraph [ref=e6]: Proxy fabric
+      - heading "Surfshark Manager" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Fast control for Tailnet SOCKS5 and authenticated HTTP endpoints.
+    - generic [ref=e9]:
+      - generic [ref=e10]: Healthy
+      - button "Refresh" [ref=e12] [cursor=pointer]
+  - generic [ref=e499]: "enable us-nyc: enabled"
+  - generic [ref=e13]:
+    - article [ref=e14]:
+      - generic [ref=e15]: Running
+      - strong [ref=e16]: 5/5
+    - article [ref=e17]:
+      - generic [ref=e18]: Available
+      - strong [ref=e19]: "142"
+    - article [ref=e20]:
+      - generic [ref=e21]: Inactive
+      - strong [ref=e22]: "137"
+    - article [ref=e23]:
+      - generic [ref=e24]: Version
+      - strong [ref=e25]: 0.4.0
+  - generic [ref=e507]:
+    - generic [ref=e508]:
+      - strong [ref=e509]: "Capacity full: 5/5 live endpoints"
+      - generic [ref=e510]: Disable one running endpoint before enabling another location.
+    - generic [ref=e511]:
+      - button "Show enabled" [ref=e512] [cursor=pointer]
+      - button "Show available" [ref=e513] [cursor=pointer]
+  - generic [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - heading "Live endpoints" [level=2] [ref=e36]
+        - paragraph [ref=e37]: Click an endpoint to copy it. Use Auth HTTP for Chrome and coworkers.
+      - generic [ref=e38]: HTTP = SOCKS + 8000
+    - generic [ref=e39]:
+      - article [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - heading "in-mum" [level=3] [ref=e43]
+            - paragraph [ref=e44]: India · Mumbai
+          - generic [ref=e45]: running
+        - generic [ref=e46]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10851" [ref=e47] [cursor=pointer]:
+            - generic [ref=e48]: SOCKS5
+            - code [ref=e49]: g5kc.tail1e9037.ts.net:10851
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18851" [ref=e50] [cursor=pointer]:
+            - generic [ref=e51]: Auth HTTP
+            - code [ref=e52]: g5kc.tail1e9037.ts.net:18851
+        - generic [ref=e53]:
+          - button "Test SOCKS" [ref=e54] [cursor=pointer]
+          - button "Test HTTP" [ref=e55] [cursor=pointer]
+          - button "Restart" [ref=e56] [cursor=pointer]
+          - button "Disable" [ref=e57] [cursor=pointer]
+      - article [ref=e58]:
+        - generic [ref=e59]:
+          - generic [ref=e60]:
+            - heading "nl-ams" [level=3] [ref=e61]
+            - paragraph [ref=e62]: Netherlands · Amsterdam
+          - generic [ref=e63]: running
+        - generic [ref=e64]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10877" [ref=e65] [cursor=pointer]:
+            - generic [ref=e66]: SOCKS5
+            - code [ref=e67]: g5kc.tail1e9037.ts.net:10877
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18877" [ref=e68] [cursor=pointer]:
+            - generic [ref=e69]: Auth HTTP
+            - code [ref=e70]: g5kc.tail1e9037.ts.net:18877
+        - generic [ref=e71]:
+          - button "Test SOCKS" [ref=e72] [cursor=pointer]
+          - button "Test HTTP" [ref=e73] [cursor=pointer]
+          - button "Restart" [ref=e74] [cursor=pointer]
+          - button "Disable" [ref=e75] [cursor=pointer]
+      - article [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - heading "sg-sng" [level=3] [ref=e79]
+            - paragraph [ref=e80]: Singapore · Singapore
+          - generic [ref=e81]: running
+        - generic [ref=e82]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10895" [ref=e83] [cursor=pointer]:
+            - generic [ref=e84]: SOCKS5
+            - code [ref=e85]: g5kc.tail1e9037.ts.net:10895
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18895" [ref=e86] [cursor=pointer]:
+            - generic [ref=e87]: Auth HTTP
+            - code [ref=e88]: g5kc.tail1e9037.ts.net:18895
+        - generic [ref=e89]:
+          - button "Test SOCKS" [ref=e90] [cursor=pointer]
+          - button "Test HTTP" [ref=e91] [cursor=pointer]
+          - button "Restart" [ref=e92] [cursor=pointer]
+          - button "Disable" [ref=e93] [cursor=pointer]
+      - article [ref=e94]:
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - heading "uk-lon" [level=3] [ref=e97]
+            - paragraph [ref=e98]: United Kingdom · London
+          - generic [ref=e99]: running
+        - generic [ref=e100]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10911" [ref=e101] [cursor=pointer]:
+            - generic [ref=e102]: SOCKS5
+            - code [ref=e103]: g5kc.tail1e9037.ts.net:10911
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18911" [ref=e104] [cursor=pointer]:
+            - generic [ref=e105]: Auth HTTP
+            - code [ref=e106]: g5kc.tail1e9037.ts.net:18911
+        - generic [ref=e107]:
+          - button "Test SOCKS" [ref=e108] [cursor=pointer]
+          - button "Test HTTP" [ref=e109] [cursor=pointer]
+          - button "Restart" [ref=e110] [cursor=pointer]
+          - button "Disable" [ref=e111] [cursor=pointer]
+      - article [ref=e514]:
+        - generic [ref=e515]:
+          - generic [ref=e516]:
+            - heading "us-nyc" [level=3] [ref=e517]
+            - paragraph [ref=e518]: United States · New York
+          - generic [ref=e519]: running
+        - generic [ref=e520]:
+          - button "SOCKS5 g5kc.tail1e9037.ts.net:10919" [ref=e521] [cursor=pointer]:
+            - generic [ref=e522]: SOCKS5
+            - code [ref=e523]: g5kc.tail1e9037.ts.net:10919
+          - button "Auth HTTP g5kc.tail1e9037.ts.net:18919" [ref=e524] [cursor=pointer]:
+            - generic [ref=e525]: Auth HTTP
+            - code [ref=e526]: g5kc.tail1e9037.ts.net:18919
+        - generic [ref=e527]:
+          - button "Test SOCKS" [ref=e528] [cursor=pointer]
+          - button "Test HTTP" [ref=e529] [cursor=pointer]
+          - button "Restart" [ref=e530] [cursor=pointer]
+          - button "Disable" [ref=e531] [cursor=pointer]
+  - generic [ref=e130]:
+    - generic [ref=e131]:
+      - generic [ref=e132]:
+        - heading "Locations" [level=2] [ref=e133]
+        - paragraph [ref=e134]: Running locations are shown first. Enable is locked when capacity is full.
+      - generic [ref=e135]:
+        - textbox "Search code, country, city, endpoint, port..." [ref=e136]: us-nyc
+        - combobox [ref=e137]:
+          - option "All" [selected]
+          - option "Enabled"
+          - option "Available"
+          - option "Running"
+    - generic [ref=e138]:
+      - button "All 142" [ref=e139] [cursor=pointer]
+      - button "Enabled 5" [ref=e532] [cursor=pointer]
+      - button "Running 5" [ref=e533] [cursor=pointer]
+      - button "Available 137" [ref=e534] [cursor=pointer]
+    - table [ref=e144]:
+      - rowgroup [ref=e145]:
+        - row "Status Code Location Ports Endpoint Action" [ref=e146]:
+          - columnheader "Status" [ref=e147]
+          - columnheader "Code" [ref=e148]
+          - columnheader "Location" [ref=e149]
+          - columnheader "Ports" [ref=e150]
+          - columnheader "Endpoint" [ref=e151]
+          - columnheader "Action" [ref=e152]
+      - rowgroup [ref=e153]:
+        - row "Running us-nyc United States New York SOCKS 10919 AUTH 18919 us-nyc.prod.surfshark.com Test Disable" [ref=e535]:
+          - cell "Running" [ref=e536]:
+            - generic [ref=e156]: Running
+          - cell "us-nyc" [ref=e495]:
+            - code [ref=e158]: us-nyc
+          - cell "United States New York" [ref=e496]:
+            - strong [ref=e160]: United States
+            - text: New York
+          - cell "SOCKS 10919 AUTH 18919" [ref=e497]:
+            - generic [ref=e162]:
+              - text: SOCKS 10919
+              - text: AUTH 18919
+          - cell "us-nyc.prod.surfshark.com" [ref=e498]
+          - cell "Test Disable" [ref=e537]:
+            - generic [ref=e165]:
+              - button "Test" [ref=e538] [cursor=pointer]
+              - button "Disable" [ref=e539] [cursor=pointer]
+    - generic [ref=e490]:
+      - button "Prev" [disabled] [ref=e491]
+      - generic [ref=e492]: Page 1 / 1 · 1 matches
+      - button "Next" [disabled] [ref=e493]

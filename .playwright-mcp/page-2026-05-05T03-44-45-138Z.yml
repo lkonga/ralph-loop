@@ -1,0 +1,464 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - link "All systems operational" [ref=e4] [cursor=pointer]:
+        - /url: https://status.vexxhost.com/
+        - generic [ref=e5]:
+          - img [ref=e6]
+          - generic [ref=e9]: All systems operational
+      - navigation "Main" [ref=e10]:
+        - list [ref=e12]:
+          - listitem [ref=e13]:
+            - button "English" [ref=e14] [cursor=pointer]:
+              - img [ref=e15]
+              - text: English
+              - img [ref=e18]
+          - listitem [ref=e20]:
+            - link "Log In" [ref=e21] [cursor=pointer]:
+              - /url: https://secure.vexxhost.com/billing/clientarea.php
+              - img
+              - text: Log In
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - link "Homepage" [ref=e25] [cursor=pointer]:
+          - /url: /
+          - img "VEXXHOST Logo" [ref=e26]
+        - navigation "Main" [ref=e27]:
+          - list [ref=e29]:
+            - listitem [ref=e30]:
+              - button "Products" [ref=e31]:
+                - text: Products
+                - img [ref=e32]
+            - listitem [ref=e34]:
+              - button "Solutions" [ref=e35]:
+                - text: Solutions
+                - img [ref=e36]
+            - listitem [ref=e38]:
+              - button "Resources" [ref=e39]:
+                - text: Resources
+                - img [ref=e40]
+            - listitem [ref=e42]:
+              - button "VEXXHOST" [ref=e43]:
+                - text: VEXXHOST
+                - img [ref=e44]
+      - link "Contact Us" [ref=e46] [cursor=pointer]:
+        - /url: /contact-us/
+        - img
+        - text: Contact Us
+  - main [ref=e47]:
+    - generic [ref=e48]:
+      - generic [ref=e62]:
+        - generic [ref=e64]: Open Source Infrastructure
+        - heading "Open Source Cloud Without Lock-In" [level=1] [ref=e68]:
+          - text: Open Source Cloud
+          - text: Without Lock-In
+        - paragraph [ref=e69]: Enterprise-grade cloud infrastructure built on open source. Kubernetes, OpenStack, Ceph, and more — use what you need, scale when you're ready.
+        - generic [ref=e70]:
+          - link "Explore Products" [ref=e71] [cursor=pointer]:
+            - /url: /products/
+            - text: Explore Products
+            - img
+          - link "Talk to an Expert" [ref=e72] [cursor=pointer]:
+            - /url: /contact-us/
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - generic [ref=e76]: 99.99%
+              - generic [ref=e77]: Uptime SLA
+            - generic [ref=e78]:
+              - generic [ref=e79]: 24/7
+              - generic [ref=e80]: Expert Support
+            - generic [ref=e81]:
+              - generic [ref=e82]: 10+
+              - generic [ref=e83]: Years Experience
+          - generic [ref=e84]:
+            - img "Certified Kubernetes" [ref=e85]
+            - img "OpenStack Powered" [ref=e86]
+      - generic [ref=e187]:
+        - paragraph [ref=e189]: Trusted by engineering teams at
+        - generic [ref=e193]:
+          - img "Red Hat" [ref=e196]
+          - img "Apple" [ref=e199]
+          - img "Linux Foundation" [ref=e202]
+          - img "Arm" [ref=e205]
+          - img "AMD" [ref=e208]
+          - img "Ciena" [ref=e211]
+          - img "DSV" [ref=e214]
+          - img "Kaseya" [ref=e217]
+          - img "CompuGroup Medical" [ref=e220]
+          - img "SpecterOps" [ref=e223]
+          - img "Zeta Global" [ref=e226]
+          - img "The Weather Network" [ref=e229]
+          - img "Higher Logic" [ref=e232]
+          - img "University of Victoria" [ref=e235]
+          - img "Simon Fraser University" [ref=e238]
+          - img "University at Buffalo" [ref=e241]
+          - img "Gumtree" [ref=e244]
+          - img "Corvex" [ref=e247]
+          - img "Virtual Systems" [ref=e250]
+          - img "Red Hat" [ref=e253]
+          - img "Apple" [ref=e256]
+          - img "Linux Foundation" [ref=e259]
+          - img "Arm" [ref=e262]
+          - img "AMD" [ref=e265]
+          - img "Ciena" [ref=e268]
+          - img "DSV" [ref=e271]
+          - img "Kaseya" [ref=e274]
+          - img "CompuGroup Medical" [ref=e277]
+          - img "SpecterOps" [ref=e280]
+          - img "Zeta Global" [ref=e283]
+          - img "The Weather Network" [ref=e286]
+          - img "Higher Logic" [ref=e289]
+          - img "University of Victoria" [ref=e292]
+          - img "Simon Fraser University" [ref=e295]
+          - img "University at Buffalo" [ref=e298]
+          - img "Gumtree" [ref=e301]
+          - img "Corvex" [ref=e304]
+          - img "Virtual Systems" [ref=e307]
+      - generic [ref=e310]:
+        - generic [ref=e312]:
+          - generic [ref=e313]:
+            - img [ref=e314]
+            - text: Products
+          - heading "Open Source Infrastructure" [level=2] [ref=e317]
+          - paragraph [ref=e318]: Start with one, combine as you grow.
+        - generic [ref=e319]:
+          - link "Kubernetes Kubernetes Pure upstream Kubernetes — hosted or on-premise, managed or supported. Your clusters, your way. Learn more" [ref=e321] [cursor=pointer]:
+            - /url: /products/kubernetes/
+            - generic [ref=e323]:
+              - img "Kubernetes" [ref=e326]
+              - heading "Kubernetes" [level=3] [ref=e327]
+              - paragraph [ref=e328]: Pure upstream Kubernetes — hosted or on-premise, managed or supported. Your clusters, your way.
+              - generic [ref=e329]:
+                - text: Learn more
+                - img [ref=e330]
+          - link "OpenStack OpenStack Private and public cloud infrastructure with full API compatibility. VMs, networking, and complete control. Learn more" [ref=e333] [cursor=pointer]:
+            - /url: /products/openstack/
+            - generic [ref=e335]:
+              - img "OpenStack" [ref=e338]
+              - heading "OpenStack" [level=3] [ref=e339]
+              - paragraph [ref=e340]: Private and public cloud infrastructure with full API compatibility. VMs, networking, and complete control.
+              - generic [ref=e341]:
+                - text: Learn more
+                - img [ref=e342]
+          - link "Ceph Ceph Distributed storage that scales from gigabytes to exabytes. S3-compatible object storage and block storage. Learn more" [ref=e345] [cursor=pointer]:
+            - /url: /products/ceph/
+            - generic [ref=e347]:
+              - img "Ceph" [ref=e350]
+              - heading "Ceph" [level=3] [ref=e351]
+              - paragraph [ref=e352]: Distributed storage that scales from gigabytes to exabytes. S3-compatible object storage and block storage.
+              - generic [ref=e353]:
+                - text: Learn more
+                - img [ref=e354]
+          - link "MigrateKit Migrate workloads from VMware to open infrastructure with minimal downtime. Automated VM conversion and testing. Learn more" [ref=e357] [cursor=pointer]:
+            - /url: /products/migratekit/
+            - generic [ref=e359]:
+              - img [ref=e362]
+              - heading "MigrateKit" [level=3] [ref=e365]
+              - paragraph [ref=e366]: Migrate workloads from VMware to open infrastructure with minimal downtime. Automated VM conversion and testing.
+              - generic [ref=e367]:
+                - text: Learn more
+                - img [ref=e368]
+          - link "Zuul Zuul CI/CD that gates code before merge. Prevent broken code from reaching your main branch. Learn more" [ref=e371] [cursor=pointer]:
+            - /url: /products/zuul/
+            - generic [ref=e373]:
+              - img "Zuul" [ref=e376]
+              - heading "Zuul" [level=3] [ref=e377]
+              - paragraph [ref=e378]: CI/CD that gates code before merge. Prevent broken code from reaching your main branch.
+              - generic [ref=e379]:
+                - text: Learn more
+                - img [ref=e380]
+      - generic [ref=e386]:
+        - generic [ref=e388]:
+          - generic [ref=e389]:
+            - img [ref=e390]
+            - text: Why VEXXHOST
+          - heading "Built by the People Who Build the Tech" [level=2] [ref=e393]
+          - paragraph [ref=e394]: We're not just operators — we're upstream contributors to the open source projects that power your infrastructure.
+        - generic [ref=e395]:
+          - generic [ref=e397]:
+            - img [ref=e399]
+            - heading "Open Source" [level=3] [ref=e403]
+            - paragraph [ref=e404]: Built on proven open source technologies. No proprietary lock-in, ever.
+          - generic [ref=e406]:
+            - img [ref=e408]
+            - heading "Upstream Experts" [level=3] [ref=e413]
+            - paragraph [ref=e414]: Operated by active contributors to OpenStack, Kubernetes, and Ceph.
+          - generic [ref=e416]:
+            - img [ref=e418]
+            - heading "Transparent Pricing" [level=3] [ref=e421]
+            - paragraph [ref=e422]: No hidden fees. No egress charges. No surprises on your bill.
+          - generic [ref=e424]:
+            - img [ref=e426]
+            - heading "Modular Platform" [level=3] [ref=e428]
+            - paragraph [ref=e429]: Start with one product. Add more as your needs grow.
+      - generic [ref=e432]:
+        - generic [ref=e434]:
+          - generic [ref=e435]:
+            - img [ref=e436]
+            - text: Solutions
+          - heading "Infrastructure for Every Workload" [level=2] [ref=e439]
+          - paragraph [ref=e440]: From VMware migrations to Kubernetes at scale, we have the infrastructure to support it.
+        - generic [ref=e441]:
+          - link "Running Kubernetes? Your Way, Our Expertise Hosted or on-premise, managed or supported — pure upstream Kubernetes with 24/7 expert backing. Kubernetes Ceph Learn more" [ref=e443] [cursor=pointer]:
+            - /url: /products/kubernetes/
+            - generic [ref=e444]:
+              - img [ref=e447]
+              - generic [ref=e451]: Running Kubernetes?
+              - heading "Your Way, Our Expertise" [level=3] [ref=e452]
+              - paragraph [ref=e453]: Hosted or on-premise, managed or supported — pure upstream Kubernetes with 24/7 expert backing.
+              - generic [ref=e454]:
+                - generic [ref=e455]: Kubernetes
+                - generic [ref=e456]: Ceph
+              - generic [ref=e457]:
+                - text: Learn more
+                - img [ref=e458]
+          - link "Building a Private Cloud? Complete Infrastructure Stack Deploy a full private cloud with compute, storage, and networking. OpenStack gives you complete control. OpenStack Ceph Learn more" [ref=e462] [cursor=pointer]:
+            - /url: /products/openstack/
+            - generic [ref=e463]:
+              - img [ref=e466]
+              - generic [ref=e468]: Building a Private Cloud?
+              - heading "Complete Infrastructure Stack" [level=3] [ref=e469]
+              - paragraph [ref=e470]: Deploy a full private cloud with compute, storage, and networking. OpenStack gives you complete control.
+              - generic [ref=e471]:
+                - generic [ref=e472]: OpenStack
+                - generic [ref=e473]: Ceph
+              - generic [ref=e474]:
+                - text: Learn more
+                - img [ref=e475]
+          - link "Leaving VMware? Migrate to Open Infrastructure Exit VMware without disruption. MigrateKit automates the migration of your VMs to OpenStack with minimal downtime. MigrateKit OpenStack Learn more" [ref=e479] [cursor=pointer]:
+            - /url: /products/migratekit/
+            - generic [ref=e480]:
+              - img [ref=e483]
+              - generic [ref=e486]: Leaving VMware?
+              - heading "Migrate to Open Infrastructure" [level=3] [ref=e487]
+              - paragraph [ref=e488]: Exit VMware without disruption. MigrateKit automates the migration of your VMs to OpenStack with minimal downtime.
+              - generic [ref=e489]:
+                - generic [ref=e490]: MigrateKit
+                - generic [ref=e491]: OpenStack
+              - generic [ref=e492]:
+                - text: Learn more
+                - img [ref=e493]
+          - link "Enterprise CI/CD? Gating That Protects Your Code Zuul gates code before merge, ensuring broken code never reaches your main branch. Zuul Learn more" [ref=e497] [cursor=pointer]:
+            - /url: /products/zuul/
+            - generic [ref=e498]:
+              - img [ref=e501]
+              - generic [ref=e505]: Enterprise CI/CD?
+              - heading "Gating That Protects Your Code" [level=3] [ref=e506]
+              - paragraph [ref=e507]: Zuul gates code before merge, ensuring broken code never reaches your main branch.
+              - generic [ref=e509]: Zuul
+              - generic [ref=e510]:
+                - text: Learn more
+                - img [ref=e511]
+      - generic [ref=e515]:
+        - generic [ref=e516]:
+          - heading "Testimonials" [level=2] [ref=e517]
+          - paragraph [ref=e518]: We have worked with thousands of amazing people
+        - generic [ref=e519]:
+          - figure "Tim Gunter Tim Gunter Chief Operating Officer Vanilla Forums Vanilla Forums" [ref=e520]:
+            - blockquote [ref=e521]:
+              - paragraph [ref=e522]: "\"Working with VEXXHOST feels like having a trusted advisor rather than just a service provider. Their team goes above and beyond to understand our unique business needs and provide tailored solutions. With their consultative approach, we've been able to make seamless transitions between vendors, and it's been a game changer for our OpenStack implementation.\""
+            - generic [ref=e523]:
+              - img "Tim Gunter" [ref=e524]
+              - generic [ref=e525]:
+                - generic [ref=e526]: Tim Gunter
+                - generic [ref=e527]: Chief Operating Officer
+                - generic [ref=e528]: Vanilla Forums
+              - img "Vanilla Forums" [ref=e529]
+          - figure "Curtis Spencer Curtis Spencer Senior Infrastructure Engineer Lightcast Lightcast" [ref=e530]:
+            - blockquote [ref=e531]:
+              - paragraph [ref=e532]: "\"VEXXHOST did a great job performing an in-place upgrade of our OpenStack cluster to their Atmosphere platform. The team worked efficiently and performed the upgrade with limited downtime. They went above and beyond to help us debug, post-upgrade networking bugs. Lightcast is very happy with the end result and we look forward to operating a much more stable and maintainable OpenStack cluster!\""
+            - generic [ref=e533]:
+              - img "Curtis Spencer" [ref=e534]
+              - generic [ref=e535]:
+                - generic [ref=e536]: Curtis Spencer
+                - generic [ref=e537]: Senior Infrastructure Engineer
+                - generic [ref=e538]: Lightcast
+              - img "Lightcast" [ref=e539]
+          - figure "Salvatore Guercio Salvatore Guercio Systems Administrator Center for Computational Research Center for Computational Research" [ref=e540]:
+            - blockquote [ref=e541]:
+              - paragraph [ref=e542]: "\"We recently had our Cloud converted over to Atmosphere and it has been nothing but a positive experience. All the features we wanted are implemented by default and rolling out upgrades and fixes is a breeze. I feel like the support that we have has gotten even better since converting to Atmosphere because the VEXXHOST team is continuously developing and improving it and we are able to get fixes and features into our deployment very quickly.\""
+            - generic [ref=e543]:
+              - img "Salvatore Guercio" [ref=e544]
+              - generic [ref=e545]:
+                - generic [ref=e546]: Salvatore Guercio
+                - generic [ref=e547]: Systems Administrator
+                - generic [ref=e548]: Center for Computational Research
+              - img "Center for Computational Research" [ref=e549]
+          - figure "Jin Lee Senior Data Scientist Opta Information Intelligence Opta Information Intelligence" [ref=e550]:
+            - blockquote [ref=e551]:
+              - paragraph [ref=e552]: "\"Initially, we ran half a trillion links across 70 nodes, taking 80 to 90 days. However, since transitioning to the Atmosphere platform, the same task now takes just 3 days. This significant improvement in efficiency has saved us time, allowing focus on other critical work aspects. The platform's reliability and performance have truly impressed us.\""
+            - generic [ref=e553]:
+              - img [ref=e554]
+              - generic [ref=e558]:
+                - generic [ref=e559]: Jin Lee
+                - generic [ref=e560]: Senior Data Scientist
+                - generic [ref=e561]: Opta Information Intelligence
+              - img "Opta Information Intelligence" [ref=e562]
+      - generic [ref=e569]:
+        - heading "Ready to Get Started?" [level=2] [ref=e570]
+        - paragraph [ref=e571]: Talk to our team about your infrastructure needs. We'll help you find the right solution.
+        - generic [ref=e572]:
+          - link "Talk to an Expert" [ref=e573] [cursor=pointer]:
+            - /url: /contact-us/
+            - text: Talk to an Expert
+            - img
+          - link "Explore Products" [ref=e574] [cursor=pointer]:
+            - /url: /products/
+    - generic [ref=e576]:
+      - generic [ref=e578]:
+        - generic [ref=e579]:
+          - img [ref=e580]
+          - text: Blog
+        - heading "The Latest From Us" [level=2] [ref=e583]
+        - paragraph [ref=e584]: Insights, updates, and stories from our team
+      - generic [ref=e585]:
+        - article [ref=e586]:
+          - link "How to Evaluate Whether Your Infrastructure Is AI-Ready Apr 29, 2026 How to Evaluate Whether Your Infrastructure Is AI-Ready Is your infrastructure ready for AI workloads? Evaluate compute, storage, networking, and orchestration layer by layer to find the gaps before they stall you." [ref=e587] [cursor=pointer]:
+            - /url: /blog/how-to-evaluate-ai-ready-infrastructure/
+            - img "How to Evaluate Whether Your Infrastructure Is AI-Ready" [ref=e589]
+            - generic [ref=e590]:
+              - time [ref=e591]: Apr 29, 2026
+              - heading "How to Evaluate Whether Your Infrastructure Is AI-Ready" [level=3] [ref=e592]
+              - paragraph [ref=e593]: Is your infrastructure ready for AI workloads? Evaluate compute, storage, networking, and orchestration layer by layer to find the gaps before they stall you.
+        - article [ref=e594]:
+          - link "Security Scanning, Vulnerability Management, and Compliance Reporting — Included, Not Add-On Apr 28, 2026 Security Scanning, Vulnerability Management, and Compliance Reporting — Included, Not Add-On Prometheus monitoring, Grafana dashboards, log aggregation, and vulnerability scanning ship with every Atmosphere deployment. Security and compliance are built in — not upsold." [ref=e595] [cursor=pointer]:
+            - /url: /blog/security-scanning-compliance-reporting-built-in/
+            - img "Security Scanning, Vulnerability Management, and Compliance Reporting — Included, Not Add-On" [ref=e597]
+            - generic [ref=e598]:
+              - time [ref=e599]: Apr 28, 2026
+              - heading "Security Scanning, Vulnerability Management, and Compliance Reporting — Included, Not Add-On" [level=3] [ref=e600]
+              - paragraph [ref=e601]: Prometheus monitoring, Grafana dashboards, log aggregation, and vulnerability scanning ship with every Atmosphere deployment. Security and compliance are built in — not upsold.
+        - article [ref=e602]:
+          - link "Half of AI Projects Never Leave Pilot and the Infrastructure Is Why Apr 24, 2026 Half of AI Projects Never Leave Pilot and the Infrastructure Is Why Only 54% of AI projects reach production. The bottleneck is infrastructure, not models. Learn how OpenStack and Kubernetes close the gap to deployment." [ref=e603] [cursor=pointer]:
+            - /url: /blog/half-of-ai-projects-never-leave-pilot-infrastructure-is-why/
+            - img "Half of AI Projects Never Leave Pilot and the Infrastructure Is Why" [ref=e605]
+            - generic [ref=e606]:
+              - time [ref=e607]: Apr 24, 2026
+              - heading "Half of AI Projects Never Leave Pilot and the Infrastructure Is Why" [level=3] [ref=e608]
+              - paragraph [ref=e609]: Only 54% of AI projects reach production. The bottleneck is infrastructure, not models. Learn how OpenStack and Kubernetes close the gap to deployment.
+      - link "View All Posts" [ref=e611] [cursor=pointer]:
+        - /url: /blog/
+        - text: View All Posts
+        - img
+    - generic [ref=e612]:
+      - generic [ref=e613]:
+        - navigation "Footer navigation" [ref=e614]:
+          - generic [ref=e615]:
+            - generic [ref=e616]:
+              - heading "Products" [level=4] [ref=e617]
+              - list [ref=e618]:
+                - listitem [ref=e619]:
+                  - link "Kubernetes" [ref=e620] [cursor=pointer]:
+                    - /url: /products/kubernetes/
+                - listitem [ref=e621]:
+                  - link "OpenStack" [ref=e622] [cursor=pointer]:
+                    - /url: /products/openstack/
+                - listitem [ref=e623]:
+                  - link "Ceph" [ref=e624] [cursor=pointer]:
+                    - /url: /products/ceph/
+                - listitem [ref=e625]:
+                  - link "MigrateKit" [ref=e626] [cursor=pointer]:
+                    - /url: /products/migratekit/
+                - listitem [ref=e627]:
+                  - link "Zuul" [ref=e628] [cursor=pointer]:
+                    - /url: /products/zuul/
+            - generic [ref=e629]:
+              - heading "Solutions" [level=4] [ref=e630]
+              - list [ref=e631]:
+                - listitem [ref=e632]:
+                  - link "Overview" [ref=e633] [cursor=pointer]:
+                    - /url: /solutions/
+                - listitem [ref=e634]:
+                  - link "AI" [ref=e635] [cursor=pointer]:
+                    - /url: /solutions/ai/
+                - listitem [ref=e636]:
+                  - link "Private Cloud" [ref=e637] [cursor=pointer]:
+                    - /url: /solutions/private-cloud/
+                - listitem [ref=e638]:
+                  - link "Managed Services" [ref=e639] [cursor=pointer]:
+                    - /url: /solutions/managed-services/
+                - listitem [ref=e640]:
+                  - link "Migration" [ref=e641] [cursor=pointer]:
+                    - /url: /solutions/migration/
+            - generic [ref=e642]:
+              - heading "Resources" [level=4] [ref=e643]
+              - list [ref=e644]:
+                - listitem [ref=e645]:
+                  - link "Case Studies" [ref=e646] [cursor=pointer]:
+                    - /url: /case-studies/
+                - listitem [ref=e647]:
+                  - link "Guides" [ref=e648] [cursor=pointer]:
+                    - /url: /white-paper/
+                - listitem [ref=e649]:
+                  - link "Tutorials" [ref=e650] [cursor=pointer]:
+                    - /url: /tutorials/
+                - listitem [ref=e651]:
+                  - link "Blog" [ref=e652] [cursor=pointer]:
+                    - /url: /blog/
+                - listitem [ref=e653]:
+                  - link "FAQ" [ref=e654] [cursor=pointer]:
+                    - /url: /faq/
+            - generic [ref=e655]:
+              - heading "Company" [level=4] [ref=e656]
+              - list [ref=e657]:
+                - listitem [ref=e658]:
+                  - link "About Us" [ref=e659] [cursor=pointer]:
+                    - /url: /company/
+                - listitem [ref=e660]:
+                  - link "Data Centers" [ref=e661] [cursor=pointer]:
+                    - /url: /company/data-centers/
+                - listitem [ref=e662]:
+                  - link "Newsroom" [ref=e663] [cursor=pointer]:
+                    - /url: /company/newsroom/
+                - listitem [ref=e664]:
+                  - link "Careers" [ref=e665] [cursor=pointer]:
+                    - /url: /company/careers/
+                - listitem [ref=e666]:
+                  - link "Contact Us" [ref=e667] [cursor=pointer]:
+                    - /url: /contact-us/
+            - generic [ref=e668]:
+              - heading "Legal" [level=4] [ref=e669]
+              - list [ref=e670]:
+                - listitem [ref=e671]:
+                  - link "Privacy Policy" [ref=e672] [cursor=pointer]:
+                    - /url: /privacy-policy/
+                - listitem [ref=e673]:
+                  - link "Terms of Service" [ref=e674] [cursor=pointer]:
+                    - /url: /terms-of-service/
+                - listitem [ref=e675]:
+                  - link "Acceptable Usage Policy" [ref=e676] [cursor=pointer]:
+                    - /url: /acceptable-usage-policy/
+            - generic [ref=e677]:
+              - heading "Connect" [level=4] [ref=e678]
+              - list [ref=e679]:
+                - listitem [ref=e680]:
+                  - link "Sign Up Now" [ref=e681] [cursor=pointer]:
+                    - /url: https://signup.vexxhost.com/
+                - listitem [ref=e682]:
+                  - link "Get A Quote" [ref=e683] [cursor=pointer]:
+                    - /url: /products/openstack/private-cloud/#private_call_to_action
+                - listitem [ref=e684]:
+                  - link "Events" [ref=e685] [cursor=pointer]:
+                    - /url: /events/
+        - generic [ref=e687]:
+          - link "VEXXHOST on GitHub" [ref=e688] [cursor=pointer]:
+            - /url: https://github.com/vexxhost
+            - img [ref=e689]
+          - link "VEXXHOST on Twitter" [ref=e691] [cursor=pointer]:
+            - /url: https://twitter.com/vexxhost
+            - img [ref=e692]
+          - link "VEXXHOST on Facebook" [ref=e694] [cursor=pointer]:
+            - /url: https://www.facebook.com/vexxhostinc
+            - img [ref=e695]
+          - link "VEXXHOST on LinkedIn" [ref=e697] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/vexxhost
+            - img [ref=e698]
+          - link "VEXXHOST on YouTube" [ref=e700] [cursor=pointer]:
+            - /url: https://www.youtube.com/channel/UCPJ1bFx7f4ZU0Hpl1kxb5gA
+            - img [ref=e701]
+          - link "VEXXHOST on Instagram" [ref=e703] [cursor=pointer]:
+            - /url: https://www.instagram.com/vexxhost
+            - img [ref=e704]
+      - paragraph [ref=e708]: © 2005-2026 VEXXHOST, Inc. All rights reserved.
+  - region "Notifications alt+T"

@@ -1,0 +1,517 @@
+- generic [active] [ref=e1]:
+  - article [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img [ref=e7]
+          - link "NVIDIA B200 Blackwell GPUs now available" [ref=e10] [cursor=pointer]:
+            - /url: https://www.civo.com/ai/b200-blackwell-gpu?utm_campaign=331096283-gpu_q426&utm_source=homepage_caroussel&utm_medium=banner
+        - generic [ref=e11]:
+          - link "Docs" [ref=e12] [cursor=pointer]:
+            - /url: /docs
+          - link "System status" [ref=e13] [cursor=pointer]:
+            - /url: https://status.civo.com
+          - link "Support" [ref=e14] [cursor=pointer]:
+            - /url: /contact
+          - link "Login" [ref=e16] [cursor=pointer]:
+            - /url: https://dashboard.civo.com/login
+      - navigation [ref=e17]:
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - link "Civo" [ref=e22] [cursor=pointer]:
+              - /url: /
+              - img "Civo" [ref=e23]
+            - navigation [ref=e25]:
+              - button "Public Cloud" [ref=e27] [cursor=pointer]:
+                - paragraph [ref=e28]: Public Cloud
+                - img [ref=e29]
+              - button "Private Cloud" [ref=e32] [cursor=pointer]:
+                - paragraph [ref=e33]: Private Cloud
+                - img [ref=e34]
+              - button "Civo AI" [ref=e37] [cursor=pointer]:
+                - paragraph [ref=e38]: Civo AI
+                - img [ref=e39]
+              - button "Solutions" [ref=e42] [cursor=pointer]:
+                - paragraph [ref=e43]: Solutions
+                - img [ref=e44]
+              - link "Pricing" [ref=e47] [cursor=pointer]:
+                - /url: /pricing
+                - paragraph [ref=e48]: Pricing
+              - button "Resources" [ref=e50] [cursor=pointer]:
+                - paragraph [ref=e51]: Resources
+                - img [ref=e52]
+              - link "Navigate" [ref=e55] [cursor=pointer]:
+                - /url: /navigate
+                - paragraph [ref=e56]: Navigate
+          - generic [ref=e57]:
+            - button "Sales enquires" [ref=e58] [cursor=pointer]:
+              - generic [ref=e59]:
+                - generic [ref=e60]: Sales enquires
+                - generic [ref=e61]: Sales enquires
+            - button "Create account" [ref=e62] [cursor=pointer]:
+              - generic [ref=e63]:
+                - generic [ref=e64]: Create account
+                - generic [ref=e65]: Create account
+    - generic [ref=e70]:
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - heading "Built for more" [level=1] [ref=e74]
+          - paragraph [ref=e76]: Civo is the Sovereign Cloud and AI platform that frees you to build without limits. The freedom of public. The sovereignty of private. The full feature parity of both.
+        - generic [ref=e77]:
+          - button "Get started for free" [ref=e78] [cursor=pointer]:
+            - generic [ref=e79]: Get started for free
+            - generic [ref=e81]:
+              - img [ref=e83]
+              - img [ref=e86]
+          - button "Talk to our team" [ref=e88] [cursor=pointer]:
+            - generic [ref=e89]: Talk to our team
+            - generic [ref=e91]:
+              - img [ref=e93]
+              - img [ref=e96]
+      - img "Brain illustration" [ref=e100]
+    - main [ref=e103]:
+      - region "Image carousel" [ref=e105]:
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]:
+              - generic [ref=e109]:
+                - heading "NVIDIA B200 Blackwell available now" [level=3] [ref=e110]
+                - paragraph [ref=e111]: NVIDIA B200 Blackwell available now. High performance AI compute. Limited stock.
+              - button "Find out more" [ref=e113] [cursor=pointer]:
+                - generic [ref=e114]: Find out more
+                - generic [ref=e116]:
+                  - img [ref=e118]
+                  - img [ref=e121]
+            - generic [ref=e123]:
+              - button "Previous slide" [ref=e124] [cursor=pointer]:
+                - generic [ref=e125]:
+                  - img [ref=e127]
+                  - img [ref=e130]
+              - button "Next slide" [ref=e132] [cursor=pointer]:
+                - generic [ref=e133]:
+                  - img [ref=e135]
+                  - img [ref=e138]
+          - link "Find out more" [ref=e145] [cursor=pointer]:
+            - /url: https://www.civo.com/ai/b200-blackwell-gpu
+      - generic [ref=e150]:
+        - heading "Clients" [level=2] [ref=e153]
+        - heading "Bright minds build with Civo" [level=3] [ref=e157]
+      - generic [ref=e169]:
+        - heading "Sovereign Cloud with no limit" [level=2] [ref=e172]
+        - generic [ref=e174]:
+          - heading "See the cloud in a new light" [level=3] [ref=e176]
+          - paragraph [ref=e178]: Civo was built to radically simplify the cloud and put power back into the hands of its users, and here’s how we do it.
+      - generic [ref=e181]:
+        - generic [ref=e183]:
+          - img "More control" [ref=e186]
+          - generic [ref=e187]:
+            - paragraph [ref=e189]: More control
+            - paragraph [ref=e191]: Take the reins and cloud on your terms. Run cloud wherever and however suits you with sovereign, secure environments that let your teams compute with confidence.
+        - generic [ref=e193]:
+          - img "More power" [ref=e196]
+          - generic [ref=e197]:
+            - paragraph [ref=e199]: More power
+            - paragraph [ref=e201]: Gain consistency, flexibility and performance that’s built to last. Deploy the true clout of cloud with CivoStack, our own custom-built software stack that powers both public and private platforms with feature parity across environments.
+        - generic [ref=e203]:
+          - img "More possibilities" [ref=e206]
+          - generic [ref=e207]:
+            - paragraph [ref=e209]: More possibilities
+            - paragraph [ref=e211]: The future of the cloud is open. Unlock the multi-cloud, AI era with cloud-native technologies built for real innovation and experimentation. Unleash your potential without workarounds or clunky integrations.
+      - generic [ref=e214]:
+        - heading "Cloud the way you want it" [level=2] [ref=e217]
+        - generic [ref=e219]:
+          - heading "Total cloud freedom" [level=3] [ref=e221]
+          - paragraph [ref=e223]: We’re making the cloud faster, simpler, and fairer. Built for transparency and performance, giving you full control of your data infrastructure and your spend.
+      - generic [ref=e226]:
+        - img "Why Civo is \"Built for more\" | Civo" [ref=e227]
+        - button "Play video" [ref=e229] [cursor=pointer]:
+          - img [ref=e230]
+      - generic [ref=e234]:
+        - heading "One cloud. Everywhere" [level=2] [ref=e237]
+        - generic [ref=e239]:
+          - heading "The cloud built for what you’re building" [level=3] [ref=e241]
+          - paragraph [ref=e243]: No hoops. No headaches. Civo’s user experience is shaped by real feedback from our customers and community. Our technology is built around open standards and true cloud parity, giving you the same cloud experience across the Civo ecosystem.
+      - generic [ref=e247]:
+        - link "01 Product 01 Flexible, scalable compute for global workloads. Deploy Kubernetes clusters, compute, managed databases and integrate load balancers in minutes, anywhere." [ref=e248] [cursor=pointer]:
+          - /url: /public-cloud
+          - generic [ref=e249]: "01"
+          - generic:
+            - generic:
+              - img "Product 01"
+          - paragraph [ref=e251]: Flexible, scalable compute for global workloads. Deploy Kubernetes clusters, compute, managed databases and integrate load balancers in minutes, anywhere.
+          - img [ref=e254]
+        - link "02 Product 02 You call the shots, we’ll run the stack. Civo private cloud solutions run on your kit with CivoStack Enterprise, or arrive ready-to-deploy with FlexCore, our all-in-one appliance." [ref=e256] [cursor=pointer]:
+          - /url: /private-cloud
+          - generic [ref=e257]: "02"
+          - generic:
+            - generic:
+              - img "Product 02"
+          - paragraph [ref=e259]: You call the shots, we’ll run the stack. Civo private cloud solutions run on your kit with CivoStack Enterprise, or arrive ready-to-deploy with FlexCore, our all-in-one appliance.
+          - img [ref=e262]
+        - link "03 Product 03 Unlock the multi-cloud, AI era with enterprise-grade infrastructure, NVIDIA GPUs and robust model management." [ref=e264] [cursor=pointer]:
+          - /url: /ai
+          - generic [ref=e265]: "03"
+          - generic:
+            - generic:
+              - img "Product 03"
+          - paragraph [ref=e267]: Unlock the multi-cloud, AI era with enterprise-grade infrastructure, NVIDIA GPUs and robust model management.
+          - img [ref=e270]
+      - generic [ref=e273]:
+        - heading "Trusted by top-tier teams worldwide" [level=2] [ref=e276]
+        - generic [ref=e278]:
+          - generic [ref=e279]:
+            - heading "Serious power for serious workloads" [level=3] [ref=e281]
+            - paragraph [ref=e283]: We’re trusted by ambitious startups and major enterprises around the world to deliver scalable, sustainable infrastructure without the hidden costs or headaches of hyperscalers.
+          - generic [ref=e284]:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - paragraph: Regent Lee
+                        - paragraph: Professor of Interdisciplinary Innovations
+                  - paragraph: "\"Civo gives us the flexibility and performance we need to train our AI models at scale... a powerful example of how secure, sovereign infrastructure can enable positive change in healthcare.\""
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - paragraph: Daniel Miodovnik
+                        - paragraph: Chief Operating Officer
+                  - paragraph: "\"We're using Civo's GPUs to develop world-leading AI models to discover new materials and develop hardware solutions to the biggest challenges in data centres.\""
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - paragraph: James Faure
+                        - paragraph: Co-Founder & CEO
+                  - paragraph: "\"Our experience with Civo has been outstanding. We're treated as a customer, not just a consumer, with a highly innovative and customer-centric service.\""
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - paragraph: Matt Butcher
+                        - paragraph: Chief Executive Officer
+                  - paragraph: "\"Civo just worked for us. We've just been able to use things as they are... This is familiar. I'm comfortable with this.\""
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - paragraph: Sumeet Kulkarni
+                        - paragraph: Engineering Manager
+                  - paragraph: "\"Civo's blazing-fast cluster startup, intuitive CLI & clean UI were instantly appealing. Their India region was a plus for data compliance.\""
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - paragraph: Sudhir Singh
+                        - paragraph: Co-Founder
+                  - paragraph: "\"Our experience with Civo has been fantastic. The best part is their availability. You just send a mail, and they're ready to address all your queries with a call.\""
+            - region "Testimonials carousel" [ref=e285]:
+              - generic [ref=e286]:
+                - generic [ref=e287]:
+                  - generic [ref=e288]:
+                    - generic [ref=e289]:
+                      - img "Regent Lee profile" [ref=e291]
+                      - generic [ref=e292]:
+                        - paragraph [ref=e294]: Regent Lee
+                        - paragraph [ref=e296]: Professor of Interdisciplinary Innovations
+                    - img "University of Oxford logo" [ref=e299]
+                  - paragraph [ref=e301]: "\"Civo gives us the flexibility and performance we need to train our AI models at scale... a powerful example of how secure, sovereign infrastructure can enable positive change in healthcare.\""
+                - generic [ref=e302]:
+                  - generic [ref=e303]:
+                    - button "Go to testimonial 1" [ref=e304] [cursor=pointer]
+                    - button "Go to testimonial 2" [ref=e305] [cursor=pointer]
+                    - button "Go to testimonial 3" [ref=e306] [cursor=pointer]
+                    - button "Go to testimonial 4" [ref=e307] [cursor=pointer]
+                    - button "Go to testimonial 5" [ref=e308] [cursor=pointer]
+                    - button "Go to testimonial 6" [ref=e309] [cursor=pointer]
+                  - generic [ref=e310]:
+                    - button "Previous" [ref=e311] [cursor=pointer]:
+                      - generic [ref=e312]:
+                        - img [ref=e314]
+                        - img [ref=e317]
+                    - button "Next" [ref=e319] [cursor=pointer]:
+                      - generic [ref=e320]:
+                        - img [ref=e322]
+                        - img [ref=e325]
+      - generic [ref=e329]:
+        - heading "Resources" [level=2] [ref=e332]
+        - heading "Ready for more bright ideas?" [level=3] [ref=e336]
+      - generic [ref=e339]:
+        - link "White papers White papers In-depth insights and analysis that shine a light on the challenges and opportunities of cloud and AI infrastructure." [ref=e341] [cursor=pointer]:
+          - /url: https://www.civo.com/white-papers
+          - generic [ref=e342]:
+            - img "White papers" [ref=e344]
+            - generic [ref=e346]:
+              - generic [ref=e347]:
+                - paragraph [ref=e349]: White papers
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+              - paragraph [ref=e352]: In-depth insights and analysis that shine a light on the challenges and opportunities of cloud and AI infrastructure.
+        - link "Meetups Meetups Connect with bright minds in person and online for insights into Kubernetes, ML, and all things Cloud and AI." [ref=e354] [cursor=pointer]:
+          - /url: https://www.civo.com/webinars
+          - generic [ref=e355]:
+            - img "Meetups" [ref=e357]
+            - generic [ref=e359]:
+              - generic [ref=e360]:
+                - paragraph [ref=e362]: Meetups
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+              - paragraph [ref=e365]: Connect with bright minds in person and online for insights into Kubernetes, ML, and all things Cloud and AI.
+        - link "Case studies Case studies See how organizations are using Civo to build faster, smarter and brighter in the real world." [ref=e367] [cursor=pointer]:
+          - /url: https://www.civo.com/case-studies
+          - generic [ref=e368]:
+            - img "Case studies" [ref=e370]
+            - generic [ref=e372]:
+              - generic [ref=e373]:
+                - paragraph [ref=e375]: Case studies
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+              - paragraph [ref=e378]: See how organizations are using Civo to build faster, smarter and brighter in the real world.
+        - link "Civo blog Civo blog Get the latest product news, company updates and educational content from Civo." [ref=e380] [cursor=pointer]:
+          - /url: https://www.civo.com/blog
+          - generic [ref=e381]:
+            - img "Civo blog" [ref=e383]
+            - generic [ref=e385]:
+              - generic [ref=e386]:
+                - paragraph [ref=e388]: Civo blog
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+              - paragraph [ref=e391]: Get the latest product news, company updates and educational content from Civo.
+      - generic [ref=e394]:
+        - heading "Contact us" [level=2] [ref=e397]
+        - generic [ref=e399]:
+          - heading "Let there be cloud" [level=3] [ref=e401]
+          - paragraph [ref=e403]: Your faster, fairer, simpler cloud starts here. Talk to a Civo specialist and get started today.
+      - generic [ref=e408]: Loading form...
+      - generic [ref=e412]:
+        - heading "FAQs" [level=2] [ref=e415]
+        - generic [ref=e417]:
+          - heading "Frequently asked questions" [level=3] [ref=e419]
+          - paragraph [ref=e421]: Got questions? We’ve got answers.
+      - generic [ref=e424]:
+        - generic [ref=e426]:
+          - button "01 What is Civo?" [expanded] [ref=e427] [cursor=pointer]:
+            - generic [ref=e428]:
+              - generic [ref=e429]: "01"
+              - generic [ref=e430]: What is Civo?
+            - button [ref=e431]:
+              - img [ref=e434]
+          - region [ref=e435]:
+            - generic [ref=e438]:
+              - paragraph [ref=e439]: "Civo is the cloud and AI platform built for more: more speed, more control, more transparency. Faster to deploy, easier to use, and fairer in price, we’re here to help you see the cloud in a new light. We’ve pioneered a Kubernetes-powered cloud with the fastest deployments in the industry – cluster launch times in under 90 seconds – and a developer experience shaped by real feedback Kubernetes. Auto-scaling machine learning environments. Carbon-neutral, GPU-powered compute. Everything we build is powerful, user-friendly, and free from unnecessary complexity. You don’t need to be a Kubernetes or ML expert to get moving – and you don’t need a team of lawyers to explain what you’re paying for."
+              - paragraph [ref=e440]: We’re trusted by ambitious startups and major enterprises to deliver scalable, sustainable infrastructure without the hidden costs or headaches of hyperscalers.
+        - generic [ref=e442]:
+          - button "02 What makes Civo a cloud native service provider?" [ref=e443] [cursor=pointer]:
+            - generic [ref=e444]:
+              - generic [ref=e445]: "02"
+              - generic [ref=e446]: What makes Civo a cloud native service provider?
+            - button [ref=e447]:
+              - img [ref=e449]
+          - paragraph [ref=e452]: "We’ve built Civo from the ground up for cloud native computing. No legacy baggage, no awkward workarounds. Our platform is powered by Kubernetes, giving you scalable, efficient container orchestration as standard. We focus on what modern workloads need most: microservices, containerization, and high availability – all designed for agility, scalability, and resilience. We produce an environment that’s as fast to adapt as you are, so you can develop, deploy, and manage applications without the drag of outdated infrastructure."
+        - generic [ref=e454]:
+          - button "03 How can I get started with Civo?" [ref=e455] [cursor=pointer]:
+            - generic [ref=e456]:
+              - generic [ref=e457]: "03"
+              - generic [ref=e458]: How can I get started with Civo?
+            - button [ref=e459]:
+              - img [ref=e461]
+          - paragraph [ref=e464]: Sign up for a Civo account and you’ll get $250 in free credit to explore our platform for a full month. No lock-ins. No legalese. Just the fastest way to work on the cloud’s bright side. When you’re ready to start building, our Civo Docs walk you through everything you need to set up and configure your environment, step-by-step.
+        - generic [ref=e466]:
+          - button "04 Is there a free trial or demo program available for Civo?" [ref=e467] [cursor=pointer]:
+            - generic [ref=e468]:
+              - generic [ref=e469]: "04"
+              - generic [ref=e470]: Is there a free trial or demo program available for Civo?
+            - button [ref=e471]:
+              - img [ref=e473]
+          - generic [ref=e476]:
+            - paragraph [ref=e477]: Absolutely. We work with open standards and an open mind.
+            - paragraph [ref=e478]
+            - list [ref=e479]:
+              - listitem [ref=e480]: Free trial – 1 month, $250 free credit. Track your usage anytime in your Civo Dashboard.
+              - listitem [ref=e481]: Book a meeting – Get a guided tour of our platform, answers to your questions, and a head start on your Civo journey.
+              - listitem [ref=e482]: Startup Program – Free credit, mentorship, and access to our cloud native experts so you can scale effectively.
+              - listitem [ref=e483]: Civo Academy – Gain access to over 50 free video guides and tutorials built to help you master Kubernetes, from container basics to launching and growing your first clusters.
+            - paragraph [ref=e484]
+  - contentinfo [ref=e486]:
+    - generic [ref=e488]:
+      - img "AICPA SOC 2 Service Organization Control Reports certification" [ref=e490]
+      - img "Cyber Essentials PLUS certification" [ref=e492]
+      - img "Crown Commercial Service certification" [ref=e494]
+      - img "G-Cloud UK Government certification" [ref=e496]
+      - img "ISO 27001 Information Security Management certification" [ref=e498]
+    - generic [ref=e502]:
+      - generic [ref=e503]:
+        - generic [ref=e504]:
+          - img "Civo" [ref=e505]
+          - generic [ref=e506]:
+            - link [ref=e507] [cursor=pointer]:
+              - /url: https://www.instagram.com/civocloud
+              - img [ref=e508]
+            - link [ref=e510] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/civocloud
+              - img [ref=e511]
+            - link [ref=e513] [cursor=pointer]:
+              - /url: https://x.com/civocloud
+              - img [ref=e514]
+            - link [ref=e516] [cursor=pointer]:
+              - /url: https://www.facebook.com/civocloud
+              - img [ref=e517]
+            - link [ref=e519] [cursor=pointer]:
+              - /url: https://www.youtube.com/civocloud
+              - img [ref=e520]
+        - generic [ref=e523]:
+          - generic [ref=e525]:
+            - heading "Company" [level=3] [ref=e526]
+            - generic [ref=e527]:
+              - link "About" [ref=e528] [cursor=pointer]:
+                - /url: /about
+              - link "Pricing" [ref=e529] [cursor=pointer]:
+                - /url: /pricing
+              - link "Case Studies" [ref=e530] [cursor=pointer]:
+                - /url: /case-studies
+              - link "Navigate Events" [ref=e531] [cursor=pointer]:
+                - /url: /navigate
+              - link "White Papers" [ref=e532] [cursor=pointer]:
+                - /url: /white-papers
+              - link "Newsroom" [ref=e533] [cursor=pointer]:
+                - /url: /newsroom
+              - link "Brand Assets" [ref=e534] [cursor=pointer]:
+                - /url: /brand-assets
+              - link "Careers" [ref=e535] [cursor=pointer]:
+                - /url: https://careers.civo.com/
+              - link "Tech Junction" [ref=e536] [cursor=pointer]:
+                - /url: /tech-junction
+              - link "Partners" [ref=e537] [cursor=pointer]:
+                - /url: /partners
+          - generic [ref=e539]:
+            - heading "Public Cloud" [level=3] [ref=e540]
+            - generic [ref=e541]:
+              - link "Kubernetes" [ref=e542] [cursor=pointer]:
+                - /url: /public-cloud/kubernetes
+              - link "Compute" [ref=e543] [cursor=pointer]:
+                - /url: /public-cloud/compute
+              - link "Pricing" [ref=e544] [cursor=pointer]:
+                - /url: /pricing
+              - link "Konstruct" [ref=e545] [cursor=pointer]:
+                - /url: /konstruct
+              - link "Databases" [ref=e546] [cursor=pointer]:
+                - /url: /public-cloud/databases
+              - link "Load balancers" [ref=e547] [cursor=pointer]:
+                - /url: /load-balancers
+              - link "Block storage" [ref=e548] [cursor=pointer]:
+                - /url: /features/block-storage
+          - generic [ref=e550]:
+            - heading "Private Cloud" [level=3] [ref=e551]
+            - generic [ref=e552]:
+              - link "CivoStack Enterprise" [ref=e553] [cursor=pointer]:
+                - /url: /private-cloud/civostack-enterprise
+              - link "FlexCore" [ref=e554] [cursor=pointer]:
+                - /url: /private-cloud/flexcore
+              - link "VMware for service providers" [ref=e555] [cursor=pointer]:
+                - /url: /vmware-service-providers
+              - link "VMware alternative" [ref=e556] [cursor=pointer]:
+                - /url: /vmware-alternative
+              - link "VMware migration" [ref=e557] [cursor=pointer]:
+                - /url: /vmware-migration-tool
+              - link "UK Sovereign Cloud" [ref=e558] [cursor=pointer]:
+                - /url: /uk-sovereign-cloud
+              - link "India Sovereign Cloud" [ref=e559] [cursor=pointer]:
+                - /url: /india
+          - generic [ref=e561]:
+            - heading "Civo AI" [level=3] [ref=e562]
+            - generic [ref=e563]:
+              - link "Cloud GPU" [ref=e564] [cursor=pointer]:
+                - /url: /ai/cloud-gpu
+              - link "Kubernetes GPU" [ref=e565] [cursor=pointer]:
+                - /url: /ai/kubernetes-gpu
+              - link "Compute GPU" [ref=e566] [cursor=pointer]:
+                - /url: /ai/gpu-compute
+              - link "relaxAI" [ref=e567] [cursor=pointer]:
+                - /url: /ai/relaxai
+          - generic [ref=e569]:
+            - heading "Solutions" [level=3] [ref=e570]
+            - generic [ref=e571]:
+              - link "Research" [ref=e572] [cursor=pointer]:
+                - /url: /research
+              - link "Blockchain" [ref=e573] [cursor=pointer]:
+                - /url: /blockchain
+              - link "Financial services" [ref=e574] [cursor=pointer]:
+                - /url: /finance
+              - link "Government" [ref=e575] [cursor=pointer]:
+                - /url: /government
+              - link "SaaS" [ref=e576] [cursor=pointer]:
+                - /url: /saas
+              - link "Startups" [ref=e577] [cursor=pointer]:
+                - /url: /startups
+          - generic [ref=e579]:
+            - heading "Resources" [level=3] [ref=e580]
+            - generic [ref=e581]:
+              - link "Ambassadors" [ref=e582] [cursor=pointer]:
+                - /url: /ambassadors
+              - link "API documentation" [ref=e583] [cursor=pointer]:
+                - /url: /api
+              - link "Blog" [ref=e584] [cursor=pointer]:
+                - /url: /blog
+              - link "Civo Documentation" [ref=e585] [cursor=pointer]:
+                - /url: /docs
+              - link "Civo Academy" [ref=e586] [cursor=pointer]:
+                - /url: /academy
+              - link "Civo GitHub repo" [ref=e587] [cursor=pointer]:
+                - /url: https://github.com/civo
+              - link "Civo marketplace" [ref=e588] [cursor=pointer]:
+                - /url: /marketplace
+              - link "Webinars" [ref=e589] [cursor=pointer]:
+                - /url: https://www.civo.com/webinars
+              - link "Tutorials" [ref=e590] [cursor=pointer]:
+                - /url: /learn
+          - generic [ref=e592]:
+            - heading "Contact" [level=3] [ref=e593]
+            - generic [ref=e594]:
+              - link "Support" [ref=e595] [cursor=pointer]:
+                - /url: /contact
+              - link "Sales inquiries" [ref=e596] [cursor=pointer]:
+                - /url: /sales
+              - link "Status" [ref=e597] [cursor=pointer]:
+                - /url: https://status.civo.com
+      - generic [ref=e599]:
+        - list [ref=e600]:
+          - listitem [ref=e601]: Copyright © 2026
+          - listitem [ref=e602]:
+            - link "Legal" [ref=e603] [cursor=pointer]:
+              - /url: /legal
+          - listitem [ref=e604]: "|"
+          - listitem [ref=e605]:
+            - link "Terms and Conditions" [ref=e606] [cursor=pointer]:
+              - /url: /legal/terms
+          - listitem [ref=e607]: "|"
+          - listitem [ref=e608]:
+            - link "Privacy Policy" [ref=e609] [cursor=pointer]:
+              - /url: /legal/privacy
+          - listitem [ref=e610]: "|"
+          - listitem [ref=e611]:
+            - link "Cookies" [ref=e612] [cursor=pointer]:
+              - /url: /legal/cookie
+          - listitem [ref=e613]: "|"
+          - listitem [ref=e614]:
+            - link "Data Processing Agreement" [ref=e615] [cursor=pointer]:
+              - /url: /legal/data-processing-agreement
+        - link "Back to top" [ref=e616] [cursor=pointer]:
+          - /url: "#top"
+          - generic [ref=e617]: Back to top
+          - img [ref=e619]
+  - alert [ref=e622]

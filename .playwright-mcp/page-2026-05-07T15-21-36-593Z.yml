@@ -1,0 +1,430 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link "Coolify" [ref=e8] [cursor=pointer]:
+            - /url: /
+          - link "v4.0.0-beta.474" [ref=e9] [cursor=pointer]:
+            - /url: https://github.com/coollabsio/coolify/releases/tag/v4.0.0-beta.474
+        - button / [ref=e11]:
+          - img [ref=e12]
+          - generic [ref=e14]: /
+        - button "Preferences 9+" [ref=e17] [cursor=pointer]:
+          - img "Preferences" [ref=e18]
+          - generic [ref=e20]: 9+
+      - combobox [ref=e23]:
+        - option "Switch team" [disabled]
+        - option "Root Team" [selected]
+      - list [ref=e24]:
+        - listitem [ref=e25]:
+          - list [ref=e26]:
+            - listitem [ref=e27]:
+              - link "Dashboard" [ref=e28] [cursor=pointer]:
+                - /url: /
+                - img [ref=e29]
+                - generic [ref=e31]: Dashboard
+            - listitem [ref=e32]:
+              - link "Projects" [ref=e33] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e34]
+                - generic [ref=e39]: Projects
+            - listitem [ref=e40]:
+              - link "Servers" [ref=e41] [cursor=pointer]:
+                - /url: /servers
+                - img [ref=e42]
+                - generic [ref=e47]: Servers
+            - listitem [ref=e48]:
+              - link "Sources" [ref=e49] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/sources
+                - img [ref=e50]
+                - generic [ref=e52]: Sources
+            - listitem [ref=e53]:
+              - link "Destinations" [ref=e54] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/destinations
+                - img [ref=e55]
+                - generic [ref=e57]: Destinations
+            - listitem [ref=e58]:
+              - link "S3 Storages" [ref=e59] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/storages
+                - img [ref=e60]
+                - generic [ref=e65]: S3 Storages
+            - listitem [ref=e66]:
+              - link "Shared Variables" [ref=e67] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/shared-variables
+                - img [ref=e68]
+                - generic [ref=e72]: Shared Variables
+            - listitem [ref=e73]:
+              - link "Notifications" [ref=e74] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/notifications/email
+                - img [ref=e75]
+                - generic [ref=e77]: Notifications
+            - listitem [ref=e78]:
+              - link "Keys & Tokens" [ref=e79] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/security/private-key
+                - img [ref=e80]
+                - generic [ref=e82]: Keys & Tokens
+            - listitem [ref=e83]:
+              - link "Tags" [ref=e84] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/tags
+                - img [ref=e85]
+                - generic [ref=e89]: Tags
+            - listitem [ref=e90]:
+              - link "Terminal" [ref=e91] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/terminal
+                - img [ref=e92]
+                - generic [ref=e95]: Terminal
+            - listitem [ref=e96]:
+              - link "Profile" [ref=e97] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/profile
+                - img [ref=e98]
+                - generic [ref=e103]: Profile
+            - listitem [ref=e104]:
+              - link "Teams" [ref=e105] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/team
+                - img [ref=e106]
+                - generic [ref=e114]: Teams
+            - listitem [ref=e115]:
+              - link "Settings" [ref=e116] [cursor=pointer]:
+                - /url: /settings
+                - img [ref=e117]
+                - generic [ref=e121]: Settings
+            - listitem [ref=e124]:
+              - generic "New version available" [ref=e125]:
+                - button "Upgrade" [ref=e127] [cursor=pointer]:
+                  - img [ref=e128]
+                  - text: Upgrade
+            - listitem [ref=e131]:
+              - link "Sponsor us" [ref=e132] [cursor=pointer]:
+                - /url: https://coolify.io/sponsorships
+                - img [ref=e133]
+                - generic [ref=e137]: Sponsor us
+            - listitem [ref=e138]:
+              - generic "Send us feedback or get help!" [ref=e141] [cursor=pointer]:
+                - img [ref=e142]
+                - generic [ref=e144]: Feedback
+            - listitem [ref=e145]:
+              - button "Logout" [ref=e147]:
+                - img [ref=e148]
+                - generic [ref=e150]: Logout
+    - main [ref=e151]:
+      - generic [ref=e153]:
+        - heading "Configuration" [level=1] [ref=e154]
+        - navigation [ref=e155]:
+          - navigation [ref=e156]:
+            - list [ref=e157]:
+              - listitem [ref=e158]:
+                - generic [ref=e159]:
+                  - link "My first project" [ref=e160] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r
+                  - button [ref=e161]:
+                    - img [ref=e162]
+              - listitem [ref=e164]:
+                - generic [ref=e165]:
+                  - link "production" [ref=e166] [cursor=pointer]:
+                    - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i
+                  - button [ref=e167]:
+                    - img [ref=e168]
+              - listitem [ref=e170]:
+                - link "lively-lobster-bl7bco02xzkpl51l5ti3sut9 (localhost)" [ref=e171] [cursor=pointer]:
+                  - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9
+              - generic [ref=e172]:
+                - generic [ref=e174]:
+                  - link "Running" [ref=e177] [cursor=pointer]:
+                    - /url: github.com/lkonga/mini-roulette-pixi/commit/17004c51a3ed6d8163ca993a671beafa167357fa
+                  - generic [ref=e178]: (unknown)
+                  - img [ref=e182] [cursor=pointer]
+                - button "Refresh Status" [ref=e183]:
+                  - img [ref=e184]
+          - generic [ref=e186]:
+            - navigation [ref=e187]:
+              - link "Configuration" [ref=e188] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9
+              - link "Deployments" [ref=e189] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/deployment
+              - link "Logs" [ref=e190] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/logs
+                - generic [ref=e191]: Logs
+              - link "Terminal" [ref=e192] [cursor=pointer]:
+                - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/terminal
+              - button "Links" [ref=e195]:
+                - generic [ref=e196]: Links
+                - img [ref=e197]
+            - generic [ref=e200]:
+              - button "Advanced" [ref=e203]:
+                - generic [ref=e204]: Advanced
+                - img [ref=e205]
+              - generic [ref=e207]:
+                - button "Redeploy" [ref=e208] [cursor=pointer]:
+                  - img [ref=e209]
+                  - text: Redeploy
+                - button "Restart" [ref=e211] [cursor=pointer]:
+                  - img [ref=e212]
+                  - text: Restart
+                - button "Stop" [ref=e217] [cursor=pointer]:
+                  - img [ref=e218]
+                  - text: Stop
+        - generic [ref=e220]:
+          - generic [ref=e221]:
+            - link "General" [ref=e222] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9
+              - generic [ref=e223]: General
+            - link "Advanced" [ref=e224] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/advanced
+              - generic [ref=e225]: Advanced
+            - link "Environment Variables" [ref=e226] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/environment-variables
+              - generic [ref=e227]: Environment Variables
+            - link "Persistent Storage" [ref=e228] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/persistent-storage
+              - generic [ref=e229]: Persistent Storage
+            - link "Git Source" [ref=e230] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/source
+              - generic [ref=e231]: Git Source
+            - link "Servers" [ref=e232] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/servers
+              - generic [ref=e233]: Servers
+            - link "Scheduled Tasks" [ref=e234] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/scheduled-tasks
+              - generic [ref=e235]: Scheduled Tasks
+            - link "Webhooks" [ref=e236] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/webhooks
+              - generic [ref=e237]: Webhooks
+            - link "Preview Deployments" [ref=e238] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/preview-deployments
+              - generic [ref=e239]: Preview Deployments
+            - link "Healthcheck" [ref=e240] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/healthcheck
+              - generic [ref=e241]: Healthcheck
+            - link "Rollback" [ref=e242] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/rollback
+              - generic [ref=e243]: Rollback
+            - link "Resource Limits" [ref=e244] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/resource-limits
+              - generic [ref=e245]: Resource Limits
+            - link "Resource Operations" [ref=e246] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/resource-operations
+              - generic [ref=e247]: Resource Operations
+            - link "Metrics" [ref=e248] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/metrics
+              - generic [ref=e249]: Metrics
+            - link "Tags" [ref=e250] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/tags
+              - generic [ref=e251]: Tags
+            - link "Danger Zone" [ref=e252] [cursor=pointer]:
+              - /url: https://g5kc.tail1e9037.ts.net:10000/project/a13id9umbhf7gfzqzva2f15r/environment/l8pdma3qkv1wfy7uqjdzzz4i/application/bl7bco02xzkpl51l5ti3sut9/danger
+              - generic [ref=e253]: Danger Zone
+          - generic [ref=e256]:
+            - generic [ref=e257]:
+              - heading "General" [level=2] [ref=e258]
+              - button "Save" [ref=e259] [cursor=pointer]
+            - generic [ref=e260]: General configuration for your application.
+            - generic [ref=e261]:
+              - generic [ref=e262]:
+                - generic [ref=e263]:
+                  - generic [ref=e264]:
+                    - text: Name
+                    - generic [ref=e265]: "*"
+                  - textbox [ref=e266]: lively-lobster-bl7bco02xzkpl51l5ti3sut9
+                - generic [ref=e267]:
+                  - generic [ref=e268]: Description
+                  - textbox [ref=e269]
+              - generic [ref=e271]:
+                - generic [ref=e272]:
+                  - generic [ref=e273]:
+                    - text: Build Pack
+                    - generic [ref=e274]: "*"
+                  - combobox [ref=e275]:
+                    - option "Nixpacks" [selected]
+                    - option "Static"
+                    - option "Dockerfile"
+                    - option "Docker Compose"
+                - generic [ref=e276]:
+                  - generic [ref=e277]:
+                    - text: Static Image
+                    - generic [ref=e278]: "*"
+                  - combobox [ref=e279]:
+                    - option "nginx:alpine" [selected]
+                    - option "apache:alpine" [disabled]
+              - generic [ref=e280]:
+                - generic [ref=e281]:
+                  - text: Custom Nginx Configuration
+                  - img [ref=e284] [cursor=pointer]
+                - textbox "Empty means default configuration will be used." [ref=e286]
+              - button "Generate Default Nginx Configuration" [ref=e288] [cursor=pointer]
+              - generic [ref=e289]:
+                - generic [ref=e291]:
+                  - generic [ref=e292]:
+                    - text: Is it a static site?
+                    - img [ref=e295] [cursor=pointer]
+                  - checkbox "Is it a static site?" [checked] [ref=e297] [cursor=pointer]
+                - generic [ref=e299]:
+                  - generic [ref=e300]:
+                    - text: Is it a SPA (Single Page Application)?
+                    - img [ref=e303] [cursor=pointer]
+                  - checkbox "Is it a SPA (Single Page Application)?" [ref=e305] [cursor=pointer]
+              - generic [ref=e306]:
+                - generic [ref=e307]:
+                  - generic [ref=e308]:
+                    - text: Domains
+                    - img [ref=e311] [cursor=pointer]
+                  - textbox "https://coolify.io" [ref=e313]: http://cdev-european.trylatest.in
+                - button "Generate Domain" [ref=e314] [cursor=pointer]
+              - generic [ref=e315]:
+                - generic [ref=e316]:
+                  - generic [ref=e317]:
+                    - text: Direction
+                    - generic [ref=e318]: "*"
+                    - img [ref=e321] [cursor=pointer]
+                  - combobox [ref=e323]:
+                    - option "Allow www & non-www." [selected]
+                    - option "Redirect to www."
+                    - option "Redirect to non-www."
+                - button "Set Direction" [ref=e325] [cursor=pointer]:
+                  - generic [ref=e326]: Set Direction
+              - generic [ref=e327]:
+                - heading "Docker Registry" [level=3] [ref=e328]
+                - img [ref=e331] [cursor=pointer]
+              - generic [ref=e333]:
+                - generic [ref=e334]:
+                  - generic [ref=e335]:
+                    - text: Docker Image
+                    - img [ref=e338] [cursor=pointer]
+                  - textbox "Empty means it won't push the image to a docker registry." [ref=e340]
+                - generic [ref=e341]:
+                  - generic [ref=e342]:
+                    - text: Docker Image Tag
+                    - img [ref=e345] [cursor=pointer]
+                  - textbox "Empty means only push commit sha tag." [ref=e347]
+              - generic [ref=e348]:
+                - heading "Build" [level=3] [ref=e349]
+                - generic [ref=e350]:
+                  - generic [ref=e351]:
+                    - generic [ref=e352]:
+                      - text: Install Command
+                      - img [ref=e355] [cursor=pointer]
+                    - textbox [ref=e357]: npm ci
+                  - generic [ref=e358]:
+                    - generic [ref=e359]:
+                      - text: Build Command
+                      - img [ref=e362] [cursor=pointer]
+                    - textbox [ref=e364]: npm run build
+                  - generic [ref=e365]:
+                    - generic [ref=e366]:
+                      - text: Start Command
+                      - img [ref=e369] [cursor=pointer]
+                    - textbox [ref=e371]
+                - generic [ref=e372]:
+                  - text: Nixpacks will detect the required configuration automatically.
+                  - link "Framework Specific Docs" [ref=e373] [cursor=pointer]:
+                    - /url: https://coolify.io/docs/applications/
+                - generic [ref=e374]:
+                  - generic [ref=e375]:
+                    - generic [ref=e376]:
+                      - generic [ref=e377]:
+                        - text: Base Directory
+                        - img [ref=e380] [cursor=pointer]
+                      - textbox / [ref=e382]
+                    - generic [ref=e383]:
+                      - generic [ref=e384]:
+                        - text: Publish Directory
+                        - generic [ref=e385]: "*"
+                      - textbox "/dist" [ref=e386]
+                  - generic [ref=e387]:
+                    - generic [ref=e388]:
+                      - text: Custom Docker Options
+                      - img [ref=e391] [cursor=pointer]
+                    - textbox "--cap-add SYS_ADMIN --device=/dev/fuse --security-opt apparmor:unconfined --ulimit nofile=1024:1024 --tmpfs /run:rw,noexec,nosuid,size=65536k --hostname=myapp" [ref=e393]
+                  - generic [ref=e396]:
+                    - generic [ref=e397]:
+                      - text: Use a Build Server?
+                      - img [ref=e400] [cursor=pointer]
+                    - checkbox "Use a Build Server?" [ref=e402] [cursor=pointer]
+              - heading "Network" [level=3] [ref=e403]
+              - generic [ref=e404]:
+                - generic [ref=e405]:
+                  - generic [ref=e406]: Ports Exposes
+                  - textbox [ref=e407]: "80"
+                - generic [ref=e408]:
+                  - generic [ref=e409]:
+                    - text: Port Mappings
+                    - img [ref=e412] [cursor=pointer]
+                  - textbox "3000:3000" [ref=e414]
+                - generic [ref=e415]:
+                  - generic [ref=e416]:
+                    - text: Network Aliases
+                    - img [ref=e419] [cursor=pointer]
+                  - textbox [ref=e421]
+              - heading "HTTP Basic Authentication" [level=3] [ref=e422]
+              - generic [ref=e426]:
+                - generic [ref=e427]:
+                  - text: Enable
+                  - img [ref=e430] [cursor=pointer]
+                - checkbox "Enable" [ref=e432] [cursor=pointer]
+              - heading "Labels" [level=3] [ref=e433]
+              - generic [ref=e434]:
+                - generic [ref=e435]: Container Labels
+                - code [ref=e440]:
+                  - generic [ref=e441]:
+                    - generic [ref=e443]:
+                      - generic [ref=e446]: "1"
+                      - generic [ref=e448]: "2"
+                      - generic [ref=e450]: "3"
+                      - generic [ref=e452]: "4"
+                      - generic [ref=e454]: "5"
+                      - generic [ref=e456]: "6"
+                      - generic [ref=e459]: "7"
+                      - generic [ref=e461]: "8"
+                      - generic [ref=e463]: "9"
+                      - generic [ref=e465]: "10"
+                      - generic [ref=e467]: "11"
+                      - generic [ref=e469]: "12"
+                      - generic [ref=e471]: "13"
+                      - generic [ref=e473]: "14"
+                      - generic [ref=e475]: "15"
+                    - generic [ref=e494]:
+                      - generic [ref=e496]: traefik.enable=true
+                      - generic [ref=e498]: traefik.http.middlewares.gzip.compress=true
+                      - generic [ref=e500]: traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+                      - generic [ref=e502]: traefik.http.routers.http-0-bl7bco02xzkpl51l5ti3sut9.entryPoints=http
+                      - generic [ref=e504]: traefik.http.routers.http-0-bl7bco02xzkpl51l5ti3sut9.middlewares=gzip
+                      - generic [ref=e506]: "traefik.http.routers.http-0-bl7bco02xzkpl51l5ti3sut9.rule=Host(`cdev-european.trylatest.in`) && PathPrefix"
+                      - generic [ref=e508]: "(`/`)"
+                      - generic [ref=e510]: traefik.http.routers.http-0-bl7bco02xzkpl51l5ti3sut9.service=http-0-bl7bco02xzkpl51l5ti3sut9
+                      - generic [ref=e512]: traefik.http.services.http-0-bl7bco02xzkpl51l5ti3sut9.loadbalancer.server.port=80
+                      - generic [ref=e514]: caddy_0.encode=zstd gzip
+                      - generic [ref=e516]: "caddy_0.handle_path.0_reverse_proxy={{upstreams 80}}"
+                      - generic [ref=e518]: caddy_0.handle_path=/*
+                      - generic [ref=e520]: caddy_0.header=-Server
+                      - generic [ref=e522]: "caddy_0.try_files={path} /index.html /index.php"
+                      - generic [ref=e524]: caddy_0=http://cdev-european.trylatest.in
+                      - generic [ref=e526]: caddy_ingress_network=coolify
+                    - textbox "Editor content" [ref=e528]
+              - generic [ref=e529]:
+                - generic [ref=e531]:
+                  - generic [ref=e532]:
+                    - text: Readonly labels
+                    - img [ref=e535] [cursor=pointer]
+                  - checkbox "Readonly labels" [checked] [ref=e537] [cursor=pointer]
+                - generic [ref=e539]:
+                  - generic [ref=e540]:
+                    - text: Escape special characters in labels?
+                    - img [ref=e543] [cursor=pointer]
+                  - checkbox "Escape special characters in labels?" [checked] [ref=e545] [cursor=pointer]
+              - button "Reset Labels to Defaults" [ref=e547] [cursor=pointer]
+              - heading "Pre/Post Deployment Commands" [level=3] [ref=e548]
+              - generic [ref=e550]:
+                - generic [ref=e551]:
+                  - text: Pre-deployment
+                  - img [ref=e554] [cursor=pointer]
+                - textbox "php artisan migrate" [ref=e556]
+              - generic [ref=e558]:
+                - generic [ref=e559]:
+                  - text: Post-deployment
+                  - img [ref=e562] [cursor=pointer]
+                - textbox "php artisan migrate" [ref=e564]
+  - img
+  - list
+  - generic [ref=e565]:
+    - alert
+    - alert

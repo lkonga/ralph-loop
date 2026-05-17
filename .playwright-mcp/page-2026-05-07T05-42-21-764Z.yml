@@ -1,0 +1,56 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - progressbar [ref=e6]
+      - main [ref=e370]:
+        - generic [ref=e371]:
+          - img [ref=e374]
+          - generic [ref=e379]:
+            - heading "2-Step Verification" [level=1] [ref=e380]
+            - generic [ref=e381]: To help keep your account safe, Google wants to make sure it’s really you trying to sign in
+            - link "lemeshchenkoyuliia@gmail.com selected. Switch account" [ref=e383] [cursor=pointer]:
+              - img [ref=e386]
+              - generic [ref=e388]: lemeshchenkoyuliia@gmail.com
+              - img [ref=e390]
+        - generic [ref=e399]:
+          - generic [ref=e400]:
+            - figure [ref=e402]:
+              - img [ref=e403]
+            - generic [ref=e458]:
+              - heading "Check your realme GT NEO 3 150W" [level=2] [ref=e460]:
+                - generic [ref=e461]: Check your realme GT NEO 3 150W
+              - generic [ref=e464]:
+                - text: Google sent a notification to your realme GT NEO 3 150W. Tap
+                - strong [ref=e465]: "Yes"
+                - text: on the notification to verify it’s you.
+          - generic [ref=e469]:
+            - generic [ref=e472] [cursor=pointer]:
+              - checkbox "Don’t ask again on this device" [checked] [ref=e473]
+              - generic:
+                - img
+            - generic [ref=e476] [cursor=pointer]: Don’t ask again on this device
+        - generic [ref=e477]:
+          - timer [ref=e479]:
+            - button "Resend it" [ref=e494]:
+              - generic [ref=e497]: Resend it
+          - button "Try another way" [ref=e487]:
+            - generic [ref=e490]: Try another way
+    - contentinfo [ref=e69]:
+      - combobox "Change language English (United States)" [ref=e73] [cursor=pointer]:
+        - generic:
+          - generic: English (United States)
+        - generic:
+          - img
+      - list [ref=e75]:
+        - listitem [ref=e76]:
+          - link "Help" [ref=e77] [cursor=pointer]:
+            - /url: https://support.google.com/accounts?hl=en-US&p=account_iph
+        - listitem [ref=e78]:
+          - link "Privacy" [ref=e79] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=IN&hl=en-US&privacy=true
+        - listitem [ref=e80]:
+          - link "Terms" [ref=e81] [cursor=pointer]:
+            - /url: https://accounts.google.com/TOS?loc=IN&hl=en-US
+  - iframe [ref=e82]:
+    
+  - generic [ref=e492]: 2-Step Verification To help keep your account safe, Google wants to make sure it’s really you trying to sign in

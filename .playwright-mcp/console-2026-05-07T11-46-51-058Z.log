@@ -1,0 +1,4 @@
+[    2058ms] [ERROR] Access to script at 'https://connect.facebook.net/en_US/fbevents.js' from origin 'https://ap.www.namecheap.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://ap.www.namecheap.com/profile/billing/Topup:0
+[    2058ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://connect.facebook.net/en_US/fbevents.js:0
+[ 1493938ms] [ERROR] Access to script at 'https://connect.facebook.net/en_US/fbevents.js' from origin 'https://ap.www.namecheap.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ https://ap.www.namecheap.com/Profile/Billing:0
+[ 1493938ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://connect.facebook.net/en_US/fbevents.js:0

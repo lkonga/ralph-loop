@@ -1,0 +1,2 @@
+[     882ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://northflank.com/api/fetch-announcement:0
+[    1911ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://aplo-evnt.com/api/v1/intent_pixel/track_request?app_id=66422ba04a77bc01c7379cb6:0

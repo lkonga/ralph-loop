@@ -1,0 +1,1247 @@
+- generic [ref=e3]:
+  - link "Skip to content" [ref=e4] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=e5]:
+    - navigation [ref=e7]:
+      - heading "Primary navigation" [level=2] [ref=e8]
+      - link "Go to the Northflank homepage" [ref=e9] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e10]: Northflank
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e15]:
+            - link "Platform" [ref=e16] [cursor=pointer]:
+              - /url: /
+            - img [ref=e17]
+          - generic [ref=e20]:
+            - link "Resources" [ref=e21] [cursor=pointer]:
+              - /url: /
+            - img [ref=e22]
+          - link "Enterprise" [ref=e26] [cursor=pointer]:
+            - /url: /enterprise
+          - link "Pricing" [ref=e29] [cursor=pointer]:
+            - /url: /pricing
+          - link "Docs" [ref=e30] [cursor=pointer]:
+            - /url: https://northflank.com/docs
+          - link "Log in" [ref=e31] [cursor=pointer]:
+            - /url: https://app.northflank.com/login
+            - generic [ref=e32]: Log in
+        - link "Get started" [ref=e33] [cursor=pointer]:
+          - /url: https://app.northflank.com/signup
+          - generic [ref=e34]: Get started
+  - generic [ref=e35]:
+    - link "Read our cookie policy" [ref=e36] [cursor=pointer]:
+      - /url: /legal/cookies
+      - img [ref=e38]
+      - paragraph [ref=e45]: Read our cookie policy
+    - button "Accept and dismiss" [ref=e46] [cursor=pointer]:
+      - img "Accept and dismiss" [ref=e48]
+  - main [ref=e50]:
+    - generic [ref=e51]:
+      - generic [ref=e53]:
+        - generic:
+          - list:
+            - listitem: CI/CD
+            - listitem: Any Cloud
+            - listitem: Kubernetes
+            - listitem: Multi-tenancy
+            - listitem: IDP
+        - generic [ref=e56]:
+          - generic [ref=e60]: Run sandboxes, AI models, and databases
+          - heading "The deployment platform for serious workloads" [level=1] [ref=e61]
+          - heading "Ship AI, services, databases, and jobs, securely. From commit to production and beyond. In your VPC, or ours." [level=2] [ref=e62]
+          - generic [ref=e64]:
+            - link "Deploy now d" [ref=e66] [cursor=pointer]:
+              - /url: https://app.northflank.com/signup
+              - generic [ref=e67]:
+                - text: Deploy now
+                - generic [ref=e69]: d
+            - button "Talk to an engineer t" [ref=e71] [cursor=pointer]:
+              - generic [ref=e72]:
+                - text: Talk to an engineer
+                - generic [ref=e74]: t
+      - generic [ref=e77]:
+        - generic [ref=e79]:
+          - link "Deployments Run apps, databases, jobs." [ref=e80] [cursor=pointer]:
+            - /url: /product/deployments
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - img [ref=e85]
+                - paragraph [ref=e88]: Deployments
+              - img "Run apps, databases, jobs." [ref=e90]
+          - link "Previews Release. Pipelines." [ref=e91] [cursor=pointer]:
+            - /url: /product/preview-environments
+            - generic [ref=e92]:
+              - generic [ref=e93]:
+                - img [ref=e96]
+                - paragraph [ref=e99]: Previews
+              - img "Release. Pipelines." [ref=e101]
+          - link "Sandboxes Secure sandbox and microVMs." [ref=e102] [cursor=pointer]:
+            - /url: /product/sandboxes
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - img [ref=e107]
+                - paragraph [ref=e110]: Sandboxes
+              - img "Secure sandbox and microVMs." [ref=e112]
+          - link "Developer platform Build with rapid CI." [ref=e113] [cursor=pointer]:
+            - /url: /product/idp
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - img [ref=e118]
+                - paragraph [ref=e121]: Developer platform
+              - img "Build with rapid CI." [ref=e123]
+          - link "K8s automation A managed abstraction layer for Kubernetes that handles the infrastructure complexity while keeping you in control." [ref=e124] [cursor=pointer]:
+            - /url: /product/app-platform
+            - generic [ref=e125]:
+              - generic [ref=e126]:
+                - img [ref=e129]
+                - paragraph [ref=e132]: K8s automation
+              - img "A managed abstraction layer for Kubernetes that handles the infrastructure complexity while keeping you in control." [ref=e134]
+          - link "GPU workloads Deploy inference, APIs, notebooks, training" [ref=e135] [cursor=pointer]:
+            - /url: /product/gpu-paas
+            - generic [ref=e136]:
+              - generic [ref=e137]:
+                - img [ref=e140]
+                - paragraph [ref=e143]: GPU workloads
+              - img "Deploy inference, APIs, notebooks, training" [ref=e145]
+        - generic [ref=e147]:
+          - paragraph [ref=e148]: Northflank Platform
+          - generic [ref=e149]:
+            - generic [ref=e150]: Runs on
+            - generic [ref=e152]: Northflank Cloud
+            - generic [ref=e153]: or
+            - generic [ref=e154]:
+              - img "Microsoft Azure" [ref=e156]
+              - img "Amazon Web Services" [ref=e159]
+              - img "Google Cloud Platform" [ref=e162]
+              - generic [ref=e164]: Bring Your Own Cloud
+      - generic [ref=e165]:
+        - generic:
+          - list:
+            - listitem: GPU provisioned
+            - listitem: Environment spun up
+            - listitem: microVM 200ms
+            - listitem: Postgres HA ready
+            - listitem: Backup successful
+    - generic [ref=e169]:
+      - generic [ref=e170]:
+        - heading "How Northflank pricing works" [level=2] [ref=e171]
+        - generic [ref=e172]:
+          - generic [ref=e173]:
+            - paragraph [ref=e174]: Runtime
+            - tablist "Pricing options" [ref=e175]:
+              - tab "Northflank Compute" [selected] [ref=e176] [cursor=pointer]
+              - tab "VPC – Bring Your Own Cloud" [ref=e177] [cursor=pointer]
+          - generic [ref=e178]:
+            - paragraph [ref=e179]: Rate
+            - tablist "Pricing options" [ref=e180]:
+              - tab "Second" [ref=e181] [cursor=pointer]
+              - tab "Minute" [ref=e182] [cursor=pointer]
+              - tab "Hour" [selected] [ref=e183] [cursor=pointer]
+              - tab "Month" [ref=e184] [cursor=pointer]
+      - generic [ref=e185]:
+        - generic [ref=e186]:
+          - img [ref=e190]
+          - generic [ref=e193]:
+            - heading "CPU" [level=4] [ref=e195]
+            - generic [ref=e198]: $0.01667 / vCPU / hour
+        - generic [ref=e199]:
+          - img [ref=e203]
+          - generic [ref=e205]:
+            - heading "Memory" [level=4] [ref=e207]
+            - generic [ref=e210]: $0.00833 / GB / hour
+        - generic [ref=e211]:
+          - img [ref=e215]
+          - generic [ref=e217]:
+            - heading "NVIDIA H100" [level=4] [ref=e219]
+            - generic [ref=e222]: $2.74 / hour
+        - generic [ref=e223]:
+          - img [ref=e227]
+          - generic [ref=e229]:
+            - heading "NVIDIA B200" [level=4] [ref=e231]
+            - generic [ref=e234]: $5.87 / hour
+        - generic [ref=e235]:
+          - img [ref=e239]
+          - generic [ref=e241]:
+            - heading "Network Egress" [level=4] [ref=e243]
+            - generic [ref=e246]: $0.06 / GB
+        - generic [ref=e247]:
+          - img [ref=e251]
+          - generic [ref=e254]:
+            - heading "Disk" [level=4] [ref=e256]
+            - generic [ref=e259]: $0.15 / GB / month
+    - generic [ref=e263]:
+      - heading "Trusted by 2,000+ start-ups and enterprises already using Northflank" [level=2] [ref=e264]
+      - list [ref=e266]:
+        - listitem [ref=e267]:
+          - link "dylibso logo" [ref=e268] [cursor=pointer]:
+            - /url: https://dylibso.com
+            - img "dylibso logo" [ref=e269]
+        - listitem [ref=e270]:
+          - link "mcprun logo" [ref=e271] [cursor=pointer]:
+            - /url: https://mcp.run
+            - img "mcprun logo" [ref=e272]
+        - listitem [ref=e273]:
+          - link "weights logo" [ref=e274] [cursor=pointer]:
+            - /url: https://weights.com
+            - img "weights logo" [ref=e275]
+        - listitem [ref=e276]:
+          - link "play logo" [ref=e277] [cursor=pointer]:
+            - /url: https://play.ht
+            - img "play logo" [ref=e278]
+        - listitem [ref=e279]:
+          - link "sentry logo" [ref=e280] [cursor=pointer]:
+            - /url: https://sentry.io
+            - img "sentry logo" [ref=e281]
+        - listitem [ref=e282]:
+          - link "northfield logo" [ref=e283] [cursor=pointer]:
+            - /url: https://www.northfieldit.com
+            - img "northfield logo" [ref=e284]
+        - listitem [ref=e285]:
+          - link "wandb logo" [ref=e286] [cursor=pointer]:
+            - /url: https://wandb.ai
+            - img "wandb logo" [ref=e287]
+        - listitem [ref=e288]:
+          - link "vibekit logo" [ref=e289] [cursor=pointer]:
+            - /url: https://vibekit.sh
+            - img "vibekit logo" [ref=e290]
+        - listitem [ref=e291]:
+          - link "tidewave logo" [ref=e292] [cursor=pointer]:
+            - /url: https://tidewave.ai/
+            - img "tidewave logo" [ref=e293]
+        - listitem [ref=e294]:
+          - link "jisr logo" [ref=e295] [cursor=pointer]:
+            - /url: https://jisr.net
+            - img "jisr logo" [ref=e296]
+        - listitem [ref=e297]:
+          - link "trustflight logo" [ref=e298] [cursor=pointer]:
+            - /url: https://www.trustflight.com
+            - img "trustflight logo" [ref=e299]
+        - listitem [ref=e300]:
+          - link "govtech logo" [ref=e301] [cursor=pointer]:
+            - /url: https://www.tech.gov.sg/
+            - img "govtech logo" [ref=e302]
+        - listitem [ref=e303]:
+          - link "chaidiscovery logo" [ref=e304] [cursor=pointer]:
+            - /url: https://www.chaidiscovery.com
+            - img "chaidiscovery logo" [ref=e305]
+        - listitem [ref=e306]:
+          - link "kuroro logo" [ref=e307] [cursor=pointer]:
+            - /url: https://kuroro.com
+            - img "kuroro logo" [ref=e308]
+        - listitem [ref=e309]:
+          - link "coreweave logo" [ref=e310] [cursor=pointer]:
+            - /url: https://coreweave.com
+            - img "coreweave logo" [ref=e311]
+        - listitem [ref=e312]:
+          - link "factorio logo" [ref=e313] [cursor=pointer]:
+            - /url: https://factorio.com
+            - img "factorio logo" [ref=e314]
+        - listitem [ref=e315]:
+          - link "quiet logo" [ref=e316] [cursor=pointer]:
+            - /url: https://quiet.com
+            - img "quiet logo" [ref=e317]
+        - listitem [ref=e318]:
+          - link "writer logo" [ref=e319] [cursor=pointer]:
+            - /url: https://writer.com
+            - img "writer logo" [ref=e320]
+        - listitem [ref=e321]:
+          - link "v7labs logo" [ref=e322] [cursor=pointer]:
+            - /url: https://v7labs.com
+            - img "v7labs logo" [ref=e323]
+        - listitem [ref=e324]:
+          - link "projectdiscovery logo" [ref=e325] [cursor=pointer]:
+            - /url: https://projectdiscovery.io/
+            - img "projectdiscovery logo" [ref=e326]
+        - listitem [ref=e327]:
+          - link [ref=e328] [cursor=pointer]:
+            - /url: https://dylibso.com
+            - img [ref=e329]
+        - listitem [ref=e330]:
+          - link [ref=e331] [cursor=pointer]:
+            - /url: https://mcp.run
+            - img [ref=e332]
+        - listitem [ref=e333]:
+          - link [ref=e334] [cursor=pointer]:
+            - /url: https://weights.com
+            - img [ref=e335]
+        - listitem [ref=e336]:
+          - link [ref=e337] [cursor=pointer]:
+            - /url: https://play.ht
+            - img [ref=e338]
+        - listitem [ref=e339]:
+          - link [ref=e340] [cursor=pointer]:
+            - /url: https://sentry.io
+            - img [ref=e341]
+        - listitem [ref=e342]:
+          - link [ref=e343] [cursor=pointer]:
+            - /url: https://www.northfieldit.com
+            - img [ref=e344]
+        - listitem [ref=e345]:
+          - link [ref=e346] [cursor=pointer]:
+            - /url: https://wandb.ai
+            - img [ref=e347]
+        - listitem [ref=e348]:
+          - link [ref=e349] [cursor=pointer]:
+            - /url: https://vibekit.sh
+            - img [ref=e350]
+        - listitem [ref=e351]:
+          - link [ref=e352] [cursor=pointer]:
+            - /url: https://tidewave.ai/
+            - img [ref=e353]
+        - listitem [ref=e354]:
+          - link [ref=e355] [cursor=pointer]:
+            - /url: https://jisr.net
+            - img [ref=e356]
+        - listitem [ref=e357]:
+          - link [ref=e358] [cursor=pointer]:
+            - /url: https://www.trustflight.com
+            - img [ref=e359]
+        - listitem [ref=e360]:
+          - link [ref=e361] [cursor=pointer]:
+            - /url: https://www.tech.gov.sg/
+            - img [ref=e362]
+        - listitem [ref=e363]:
+          - link [ref=e364] [cursor=pointer]:
+            - /url: https://www.chaidiscovery.com
+            - img [ref=e365]
+        - listitem [ref=e366]:
+          - link [ref=e367] [cursor=pointer]:
+            - /url: https://kuroro.com
+            - img [ref=e368]
+        - listitem [ref=e369]:
+          - link [ref=e370] [cursor=pointer]:
+            - /url: https://coreweave.com
+            - img [ref=e371]
+        - listitem [ref=e372]:
+          - link [ref=e373] [cursor=pointer]:
+            - /url: https://factorio.com
+            - img [ref=e374]
+        - listitem [ref=e375]:
+          - link [ref=e376] [cursor=pointer]:
+            - /url: https://quiet.com
+            - img [ref=e377]
+        - listitem [ref=e378]:
+          - link [ref=e379] [cursor=pointer]:
+            - /url: https://writer.com
+            - img [ref=e380]
+        - listitem [ref=e381]:
+          - link [ref=e382] [cursor=pointer]:
+            - /url: https://v7labs.com
+            - img [ref=e383]
+        - listitem [ref=e384]:
+          - link [ref=e385] [cursor=pointer]:
+            - /url: https://projectdiscovery.io/
+            - img [ref=e386]
+    - generic [ref=e389]:
+      - generic [ref=e391]:
+        - paragraph [ref=e392]:
+          - generic [ref=e393]: With you at every step
+        - heading "The operating system for your engineering team" [level=2] [ref=e394]
+      - generic [ref=e395]:
+        - generic [ref=e396]:
+          - button "Run":
+            - generic:
+              - generic:
+                - img
+            - generic: Run
+          - button "Release" [ref=e397] [cursor=pointer]:
+            - img [ref=e400]
+            - generic [ref=e403]: Release
+          - button "Scale" [ref=e404] [cursor=pointer]:
+            - img [ref=e407]
+            - generic [ref=e410]: Scale
+          - button "Observe" [ref=e411] [cursor=pointer]:
+            - img [ref=e414]
+            - generic [ref=e416]: Observe
+          - button "Secure" [ref=e417] [cursor=pointer]:
+            - img [ref=e420]
+            - generic [ref=e422]: Secure
+        - generic [ref=e423]:
+          - generic [ref=e425]:
+            - generic [ref=e426]:
+              - img [ref=e429]
+              - heading "Run containers on command" [level=3] [ref=e432]
+            - list [ref=e433]:
+              - listitem [ref=e434]:
+                - img [ref=e437]
+                - paragraph [ref=e440]: Run your most critical services, databases, jobs, inference, and agents
+              - listitem [ref=e441]:
+                - img [ref=e444]
+                - paragraph [ref=e447]: Spin up ephemeral and preview environments from pull requests
+              - listitem [ref=e448]:
+                - img [ref=e451]
+                - paragraph [ref=e454]: All your production infrastructure
+              - listitem [ref=e455]:
+                - img [ref=e458]
+                - paragraph [ref=e461]: Connect Git to trigger builds and deploy
+              - listitem [ref=e462]:
+                - img [ref=e465]
+                - paragraph [ref=e468]: Host workloads on our cloud or yours
+          - generic [ref=e473]:
+            - img "Run containers on command" [ref=e475]
+            - img "Release on a Friday" [ref=e477]
+            - img "Scale with precision" [ref=e479]
+            - img "Observe like a hawk" [ref=e481]
+            - img "Secure by design" [ref=e483]
+    - generic [ref=e485]:
+      - generic [ref=e488]:
+        - img [ref=e492]
+        - heading "We’ve got you covered on all flanks" [level=2] [ref=e496]
+      - generic [ref=e497]:
+        - img [ref=e506]
+        - generic [ref=e513]:
+          - generic [ref=e514]:
+            - heading "If you’re building with AI…" [level=3] [ref=e515]
+            - list [ref=e516]:
+              - listitem [ref=e517]:
+                - img [ref=e518]
+                - generic [ref=e520]: Deploy and scale OSS models like Llama4, Deepseek
+              - listitem [ref=e521]:
+                - img [ref=e522]
+                - generic [ref=e524]: Secure code execution for code-gen
+              - listitem [ref=e525]:
+                - img [ref=e526]
+                - generic [ref=e528]: Long-running agents (MCP, RAG, TTS, image, video, voice)
+              - listitem [ref=e529]:
+                - img [ref=e530]
+                - generic [ref=e532]: VectorDBs like pgvector
+              - listitem [ref=e533]:
+                - img [ref=e534]
+                - generic [ref=e536]: Spot instances
+              - listitem [ref=e537]:
+                - img [ref=e538]
+                - generic [ref=e540]: Import your GPU K8s clusters
+              - listitem [ref=e541]:
+                - img [ref=e542]
+                - generic [ref=e544]: Jupyter notebooks
+              - listitem [ref=e545]:
+                - img [ref=e546]
+                - generic [ref=e548]: Custom autoscaling
+              - listitem [ref=e549]:
+                - img [ref=e550]
+                - generic [ref=e552]: Multi-cloud support
+              - listitem [ref=e553]:
+                - img [ref=e554]
+                - generic [ref=e556]: Fast multi-read-write storage
+          - generic [ref=e557]:
+            - heading "...you still need these." [level=3] [ref=e558]
+            - list [ref=e559]:
+              - listitem [ref=e560]:
+                - img [ref=e561]
+                - generic [ref=e563]: Secrets and config management
+              - listitem [ref=e564]:
+                - img [ref=e565]
+                - generic [ref=e567]: Deploy applications, APIs, databases, and scheduled jobs
+              - listitem [ref=e568]:
+                - img [ref=e569]
+                - generic [ref=e571]: Build and release pipelines
+              - listitem [ref=e572]:
+                - img [ref=e573]
+                - generic [ref=e575]: Preview, staging, and production environments
+              - listitem [ref=e576]:
+                - img [ref=e577]
+                - generic [ref=e579]: Continuous Integration and Continuous Deployment (CI/CD)
+              - listitem [ref=e580]:
+                - img [ref=e581]
+                - generic [ref=e583]: Templates
+              - listitem [ref=e584]:
+                - img [ref=e585]
+                - generic [ref=e587]: Secure multi-tenancy
+              - listitem [ref=e588]:
+                - img [ref=e589]
+                - generic [ref=e591]: Run in your VPC
+    - generic [ref=e593]:
+      - generic [ref=e596]:
+        - img [ref=e600]
+        - heading "Works with any stack" [level=2] [ref=e604]
+      - generic [ref=e605]:
+        - generic [ref=e606]:
+          - button "Previous" [disabled] [ref=e607] [cursor=pointer]:
+            - img "Previous" [ref=e609]
+          - button "Next" [ref=e611] [cursor=pointer]:
+            - img "Next" [ref=e613]
+        - generic [ref=e617]:
+          - generic [ref=e619]:
+            - generic [ref=e620]:
+              - heading "Spring Boot + MongoDB" [level=3] [ref=e621]:
+                - img [ref=e623]
+                - generic [ref=e625]: Spring Boot
+                - generic [ref=e626]: +
+                - img [ref=e628]
+                - generic [ref=e630]: MongoDB
+              - paragraph [ref=e631]: Create modern web services and content management systems with flexible schemas.
+            - generic [ref=e632]:
+              - heading "React + PostgreSQL" [level=3] [ref=e633]:
+                - img [ref=e635]
+                - generic [ref=e637]: React
+                - generic [ref=e638]: +
+                - img [ref=e640]
+                - generic [ref=e642]: PostgreSQL
+              - paragraph [ref=e643]: Build complex web applications and data visualization dashboards with interactive interfaces.
+            - generic [ref=e644]:
+              - heading "Python + PyTorch" [level=3] [ref=e645]:
+                - img [ref=e647]
+                - generic [ref=e649]: Python
+                - generic [ref=e650]: +
+                - img [ref=e652]
+                - generic [ref=e654]: PyTorch
+              - paragraph [ref=e655]: Build deep learning applications and AI research platforms with flexible neural network framework.
+            - generic [ref=e656]:
+              - heading "Django + PostgreSQL" [level=3] [ref=e657]:
+                - img [ref=e659]
+                - generic [ref=e661]: Django
+                - generic [ref=e662]: +
+                - img [ref=e664]
+                - generic [ref=e666]: PostgreSQL
+              - paragraph [ref=e667]: Build enterprise web applications and admin panels with robust data management.
+            - generic [ref=e668]:
+              - heading "MinIO + MongoDB" [level=3] [ref=e669]:
+                - generic [ref=e670]: MinIO
+                - generic [ref=e671]: +
+                - img [ref=e673]
+                - generic [ref=e675]: MongoDB
+              - paragraph [ref=e676]: Create content management systems and digital asset platforms with flexible file handling.
+            - generic [ref=e677]:
+              - heading "Docker + Ollama" [level=3] [ref=e678]:
+                - img [ref=e680]
+                - generic [ref=e682]: Docker
+                - generic [ref=e683]: +
+                - generic [ref=e684]: Ollama
+              - paragraph [ref=e685]: Deploy containerized AI applications with local model serving for scalable inference.
+            - generic [ref=e686]:
+              - heading "C# + MySQL" [level=3] [ref=e687]:
+                - img [ref=e689]
+                - generic [ref=e691]: C#
+                - generic [ref=e692]: +
+                - img [ref=e694]
+                - generic [ref=e696]: MySQL
+              - paragraph [ref=e697]: Develop traditional business applications and customer relationship management systems.
+            - generic [ref=e698]:
+              - heading "Python + Ollama" [level=3] [ref=e699]:
+                - img [ref=e701]
+                - generic [ref=e703]: Python
+                - generic [ref=e704]: +
+                - generic [ref=e705]: Ollama
+              - paragraph [ref=e706]: Create local AI applications and privacy-focused chatbots with on-premise model deployment.
+          - generic [ref=e708]:
+            - generic [ref=e709]:
+              - heading "React + Redis" [level=3] [ref=e710]:
+                - img [ref=e712]
+                - generic [ref=e714]: React
+                - generic [ref=e715]: +
+                - img [ref=e717]
+                - generic [ref=e719]: Redis
+              - paragraph [ref=e720]: Develop real-time applications like trading platforms and collaborative tools.
+            - generic [ref=e721]:
+              - heading "React + OpenWebUI" [level=3] [ref=e722]:
+                - img [ref=e724]
+                - generic [ref=e726]: React
+                - generic [ref=e727]: +
+                - generic [ref=e728]: OpenWebUI
+              - paragraph [ref=e729]: Develop interactive AI chat applications and conversational user interfaces.
+            - generic [ref=e730]:
+              - heading "Node.js + Redis" [level=3] [ref=e731]:
+                - img [ref=e733]
+                - generic [ref=e735]: Node.js
+                - generic [ref=e736]: +
+                - img [ref=e738]
+                - generic [ref=e740]: Redis
+              - paragraph [ref=e741]: Develop high-performance real-time applications with session management and caching.
+            - generic [ref=e742]:
+              - heading "Spring Boot + PostgreSQL" [level=3] [ref=e743]:
+                - img [ref=e745]
+                - generic [ref=e747]: Spring Boot
+                - generic [ref=e748]: +
+                - img [ref=e750]
+                - generic [ref=e752]: PostgreSQL
+              - paragraph [ref=e753]: Build enterprise REST APIs and business applications with comprehensive data management.
+            - generic [ref=e754]:
+              - heading "Python + LiteLLM" [level=3] [ref=e755]:
+                - img [ref=e757]
+                - generic [ref=e759]: Python
+                - generic [ref=e760]: +
+                - generic [ref=e761]: LiteLLM
+              - paragraph [ref=e762]: Build AI applications that seamlessly integrate with multiple LLM providers and APIs.
+            - generic [ref=e763]:
+              - heading "Python + MongoDB" [level=3] [ref=e764]:
+                - img [ref=e766]
+                - generic [ref=e768]: Python
+                - generic [ref=e769]: +
+                - img [ref=e771]
+                - generic [ref=e773]: MongoDB
+              - paragraph [ref=e774]: Create content management systems and social platforms with flexible data models.
+            - generic [ref=e775]:
+              - heading "Laravel + PostgreSQL" [level=3] [ref=e776]:
+                - img [ref=e778]
+                - generic [ref=e780]: Laravel
+                - generic [ref=e781]: +
+                - img [ref=e783]
+                - generic [ref=e785]: PostgreSQL
+              - paragraph [ref=e786]: Create modern web applications and APIs with advanced database features and relationships.
+            - generic [ref=e787]:
+              - heading "Node.js + MySQL" [level=3] [ref=e788]:
+                - img [ref=e790]
+                - generic [ref=e792]: Node.js
+                - generic [ref=e793]: +
+                - img [ref=e795]
+                - generic [ref=e797]: MySQL
+              - paragraph [ref=e798]: Build traditional web applications and e-commerce platforms with proven database reliability.
+          - generic [ref=e800]:
+            - generic [ref=e801]:
+              - heading "Go + Redis" [level=3] [ref=e802]:
+                - img [ref=e804]
+                - generic [ref=e806]: Go
+                - generic [ref=e807]: +
+                - img [ref=e809]
+                - generic [ref=e811]: Redis
+              - paragraph [ref=e812]: Develop high-throughput microservices and real-time messaging systems.
+            - generic [ref=e813]:
+              - heading "Next.js + OpenWebUI" [level=3] [ref=e814]:
+                - img [ref=e816]
+                - generic [ref=e818]: Next.js
+                - generic [ref=e819]: +
+                - generic [ref=e820]: OpenWebUI
+              - paragraph [ref=e821]: Create AI-powered web applications and chatbot interfaces with server-side rendering.
+            - generic [ref=e822]:
+              - heading "Ruby on Rails + PostgreSQL" [level=3] [ref=e823]:
+                - img [ref=e825]
+                - generic [ref=e827]: Ruby on Rails
+                - generic [ref=e828]: +
+                - img [ref=e830]
+                - generic [ref=e832]: PostgreSQL
+              - paragraph [ref=e833]: Build full-featured web applications and SaaS platforms with convention-over-configuration.
+            - generic [ref=e834]:
+              - heading "Laravel + MySQL" [level=3] [ref=e835]:
+                - img [ref=e837]
+                - generic [ref=e839]: Laravel
+                - generic [ref=e840]: +
+                - img [ref=e842]
+                - generic [ref=e844]: MySQL
+              - paragraph [ref=e845]: Build elegant web applications and e-commerce platforms with rapid development capabilities.
+            - generic [ref=e846]:
+              - heading "FastAPI + Redis" [level=3] [ref=e847]:
+                - img [ref=e849]
+                - generic [ref=e851]: FastAPI
+                - generic [ref=e852]: +
+                - img [ref=e854]
+                - generic [ref=e856]: Redis
+              - paragraph [ref=e857]: Develop ultra-fast APIs for real-time applications and high-throughput services.
+            - generic [ref=e858]:
+              - heading "Python + Jupyter" [level=3] [ref=e859]:
+                - img [ref=e861]
+                - generic [ref=e863]: Python
+                - generic [ref=e864]: +
+                - img [ref=e866]
+                - generic [ref=e868]: Jupyter
+              - paragraph [ref=e869]: Build data science workflows and AI research platforms with interactive notebook environments.
+            - generic [ref=e870]:
+              - heading "Java + PostgreSQL" [level=3] [ref=e871]:
+                - img [ref=e873]
+                - generic [ref=e875]: Java
+                - generic [ref=e876]: +
+                - img [ref=e878]
+                - generic [ref=e880]: PostgreSQL
+              - paragraph [ref=e881]: Create enterprise applications and financial systems with robust transaction support.
+            - generic [ref=e882]:
+              - heading "C# + MongoDB" [level=3] [ref=e883]:
+                - img [ref=e885]
+                - generic [ref=e887]: C#
+                - generic [ref=e888]: +
+                - img [ref=e890]
+                - generic [ref=e892]: MongoDB
+              - paragraph [ref=e893]: Build modern web applications and content management systems with flexible data handling.
+          - generic [ref=e895]:
+            - generic [ref=e896]:
+              - heading "FastAPI + LiteLLM" [level=3] [ref=e897]:
+                - img [ref=e899]
+                - generic [ref=e901]: FastAPI
+                - generic [ref=e902]: +
+                - generic [ref=e903]: LiteLLM
+              - paragraph [ref=e904]: Develop unified AI APIs that work with multiple LLM providers and model formats.
+            - generic [ref=e905]:
+              - heading "Python + PostgreSQL" [level=3] [ref=e906]:
+                - img [ref=e908]
+                - generic [ref=e910]: Python
+                - generic [ref=e911]: +
+                - img [ref=e913]
+                - generic [ref=e915]: PostgreSQL
+              - paragraph [ref=e916]: Build data analytics platforms and scientific applications with robust data storage.
+            - generic [ref=e917]:
+              - heading "Java + MongoDB" [level=3] [ref=e918]:
+                - img [ref=e920]
+                - generic [ref=e922]: Java
+                - generic [ref=e923]: +
+                - img [ref=e925]
+                - generic [ref=e927]: MongoDB
+              - paragraph [ref=e928]: Build scalable web applications and content platforms with flexible data models.
+            - generic [ref=e929]:
+              - heading "SvelteKit + Redis" [level=3] [ref=e930]:
+                - img [ref=e932]
+                - generic [ref=e934]: SvelteKit
+                - generic [ref=e935]: +
+                - img [ref=e937]
+                - generic [ref=e939]: Redis
+              - paragraph [ref=e940]: Develop high-performance real-time applications with minimal overhead.
+            - generic [ref=e941]:
+              - heading "PHP + PostgreSQL" [level=3] [ref=e942]:
+                - img [ref=e944]
+                - generic [ref=e946]: PHP
+                - generic [ref=e947]: +
+                - img [ref=e949]
+                - generic [ref=e951]: PostgreSQL
+              - paragraph [ref=e952]: Create modern web applications and content management systems with advanced database features.
+            - generic [ref=e953]:
+              - heading "FastAPI + MongoDB" [level=3] [ref=e954]:
+                - img [ref=e956]
+                - generic [ref=e958]: FastAPI
+                - generic [ref=e959]: +
+                - img [ref=e961]
+                - generic [ref=e963]: MongoDB
+              - paragraph [ref=e964]: Build flexible APIs for mobile applications and IoT data collection systems.
+            - generic [ref=e965]:
+              - heading "Spring Boot + Redis" [level=3] [ref=e966]:
+                - img [ref=e968]
+                - generic [ref=e970]: Spring Boot
+                - generic [ref=e971]: +
+                - img [ref=e973]
+                - generic [ref=e975]: Redis
+              - paragraph [ref=e976]: Build high-performance web services with distributed caching and real-time features.
+            - generic [ref=e977]:
+              - heading "PHP + Redis" [level=3] [ref=e978]:
+                - img [ref=e980]
+                - generic [ref=e982]: PHP
+                - generic [ref=e983]: +
+                - img [ref=e985]
+                - generic [ref=e987]: Redis
+              - paragraph [ref=e988]: Develop high-performance websites with optimized caching and session management.
+    - generic [ref=e990]:
+      - heading "Features" [level=2] [ref=e992]
+      - generic [ref=e993]:
+        - generic [ref=e995]:
+          - generic [ref=e996]:
+            - group [ref=e997]:
+              - generic "Developer experience Collapse details" [ref=e998]:
+                - generic [ref=e1001]:
+                  - heading "Developer experience" [level=3] [ref=e1002]
+                  - img "Collapse details" [ref=e1004]
+              - list [ref=e1008]:
+                - listitem [ref=e1009]: Choice of UI, CLI, APIs & GitOps
+                - listitem [ref=e1010]: Runs on AWS, GCP, Azure, Oracle
+                - listitem [ref=e1011]: Build re-useable templates
+            - group [ref=e1012]:
+              - generic "Polyglot platform Expand details" [ref=e1013]:
+                - generic [ref=e1015] [cursor=pointer]:
+                  - heading "Polyglot platform" [level=3] [ref=e1016]
+                  - img "Expand details" [ref=e1018]
+            - group [ref=e1020]:
+              - generic "Run your AI Expand details" [ref=e1021]:
+                - generic [ref=e1023] [cursor=pointer]:
+                  - heading "Run your AI" [level=3] [ref=e1024]
+                  - img "Expand details" [ref=e1026]
+            - group [ref=e1028]:
+              - generic "We fixed Kubernetes Expand details" [ref=e1029]:
+                - generic [ref=e1031] [cursor=pointer]:
+                  - heading "We fixed Kubernetes" [level=3] [ref=e1032]
+                  - img "Expand details" [ref=e1034]
+          - button "Book a demo b" [ref=e1038] [cursor=pointer]:
+            - generic [ref=e1039]:
+              - text: Book a demo
+              - generic [ref=e1041]: b
+        - generic [ref=e1047]:
+          - generic [ref=e1048]:
+            - img "Developer experience"
+          - generic [ref=e1049]:
+            - img "Polyglot platform"
+          - generic [ref=e1050]:
+            - img "Run your AI"
+          - generic [ref=e1051]:
+            - img "We fixed Kubernetes"
+    - generic [ref=e1052]:
+      - generic [ref=e1055]:
+        - generic [ref=e1056]:
+          - paragraph [ref=e1057]:
+            - generic [ref=e1058]: End-to-end
+          - heading "A golden path to production" [level=2] [ref=e1059]
+        - generic [ref=e1060]:
+          - paragraph [ref=e1061]: Accelerate every step from push to production with highly configurable self-service workflows, pipelines, templates, and GitOps.
+          - paragraph [ref=e1062]: Securely deploy preview, staging, and production environments with observability tooling, backups, restores, and rollbacks included.
+        - link "Learn more about Northflank features" [ref=e1063] [cursor=pointer]:
+          - /url: https://northflank.com/features
+          - text: Learn more
+          - generic [ref=e1064]: about Northflank features
+      - img [ref=e1069]:
+        - generic [ref=e1070]:
+          - generic [ref=e1071]:
+            - generic [ref=e1072]:
+              - generic [ref=e1076]: Push to Git
+              - generic [ref=e1077]: feature/hello-world 11f9a72
+            - generic [ref=e1079]:
+              - generic [ref=e1084]: Build started
+              - generic [ref=e1090]: Build started
+              - generic [ref=e1096]: Build started
+            - generic [ref=e1098]:
+              - generic [ref=e1104]: feature/*
+              - generic [ref=e1110]: "PR #212"
+          - generic [ref=e1116]:
+            - generic [ref=e1117]:
+              - generic [ref=e1122]: Preview 212
+              - generic [ref=e1128]: Preview 212
+              - generic [ref=e1130]:
+                - generic [ref=e1132]:
+                  - generic [ref=e1135]: Preview 212
+                  - generic [ref=e1136]: feature/hello-world
+                - generic [ref=e1137]:
+                  - generic [ref=e1143]: 3/3
+                  - generic [ref=e1148]: 1/2
+                - generic [ref=e1151]:
+                  - generic [ref=e1156]: 1/1
+                  - generic [ref=e1161]: 1/1
+                - generic [ref=e1166]: https://preview212.code.run
+            - generic [ref=e1168]:
+              - generic [ref=e1173]: Preview 212
+              - generic [ref=e1175]:
+                - generic [ref=e1177]:
+                  - generic [ref=e1180]: Staging
+                  - generic [ref=e1181]: feature/hello-world
+                - generic [ref=e1182]:
+                  - generic [ref=e1188]: 3/3
+                  - generic [ref=e1193]: 1/2
+                - generic [ref=e1196]:
+                  - generic [ref=e1201]: 1/1
+                  - generic [ref=e1206]: 1/1
+                - generic [ref=e1211]: https://staging.acme.com
+            - generic [ref=e1213]:
+              - generic [ref=e1221]: Promote deployment
+              - generic [ref=e1229]: Deploy environment
+          - generic [ref=e1234]:
+            - generic [ref=e1235]:
+              - generic [ref=e1240]: Preview 212
+              - generic [ref=e1242]:
+                - generic [ref=e1244]:
+                  - generic [ref=e1247]: Production
+                  - generic [ref=e1248]: main
+                - generic [ref=e1249]:
+                  - generic [ref=e1255]: 10/10
+                  - generic [ref=e1260]: 2/3
+                - generic [ref=e1263]:
+                  - generic [ref=e1268]: 1/1
+                  - generic [ref=e1273]: 1/1
+                - generic [ref=e1278]: https://acme.com
+            - generic [ref=e1280]:
+              - generic [ref=e1282]:
+                - generic [ref=e1289]: Autoscaling
+                - generic [ref=e1295]: Backups
+              - generic [ref=e1297]:
+                - generic [ref=e1304]: Rollbacks
+                - generic [ref=e1310]: Health checks
+            - generic [ref=e1313]:
+              - generic [ref=e1319]: Run database backup
+              - generic [ref=e1327]: Run migration
+    - generic [ref=e1335]:
+      - heading "Testimonials from Weights and Polyguard" [level=2] [ref=e1336]
+      - figure [ref=e1338]:
+        - generic [ref=e1340]:
+          - img [ref=e1343]
+          - paragraph [ref=e1346]: From the front lines
+        - blockquote [ref=e1348]:
+          - paragraph [ref=e1349]: Northflank helped us scale to over 3M users with an engineering team of two. It allows us to run 10,000 AI training jobs and half a million inference runs per day, without us having to worry about autoscaling or spot instance orchestration. We don’t waste time or money on infrastructure, so we can focus on building product.
+        - generic [ref=e1352]:
+          - generic [ref=e1354]:
+            - img "JonLuca DeCaro – profile image"
+          - generic [ref=e1355]:
+            - generic [ref=e1356]:
+              - text: JonLuca DeCaro
+              - link "JonLuca DeCaro's LinkedIn profile" [ref=e1357] [cursor=pointer]:
+                - /url: https://www.linkedin.com/in/jonluca/
+                - img "JonLuca DeCaro's LinkedIn profile" [ref=e1359]
+            - generic [ref=e1362]: Founder @ Weights
+      - generic [ref=e1364]:
+        - button "Read a testimonial from Weights" [ref=e1365] [cursor=pointer]:
+          - generic [ref=e1368]: Read a testimonial from Weights
+        - button "Read a testimonial from Polyguard" [ref=e1369] [cursor=pointer]:
+          - generic [ref=e1372]: Read a testimonial from Polyguard
+    - generic [ref=e1373]:
+      - generic [ref=e1376]:
+        - generic [ref=e1377]:
+          - paragraph [ref=e1378]:
+            - generic [ref=e1379]: We run it better
+          - heading "Flexibility without compromise" [level=2] [ref=e1380]
+        - generic [ref=e1381]:
+          - paragraph [ref=e1382]: Northflank seamlessly integrates with your preferred tooling, and can accommodate any tech stack.
+          - paragraph [ref=e1383]: You get the same exceptional developer experience, and total control over your data residency, deployment regions, security, and cloud expenses.
+        - link "Learn more about the Northflank platform" [ref=e1384] [cursor=pointer]:
+          - /url: https://northflank.com/features/platform
+          - text: Learn more
+          - generic [ref=e1385]: about the Northflank platform
+      - img [ref=e1390]:
+        - generic [ref=e1391]:
+          - generic [ref=e1425]:
+            - generic [ref=e1444]: Version Control
+            - generic [ref=e1462]: CDN
+            - generic [ref=e1475]: CI
+            - generic [ref=e1494]: Container Registries
+          - generic [ref=e1495]:
+            - generic [ref=e1534]: Languages and Frameworks
+            - generic [ref=e1570]: Databases and Queues
+            - generic [ref=e1589]: Observability
+    - generic [ref=e1630]:
+      - heading "Testimonials from Sentry and Writer" [level=2] [ref=e1631]
+      - figure [ref=e1633]:
+        - generic [ref=e1635]:
+          - img [ref=e1638]
+          - paragraph [ref=e1641]: Endorsed by infra veterans
+        - blockquote [ref=e1643]:
+          - paragraph [ref=e1644]: Northflank is way easier than gluing a bunch of tools together to spin up apps and databases. It’s the ideal platform to deploy containers in our cloud account, avoiding the brain damage of big cloud and Kubernetes. It’s more powerful and flexible than traditional PaaS – all within our VPC. Northflank has become a go-to way to deploy workloads at Sentry.
+        - generic [ref=e1647]:
+          - generic [ref=e1649]:
+            - img "David Cramer – profile image"
+          - generic [ref=e1650]:
+            - generic [ref=e1651]:
+              - text: David Cramer
+              - link "David Cramer's LinkedIn profile" [ref=e1652] [cursor=pointer]:
+                - /url: https://www.linkedin.com/in/dmcramer/
+                - img "David Cramer's LinkedIn profile" [ref=e1654]
+            - generic [ref=e1657]: Co-Founder and CPO @ Sentry
+      - generic [ref=e1659]:
+        - button "Read a testimonial from Sentry" [ref=e1660] [cursor=pointer]:
+          - generic [ref=e1663]: Read a testimonial from Sentry
+        - button "Read a testimonial from Writer" [ref=e1664] [cursor=pointer]:
+          - generic [ref=e1667]: Read a testimonial from Writer
+    - generic [ref=e1668]:
+      - generic [ref=e1671]:
+        - generic [ref=e1672]:
+          - paragraph [ref=e1673]:
+            - generic [ref=e1674]: K8s should work for you
+          - heading "Kubernetes, unleashed" [level=2] [ref=e1675]
+        - generic [ref=e1676]:
+          - paragraph [ref=e1677]: Northflank leverages Kubernetes as an operating system to give you the best of cloud native, without the overhead.
+          - paragraph [ref=e1678]: Deploy to Northflank’s cloud for maximum simplicity, or connect your GKE, EKS, AKS, or bare-metal to deliver a managed platform experience in minutes.
+        - link "Learn more about Northflank in Your Cloud" [ref=e1679] [cursor=pointer]:
+          - /url: https://northflank.com/features/bring-your-own-cloud
+          - text: Learn more
+          - generic [ref=e1680]: about Northflank in Your Cloud
+      - generic [ref=e1682]:
+        - img "Northflank Kubernetes"
+    - generic [ref=e1685]:
+      - generic [ref=e1688]:
+        - paragraph [ref=e1689]:
+          - generic [ref=e1690]: Built for scale
+        - heading "You’re in good company" [level=2] [ref=e1691]
+        - paragraph [ref=e1693]: Since 2019, teams have used Northflank to run everything from enterprise products to high-scale AI infrastructure. Whether it’s one container or one thousand, Northflank holds the line.
+      - generic [ref=e1694]:
+        - generic [ref=e1696]:
+          - paragraph [ref=e1697]: Millions
+          - paragraph [ref=e1698]: of containers
+        - generic [ref=e1701]:
+          - paragraph [ref=e1702]: 130B+
+          - paragraph [ref=e1703]: Requests processed
+        - generic [ref=e1706]:
+          - paragraph [ref=e1707]: $24M+
+          - paragraph [ref=e1708]: Raised in funding
+        - generic [ref=e1711]:
+          - paragraph [ref=e1712]: 70k+
+          - paragraph [ref=e1713]: Developers in production
+        - generic [ref=e1716]:
+          - paragraph [ref=e1717]: 330+
+          - paragraph [ref=e1718]: Availability zones
+    - generic [ref=e1722]:
+      - generic [ref=e1724]:
+        - paragraph [ref=e1725]:
+          - generic [ref=e1726]: Run anything. Anywhere.
+        - heading "Deploy in your preferred cloud" [level=2] [ref=e1727]
+        - figure "Bartlomiej Baran – profile image Bartlomiej Baran Co-Founder and CTO @ Blynksolve" [ref=e1728]:
+          - blockquote [ref=e1729]:
+            - paragraph [ref=e1730]: In the strict industry of pharmaceutical manufacturing, precision, accuracy, and compliance are non-negotiable. Northflank has empowered our team to maintain complete accountability for every aspect of our software development and deployment, providing us with clear change management, release control and traceability features. The additional flexibility of the platform to make use of Compliant Cloud via BYOC and optional on-prem deployment means that we can meet our customers wherever they may need us.
+          - generic [ref=e1732]:
+            - generic [ref=e1734]:
+              - img "Bartlomiej Baran – profile image"
+            - generic [ref=e1735]:
+              - generic [ref=e1736]: Bartlomiej Baran
+              - generic [ref=e1737]: Co-Founder and CTO @ Blynksolve
+      - generic [ref=e1738]:
+        - link "Northflank Deploy into global regions with Northflank Managed Cloud" [ref=e1739] [cursor=pointer]:
+          - /url: /cloud/northflank
+          - generic [ref=e1741]:
+            - heading "Northflank" [level=3] [ref=e1744]
+            - paragraph [ref=e1745]: Deploy into global regions with Northflank Managed Cloud
+        - link "Google Cloud Platform Deploy into GCP on Northflank with Google Kubernetes Engine (GKE)" [ref=e1746] [cursor=pointer]:
+          - /url: /cloud/gcp
+          - generic [ref=e1748]:
+            - generic [ref=e1749]:
+              - img [ref=e1751]
+              - heading "Google Cloud Platform" [level=3] [ref=e1753]
+            - paragraph [ref=e1754]: Deploy into GCP on Northflank with Google Kubernetes Engine (GKE)
+        - link "Amazon Web Services Deploy into AWS on Northflank with Elastic Kubernetes Service (EKS)" [ref=e1755] [cursor=pointer]:
+          - /url: /cloud/aws
+          - generic [ref=e1757]:
+            - generic [ref=e1758]:
+              - img [ref=e1760]
+              - heading "Amazon Web Services" [level=3] [ref=e1762]
+            - paragraph [ref=e1763]: Deploy into AWS on Northflank with Elastic Kubernetes Service (EKS)
+        - link "Microsoft Azure Deploy into Microsoft Azure on Northflank with Azure Kubernetes Service (AKS)" [ref=e1764] [cursor=pointer]:
+          - /url: /cloud/azure
+          - generic [ref=e1766]:
+            - generic [ref=e1767]:
+              - img [ref=e1769]
+              - heading "Microsoft Azure" [level=3] [ref=e1771]
+            - paragraph [ref=e1772]: Deploy into Microsoft Azure on Northflank with Azure Kubernetes Service (AKS)
+        - link "Civo Deploy into Civo on Northflank with Civo Kubernetes" [ref=e1773] [cursor=pointer]:
+          - /url: /cloud/civo
+          - generic [ref=e1775]:
+            - generic [ref=e1776]:
+              - img [ref=e1778]
+              - heading "Civo" [level=3] [ref=e1780]
+            - paragraph [ref=e1781]: Deploy into Civo on Northflank with Civo Kubernetes
+        - link "Oracle Deploy into Oracle on Northflank with Oracle Kubernetes Engine (OKE)" [ref=e1782] [cursor=pointer]:
+          - /url: /cloud/oci
+          - generic [ref=e1784]:
+            - generic [ref=e1785]:
+              - img [ref=e1787]
+              - heading "Oracle" [level=3] [ref=e1789]
+            - paragraph [ref=e1790]: Deploy into Oracle on Northflank with Oracle Kubernetes Engine (OKE)
+        - link "CoreWeave CoreWeave Deploy into CoreWeave on Northflank with CoreWeave Kubernetes Service (CKS)" [ref=e1791] [cursor=pointer]:
+          - /url: /cloud/coreweave
+          - generic [ref=e1793]:
+            - generic [ref=e1794]:
+              - img "CoreWeave" [ref=e1796]
+              - heading "CoreWeave" [level=3] [ref=e1801]
+            - paragraph [ref=e1802]: Deploy into CoreWeave on Northflank with CoreWeave Kubernetes Service (CKS)
+        - link "GPUs Deploy into GPUs on Northflank" [ref=e1803] [cursor=pointer]:
+          - /url: /cloud/gpus
+          - generic [ref=e1805]:
+            - generic [ref=e1806]:
+              - img [ref=e1808]
+              - heading "GPUs" [level=3] [ref=e1811]
+            - paragraph [ref=e1812]: Deploy into GPUs on Northflank
+        - button "Don’t see your cloud? Import any Kubernetes cluster…" [ref=e1813] [cursor=pointer]:
+          - generic [ref=e1815]:
+            - generic [ref=e1816]:
+              - img [ref=e1818]
+              - heading "Don’t see your cloud?" [level=3] [ref=e1820]
+            - paragraph [ref=e1821]: Import any Kubernetes cluster…
+    - generic [ref=e1824]:
+      - generic [ref=e1825]:
+        - heading "Making Kubernetes boring" [level=2] [ref=e1827]:
+          - text: Making Kubernetes
+          - text: boring
+        - generic [ref=e1828]:
+          - link "Get started for free" [ref=e1829] [cursor=pointer]:
+            - /url: https://app.northflank.com/signup
+            - generic [ref=e1830]: Get started for free
+          - button "Book a demo" [ref=e1831] [cursor=pointer]:
+            - generic [ref=e1832]: Book a demo
+      - generic [ref=e1834]:
+        - paragraph [ref=e1835]:
+          - generic [ref=e1836]: If name-dropping helps, here you go.
+        - generic [ref=e1837]:
+          - link "sentry logo" [ref=e1838] [cursor=pointer]:
+            - /url: https://sentry.io
+            - img "sentry logo" [ref=e1839]
+          - link "writer logo" [ref=e1840] [cursor=pointer]:
+            - /url: https://writer.com
+            - img "writer logo" [ref=e1841]
+          - link "northfield logo" [ref=e1842] [cursor=pointer]:
+            - /url: https://www.northfieldit.com
+            - img "northfield logo" [ref=e1843]
+          - link "quiet logo" [ref=e1844] [cursor=pointer]:
+            - /url: https://quiet.com
+            - img "quiet logo" [ref=e1845]
+          - link "chaidiscovery logo" [ref=e1846] [cursor=pointer]:
+            - /url: https://www.chaidiscovery.com
+            - img "chaidiscovery logo" [ref=e1847]
+  - contentinfo [ref=e1848]:
+    - generic [ref=e1853]:
+      - generic [ref=e1854]:
+        - generic [ref=e1856]:
+          - figure [ref=e1857]:
+            - generic [ref=e1858]:
+              - blockquote [ref=e1860]:
+                - paragraph [ref=e1861]: “It’s the only platform we’ve used that doesn’t get in your way. We run GPU workloads, test Kata-based runtimes, and even used it to get us SOC 2 compliant. Everything just works.”
+              - generic [ref=e1863]:
+                - generic [ref=e1865]:
+                  - img "Niranjan Ravichandra – profile image"
+                - generic [ref=e1866]:
+                  - generic [ref=e1867]: Niranjan Ravichandra
+                  - generic [ref=e1868]: Co-Founder and CTO @ Cedana
+          - generic [ref=e1869]:
+            - generic [ref=e1870]: Cedana deploy customer envs in one click, test secure runtime workloads, avoid vendor lock-in, and ship infrastructure tools faster.
+            - link "Read the case study" [ref=e1872] [cursor=pointer]:
+              - /url: /blog/how-cedana-uses-northflank-to-deploy-workloads-onto-kubernetes-with-microvms-and-secure-runtimes
+        - generic [ref=e1874]:
+          - link "All systems operational" [ref=e1876] [cursor=pointer]:
+            - /url: https://status.northflank.com
+            - paragraph [ref=e1878]: All systems operational
+          - paragraph [ref=e1879]: © 2026 Northflank Ltd. All rights reserved.
+      - generic [ref=e1880]:
+        - navigation [ref=e1881]:
+          - heading "Full navigation" [level=2] [ref=e1882]
+          - generic [ref=e1884]:
+            - paragraph [ref=e1885]: Features
+            - list [ref=e1886]:
+              - listitem [ref=e1887]:
+                - link "Deployments" [ref=e1888] [cursor=pointer]:
+                  - /url: /product/deployments
+              - listitem [ref=e1889]:
+                - link "Preview environments" [ref=e1890] [cursor=pointer]:
+                  - /url: /product/preview-environments
+              - listitem [ref=e1891]:
+                - link "Sandboxes" [ref=e1892] [cursor=pointer]:
+                  - /url: /product/sandboxes
+              - listitem [ref=e1893]:
+                - link "GPU workloads" [ref=e1894] [cursor=pointer]:
+                  - /url: /product/gpu-paas
+              - listitem [ref=e1895]:
+                - link "Bring your own cloud" [ref=e1896] [cursor=pointer]:
+                  - /url: /product/bring-your-own-cloud
+              - listitem [ref=e1897]:
+                - link "Internal developer platform" [ref=e1898] [cursor=pointer]:
+                  - /url: /product/idp
+              - listitem [ref=e1899]:
+                - link "K8s orchestration" [ref=e1900] [cursor=pointer]:
+                  - /url: /product/app-platform
+              - listitem [ref=e1901]:
+                - link "Customer VPC deployment" [ref=e1902] [cursor=pointer]:
+                  - /url: /product/customer-vpc-deployments
+              - listitem [ref=e1903]:
+                - link "Core platform" [ref=e1904] [cursor=pointer]:
+                  - /url: /features/platform
+              - listitem [ref=e1905]:
+                - link "Infrastructure layer" [ref=e1906] [cursor=pointer]:
+                  - /url: /features/infrastructure-layer
+              - listitem [ref=e1907]:
+                - link "Application layer" [ref=e1908] [cursor=pointer]:
+                  - /url: /features/application-layer
+              - listitem [ref=e1909]:
+                - link "Release layer" [ref=e1910] [cursor=pointer]:
+                  - /url: /features/release-layer
+              - listitem [ref=e1911]:
+                - link "Northflank Cloud" [ref=e1912] [cursor=pointer]:
+                  - /url: /features/managed-cloud
+              - listitem [ref=e1913]:
+                - link "Deploy in your own cloud" [ref=e1914] [cursor=pointer]:
+                  - /url: /features/bring-your-own-cloud
+          - generic [ref=e1915]:
+            - generic [ref=e1916]:
+              - paragraph [ref=e1917]: Product
+              - list [ref=e1918]:
+                - listitem [ref=e1919]:
+                  - link "Pricing" [ref=e1920] [cursor=pointer]:
+                    - /url: /pricing
+                - listitem [ref=e1921]:
+                  - link "Calculator" [ref=e1922] [cursor=pointer]:
+                    - /url: /pricing#calculator
+                - listitem [ref=e1923]:
+                  - link "Schedule a demo" [ref=e1924] [cursor=pointer]:
+                    - /url: https://cal.com/team/northflank/northflank-demo?duration=30
+                - listitem [ref=e1925]:
+                  - link "Log in" [ref=e1926] [cursor=pointer]:
+                    - /url: https://app.northflank.com/login
+                - listitem [ref=e1927]:
+                  - link "Sign up" [ref=e1928] [cursor=pointer]:
+                    - /url: https://app.northflank.com/signup
+            - generic [ref=e1929]:
+              - paragraph [ref=e1930]: Cloud providers
+              - list [ref=e1931]:
+                - listitem [ref=e1932]:
+                  - link "Google Cloud Platform on Northflank" [ref=e1933] [cursor=pointer]:
+                    - /url: /cloud/gcp
+                - listitem [ref=e1934]:
+                  - link "Amazon Web Services on Northflank" [ref=e1935] [cursor=pointer]:
+                    - /url: /cloud/aws
+                - listitem [ref=e1936]:
+                  - link "Microsoft Azure on Northflank" [ref=e1937] [cursor=pointer]:
+                    - /url: /cloud/azure
+                - listitem [ref=e1938]:
+                  - link "Civo on Northflank" [ref=e1939] [cursor=pointer]:
+                    - /url: /cloud/civo
+                - listitem [ref=e1940]:
+                  - link "Oracle on Northflank" [ref=e1941] [cursor=pointer]:
+                    - /url: /cloud/oci
+                - listitem [ref=e1942]:
+                  - link "CoreWeave on Northflank" [ref=e1943] [cursor=pointer]:
+                    - /url: /cloud/coreweave
+                - listitem [ref=e1944]:
+                  - link "GPUs on Northflank" [ref=e1945] [cursor=pointer]:
+                    - /url: /cloud/gpus
+          - generic [ref=e1947]:
+            - paragraph [ref=e1948]: Resources
+            - list [ref=e1949]:
+              - listitem [ref=e1950]:
+                - link "Changelog" [ref=e1951] [cursor=pointer]:
+                  - /url: /changelog
+              - listitem [ref=e1952]:
+                - link "Blog" [ref=e1953] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e1954]:
+                - link "Guides & tutorials" [ref=e1955] [cursor=pointer]:
+                  - /url: /guides
+              - listitem [ref=e1956]:
+                - link "Stack templates" [ref=e1957] [cursor=pointer]:
+                  - /url: /stacks
+              - listitem [ref=e1958]:
+                - link "Status" [ref=e1959] [cursor=pointer]:
+                  - /url: https://status.northflank.com
+              - listitem [ref=e1960]:
+                - link "Security" [ref=e1961] [cursor=pointer]:
+                  - /url: /security
+              - listitem [ref=e1962]:
+                - link "Documentation" [ref=e1963] [cursor=pointer]:
+                  - /url: https://northflank.com/docs/v1/application/overview
+              - listitem [ref=e1964]:
+                - link "API reference" [ref=e1965] [cursor=pointer]:
+                  - /url: https://northflank.com/docs/v1/api/introduction
+              - listitem [ref=e1966]:
+                - link "Request GPUs" [ref=e1967] [cursor=pointer]:
+                  - /url: /request/gpu
+          - generic [ref=e1968]:
+            - generic [ref=e1969]:
+              - paragraph [ref=e1970]: Company
+              - list [ref=e1971]:
+                - listitem [ref=e1972]:
+                  - link "About Northflank" [ref=e1973] [cursor=pointer]:
+                    - /url: /about
+                - listitem [ref=e1974]:
+                  - link "Careers" [ref=e1975] [cursor=pointer]:
+                    - /url: /careers
+                - listitem [ref=e1976]:
+                  - link "Terms of Service" [ref=e1977] [cursor=pointer]:
+                    - /url: /legal/terms
+                - listitem [ref=e1978]:
+                  - link "Privacy policy" [ref=e1979] [cursor=pointer]:
+                    - /url: /legal/privacy
+                - listitem [ref=e1980]:
+                  - link "Contact us" [ref=e1981] [cursor=pointer]:
+                    - /url: /contact
+            - generic [ref=e1982]:
+              - paragraph [ref=e1983]: Registered office
+              - list [ref=e1984]:
+                - listitem [ref=e1985]:
+                  - paragraph [ref=e1987]:
+                    - text: Company 11918540
+                    - text: 20-22 Wenlock Road,
+                    - text: London, England, N1 7GU
+            - generic [ref=e1988]:
+              - paragraph [ref=e1989]: Get in touch
+              - list [ref=e1990]:
+                - listitem [ref=e1991]:
+                  - link "Email contact@northflank.com" [ref=e1992] [cursor=pointer]:
+                    - /url: mailto:contact@northflank.com
+                    - generic [ref=e1993]:
+                      - img "Email" [ref=e1995]
+                      - paragraph [ref=e1997]: contact@northflank.com
+                - listitem [ref=e1998]:
+                  - link "LinkedIn Northflank" [ref=e1999] [cursor=pointer]:
+                    - /url: https://www.linkedin.com/company/northflank
+                    - generic [ref=e2000]:
+                      - img "LinkedIn" [ref=e2002]
+                      - paragraph [ref=e2004]: Northflank
+                - listitem [ref=e2005]:
+                  - link "X @northflank" [ref=e2006] [cursor=pointer]:
+                    - /url: https://x.com/northflank
+                    - generic [ref=e2007]:
+                      - img "X" [ref=e2009]
+                      - paragraph [ref=e2011]: "@northflank"
+        - link "Northflank is SOC 2 Type 2 compliant" [ref=e2013] [cursor=pointer]:
+          - /url: https://trust.northflank.com
+          - img "Northflank is SOC 2 Type 2 compliant" [ref=e2014]

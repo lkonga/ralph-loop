@@ -1,0 +1,12 @@
+[     107ms] [ERROR] Failed to load resource: net::ERR_PROXY_CONNECTION_FAILED @ https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap:0
+[     309ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://g5kc.tail1e9037.ts.net:8443/api/dashboard/overview:0
+[     314ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://g5kc.tail1e9037.ts.net:8443/api/request-logs?limit=25&offset=0:0
+[     315ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://g5kc.tail1e9037.ts.net:8443/api/settings:0
+[     315ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://g5kc.tail1e9037.ts.net:8443/api/request-logs/options:0
+[     423ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl.qjz9zk/9p2vKq) %o @ https://g5kc.tail1e9037.ts.net:8443/dashboard:0
+[  130639ms] [ERROR] Failed to load resource: net::ERR_PROXY_CONNECTION_FAILED @ https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap:0
+[  130746ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://g5kc.tail1e9037.ts.net:8443/api/dashboard/overview:0
+[  130752ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://g5kc.tail1e9037.ts.net:8443/api/request-logs?limit=25&offset=0:0
+[  130753ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://g5kc.tail1e9037.ts.net:8443/api/request-logs/options:0
+[  130753ms] [ERROR] Failed to load resource: the server responded with a status of 401 () @ https://g5kc.tail1e9037.ts.net:8443/api/settings:0
+[  130887ms] [VERBOSE] [DOM] Password forms should have (optionally hidden) username fields for accessibility: (More info: https://goo.gl.qjz9zk/9p2vKq) %o @ https://g5kc.tail1e9037.ts.net:8443/dashboard:0
