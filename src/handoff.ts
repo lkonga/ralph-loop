@@ -166,11 +166,15 @@ function buildChatOpenOptions(prompt: string, _opts: HandoffOptions, summary?: s
 
 async function applyModelIfNeeded(opts: HandoffOptions): Promise<void> {
 	if (!opts.model) return;
-	const models = await vscode.lm.selectChatModels({ id: opts.model, vendor: "copilot" });
-	const model = models[0];
-	if (model) {
-		await vscode.commands.executeCommand("workbench.action.chat.changeModel",
-			{ id: model.id, vendor: model.vendor, family: model.family });
+	try {
+		const models = await vscode.lm.selectChatModels({ id: opts.model, vendor: "copilot" });
+		const model = models[0];
+		if (model) {
+			await vscode.commands.executeCommand("workbench.action.chat.changeModel",
+				{ id: model.id, vendor: model.vendor, family: model.family });
+		}
+	} catch {
+		// model not available — non-fatal, proceed without switching
 	}
 }
 
