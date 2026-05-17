@@ -187,7 +187,8 @@ const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) 
 			await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "agent" });
 			await delay(300);
 			await applyModelIfNeeded(opts);
-			await vscode.commands.executeCommand("workbench.action.chat.openEditSession", { query: prompt, mode: "agent" });
+			// ⚠️ CRITICAL: openEditSession takes a plain string, NOT { query: prompt }
+			await vscode.commands.executeCommand("workbench.action.chat.openEditSession", prompt);
 			return;
 		} catch { /* fall through */ }
 
@@ -196,18 +197,17 @@ const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) 
 			await vscode.commands.executeCommand("workbench.action.chat.newEditSession");
 			await delay(500);
 			await applyModelIfNeeded(opts);
-			await vscode.commands.executeCommand("workbench.action.chat.openEditSession", { query: prompt, mode: "agent" });
+			await vscode.commands.executeCommand("workbench.action.chat.openEditSession", prompt);
 			return;
 		} catch { /* fall through */ }
 
 		try {
-			// Attempt 3: newChat as last resort (old strategy 7 path)
+			// Attempt 3: newChat + open + clipboard as last resort
 			await vscode.commands.executeCommand("workbench.action.chat.newChat");
 			await delay(800);
-			await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "ask" });
 			await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "agent" });
 			await applyModelIfNeeded(opts);
-			await vscode.commands.executeCommand("workbench.action.chat.open", { query: prompt, mode: "agent" });
+			await vscode.commands.executeCommand("workbench.action.chat.open", prompt);
 		} catch { /* exhausted all options */ }
 	},
 	13: async (prompt, opts) => {
