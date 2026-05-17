@@ -182,6 +182,8 @@ const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) 
 	7: async (prompt, opts) => {
 		// Fallback ladder: prefer newChat (sidebar), fall back to newEditSession (inline).
 		// newEditSession opens Ctrl+I inline mode which is wrong for sidebar usage.
+		// NOTE: do NOT call applyModelIfNeeded here — model switching corrupts chat state
+		// and was the root cause of all silent failures.
 		await new Promise(r => setTimeout(r, 2500)); // brief pause for "Done" to flush
 
 		try {
@@ -190,7 +192,6 @@ const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) 
 			await delay(500);
 			await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "ask" });
 			await vscode.commands.executeCommand("workbench.action.chat.toggleAgentMode", { modeId: "agent" });
-			await applyModelIfNeeded(opts);
 			await vscode.commands.executeCommand("workbench.action.chat.open", { query: prompt, mode: "agent" });
 			return;
 		} catch { /* fall through */ }
@@ -199,7 +200,6 @@ const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) 
 			// Attempt 2: newChat + open (simpler, no toggle)
 			await vscode.commands.executeCommand("workbench.action.chat.newChat");
 			await delay(500);
-			await applyModelIfNeeded(opts);
 			await vscode.commands.executeCommand("workbench.action.chat.open", { query: prompt, mode: "agent" });
 			return;
 		} catch { /* fall through */ }
@@ -208,7 +208,6 @@ const advancedStrategies: Record<number, (prompt: string, opts: HandoffOptions) 
 			// Attempt 3: newEditSession as last resort (inline chat)
 			await vscode.commands.executeCommand("workbench.action.chat.newEditSession");
 			await delay(500);
-			await applyModelIfNeeded(opts);
 			await vscode.commands.executeCommand("workbench.action.chat.openEditSession", prompt);
 		} catch { /* exhausted all options */ }
 
